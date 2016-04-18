@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact\Message;
 
-use Proengeno\Edifact\Message\SegmentRegister;
+use Proengeno\Edifact\EdifactRegistrar;
 use Proengeno\Edifact\Interfaces\SegInterface;
 use Proengeno\Edifact\Validation\MessageValidator;
 use Proengeno\Edifact\Interfaces\EdifactMessageInterface;
@@ -77,7 +77,7 @@ abstract class MessageCore implements EdifactMessageInterface
         }
 
         array_walk_recursive($arrayPointer, function($segment) use ($segmentSearch, &$results) {
-            if (SegmentRegister::getClassname($segmentSearch) == get_class($segment)) {
+            if ($segment->name() == strtoupper($segmentSearch)) {
                 $results[] = $segment;
             }
         });
@@ -125,7 +125,7 @@ abstract class MessageCore implements EdifactMessageInterface
 
     private static function getSegmentObject($segLine, $delimiter)
     {
-        return call_user_func_array(SegmentRegister::getClassname(self::getSegname($segLine)) . '::fromSegLine', [$segLine, $delimiter]);
+        return call_user_func_array(EdifactRegistrar::getSegment(self::getSegname($segLine)) . '::fromSegLine', [$segLine, $delimiter]);
     }
 
     private static function getSegname($segLine) 

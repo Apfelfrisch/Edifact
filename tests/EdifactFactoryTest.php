@@ -1,8 +1,8 @@
 <?php
 
 use Proengeno\Edifact\EdifactFactory;
+use Proengeno\Edifact\Exceptions\EdifactException;
 use Proengeno\Edifact\Message\Messages\Orders_17103;
-use Proengeno\Edifact\Exceptions\EdifactParseException;
 
 class EdifactFactoryTest extends TestCase 
 {
@@ -23,7 +23,7 @@ class EdifactFactoryTest extends TestCase
         $referenz = '11111';
         $string = "UNH+O160482A7C2+$messageType:D:09B:UN:1.1e'RFF+Z13:$referenz'";
 
-        $this->expectException(EdifactParseException::class);
+        $this->expectException(EdifactException::class);
 
         $edifactObject = EdifactFactory::fromString($string);
     }
@@ -33,7 +33,7 @@ class EdifactFactoryTest extends TestCase
     {
         $string = "UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'RFF+Z13:'";
 
-        $this->expectException(EdifactParseException::class);
+        $this->expectException(EdifactException::class);
 
         $edifactObject = EdifactFactory::fromString($string);
     }
@@ -43,7 +43,7 @@ class EdifactFactoryTest extends TestCase
     {
         $string = "UNH+O160482A7C2+:D:09B:UN:1.1e'RFF+Z13:17103'";
 
-        $this->expectException(EdifactParseException::class);
+        $this->expectException(EdifactException::class);
 
         $edifactObject = EdifactFactory::fromString($string);
     }

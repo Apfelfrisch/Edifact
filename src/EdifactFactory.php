@@ -2,16 +2,10 @@
 
 namespace Proengeno\Edifact;
 
-use Proengeno\Edifact\Exceptions\EdifactParseException;
+use Proengeno\Edifact\Exceptions\EdifactException;
 
 class EdifactFactory
 {
-    public static $mappings = [
-        'orders_17201' => Message\Messages\Orders_17201::class,
-        'orders_17103' => Message\Messages\Orders_17103::class,
-        'utilmd_11019' => Message\Messages\Utilmd_11019::class,
-    ];
-
     public static function fromString($edifactString)
     {
         $className = self::getClassname($edifactString);
@@ -21,22 +15,17 @@ class EdifactFactory
 
     private static function getClassname($edifactString) 
     {
-        $messageType = self::getMessageType($edifactString);
-        $typeReferenz = self::getTypeReferenz($edifactString);
-
-        $mapKey = strtolower($messageType . '_' . $typeReferenz);
-
-        if (isset(self::$mappings[$mapKey])) {
-            return self::$mappings[$mapKey];
+        $classname = self::getMessageType($edifactString);
+        if ($typeReferenz = self::getTypeReferenz($edifactString) ) {
+            $classname .= '_' . $typeReferenz;
         }
-
-        throw EdifactParseException::messageNotFound($messageType, $typeReferenz);
+        return EdifactRegistrar::getMessage($classname);
     }
 
     private static function getMessageType($edifactString)
     {
         if (!preg_match('/UNH\+(.*?)\+(.*?)\:/', $edifactString, $matches) || empty($matches[2])) {
-            throw EdifactParseException::couldNotFindMassageType();
+            throw EdifactException::massageTypeNotFound();
         }
 
         return $matches[2];
@@ -45,7 +34,7 @@ class EdifactFactory
     private static function getTypeReferenz($edifactString)
     {
         if (!preg_match('/RFF\+Z13\:(.*?)\'/', $edifactString, $matches) || empty($matches[1])) {
-            throw EdifactParseException::couldNotFindMassageReference();
+            throw EdifactException::referenceNotFound();
         }
 
         return $matches[1];
