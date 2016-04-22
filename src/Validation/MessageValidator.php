@@ -9,7 +9,8 @@ use Proengeno\Edifact\Interfaces\SegValidatorInterface;
 use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 use Proengeno\Edifact\Interfaces\EdifactMessageInterface;
 
-class MessageValidator implements MessageValidatorInterface {
+class MessageValidator implements MessageValidatorInterface 
+{
     private $segValidator;
     private $trueLinecount = 1;
     
@@ -41,7 +42,7 @@ class MessageValidator implements MessageValidatorInterface {
             }
 
             $this->validateSegment($lines[$lineCount]);
-            $this->vaildateLine(@$lines[$lineCount], @$blueprint[$blueprintCount]);
+            $this->validateAgainstBlueprint(@$lines[$lineCount], @$blueprint[$blueprintCount]);
 
             if ($this->segmentHasLoop($blueprint[$blueprintCount])) {
                 $this->reLoop($lines, $blueprint, $lineCount, $blueprintCount);
@@ -72,16 +73,37 @@ class MessageValidator implements MessageValidatorInterface {
         }
     }
     
-    private function vaildateLine($line, $blueprint)
+    private function validateAgainstBlueprint($segment, $blueprint)
     {
-        if ($line == null) {
+        if ($segment == null) {
             throw new Exception('Unerwartetes Edifact-Ende.');
         }
-        if ($line->name() != $blueprint['name']) {
+        $this->validateBlueprintNames($segment, $blueprint);
+        $this->validateBlueprintTemplates($segment, $blueprint);
+    }
+
+    private function validateBlueprintNames($segment, $blueprint)
+    {
+        if ($segment->name() != $blueprint['name']) {
             if (isset($blueprint['name'])) {
-                throw new Exception('Zeile ' . $this->trueLinecount . ': Unerwartetes Segement ' . @$line->name() . ', ' . $blueprint['name'] . ' erwartet.');
+                throw new Exception('Zeile ' . $this->trueLinecount . ': Unerwartetes Segement ' . @$segment->name() . ', ' . $blueprint['name'] . ' erwartet.');
             }
-            throw new Exception('Zeile ' . $this->trueLinecount . ': Unerwartetes Segement ' . @$line->name() . ', Ende erwartet.');
+            throw new Exception('Zeile ' . $this->trueLinecount . ': Unerwartetes Segement ' . @$segment->name() . ', Ende erwartet.');
+        }
+    }
+
+    private function validateBlueprintTemplates($segment, array $blueprint)
+    {
+        if (isset($blueprint['templates'])) {
+            foreach ($blueprint['templates'] as $segmendMethod => $suggestions) {
+                if (!in_array($segment->$segmendMethod(), $suggestions)) {
+                    $message = 'Zeile ' . $this->trueLinecount
+                        . ', Segment ' . $segment->name()
+                        . ', enthält unerlaubten Inhalt: "' . $segment->$segmendMethod() . '"'
+                        . '. Erlaubt ist ("' . implode('" | "', $suggestions). '")';
+                    throw new Exception($message);
+                }
+            }
         }
     }
     

@@ -13,8 +13,8 @@
     "autoload-dev": {
         "classmap": [
             "tests/TestCase.php",
-            "tests/_Dummies/SegmentDummy.php",
-            "tests/_Dummies/MessageDummy.php"
+            "tests/Fixtures/Segment.php",
+            "tests/Fixtures/Message.php"
         ]   
     }
 }

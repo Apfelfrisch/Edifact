@@ -8,7 +8,7 @@ class EdifactRegistrarTest extends TestCase
     /** @test */
     public function it_can_regsiter_resolve_a_new_segment_class_path()
     {
-        $pathToSegementClass = SegmentDummy::class;
+        $pathToSegementClass = Segment::class;
 
         EdifactRegistrar::addSegement('ZZZ', $pathToSegementClass);
 
@@ -20,7 +20,7 @@ class EdifactRegistrarTest extends TestCase
     /** @test */
     public function it_can_regsiter_resolve_a_new_message_class_path()
     {
-        $pathToMessageClass = MessageDummy::class;
+        $pathToMessageClass = Message::class;
 
         EdifactRegistrar::addMessage('UTILMD', $pathToMessageClass);
 
@@ -32,7 +32,7 @@ class EdifactRegistrarTest extends TestCase
     /** @test */
     public function it_throws_an_exception_if_the_class_is_not_registered()
     {
-        $pathToSegementClass = SegmentDummy::class;
+        $pathToSegementClass = Segment::class;
         
         $this->expectException(EdifactException::class);
         $this->assertEquals($pathToSegementClass, EdifactRegistrar::getSegment('ZZZ'));

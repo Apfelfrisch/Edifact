@@ -9,13 +9,13 @@ class MessageCoreTest extends TestCase
     /** @test */
     public function it_instanciates_from_an_edifact_string()
     {
-        $messageCore = MessageDummy::fromString("UNA:+.? 'UNH'BGM'UNS'UNT'UNZ'");
+        $messageCore = Message::fromString("UNA:+.? 'UNH'BGM'UNS'UNT'UNZ'");
     }
 
     /** @test */
     public function it_can_search_the_whole_message_segments_by_name()
     {
-        $messageCore = MessageDummy::fromString("UNA:+.? 'UNH'BGM'UNS'UNT'UNZ'");
+        $messageCore = Message::fromString("UNA:+.? 'UNH'BGM'UNS'UNT'UNZ'");
 
         $this->assertCount(1, $messageCore->findSegments('UNH'));
     }
@@ -23,7 +23,7 @@ class MessageCoreTest extends TestCase
     /** @test */
     public function it_can_search_the_a_specific_sub_message_segments_by_name()
     {
-        $messageCore = MessageDummy::fromString("UNA:+.? 'UNH'BGM'UNS'UNT'UNZ'");
+        $messageCore = Message::fromString("UNA:+.? 'UNH'BGM'UNS'UNT'UNZ'");
 
         $this->assertCount(1, $messageCore->findSegments('UNH', 0));
     }
@@ -31,7 +31,7 @@ class MessageCoreTest extends TestCase
     /** @test */
     public function it_can_search_the_a_specific_sub_message_body_segments_by_name()
     {
-        $messageCore = MessageDummy::fromString("UNA:+.? 'UNH'BGM'UNS'UNT'UNZ'");
+        $messageCore = Message::fromString("UNA:+.? 'UNH'BGM'UNS'UNT'UNZ'");
 
         $this->assertCount(1, $messageCore->findSegments('BGM', 0, 0));
     }
@@ -39,7 +39,7 @@ class MessageCoreTest extends TestCase
     /** @test */
     public function it_can_search_the_a_specific_message_and_returns_an_empty_array_if_nothing_was_found()
     {
-        $messageCore = MessageDummy::fromString("UNA:+.? 'UNH'BGM'UNS'UNT'UNZ'");
+        $messageCore = Message::fromString("UNA:+.? 'UNH'BGM'UNS'UNT'UNZ'");
 
         $this->assertCount(0, $messageCore->findSegments('AGR'));
     }
@@ -51,7 +51,7 @@ class MessageCoreTest extends TestCase
             $validator->shouldReceive('validate')->once();
         });
 
-        $messageCore = MessageDummy::fromString("UNA:+.? 'UNH'BGM'UNS'UNT'UNZ'", $validator);
+        $messageCore = Message::fromString("UNA:+.? 'UNH'BGM'UNS'UNT'UNZ'", $validator);
         $messageCore->validate();
     }
 
@@ -59,7 +59,7 @@ class MessageCoreTest extends TestCase
     public function it_can_cast_itself_to_a_string()
     {
         $edifactString = "UNA:+.? 'UNH'BGM'UNS'UNT'UNZ'";
-        $messageCore = MessageDummy::fromString($edifactString);
+        $messageCore = Message::fromString($edifactString);
 
         $this->assertEquals($edifactString, (string)$messageCore);
     }

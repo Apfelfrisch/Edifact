@@ -11,54 +11,54 @@ class SegFrameworkTest extends TestCase
 {
     protected function setUp()
     {
-        SegmentDummy::setDelimiter(null);
-        SegmentDummy::setValidator(null);
+        Segment::setDelimiter(null);
+        Segment::setValidator(null);
     }
 
     /** @test */
     public function it_can_set_a_costum_delimter()
     {
         $customDelimiter = new Delimiter;
-        $segmentDummy = SegmentDummy::fromAttributes('A');
+        $segment = Segment::fromAttributes('A');
 
-        $segmentDummy->setDelimiter($customDelimiter);
+        $segment->setDelimiter($customDelimiter);
 
-        $this->assertEquals($customDelimiter, $segmentDummy->getDelimiter());
+        $this->assertEquals($customDelimiter, $segment->getDelimiter());
     }
 
     /** @test */
     public function it_gives_a_standard_delimiter_if_none_was_set()
     {
-        $segmentDummy = SegmentDummy::fromAttributes('A');
+        $segment = Segment::fromAttributes('A');
 
-        $this->assertInstanceOf(Delimiter::class, $segmentDummy->getDelimiter());
+        $this->assertInstanceOf(Delimiter::class, $segment->getDelimiter());
     }
 
     /** @test */
     public function it_can_set_a_costum_validator()
     {
         $customValidator = new SegmentValidator;
-        $segmentDummy = SegmentDummy::fromAttributes('A');
+        $segment = Segment::fromAttributes('A');
 
-        SegmentDummy::setValidator($customValidator);
+        Segment::setValidator($customValidator);
 
-        $this->assertEquals($customValidator, $segmentDummy->getValidator());
+        $this->assertEquals($customValidator, $segment->getValidator());
     }
 
     /** @test */
     public function it_gives_a_standard_validator_if_none_was_set()
     {
-        $segmentDummy = SegmentDummy::fromAttributes('A');
+        $segment = Segment::fromAttributes('A');
 
-        $this->assertInstanceOf(SegmentValidator::class, $segmentDummy->getValidator());
+        $this->assertInstanceOf(SegmentValidator::class, $segment->getValidator());
     }
 
     /** @test */
     public function it_gives_its_segment_name()
     {
-        $segmentDummy = SegmentDummy::fromSegLine('A');
+        $segment = Segment::fromSegLine('A');
 
-        $this->assertEquals('A', $segmentDummy->name());
+        $this->assertEquals('A', $segment->name());
     }
 
     /** @test */
@@ -67,11 +67,11 @@ class SegFrameworkTest extends TestCase
         $customValidator = m::mock(SegValidatorInterface::class, function($customValidator) {
             $customValidator->shouldReceive('validate')->once();
         });
-        $segmentDummy = SegmentDummy::fromSegLine('A');
+        $segment = Segment::fromSegLine('A');
 
-        SegmentDummy::setValidator($customValidator);
+        Segment::setValidator($customValidator);
 
-        $segmentDummy->validate();
+        $segment->validate();
     }
 
     /** @test */
@@ -80,9 +80,9 @@ class SegFrameworkTest extends TestCase
         $givenString = 'A+B+1:2:3:4:5+D+E';
         $expectedString = $givenString;
 
-        $segmentDummy = SegmentDummy::fromSegLine($givenString);
+        $segment = Segment::fromSegLine($givenString);
 
-        $this->assertEquals($expectedString, (string)$segmentDummy);
+        $this->assertEquals($expectedString, (string)$segment);
     }
 
     /** @test */
@@ -91,9 +91,9 @@ class SegFrameworkTest extends TestCase
         $givenString = 'A+B+1:2:::+D++';
         $expectedString = 'A+B+1:2+D';
 
-        $segmentDummy = SegmentDummy::fromSegLine($givenString);
+        $segment = Segment::fromSegLine($givenString);
 
-        $this->assertEquals($expectedString, (string)$segmentDummy);
+        $this->assertEquals($expectedString, (string)$segment);
     }
 
 }

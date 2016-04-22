@@ -2,7 +2,7 @@
 
 use Proengeno\Edifact\Message\Segments\SegFramework;
 
-class SegmentDummy extends SegFramework
+class Segment extends SegFramework
 {
     protected static $validationBlueprint = [
         'A' => ['A' => 'M|an|3'],
