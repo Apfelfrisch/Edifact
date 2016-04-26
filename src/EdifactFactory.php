@@ -6,37 +6,40 @@ use Proengeno\Edifact\Exceptions\EdifactException;
 
 class EdifactFactory
 {
-    public static function fromString($edifactString)
+    public static function fromStream(EdifactFile $stream)
     {
-        $className = self::getClassname($edifactString);
+        $className = self::getClassname($stream);
 
-        return call_user_func_array("$className::fromString", [$edifactString]);
+        return new $className($stream);
     }
 
-    private static function getClassname($edifactString) 
+    private static function getClassname($edifactStream) 
     {
-        $classname = self::getMessageType($edifactString);
-        if ($typeReferenz = self::getTypeReferenz($edifactString) ) {
+        $classname = self::getMessageType($edifactStream);
+        if ($typeReferenz = self::getTypeReferenz($edifactStream) ) {
             $classname .= '_' . $typeReferenz;
         }
         return EdifactRegistrar::getMessage($classname);
     }
 
-    private static function getMessageType($edifactString)
+    private static function getMessageType($edifactStream)
     {
-        if (!preg_match('/UNH\+(.*?)\+(.*?)\:/', $edifactString, $matches) || empty($matches[2])) {
-            throw EdifactException::massageTypeNotFound();
+        while ($segment = $edifactStream->streamGetSegment()) {
+            if (preg_match('/UNH\+(.*?)\+(.*?)\:/', $segment, $matches) || empty($matches[2])) {
+                return $matches[2];
+            }
         }
 
-        return $matches[2];
+        throw EdifactException::massageTypeNotFound();
     }
 
-    private static function getTypeReferenz($edifactString)
+    private static function getTypeReferenz($edifactStream)
     {
-        if (!preg_match('/RFF\+Z13\:(.*?)\'/', $edifactString, $matches) || empty($matches[1])) {
-            throw EdifactException::referenceNotFound();
+        while ($segment = $edifactStream->streamGetSegment()) {
+            if (preg_match('/RFF\+Z13\:(.*?)\'/', $edifactStream, $matches) || empty($matches[1])) {
+                return $matches[1];
+            }
         }
-
-        return $matches[1];
+        throw EdifactException::referenceNotFound();
     }
 }

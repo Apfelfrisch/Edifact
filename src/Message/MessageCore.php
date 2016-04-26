@@ -2,58 +2,64 @@
 
 namespace Proengeno\Edifact\Message;
 
+use Proengeno\Edifact\EdifactFile;
 use Proengeno\Edifact\EdifactRegistrar;
-use Proengeno\Edifact\Interfaces\SegInterface;
+use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Validation\MessageValidator;
 use Proengeno\Edifact\Interfaces\EdifactMessageInterface;
 use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 
 abstract class MessageCore implements EdifactMessageInterface
 {
-    protected static $firstBodySegment;
     protected static $validationBlueprint;
 
-    private $segments;
+    private $file;
+    private $delimter;
     private $validator;
     
-    private function __construct(array $segments, $validator)
+    public function __construct(EdifactFile $file, MessageValidatorInterface $validator = null)
     {
-        $this->segments = $segments;
-        $this->validator = $validator;
+        $this->file = $file;
+        $this->validator = $validator ?: new MessageValidator;
     }
     
-    public static function fromString($string, MessageValidatorInterface $validator = null)
+    public static function fromString($string)
     {
-        $delimiter = Delimiter::setFromEdifact($string);
+        $file = new EdifactFile('php://memory', 'wb+');
+        $file->write($string);
+        $file->rewind();
 
-        $nestedCounter = -1;
-        $itemCount = -1;
-        foreach ($delimiter->explodeMessage($string) as $segLine) {
-            $segment = self::getSegmentObject($segLine, $delimiter);
-            if (self::isNewNestedMessage($segment)) {
-                $nestedCounter++;
-                $itemCount = -1;
-            }
-            $itemCount = self::countItem($segment, $itemCount);
+        return new static($file);
+    }
+    
+    public function __toString()
+    {
+        return $this->file->__toString();
+    }
+    
+    public function getNextSegment()
+    {
+        $segment = $this->file->streamGetSegment();
 
-            self::merge($segments, $segment, $nestedCounter, $itemCount);
+        if ($segment !== false) {
+            return $this->getSegmentObject($segment);
         }
-
-        return new static($segments, $validator ?: new MessageValidator);
+        return false;
     }
     
+    public function getPointerPosition()
+    {
+        return $this->file->tell();
+    }
+
+    public function setPointerPosition($position)
+    {
+        return $this->file->seek($position);
+    }
+
     public function getSegments()
     {
-        return $this->segments;
-    }
-
-    public function getFlatSegments(array $array) {
-        $flattendArray = [];
-        array_walk_recursive($array, function($item) use (&$flattendArray) { 
-            $flattendArray[] = $item; 
-        });
-
-        return $flattendArray;
+        //return $this->file;
     }
 
     public function getValidationBlueprint()
@@ -63,26 +69,7 @@ abstract class MessageCore implements EdifactMessageInterface
 
     public function findSegments($segmentSearch, $messageCount = null, $bodyCount = null)
     {
-        $results = [];
-        $arrayPointer = $this->segments;
-
-        if ($messageCount !== null && $bodyCount !== null) {
-            if (isset($this->segments['messages'][$messageCount]['body'][$bodyCount])) {
-                $arrayPointer = $this->segments['messages'][$messageCount]['body'][$bodyCount];
-            }
-        } elseif ($messageCount !== null) {
-            if (isset($this->segments['messages'][$messageCount])) {
-                $arrayPointer = $this->segments['messages'][$messageCount];
-            }
-        }
-
-        array_walk_recursive($arrayPointer, function($segment) use ($segmentSearch, &$results) {
-            if ($segment->name() == strtoupper($segmentSearch)) {
-                $results[] = $segment;
-            }
-        });
-
-        return $results;
+        //
     }
 
     public function validate()
@@ -92,57 +79,21 @@ abstract class MessageCore implements EdifactMessageInterface
         return $this;
     }
 
-    public function __toString()
+    public function getDelimter()
     {
-        return implode("'", $this->getFlatSegments($this->segments)) . "'";
+        if ($this->delimter !== null) {
+            $this->delimter = new Delimiter;
+        }
+        return $this->delimter;
     }
 
-    private static function merge(&$segments, $segment, $nestedCounter, &$itemCount)
+    private function getSegmentObject($segLine)
     {
-        if ($nestedCounter < 0) {
-            $segments['messageHeader'][] = $segment;
-            return;
-        }
-
-        if ($segment->name() == 'UNZ') {
-            $segments['messageFooter'][] = $segment;
-            return;
-        }
-
-        if ($segment->name() == 'UNT') {
-            $segments['messages'][$nestedCounter]['bodyFooter'][] = $segment;
-            return;
-        }
-
-        if ($itemCount < 0) {
-            $segments['messages'][$nestedCounter]['bodyHeader'][] = $segment;
-            return;
-        }
-
-        $segments['messages'][$nestedCounter]['body'][$itemCount][] = $segment;
+        return call_user_func_array(EdifactRegistrar::getSegment($this->getSegname($segLine)) . '::fromSegLine', [$segLine, $this->getDelimter()]);
     }
 
-
-    private static function getSegmentObject($segLine, $delimiter)
-    {
-        return call_user_func_array(EdifactRegistrar::getSegment(self::getSegname($segLine)) . '::fromSegLine', [$segLine, $delimiter]);
-    }
-
-    private static function getSegname($segLine) 
+    private function getSegname($segLine) 
     {
         return substr($segLine, 0, 3);
-    }
-
-    private static function isNewNestedMessage($line)
-    {
-        return $line->name() == 'UNH';
-    }
-
-    private static function countItem($line, $counter)
-    {
-        if ($line->name() == static::$firstBodySegment) {
-            return ++$counter;
-        }
-        return $counter;
     }
 }

@@ -34,7 +34,7 @@ class StreamTest extends TestCase
         $stream = new EdifactFile($filePath = __DIR__ . '/data/edifact.txt');
 
         while (! $stream->eof()) {
-            $string[] = $stream->fgetsSegment();
+            $string[] = $stream->streamGetSegment();
         }
 
         $this->assertEquals('UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e', $string[0]);
@@ -440,18 +440,6 @@ class StreamTest extends TestCase
     {
         $this->setExpectedException('InvalidArgumentException', 'Invalid stream');
         $this->stream->attach($resource);
-    }
-
-    public function testAttachWithResourceAttachesResource()
-    {
-        $this->tmpnam = tempnam(sys_get_temp_dir(), 'diac');
-        $resource = fopen($this->tmpnam, 'r+');
-        $this->stream->attach($resource);
-
-        $r = new ReflectionProperty($this->stream, 'resource');
-        $r->setAccessible(true);
-        $test = $r->getValue($this->stream);
-        $this->assertSame($resource, $test);
     }
 
     public function testAttachWithStringRepresentingResourceCreatesAndAttachesResource()

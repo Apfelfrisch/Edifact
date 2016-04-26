@@ -7,15 +7,10 @@ use InvalidArgumentException;
 
 class EdifactFile
 {
-    const SEGMENT_DELIMITER = '\'';
     /**
      * @var resource
      */
     protected $resource;
-    /**
-     * @var string|resource
-     */
-    protected $stream;
     /**
      * @param string|resource $stream
      * @param string $mode Mode with which to open stream
@@ -176,6 +171,15 @@ class EdifactFile
     /**
      * {@inheritdoc}
      */
+    public function writeAndRewind($string)
+    {
+        $this->write($string);
+        $this->rewind();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function write($string)
     {
         if (! $this->resource) {
@@ -234,19 +238,18 @@ class EdifactFile
         if (false === $result = stream_get_contents($this->resource)) {
             throw new RuntimeException('Error reading from stream');
         }
-        return $result;
+        return trim($result);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function fgetsSegment()
+    public function streamGetSegment($delimter = "'")
     {
         if (! $this->isReadable()) {
             throw new RuntimeException('Stream is not readable');
         }
-
-        $result = stream_get_line($this->resource, 4096, self::SEGMENT_DELIMITER);
+        $result = stream_get_line($this->resource, 4096, $delimter);
         return $result;
     }
     /**
@@ -288,9 +291,6 @@ class EdifactFile
             throw new InvalidArgumentException(
                 'Invalid stream provided; must be a string stream identifier or stream resource'
             );
-        }
-        if ($stream !== $resource) {
-            $this->stream = $stream;
         }
         $this->resource = $resource;
     }

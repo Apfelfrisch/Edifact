@@ -21,35 +21,31 @@ class MessageValidator implements MessageValidatorInterface
 
     public function validate(EdifactMessageInterface $edifact)
     {
-        $lines = $edifact->getSegments();
-        foreach ($lines['messages'] as $messages) {
-            foreach ($messages['body'] as $body) {
-                $message = array_merge($lines['messageHeader'], $messages['bodyHeader'], $body, $messages['bodyFooter'], $lines['messageFooter']);
-                $this->loopBlueprint($message, $edifact->getValidationBlueprint());
-            }
-        }
+        $this->loop($edifact, $edifact->getValidationBlueprint());
 
         return $this;
     }
     
-    public function loopBlueprint($lines, $blueprint)
+    public function loop($edifact, $blueprint)
     {
+        $lineCount = 0;
         $blueprintCount = 0;
-        for ($lineCount = 0; $lineCount < count($lines); $lineCount++) {
+        while ($line = $edifact->getNextSegment()) {
             // Gratz, Validation ist für die teilmenge erfolgreich durchgelaufen, gebe anzahl der durchläufe zurück
             if ($this->endOfBlueprint($blueprint, $blueprintCount)) {
                 return $lineCount;
             }
 
-            $this->validateSegment($lines[$lineCount]);
-            $this->validateAgainstBlueprint(@$lines[$lineCount], @$blueprint[$blueprintCount]);
+            $this->validateSegment($line);
+            $this->validateAgainstBlueprint($line, @$blueprint[$blueprintCount]);
 
             if ($this->segmentHasLoop($blueprint[$blueprintCount])) {
-                $this->reLoop($lines, $blueprint, $lineCount, $blueprintCount);
+                $this->reLoop($edifact, $blueprint, $lineCount, $blueprintCount);
             }
 
             $blueprintCount++;
             $this->trueLinecount++;
+            $this->lastPosition = $edifact->getPointerPosition();
         }
     }
 
@@ -63,14 +59,13 @@ class MessageValidator implements MessageValidatorInterface
         return isset($segment['maxLoops']);
     }
 
-    private function reLoop($lines, $blueprint, &$lineCount, &$blueprintCount)
+    private function reLoop($edifact, $blueprint, &$lineCount, &$blueprintCount)
     {
-        $cuttedLines = array_slice($lines, $lineCount+1);
-        $lineCount += $this->loopBlueprint($cuttedLines, $blueprint[$blueprintCount]['segments']);
-
-        if ($lines[$lineCount + 1]->name() == $blueprint[$blueprintCount]['name']) {
-            $blueprintCount--;
-        }
+        $lineCount += $this->loop($edifact, $blueprint[$blueprintCount]['segments']);
+        //if ($edifact->getNextSegment()->name() == $blueprint[$blueprintCount]['name']) {
+        //    $blueprintCount--;
+        //}
+        $edifact->setPointerPosition($this->lastPosition);
     }
     
     private function validateAgainstBlueprint($segment, $blueprint)
