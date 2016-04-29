@@ -41,13 +41,6 @@ class Delimiter
         );
     }
 
-    public function explodeMessage($string)
-    {
-        $string = $this->removeLineBreaks($string);
-
-        return $this->explodeString($string, $this->segment);
-    }
-
     public function explodeSegments($string)
     {
         return $this->explodeString($string, $this->dataGroup);

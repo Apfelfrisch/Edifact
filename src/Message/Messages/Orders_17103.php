@@ -2,12 +2,11 @@
 
 namespace Proengeno\Edifact\Message\Messages;
 
-use Proengeno\Edifact\Message\MessageCore;
+use Message\Builder\Orders_17103_Builder;
+use Proengeno\Edifact\Message\Message;
 
-class Orders_17103 extends MessageCore 
+class Orders_17103 extends Message 
 {
-    protected static $firstBodySegment = 'BGM';
-
     protected static $validationBlueprint = [
         0 => ['name' => 'UNA'],
         1 => ['name' => 'UNH', 'maxLoops' => 10, 'necessity' => 'R', 'segments' => [
@@ -29,4 +28,10 @@ class Orders_17103 extends MessageCore
         ]],
         2 => ['name' => 'UNZ']
     ];
+
+    public static function build($from, $to)
+    {
+        return new Orders_17103_Builder($from, $to);
+    }
+    
 }

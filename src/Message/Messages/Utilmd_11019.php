@@ -2,11 +2,10 @@
 
 namespace Proengeno\Edifact\Message\Messages;
 
-use Proengeno\Edifact\Message\MessageCore;
+use Proengeno\Edifact\Message\Message;
 
-class Utilmd_11019 extends MessageCore 
+class Utilmd_11019 extends Message 
 {
-    protected static $firstBodySegment = 'IDE';
     protected static $validationBlueprint = [
         0 => ['name' => 'UNA'],
         1 => ['name' => 'UNH', 'maxLoops' => 10, 'necessity' => 'R', 'segments' => [
@@ -24,4 +23,9 @@ class Utilmd_11019 extends MessageCore
         ]],
         2 => ['name' => 'UNZ']
     ];
+
+    public static function build($from, $to)
+    {
+        return new Orders_17103Builder($from, $to);
+    }
 }

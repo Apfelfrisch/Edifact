@@ -9,10 +9,12 @@ use Proengeno\Edifact\Validation\MessageValidator;
 use Proengeno\Edifact\Interfaces\EdifactMessageInterface;
 use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 
-abstract class MessageCore implements EdifactMessageInterface
+abstract class Message implements EdifactMessageInterface
 {
-    protected static $validationBlueprint;
+    const UNA_SEGMENT = 'UNA';
 
+    protected static $validationBlueprint;
+    
     private $file;
     private $delimter;
     private $validator;
@@ -45,7 +47,7 @@ abstract class MessageCore implements EdifactMessageInterface
     
     public function getNextSegment()
     {
-        $segment = $this->file->streamGetSegment();
+        $segment = $this->file->streamGetSegment($this->getDelimter()->getSegment());
 
         if ($segment !== false) {
             $segment = $this->currentSegment = $this->getSegmentObject($segment);
@@ -82,11 +84,28 @@ abstract class MessageCore implements EdifactMessageInterface
 
     public function getDelimter()
     {
-        if ($this->delimter !== null) {
-            $this->delimter = new Delimiter;
+        if ($this->delimter === null) {
+            $position = $this->getPointerPosition();
+            $this->file->rewind();
+
+            if ($this->file->read(3) != self::UNA_SEGMENT) {
+                $this->delimter = new Delimiter();
+            } else {
+                $this->delimter = new Delimiter(
+                    $this->file->read(1),
+                    $this->file->read(1),
+                    $this->file->read(1),
+                    $this->file->read(1),
+                    $this->file->read(1),
+                    $this->file->read(1)
+                );
+            }
+            $this->setPointerPosition($position);
         }
         return $this->delimter;
     }
+
+    abstract public static function build($from, $to);
 
     private function getSegmentObject($segLine)
     {

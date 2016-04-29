@@ -2,10 +2,10 @@
 
 use Mockery as m;
 use Proengeno\Edifact\EdifactFile;
-use Proengeno\Edifact\Message\MessageCore;
+use Proengeno\Edifact\Message\Message as MessageCore;
 use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 
-class MessageCoreTest extends TestCase 
+class MessageTest extends TestCase 
 {
     private $messageCore;
 
@@ -52,7 +52,7 @@ class MessageCoreTest extends TestCase
     }
 
     /** @test */
-    public function it_can_call_a_validator_on_itself()
+    public function it_can_validate_itself()
     {
         $file = m::mock(EdifactFile::class);
         $validator = m::mock(MessageValidatorInterface::class, function($validator){
@@ -60,6 +60,36 @@ class MessageCoreTest extends TestCase
         });
         $messageCore = new Message($file, $validator);
         $messageCore->validate();
+    }
+
+    /** @test */
+    public function it_can_return_the_delimter()
+    {
+        $validator = m::mock(MessageValidatorInterface::class, function($validator){
+            $validator->shouldReceive('validate')->once();
+        });
+
+        $unaValues = [":+.? '", "abcdef"];
+        foreach ($unaValues as $unaValue) {
+            $messageCore = Message::fromString("UNA" . $unaValue . "'UNH");
+            $delimter = $messageCore->getDelimter();
+            $this->assertEquals($unaValue, 
+                 $delimter->getData()
+               . $delimter->getDataGroup()
+               . $delimter->getDecimal()
+               . $delimter->getTerminator()
+               . $delimter->getEmpty()
+               . $delimter->getSegment()
+           );
+        }
+    }
+
+    /** @test */
+    public function it_return_the_message_builder_class()
+    {
+        $message = Message::build('from', 'to');
+        $this->assertInstanceOf('Proengeno\Edifact\Message\Builder', $message);
+        unlink($message->get()->getMetadata('uri'));
     }
 }
     

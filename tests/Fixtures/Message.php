@@ -1,6 +1,6 @@
 <?php
 
-use Proengeno\Edifact\Message\MessageCore;
+use Proengeno\Edifact\Message\Message as MessageCore;
 
 class Message extends MessageCore
 {
@@ -16,5 +16,10 @@ class Message extends MessageCore
         ]],
         ['name' => 'UNZ']
     ];
+    
+    public static function build($from, $to)
+    {
+        return new Builder(static::class, $from, $to);
+    }
 }
     
