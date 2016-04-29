@@ -16,6 +16,7 @@ abstract class MessageCore implements EdifactMessageInterface
     private $file;
     private $delimter;
     private $validator;
+    private $currentSegment;
     
     public function __construct(EdifactFile $file, MessageValidatorInterface $validator = null)
     {
@@ -36,15 +37,20 @@ abstract class MessageCore implements EdifactMessageInterface
     {
         return $this->file->__toString();
     }
+
+    public function getCurrentSegment()
+    {
+        return $this->currentSegment;
+    }
     
     public function getNextSegment()
     {
         $segment = $this->file->streamGetSegment();
 
         if ($segment !== false) {
-            return $this->getSegmentObject($segment);
-        }
-        return false;
+            $segment = $this->currentSegment = $this->getSegmentObject($segment);
+        } 
+        return $segment;
     }
     
     public function getPointerPosition()
@@ -55,11 +61,6 @@ abstract class MessageCore implements EdifactMessageInterface
     public function setPointerPosition($position)
     {
         return $this->file->seek($position);
-    }
-
-    public function getSegments()
-    {
-        //return $this->file;
     }
 
     public function getValidationBlueprint()

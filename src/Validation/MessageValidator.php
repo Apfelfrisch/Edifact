@@ -35,7 +35,6 @@ class MessageValidator implements MessageValidatorInterface
             if ($this->endOfBlueprint($blueprint, $blueprintCount)) {
                 return $lineCount;
             }
-
             $this->validateSegment($line);
             $this->validateAgainstBlueprint($line, @$blueprint[$blueprintCount]);
 
@@ -62,9 +61,9 @@ class MessageValidator implements MessageValidatorInterface
     private function reLoop($edifact, $blueprint, &$lineCount, &$blueprintCount)
     {
         $lineCount += $this->loop($edifact, $blueprint[$blueprintCount]['segments']);
-        //if ($edifact->getNextSegment()->name() == $blueprint[$blueprintCount]['name']) {
-        //    $blueprintCount--;
-        //}
+        if ($edifact->getCurrentSegment()->name() == $blueprint[$blueprintCount]['name']) {
+            $blueprintCount--;
+        }
         $edifact->setPointerPosition($this->lastPosition);
     }
     

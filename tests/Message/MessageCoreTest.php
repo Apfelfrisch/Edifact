@@ -36,22 +36,19 @@ class MessageCoreTest extends TestCase
     }
 
     /** @test */
+    public function it_fetch_the_current_segement_from_stream()
+    {
+        $messageCore = Message::fromString("UNH'UNB");
+        $this->assertInstanceOf('Proengeno\Edifact\Message\Segments\Unh', $messageCore->getNextSegment());
+        $this->assertInstanceOf('Proengeno\Edifact\Message\Segments\Unh', $messageCore->getCurrentSegment());
+    }
+
+    /** @test */
     public function it_fetch_the_next_segement_from_stream()
     {
         $messageCore = Message::fromString("UNH'UNB");
         $this->assertInstanceOf('Proengeno\Edifact\Message\Segments\Unh', $messageCore->getNextSegment());
         $this->assertInstanceOf('Proengeno\Edifact\Message\Segments\Unb', $messageCore->getNextSegment());
-    }
-
-    /** @test */
-    public function it_fetch_the_previous_segement_from_stream()
-    {
-        $messageCore = Message::fromString("UNB'UNH'RFF");
-        $messageCore->getNextSegment();
-        $messageCore->getNextSegment();
-        $messageCore->getNextSegment();
-        $this->assertInstanceOf('Proengeno\Edifact\Message\Segments\Unh', $messageCore->getPreviousSegment());
-        $this->assertInstanceOf('Proengeno\Edifact\Message\Segments\Unb', $messageCore->getPreviousSegment());
     }
 
     /** @test */
