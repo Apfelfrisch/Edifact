@@ -1,7 +1,12 @@
 <?php
 
+namespace Proengeno\Edifact\Test\Message;
+
 use Mockery as m;
 use Proengeno\Edifact\EdifactFile;
+use Proengeno\Edifact\Test\TestCase;
+use Proengeno\Edifact\Test\Fixtures\Builder;
+use Proengeno\Edifact\Test\Fixtures\Message;
 use Proengeno\Edifact\Message\Builder as BuilderCore;
 
 class BuilderTest extends TestCase 
@@ -10,7 +15,7 @@ class BuilderTest extends TestCase
 
     public function setUp()
     {
-        $this->builder = new Builder(Message::class, 'from', 'to', 'wb+');
+        $this->builder = new Builder(Message::class, 'from', 'to', 'VL', 'wb+');
     }
 
     /** @test */
@@ -20,8 +25,26 @@ class BuilderTest extends TestCase
     }
 
     /** @test */
-    public function it_can_return_the_edifact_file()
+    public function it_can_instanciate_the_edifact_message()
     {
-        $this->assertInstanceOf(EdifactFile::class, $this->builder->get());
+        $this->assertInstanceOf(Message::class, $this->builder->get());
     }
+
+    /** @test */
+    public function it_provides_the_unb_ref()
+    {
+        $this->assertEquals('M_unique_id', $this->builder->unbReference());
+    }
+
+    /** @test */
+    public function it_sets_the_header_an_footer_from_the_edifact_message()
+    {
+        //die(var_dump((string)$this->builder->get()));
+    }
+}
+
+namespace Proengeno\Edifact\Message;
+
+function uniqid($prefix = null) {
+    return $prefix . '_unique_id';
 }

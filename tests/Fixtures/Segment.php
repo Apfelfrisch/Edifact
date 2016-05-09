@@ -1,5 +1,7 @@
 <?php
 
+namespace Proengeno\Edifact\Test\Fixtures;
+
 use Proengeno\Edifact\Message\Segments\SegFramework;
 
 class Segment extends SegFramework

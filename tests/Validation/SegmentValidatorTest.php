@@ -1,6 +1,9 @@
 <?php
 
+namespace Proengeno\Edifact\Test\Validation;
+
 use Mockery as m;
+use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\Validation\MessageValidator;
 use Proengeno\Edifact\Validation\SegmentValidator;
 use Proengeno\Edifact\Exceptions\SegValidationException;

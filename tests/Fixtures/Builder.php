@@ -1,5 +1,7 @@
 <?php
 
+namespace Proengeno\Edifact\Test\Fixtures;
+
 use Proengeno\Edifact\Message\Message;
 use Proengeno\Edifact\Message\Builder as BuilderCore;
 

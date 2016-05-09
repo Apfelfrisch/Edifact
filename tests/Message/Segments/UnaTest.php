@@ -1,5 +1,8 @@
 <?php
 
+namespace Proengeno\Edifact\Test\Message\Segments;
+
+use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Message\Segments\Una;
 
@@ -86,10 +89,11 @@ class UnaTest extends TestCase
      */
     public function it_can_return_itself_as_a_string()
     {
-        $unaString = 'UNA:+.? '; 
+        $unaString = "UNA:+.? "; 
+        $expectedString = "UNA:+.? '"; 
 
         $seg = Una::fromSegLine($unaString);
 
-        $this->assertEquals($unaString, (string)$seg);
+        $this->assertEquals($expectedString, (string)$seg);
     }
 }

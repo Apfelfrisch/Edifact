@@ -80,7 +80,7 @@ abstract class SegFramework implements SegInterface
             $this->cache['segLine'] = implode(static::$delimiter->getDataGroup(), $this->deleteEmptyArrayEnds($dataFields));
         }
         
-        return $this->cache['segLine'];
+        return $this->cache['segLine'] . static::$delimiter->getSegment();
     }
 
     protected static function mapToBlueprint($segLine)

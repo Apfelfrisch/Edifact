@@ -1,9 +1,11 @@
 <?php
 
+namespace Proengeno\Edifact\Test\Message\Segments;
+
 use Mockery as m;
+use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\Message\Delimiter;
-use Proengeno\Edifact\Message\Segments\Unh;
-use Proengeno\Edifact\Exceptions\SegValidationException;
+use Proengeno\Edifact\Test\Fixtures\Segment;
 use Proengeno\Edifact\Validation\SegmentValidator;
 use Proengeno\Edifact\Interfaces\SegValidatorInterface;
 
@@ -78,7 +80,7 @@ class SegFrameworkTest extends TestCase
     public function it_can_cast_to_a_string()
     {
         $givenString = 'A+B+1:2:3:4:5+D+E';
-        $expectedString = $givenString;
+        $expectedString = $givenString . "'";
 
         $segment = Segment::fromSegLine($givenString);
 
@@ -89,7 +91,7 @@ class SegFrameworkTest extends TestCase
     public function it_removes_his_loose_ends_when_it_is_castet_to_a_string()
     {
         $givenString = 'A+B+1:2:::+D++';
-        $expectedString = 'A+B+1:2+D';
+        $expectedString = "A+B+1:2+D'";
 
         $segment = Segment::fromSegLine($givenString);
 

@@ -45,7 +45,7 @@ class Una extends SegFramework
 
     public function __toString()
     {
-        return $this->segLine = implode('', $this->elements['UNA']);
+        return $this->segLine = implode('', $this->elements['UNA']) . "'";
     }
 
     protected static function mapToBlueprint($segLine)

@@ -1,6 +1,9 @@
 <?php
 
+namespace Proengeno\Edifact\Test\Message;
+
 use Proengeno\Edifact\EdifactFile;
+use Proengeno\Edifact\Test\TestCase;
 
 class StreamTest extends TestCase
 {

@@ -1,5 +1,8 @@
 <?php
 
+namespace Proengeno\Edifact\Test\Message\Segments;
+
+use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Message\Segments\Loc;
 

@@ -1,6 +1,9 @@
 <?php
 
+namespace Proengeno\Edifact\Test\Message;
+
 use Proengeno\Edifact\EdifactFile;
+use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\EdifactFactory;
 use Proengeno\Edifact\Exceptions\EdifactException;
 use Proengeno\Edifact\Message\Messages\Orders_17103;

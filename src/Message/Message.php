@@ -105,6 +105,11 @@ abstract class Message implements EdifactMessageInterface
         return $this->delimter;
     }
 
+    public function name($param)
+    {
+        return null;
+    }
+    
     abstract public static function build($from, $to);
 
     private function getSegmentObject($segLine)

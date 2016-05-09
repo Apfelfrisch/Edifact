@@ -1,5 +1,8 @@
 <?php
 
+namespace Proengeno\Edifact\Test\Message;
+
+use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\EdifactRegistrar;
 use Proengeno\Edifact\Exceptions\EdifactException;
 

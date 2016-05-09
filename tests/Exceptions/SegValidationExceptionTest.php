@@ -1,5 +1,8 @@
 <?php
 
+namespace Proengeno\Edifact\Test\Exceptions;
+
+use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\Exceptions\SegValidationException;
 
 class SegValidationExceptionTest extends TestCase 
