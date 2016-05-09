@@ -2,33 +2,47 @@
 
 namespace Proengeno\Edifact;
 
+use Exception;
+use SplFileInfo;
+use LogicException;
+use DomainException;
 use RuntimeException;
-use InvalidArgumentException;
+use SeekableIterator;
+use RecursiveIterator;
 
-class EdifactFile
+class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIterator 
 {
-    /**
-     * @var resource
-     */
-    protected $resource;
-    /**
-     * @param string|resource $stream
-     * @param string $mode Mode with which to open stream
-     * @throws InvalidArgumentException
-     */
-    public function __construct($stream, $mode = 'r')
-    {
-        $this->setStream($stream, $mode);
+    const DROP_NEW_LINE = 1;
+    const READ_AHEAD = 2;
+    const SKIP_EMPTY = 4;
+    const READ_CSV = 8;
+    
+    private $delimiter = "'";
+    private $rsrc;
+    private $flags;
+    private $filename;
+    private $maxLineLen = 0;
+    private $currentSegment = false;
+    private $currentSegmentNumber = 0;
+    
+    public function __construct($filename, $open_mode = 'r', $use_include_path = false) {
+        if (is_string($filename) && empty($filename)) {
+            throw new RuntimeException( __METHOD__."({$filename}): Filename cannot be empty");
+        }
+        if (!is_string($open_mode)) {
+            throw new Exception( 'SplFileObject::__construct() expects parameter 2 to be string, '.  gettype($open_mode).' given');
+        }
+
+        parent::__construct($filename);
+        $this->filename = $filename;
+        $this->rsrc = @fopen($filename, $open_mode, $use_include_path);
+        if (false === $this->rsrc) {
+            throw new RuntimeException( __METHOD__.  "({$filename}): failed to open stream: No such file or directory");
+        }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __toString()
     {
-        if (! $this->isReadable()) {
-            return '';
-        }
         try {
             $this->rewind();
             return $this->getContents();
@@ -37,261 +51,173 @@ class EdifactFile
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function close()
-    {
-        if (! $this->resource) {
-            return;
-        }
-        $resource = $this->detach();
-        fclose($resource);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function detach()
-    {
-        $resource = $this->resource;
-        $this->resource = null;
-        return $resource;
-    }
-
-    /**
-     * Attach a new stream/resource to the instance.
-     *
-     * @param string|resource $resource
-     * @param string $mode
-     * @throws InvalidArgumentException for stream identifier that cannot be
-     *     cast to a resource
-     * @throws InvalidArgumentException for non-resource stream
-     */
-    public function attach($resource, $mode = 'r')
-    {
-        $this->setStream($resource, $mode);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSize()
-    {
-        if (null === $this->resource) {
-            return null;
-        }
-        $stats = fstat($this->resource);
-        return $stats['size'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function tell()
-    {
-        if (! $this->resource) {
-            throw new RuntimeException('No resource available; cannot tell position');
-        }
-        $result = ftell($this->resource);
-        if (! is_int($result)) {
-            throw new RuntimeException('Error occurred during tell operation');
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function eof()
-    {
-        if (! $this->resource) {
-            return true;
-        }
-        return feof($this->resource);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isSeekable()
-    {
-        if (! $this->resource) {
-            return false;
-        }
-        $meta = stream_get_meta_data($this->resource);
-        return $meta['seekable'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function seek($offset, $whence = SEEK_SET)
-    {
-        if (! $this->resource) {
-            throw new RuntimeException('No resource available; cannot seek position');
-        }
-        if (! $this->isSeekable()) {
-            throw new RuntimeException('Stream is not seekable');
-        }
-        $result = fseek($this->resource, $offset, $whence);
-        if (0 !== $result) {
-            throw new RuntimeException('Error seeking within stream');
-        }
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rewind()
-    {
-        return $this->seek(0);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isWritable()
-    {
-        if (! $this->resource) {
-            return false;
-        }
-        $meta = stream_get_meta_data($this->resource);
-        $mode = $meta['mode'];
-        return (
-            strstr($mode, 'x')
-            || strstr($mode, 'w')
-            || strstr($mode, 'c')
-            || strstr($mode, 'a')
-            || strstr($mode, '+')
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function writeAndRewind($string)
-    {
-        $this->write($string);
-        $this->rewind();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function write($string)
-    {
-        if (! $this->resource) {
-            throw new RuntimeException('No resource available; cannot write');
-        }
-        if (! $this->isWritable()) {
-            throw new RuntimeException('EdifactFile is not writable');
-        }
-        $result = fwrite($this->resource, $string);
-        if (false === $result) {
-            throw new RuntimeException('Error writing to stream');
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isReadable()
-    {
-        if (! $this->resource) {
-            return false;
-        }
-        $meta = stream_get_meta_data($this->resource);
-        $mode = $meta['mode'];
-        return (strstr($mode, 'r') || strstr($mode, '+'));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function read($length)
-    {
-        if (! $this->resource) {
-            throw new RuntimeException('No resource available; cannot read');
-        }
-        if (! $this->isReadable()) {
-            throw new RuntimeException('Stream is not readable');
-        }
-        $result = fread($this->resource, $length);
-        if (false === $result) {
-            throw new RuntimeException('Error reading stream');
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getContents()
     {
-        if (! $this->isReadable()) {
-            throw new RuntimeException('Stream is not readable');
-        }
-
-        if (false === $result = stream_get_contents($this->resource)) {
+        if (false === $result = stream_get_contents($this->rsrc)) {
             throw new RuntimeException('Error reading from stream');
         }
         return trim($result);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function streamGetSegment($delimter = "'")
-    {
-        if (! $this->isReadable()) {
-            throw new RuntimeException('Stream is not readable');
-        }
-        $result = stream_get_line($this->resource, 4096, $delimter);
-        return $result;
+    public function eof() {
+        return feof($this->rsrc);
     }
-    /**
-     * {@inheritdoc}
-     */
-    public function getMetadata($key = null)
-    {
-        if (null === $key) {
-            return stream_get_meta_data($this->resource);
-        }
-        $metadata = stream_get_meta_data($this->resource);
-        if (! array_key_exists($key, $metadata)) {
-            return null;
-        }
-        return $metadata[$key];
+    
+    public function flush() {
+        return fflush($this->rsrc);
     }
-    /**
-     * Set the internal stream resource.
-     *
-     * @param string|resource $stream String stream target or stream resource.
-     * @param string $mode Resource mode for stream target.
-     * @throws InvalidArgumentException for invalid streams or resources.
-     */
-    private function setStream($stream, $mode = 'r')
+    
+    public function getChar() {
+        $char = fgetc($this->rsrc);
+        if ($char == "'") {
+            $this->currentSegmentNumber++;
+        }
+        return $char;
+    }
+    
+    public function getSegment() {
+        if (false !== $this->currentSegment) {
+            $this->next();
+        }
+        
+        return $this->currentSegment = $this->getCurrentLineImpl();
+    }
+    
+    public function lock($operation, &$wouldblock = false) {
+        return flock($this->rsrc, $operation, $wouldblock);
+    }
+    
+    public function passthru() {
+        return fpassthru($this->rsrc);
+    }
+    
+    public function read($length) {
+        return fread($this->rsrc, $length);
+    }
+    
+    public function seek($offset, $whence = SEEK_SET) {
+        if (0 == $result = fseek($this->rsrc, $offset, $whence)) {
+            return true;
+        }
+        return false;
+    }
+    
+    public function stat() {
+        return fstat($this->rsrc);
+    }
+    
+    public function tell() {
+        return ftell($this->rsrc);
+    }
+    
+    public function truncate($size) {
+        return ftruncate($this->rsrc, $size);
+    }
+    
+    public function write($str) {
+        fwrite($this->rsrc, $str);
+    }
+
+    public function writeAndRewind($str)
     {
-        $error = null;
-        $resource = $stream;
-        if (is_string($stream)) {
-            set_error_handler(function ($e) use (&$error) {
-                $error = $e;
-            }, E_WARNING);
-            $resource = fopen($stream, $mode);
-            restore_error_handler();
+        $this->write($str);
+        $this->rewind();
+    }
+
+    public function getDelimiter() {
+        return $this->delimiter;
+    }
+    
+    public function getFlags() 
+    {
+        return $this->flags;
+    }
+    
+    public function getMaxLineLen() 
+    {
+        return $this->maxLineLen;
+    }
+    
+    public function setDelimiter($delimiter = "'") 
+    {
+        $this->delimiter = $delimiter;
+    }
+    
+    public function setFlags($flags) 
+    {
+        $this->flags = $flags;
+    }
+    
+    public function setMaxLineLen($max_len) 
+    {
+        if ($max_len < 0) {
+            throw new DomainException('Maximum line length must be greater than or equal zero');
         }
-        if ($error) {
-            throw new InvalidArgumentException('Invalid stream reference provided');
+        $this->maxLineLen = $max_len;
+    }
+    
+    public function current() 
+    {
+        if ($this->currentSegment === false) {
+            $this->currentSegment = $this->getCurrentLineImpl();
         }
-        if (! is_resource($resource) || 'stream' !== get_resource_type($resource)) {
-            throw new InvalidArgumentException(
-                'Invalid stream provided; must be a string stream identifier or stream resource'
-            );
+        return $this->currentSegment;
+    }
+    
+    public function key() {
+        return $this->currentSegmentNumber;
+    }
+    
+    public function next() {
+        $this->currentSegment = false;
+        $this->currentSegmentNumber++;
+    }
+    
+    public function rewind() {
+        rewind($this->rsrc);
+        $this->currentSegmentNumber = 0;
+        $this->currentSegment = false;
+        if ($this->flags & self::READ_AHEAD) {
+            $this->current();
         }
-        $this->resource = $resource;
+    }
+    
+    public function seekToSegment($segmentPosition) {
+        if ($segmentPosition < 0) {
+            throw new LogicException("Can't seek file " . $this->filename . " to negative Segment position $segmentPosition");
+        }
+        $this->rewind();
+        for ($i = 0; $i < $segmentPosition; $i++) {
+            $this->current();
+            $this->next();
+            if ($this->eof()) {
+                $this->currentSegmentNumber--;
+                break;
+            }
+        }
+        $this->current();
+    }
+    
+    public function valid() {
+        if ($this->flags & self::READ_AHEAD) {
+            return $this->current() !== false;
+        }
+        return !$this->eof();
+    }
+
+    public function getChildren() {
+        return null;
+    }
+
+    public function hasChildren() {
+        return false;
+    }
+
+    private function getCurrentLineImpl()
+    {
+        $line = stream_get_line($this->rsrc, $this->maxLineLen, $this->delimiter);
+    
+        return $line;
     }
 }
+

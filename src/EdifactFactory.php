@@ -24,7 +24,7 @@ class EdifactFactory
 
     private static function getMessageType($edifactStream)
     {
-        while ($segment = $edifactStream->streamGetSegment()) {
+        while ($segment = $edifactStream->getSegment()) {
             if (preg_match('/UNH\+(.*?)\+(.*?)\:/', $segment, $matches) || empty($matches[2])) {
                 return $matches[2];
             }
@@ -35,7 +35,7 @@ class EdifactFactory
 
     private static function getTypeReferenz($edifactStream)
     {
-        while ($segment = $edifactStream->streamGetSegment()) {
+        while ($segment = $edifactStream->getSegment()) {
             if (preg_match('/RFF\+Z13\:(.*?)\'/', $edifactStream, $matches) || empty($matches[1])) {
                 return $matches[1];
             }

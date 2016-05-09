@@ -18,6 +18,14 @@ class BuilderTest extends TestCase
         $this->builder = new Builder(Message::class, 'from', 'to', 'VL', 'wb+');
     }
 
+    public function tearDown()
+    {
+        $filepath = $this->builder->get()->getFilepath();
+        if (file_exists($filepath)) {
+            unlink($filepath);
+        }
+    }
+
     /** @test */
     public function it_instanciates_with_file_and_validator()
     {

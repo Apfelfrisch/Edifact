@@ -28,16 +28,20 @@ abstract class Message implements EdifactMessageInterface
     
     public static function fromString($string)
     {
-        $file = new EdifactFile('php://memory', 'wb+');
-        $file->write($string);
-        $file->rewind();
-
+        $tmpnam = tempnam(sys_get_temp_dir(), 'edifact');
+        $file = new EdifactFile($tmpnam, 'w+');
+        $file->writeAndRewind($string);
         return new static($file);
     }
     
     public function __toString()
     {
         return $this->file->__toString();
+    }
+
+    public function getFilepath()
+    {
+        return $this->file->getRealPath();
     }
 
     public function getCurrentSegment()
@@ -47,7 +51,7 @@ abstract class Message implements EdifactMessageInterface
     
     public function getNextSegment()
     {
-        $segment = $this->file->streamGetSegment($this->getDelimter()->getSegment());
+        $segment = $this->file->getSegment();
 
         if ($segment !== false) {
             $segment = $this->currentSegment = $this->getSegmentObject($segment);
@@ -92,12 +96,12 @@ abstract class Message implements EdifactMessageInterface
                 $this->delimter = new Delimiter();
             } else {
                 $this->delimter = new Delimiter(
-                    $this->file->read(1),
-                    $this->file->read(1),
-                    $this->file->read(1),
-                    $this->file->read(1),
-                    $this->file->read(1),
-                    $this->file->read(1)
+                    $this->file->getChar(1),
+                    $this->file->getChar(1),
+                    $this->file->getChar(1),
+                    $this->file->getChar(1),
+                    $this->file->getChar(1),
+                    $this->file->getChar(1)
                 );
             }
             $this->setPointerPosition($position);
