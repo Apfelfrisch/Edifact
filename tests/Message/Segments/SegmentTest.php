@@ -98,4 +98,13 @@ class SegmentTest extends TestCase
         $this->assertEquals($expectedString, (string)$segment);
     }
 
+    /** @test */
+    public function it_handles_string_terminations()
+    {
+        $givenString = "A+B?+";
+        $expectedString = "A+B+1:2+D'";
+
+        $segment = Segment::fromSegLine($givenString);
+        $this->assertEquals('B+', $segment->getB());
+    }
 }

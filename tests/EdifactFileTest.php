@@ -44,6 +44,18 @@ class EdifactFileTest extends TestCase
         $this->assertEquals('RFF+Z13:17103', $string[1]);
     }
 
+    public function testTerminateSegmentDelimiter()
+    {
+        $message = "UNB'NAD+Up?'Verd'UNZ";
+        $this->stream->writeAndRewind($message);
+
+        while (! $this->stream->eof()) {
+            $string[] = $this->stream->getSegment();
+        }
+
+        $this->assertEquals("NAD+Up'Verd", $string[1]);
+    }
+
     public function testToStringRetrievesFullContentsOfStream()
     {
         $message = 'foo bar';

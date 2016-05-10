@@ -16,7 +16,7 @@ abstract class Message implements EdifactMessageInterface
     protected static $validationBlueprint;
     
     private $file;
-    private $delimter;
+    private $delimiter;
     private $validator;
     private $currentSegment;
     
@@ -86,27 +86,9 @@ abstract class Message implements EdifactMessageInterface
         return $this;
     }
 
-    public function getDelimter()
+    public function getDelimiter()
     {
-        if ($this->delimter === null) {
-            $position = $this->getPointerPosition();
-            $this->file->rewind();
-
-            if ($this->file->read(3) != self::UNA_SEGMENT) {
-                $this->delimter = new Delimiter();
-            } else {
-                $this->delimter = new Delimiter(
-                    $this->file->getChar(1),
-                    $this->file->getChar(1),
-                    $this->file->getChar(1),
-                    $this->file->getChar(1),
-                    $this->file->getChar(1),
-                    $this->file->getChar(1)
-                );
-            }
-            $this->setPointerPosition($position);
-        }
-        return $this->delimter;
+        return $this->file->getDelimiter();
     }
 
     public function name($param)
@@ -118,7 +100,7 @@ abstract class Message implements EdifactMessageInterface
 
     private function getSegmentObject($segLine)
     {
-        return call_user_func_array(EdifactRegistrar::getSegment($this->getSegname($segLine)) . '::fromSegLine', [$segLine, $this->getDelimter()]);
+        return call_user_func_array(EdifactRegistrar::getSegment($this->getSegname($segLine)) . '::fromSegLine', [$segLine, $this->getDelimiter()]);
     }
 
     private function getSegname($segLine) 

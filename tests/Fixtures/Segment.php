@@ -21,5 +21,10 @@ class Segment extends SegmentCore
             'A' => ['A' => $attribute],
         ]);
     }
+
+    public function getB()
+    {
+        return @$this->elements['B']['B'] ?: null;
+    }
 }
     

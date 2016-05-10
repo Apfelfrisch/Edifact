@@ -9,6 +9,7 @@ use DomainException;
 use RuntimeException;
 use SeekableIterator;
 use RecursiveIterator;
+use Proengeno\Edifact\Message\Delimiter;
 
 class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIterator 
 {
@@ -17,10 +18,10 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
     const SKIP_EMPTY = 4;
     const READ_CSV = 8;
     
-    private $delimiter = "'";
     private $rsrc;
     private $flags;
     private $filename;
+    private $delimiter;
     private $maxLineLen = 0;
     private $currentSegment = false;
     private $currentSegmentNumber = 0;
@@ -124,10 +125,6 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
         $this->rewind();
     }
 
-    public function getDelimiter() {
-        return $this->delimiter;
-    }
-    
     public function getFlags() 
     {
         return $this->flags;
@@ -137,10 +134,13 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
     {
         return $this->maxLineLen;
     }
-    
-    public function setDelimiter($delimiter = "'") 
+
+    public function getDelimiter()
     {
-        $this->delimiter = $delimiter;
+        if ($this->delimiter === null) {
+            $this->delimiter = Delimiter::setFromFile($this);
+        }
+        return $this->delimiter;
     }
     
     public function setFlags($flags) 
@@ -220,9 +220,29 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
 
     private function getCurrentLineImpl()
     {
-        $line = stream_get_line($this->rsrc, $this->maxLineLen, $this->delimiter);
-    
+        $mergedLines = '';
+        while ($line = $this->streamGetLine()) {
+            if ($this->delimiterWasTerminated($line)) {
+                $line[(strlen($line) -1 )] = $this->getDelimiter()->getSegment();
+                $mergedLines .= $line;
+                continue;
+            }
+            $mergedLines .= $line;
+
+            return $mergedLines;
+        }
+
         return $line;
+    }
+
+    private function streamGetLine()
+    {
+        return stream_get_line($this->rsrc, $this->maxLineLen, $this->getDelimiter()->getSegment());
+    }
+    
+    private function delimiterWasTerminated($line)
+    {
+        return $line[(strlen($line) -1 )] == $this->getDelimiter()->getTerminator();
     }
 }
 

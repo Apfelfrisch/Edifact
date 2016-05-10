@@ -2,8 +2,13 @@
 
 namespace Proengeno\Edifact\Message;
 
+use Proengeno\Edifact\EdifactFile;
+
 class Delimiter 
 {
+    const UNA_SEGMENT = 'UNA';
+    const PLACE_HOLDER = ' #-|-# ';
+
     private $data;
     private $dataGroup;
     private $decimal;
@@ -21,15 +26,21 @@ class Delimiter
         $this->segment = $segment;
     }
     
-    public static function setFromEdifact($string)
+    public static function setFromFile(EdifactFile $file)
     {
-        if (self::stringHasUna($string)) {
-            list($data, $dataGroup, $decimal, $terminator, $empty, $segment) = str_split(substr($string, 3, 6));
+        $position = $file->tell();
+        $file->rewind();
 
-            return new self($data, $dataGroup, $decimal, $terminator, $empty, $segment);
+        if ($file->read(3) != self::UNA_SEGMENT) {
+            $instance = new self();
+        } else {
+            $instance = new self(
+                $file->getChar(1), $file->getChar(1), $file->getChar(1), $file->getChar(1), $file->getChar(1), $file->getChar(1)
+            );
         }
+        $file->seek($position);
 
-        return new self;
+        return $instance;
     }
 
     public function terminate($string)
@@ -85,18 +96,15 @@ class Delimiter
     {
         $string = $this->removeLineBreaks($string);
 
-        $foundTermination = false;
-        if (strpos($string, $this->terminator.$pattern) ) {
-            $string = str_replace($this->terminator.$pattern, ' #-placeHolder-# ', $string);
-
-            $foundTermination = true;
+        if ($foundTermination = (boolean)strpos($string, $this->terminator.$pattern) ) {
+            $string = str_replace($this->terminator.$pattern, self::PLACE_HOLDER, $string);
         }
 
         $explodedString = explode($pattern, $string);
 
         if ($foundTermination) {
             for ($i = 0; $i < count($explodedString); $i++) {
-                $explodedString[$i] = str_replace(' #-placeHolder-# ', $pattern, $explodedString[$i]);
+                $explodedString[$i] = str_replace(self::PLACE_HOLDER, $pattern, $explodedString[$i]);
             }
         }
 
@@ -115,10 +123,5 @@ class Delimiter
     private function removeLineBreaks($string)
     {
         return str_replace(["\r", "\n"], '', $string);
-    }
-
-    private static function stringHasUna($string)
-    {
-        return substr($string, 0, 3) == 'UNA';
     }
 }

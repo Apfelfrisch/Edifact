@@ -76,14 +76,14 @@ class MessageTest extends TestCase
         $unaValues = [":+.? '", "abcdef"];
         foreach ($unaValues as $unaValue) {
             $messageCore = Message::fromString("UNA" . $unaValue . "'UNH");
-            $delimter = $messageCore->getDelimter();
+            $delimiter = $messageCore->getDelimiter();
             $this->assertEquals($unaValue, 
-                 $delimter->getData()
-               . $delimter->getDataGroup()
-               . $delimter->getDecimal()
-               . $delimter->getTerminator()
-               . $delimter->getEmpty()
-               . $delimter->getSegment()
+                 $delimiter->getData()
+               . $delimiter->getDataGroup()
+               . $delimiter->getDecimal()
+               . $delimiter->getTerminator()
+               . $delimiter->getEmpty()
+               . $delimiter->getSegment()
            );
         }
     }
