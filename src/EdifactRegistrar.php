@@ -27,11 +27,7 @@ class EdifactRegistrar
         'UNT' => Message\Segments\Unt::class,
         'UNZ' => Message\Segments\Unz::class,
     ];
-    private static $messages = [
-        'ORDERS_17201' => Message\Messages\Orders_17201::class,
-        'ORDERS_17103' => Message\Messages\Orders_17103::class,
-        'UTILMD_11019' => Message\Messages\Utilmd_11019::class,
-    ];
+    private static $messages = [];
 
     public static function addSegement($key, $path)
     {

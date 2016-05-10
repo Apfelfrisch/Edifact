@@ -8,7 +8,7 @@ class Builder extends BuilderCore
 {
     protected $messageType = 'RANDOM_MESSAGE';
 
-    public function addMessage()
+    public function getMessage($array)
     {
         return null;
     }

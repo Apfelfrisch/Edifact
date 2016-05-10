@@ -45,9 +45,20 @@ class BuilderTest extends TestCase
     }
 
     /** @test */
+    public function it_dont_sets_the_header_an_footer_when_no_message_was_added()
+    {
+        $this->assertEmpty((string)$this->builder->get());
+    }
+
+    /** @test */
     public function it_sets_the_header_an_footer_from_the_edifact_message()
     {
-        //die(var_dump((string)$this->builder->get()));
+        $expectedMessage = "UNA:+.? 'UNB+UNOC:3+from:500+to:500+160510:0143+M_unique_id+VL'UNZ+1+M_unique_id'";
+
+        $message = $this->builder->addMessage([])->get();
+
+        $this->assertStringStartsWith("UNA:+.? 'UNB+UNOC:3+from:500+to:500", (string)$message);
+        $this->assertStringEndsWith("M_unique_id+VL'UNZ+1+M_unique_id'", (string)$message);
     }
 }
 

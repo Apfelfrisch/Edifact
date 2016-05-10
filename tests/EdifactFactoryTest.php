@@ -5,8 +5,9 @@ namespace Proengeno\Edifact\Test\Message;
 use Proengeno\Edifact\EdifactFile;
 use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\EdifactFactory;
+use Proengeno\Edifact\Test\Fixtures\Message;
 use Proengeno\Edifact\Exceptions\EdifactException;
-use Proengeno\Edifact\Message\Messages\Orders_17103;
+use Proengeno\Edifact\EdifactRegistrar;
 
 class EdifactFactoryTest extends TestCase 
 {
@@ -27,10 +28,12 @@ class EdifactFactoryTest extends TestCase
     /** @test */
     public function it_resolves_the_classname_over_type_and_referenz()
     {
+        EdifactRegistrar::addMessage('ORDERS_17103', Message::class);
+
         $this->stream->writeAndRewind("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'RFF+Z13:17103'");
         $edifactObject = EdifactFactory::fromStream($this->stream);
 
-        $this->assertInstanceOf(Orders_17103::class, $edifactObject);
+        $this->assertInstanceOf(Message::class, $edifactObject);
     }
 
     /** @test */
