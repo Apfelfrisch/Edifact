@@ -5,7 +5,7 @@ namespace Proengeno\Edifact\Message\Segments;
 use DateTime;
 use Proengeno\Edifact\Exceptions\SegValidationException;
 
-class Dtm extends SegFramework 
+class Dtm extends Segment 
 {
     private static $timecodes = [
         102 => 'YmdH',

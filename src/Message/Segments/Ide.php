@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact\Message\Segments;
 
-class Ide extends SegFramework 
+class Ide extends Segment 
 {
     protected static $validationBlueprint = [
         'IDE' => ['IDE' => 'M|a|3'],

@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact\Message\Segments;
 
-class Lin extends SegFramework 
+class Lin extends Segment 
 {
     protected static $validationBlueprint = [
         'LIN' => ['LIN' => 'M|a|3'],

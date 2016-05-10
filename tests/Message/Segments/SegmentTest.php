@@ -9,7 +9,7 @@ use Proengeno\Edifact\Test\Fixtures\Segment;
 use Proengeno\Edifact\Validation\SegmentValidator;
 use Proengeno\Edifact\Interfaces\SegValidatorInterface;
 
-class SegFrameworkTest extends TestCase 
+class SegmentTest extends TestCase 
 {
     protected function setUp()
     {

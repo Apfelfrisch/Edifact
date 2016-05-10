@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact\Message\Segments;
 
-class Qty extends SegFramework 
+class Qty extends Segment 
 {
     protected static $validationBlueprint = [
         'QTY' => ['QTY' => 'M|a|3'],

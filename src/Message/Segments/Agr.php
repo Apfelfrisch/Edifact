@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact\Message\Segments;
 
-class Agr extends SegFramework 
+class Agr extends Segment 
 {
     protected static $validationBlueprint = [
         'AGR' => ['AGR' => 'M|a|3'],

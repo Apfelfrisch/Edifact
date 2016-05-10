@@ -4,7 +4,7 @@ namespace Proengeno\Edifact\Message\Segments;
 
 use Proengeno\Edifact\Message\Delimiter;
 
-class Una extends SegFramework 
+class Una extends Segment 
 {
     protected static $validationBlueprint = [
         'UNA' => ['Una' => 'M|a|3', 'data' => 'M|an|1', 'dataGroup' => 'M|an|1', 'decimal' => 'M|an|1', 'terminator' => 'M|an|1', 'empty' => 'M|an|1'],

@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact\Message\Segments;
 
-class Cav extends SegFramework 
+class Cav extends Segment 
 {
     protected static $validationBlueprint = [
         'CAV' => ['CAV' => 'M|a|3'],

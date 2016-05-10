@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact\Message\Segments;
 
-class Unh extends SegFramework 
+class Unh extends Segment 
 {
     protected static $validationBlueprint = [
         'UNH' => ['UNH' => 'M|an|3'],

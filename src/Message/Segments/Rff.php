@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact\Message\Segments;
 
-class Rff extends SegFramework 
+class Rff extends Segment 
 {
     protected static $validationBlueprint = [
         'RFF' => ['RFF' => 'M|a|3'],

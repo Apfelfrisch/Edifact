@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact\Message\Segments;
 
-class Bgm extends SegFramework 
+class Bgm extends Segment 
 {
     protected static $validationBlueprint = [
         'BGM' => ['BGM' => 'M|a|3'],

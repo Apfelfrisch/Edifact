@@ -2,9 +2,9 @@
 
 namespace Proengeno\Edifact\Test\Fixtures;
 
-use Proengeno\Edifact\Message\Segments\SegFramework;
+use Proengeno\Edifact\Message\Segments\Segment as SegmentCore;
 
-class Segment extends SegFramework
+class Segment extends SegmentCore
 {
     protected static $validationBlueprint = [
         'A' => ['A' => 'M|an|3'],

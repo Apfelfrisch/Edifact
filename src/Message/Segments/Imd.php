@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact\Message\Segments;
 
-class Imd extends SegFramework 
+class Imd extends Segment 
 {
     protected static $validationBlueprint = [
         'IMD' => ['IMD' => 'M|a|3'],

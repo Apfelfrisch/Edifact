@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact\Message\Segments;
 
-class Nad extends SegFramework 
+class Nad extends Segment 
 {
     protected static $validationBlueprint = [
         'NAD' => ['NAD' => 'M|an|3'],

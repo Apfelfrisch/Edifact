@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact\Message\Segments;
 
-class Cci extends SegFramework 
+class Cci extends Segment 
 {
     protected static $validationBlueprint = [
         'CCI' => ['CCI' => 'M|a|3'],

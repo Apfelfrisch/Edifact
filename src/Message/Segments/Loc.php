@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact\Message\Segments;
 
-class Loc extends SegFramework 
+class Loc extends Segment 
 {
     protected static $validationBlueprint = [
         'LOC' => ['LOC' => 'M|a|3'],

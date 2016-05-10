@@ -7,7 +7,7 @@ use Proengeno\Edifact\Validation\SegmentValidator;
 use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Interfaces\SegValidatorInterface;
 
-abstract class SegFramework implements SegInterface 
+abstract class Segment implements SegInterface 
 {
     protected static $delimiter;
     protected static $validator;

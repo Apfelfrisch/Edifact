@@ -4,7 +4,7 @@ namespace Proengeno\Edifact\Message\Segments;
 
 use DateTime;
 
-class Unb extends SegFramework 
+class Unb extends Segment 
 {
     protected static $validationBlueprint = [
         'UNB' => ['UNB' => 'M|an|3'],
