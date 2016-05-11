@@ -2,32 +2,39 @@
 
 namespace Proengeno\Edifact\Message;
 
-use DateTime;
 use Exception;
 use ReflectionClass;
 use Proengeno\Edifact\EdifactFile;
 use Proengeno\Edifact\Message\Segments\Una;
-use Proengeno\Edifact\Message\Segments\Unb;
 use Proengeno\Edifact\Message\Segments\Unz;
 
 abstract class Builder
 {
     private $messageCount = 0;
+    private $messageWasFetched = false;
 
-    private $to;
-    private $from;
-    private $type;
+    protected $to;
+    protected $from;
+    protected $edifactFile;
+
     private $message;
-    private $edifactFile;
     private $unbReference;
     
-    public function __construct($message, $from, $to, $type = null, $mode = 'w+')
+    public function __construct($message, $from, $to, $mode = 'w+')
     {
         $this->to = $to;
         $this->from = $from;
-        $this->type = $type;
         $this->setMessageClass($message);
         $this->edifactFile = new EdifactFile($this->getFilename(), $mode);
+    }
+
+    public function __destruct()
+    {
+        $filepath = $this->edifactFile->getRealPath();
+        // Datei löschen falls Sie nicht Vollständig erstellt wurde (Exceptions o.ä) 
+        if ($this->messageWasFetched === false && file_exists($filepath)) {
+            unlink($filepath);
+        }
     }
 
     public function addMessage(array $array)
@@ -41,20 +48,13 @@ abstract class Builder
         return $this;
     }
 
-    private function messageIsEmpty()
-    {
-        return $this->edifactFile->tell() == 0;
-    }
-
-    abstract protected function getMessage($array);
-    
     public function get()
     {
         if (!$this->messageIsEmpty()) {
             $this->edifactFile->write($this->getUnz());
             $this->edifactFile->rewind();
         }
-
+        $this->messageWasFetched = true;
         return new $this->message($this->edifactFile);
     }
 
@@ -64,6 +64,15 @@ abstract class Builder
             return $this->unbReference = uniqid($this->getFirstCharFromMessageClassname());
         }
         return $this->unbReference;
+    }
+    
+    abstract protected function getMessage($array);
+
+    abstract protected function getUnb();
+    
+    private function messageIsEmpty()
+    {
+        return $this->edifactFile->tell() == 0;
     }
 
     private function setMessageClass($message)
@@ -89,7 +98,7 @@ abstract class Builder
     
     private function getFilename()
     {
-        return $this->messageType . '_' . $this->type . '_' . $this->from . '_' . $this->to . '_' . date('Ymd') . '_' . $this->unbReference() . '.txt';
+        return $this->messageType . '_' . $this->messageSubType . '_' . $this->from . '_' . $this->to . '_' . date('Ymd') . '_' . $this->unbReference() . '.txt';
     }
     
     private function getFirstCharFromMessageClassname()
@@ -107,11 +116,6 @@ abstract class Builder
         return Una::fromAttributes();
     }
     
-    private function getUnb()
-    {
-        return Unb::fromAttributes('UNOC', 3, $this->from, 500, $this->to, 500, new DateTime(), $this->unbReference(), $this->type);
-    }
-
     private function getUnz()
     {
         return Unz::fromAttributes($this->messageCount, $this->unbReference());

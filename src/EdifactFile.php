@@ -81,7 +81,7 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
             $this->next();
         }
         
-        return $this->currentSegment = $this->getCurrentLineImpl();
+        return $this->currentSegment = $this->fetchSegment();
     }
     
     public function lock($operation, &$wouldblock = false) {
@@ -164,7 +164,7 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
     public function current() 
     {
         if ($this->currentSegment === false) {
-            $this->currentSegment = $this->getCurrentLineImpl();
+            $this->currentSegment = $this->fetchSegment();
         }
         return $this->currentSegment;
     }
@@ -218,7 +218,7 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
         return false;
     }
 
-    private function getCurrentLineImpl()
+    private function fetchSegment()
     {
         $mergedLines = '';
         while ($line = $this->streamGetLine()) {

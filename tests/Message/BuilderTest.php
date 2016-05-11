@@ -12,15 +12,17 @@ use Proengeno\Edifact\Message\Builder as BuilderCore;
 class BuilderTest extends TestCase 
 {
     private $builder;
+    private $file;
 
     public function setUp()
     {
-        $this->builder = new Builder(Message::class, 'from', 'to', 'VL', 'wb+');
+        $this->builder = new Builder(Message::class, 'from', 'to', 'wb+');
+        $this->file = $this->builder->getEdifactFile();
     }
 
     public function tearDown()
     {
-        $filepath = $this->builder->get()->getFilepath();
+        $filepath = $this->file->getRealPath();
         if (file_exists($filepath)) {
             unlink($filepath);
         }
@@ -30,6 +32,15 @@ class BuilderTest extends TestCase
     public function it_instanciates_with_file_and_validator()
     {
         $this->assertInstanceOf(BuilderCore::class, $this->builder);
+    }
+
+    /** @test */
+    public function it_deletes_the_file_if_the_building_was_interrupted()
+    {
+        $filepath = $this->file->getRealPath();
+        $this->assertFileExists($filepath);
+        unset($this->builder);
+        $this->assertFalse(file_exists($filepath));
     }
 
     /** @test */
