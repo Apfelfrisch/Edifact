@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact;
 
-use Proengeno\Edifact\Exceptions\EdifactException;
+use Proengeno\Edifact\Exceptions\ValidationException;
 
 class EdifactRegistrar
 {
@@ -40,7 +40,7 @@ class EdifactRegistrar
         if (isset(static::$segments[$key])) {
             return static::$segments[$key];
         }
-        throw EdifactException::segmentUnknown($key);
+        throw ValidationException::segmentUnknown($key);
     }
 
     public static function addMessage($key, $path)
@@ -54,6 +54,6 @@ class EdifactRegistrar
         if (isset(static::$messages[$key])) {
             return static::$messages[$key];
         }
-        throw EdifactException::messageUnknown($key);
+        throw ValidationException::messageUnknown($key);
     }
 }

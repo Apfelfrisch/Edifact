@@ -4,7 +4,7 @@ namespace Proengeno\Edifact\Exceptions;
 
 use RuntimeException;
 
-class EdifactException extends RuntimeException
+class ValidationException extends RuntimeException
 {
     public static function segmentUnknown($segment)
     {

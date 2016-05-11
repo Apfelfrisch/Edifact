@@ -2,7 +2,6 @@
 
 namespace Proengeno\Edifact\Validation;
 
-use Exception;
 use Proengeno\Edifact\Interfaces\SegValidatorInterface;
 use Proengeno\Edifact\Exceptions\SegValidationException;
 

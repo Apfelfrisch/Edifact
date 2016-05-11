@@ -6,7 +6,7 @@ use Proengeno\Edifact\EdifactFile;
 use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\EdifactFactory;
 use Proengeno\Edifact\Test\Fixtures\Message;
-use Proengeno\Edifact\Exceptions\EdifactException;
+use Proengeno\Edifact\Exceptions\ValidationException;
 use Proengeno\Edifact\EdifactRegistrar;
 
 class EdifactFactoryTest extends TestCase 
@@ -43,7 +43,7 @@ class EdifactFactoryTest extends TestCase
         $referenz = '11111';
         $this->stream->writeAndRewind("UNH+O160482A7C2+$messageType:D:09B:UN:1.1e'RFF+Z13:$referenz'");
 
-        $this->expectException(EdifactException::class);
+        $this->expectException(ValidationException::class);
 
         $edifactObject = EdifactFactory::fromStream($this->stream);
     }
@@ -53,7 +53,7 @@ class EdifactFactoryTest extends TestCase
     {
         $this->stream->writeAndRewind("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'RFF+Z13:'");
 
-        $this->expectException(EdifactException::class);
+        $this->expectException(ValidationException::class);
 
         $edifactObject = EdifactFactory::fromStream($this->stream);
     }
@@ -63,7 +63,7 @@ class EdifactFactoryTest extends TestCase
     {
         $this->stream->writeAndRewind("UNH+O160482A7C2+:D:09B:UN:1.1e'RFF+Z13:17103'");
 
-        $this->expectException(EdifactException::class);
+        $this->expectException(ValidationException::class);
 
         $edifactObject = EdifactFactory::fromStream($this->stream);
     }

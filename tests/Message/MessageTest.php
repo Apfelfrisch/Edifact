@@ -94,7 +94,6 @@ class MessageTest extends TestCase
         $message = Message::build('from', 'to');
 
         $this->assertInstanceOf('Proengeno\Edifact\Message\Builder', $message);
-        unlink($message->get()->getFilepath());
     }
 }
     

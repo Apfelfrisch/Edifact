@@ -2,11 +2,11 @@
 
 namespace Proengeno\Edifact\Message;
 
-use Exception;
 use ReflectionClass;
 use Proengeno\Edifact\EdifactFile;
 use Proengeno\Edifact\Message\Segments\Una;
 use Proengeno\Edifact\Message\Segments\Unz;
+use Proengeno\Edifact\Exceptions\ValidationException;
 
 abstract class Builder
 {
@@ -78,7 +78,7 @@ abstract class Builder
     private function setMessageClass($message)
     {
         if (! $this->classesAreRelated($message, Message::class)) {
-            throw new Exception('Class "' . $message . '" not Child of "'. Builder::class . '"');
+            throw new ValidationException('Class "' . $message . '" not Child of "'. Builder::class . '"');
         }
 
         $this->message = $message;

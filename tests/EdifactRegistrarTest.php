@@ -4,7 +4,7 @@ namespace Proengeno\Edifact\Test\Message;
 
 use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\EdifactRegistrar;
-use Proengeno\Edifact\Exceptions\EdifactException;
+use Proengeno\Edifact\Exceptions\ValidationException;
 
 class EdifactRegistrarTest extends TestCase 
 {
@@ -37,7 +37,7 @@ class EdifactRegistrarTest extends TestCase
     {
         $pathToSegementClass = Segment::class;
         
-        $this->expectException(EdifactException::class);
+        $this->expectException(ValidationException::class);
         $this->assertEquals($pathToSegementClass, EdifactRegistrar::getSegment('ZZZ'));
     }
 }

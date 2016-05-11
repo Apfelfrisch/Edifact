@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact;
 
-use Proengeno\Edifact\Exceptions\EdifactException;
+use Proengeno\Edifact\Exceptions\ValidationException;
 
 class EdifactFactory
 {
@@ -30,7 +30,7 @@ class EdifactFactory
             }
         }
 
-        throw EdifactException::massageTypeNotFound();
+        throw ValidationException::massageTypeNotFound();
     }
 
     private static function getTypeReferenz($edifactStream)
@@ -40,6 +40,6 @@ class EdifactFactory
                 return $matches[1];
             }
         }
-        throw EdifactException::referenceNotFound();
+        throw ValidationException::referenceNotFound();
     }
 }

@@ -2,12 +2,13 @@
 
 namespace Proengeno\Edifact\Validation;
 
-use Exception;
-use Proengeno\Edifact\Validation\SegmentValidator;
 use Proengeno\Edifact\Interfaces\SegInterface;
+use Proengeno\Edifact\Validation\SegmentValidator;
+use Proengeno\Edifact\Exceptions\ValidationException;
 use Proengeno\Edifact\Interfaces\SegValidatorInterface;
-use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
+use Proengeno\Edifact\Exceptions\SegValidationException;
 use Proengeno\Edifact\Interfaces\EdifactMessageInterface;
+use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 
 class MessageValidator implements MessageValidatorInterface 
 {
@@ -70,7 +71,7 @@ class MessageValidator implements MessageValidatorInterface
     private function validateAgainstBlueprint($segment, $blueprint)
     {
         if ($segment == null) {
-            throw new Exception('Unerwartetes Edifact-Ende.');
+            throw new ValidationException('Unerwartetes Edifact-Ende.');
         }
         $this->validateBlueprintNames($segment, $blueprint);
         $this->validateBlueprintTemplates($segment, $blueprint);
@@ -80,9 +81,9 @@ class MessageValidator implements MessageValidatorInterface
     {
         if ($segment->name() != $blueprint['name']) {
             if (isset($blueprint['name'])) {
-                throw new Exception('Zeile ' . $this->trueLinecount . ': Unerwartetes Segement ' . @$segment->name() . ', ' . $blueprint['name'] . ' erwartet.');
+                throw new ValidationException('Zeile ' . $this->trueLinecount . ': Unerwartetes Segement ' . @$segment->name() . ', ' . $blueprint['name'] . ' erwartet.');
             }
-            throw new Exception('Zeile ' . $this->trueLinecount . ': Unerwartetes Segement ' . @$segment->name() . ', Ende erwartet.');
+            throw new ValidationException('Zeile ' . $this->trueLinecount . ': Unerwartetes Segement ' . @$segment->name() . ', Ende erwartet.');
         }
     }
 
@@ -95,7 +96,7 @@ class MessageValidator implements MessageValidatorInterface
                         . ', Segment ' . $segment->name()
                         . ', enthält unerlaubten Inhalt: "' . $segment->$segmendMethod() . '"'
                         . '. Erlaubt ist ("' . implode('" | "', $suggestions). '")';
-                    throw new Exception($message);
+                    throw new ValidationException($message);
                 }
             }
         }
@@ -105,8 +106,8 @@ class MessageValidator implements MessageValidatorInterface
     {
         try {
             $segment->validate($this->segValidator);
-        } catch (Exception $e) {
-            throw new Exception('Zeile ' . $this->trueLinecount . ', Segment ' . $segment->name() . ', ' . $e->getMessage());
+        } catch (SegValidationException $e) {
+            throw new ValidationException('Zeile ' . $this->trueLinecount . ', Segment ' . $segment->name() . ', ' . $e->getMessage());
         }
     }
 }

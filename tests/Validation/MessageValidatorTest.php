@@ -6,6 +6,7 @@ use Mockery as m;
 use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\Test\Fixtures\Message;
 use Proengeno\Edifact\Validation\MessageValidator;
+use Proengeno\Edifact\Exceptions\ValidationException;
 
 class MessageValidatorTest extends TestCase 
 {
@@ -44,7 +45,7 @@ class MessageValidatorTest extends TestCase
         $validator = new MessageValidator;
         
         $edifactMessage = Message::fromString("UNA:+.? '" . $illegallSegement . "'");
-        $this->expectException(\Exception::class);
+        $this->expectException(ValidationException::class);
         $edifactMessage->validate();
     }
 
@@ -56,7 +57,7 @@ class MessageValidatorTest extends TestCase
         $validator = new MessageValidator;
         
         $edifactMessage = Message::fromString("UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'" . $illegallyBgm . "'LIN+1'DTM+137:201604221414:203'UNS+D'UNT+18+2'UNZ+4+6910995E'");
-        $this->expectException(\Exception::class);
+        $this->expectException(ValidationException::class);
         $validator->validate($edifactMessage);
     }
 }
