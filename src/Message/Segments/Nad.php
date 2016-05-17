@@ -30,7 +30,9 @@ class Nad extends Segment
         $number, 
         $district,
         $city, 
-        $zip)
+        $zip,
+        $country = 'DE'
+    )
     {
         return new static([
             'NAD' => ['NAD' => 'NAD'],
@@ -48,8 +50,15 @@ class Nad extends Segment
             'C059' => ['3042:1' => substr($street, 0, 35), '3042:2' => substr($street, 35), '3042:3' => $number, '3042:4' => $district],
             '3164' => ['3164' => $city],
             '3251' => ['3251' => $zip],
-            '3207' => ['3251' => 'DE']
+            '3207' => ['3251' => $country]
         ]);
+    }
+
+    public static function fromMpCode($qualifier, $id, $idCode)
+    {
+        return static::fromAttributes(
+            $qualifier, $id, $idCode, null, null, null, null, null, null, null, null, null, null, null, null
+        );
     }
 
     public static function fromPersonAdress($qualifier, $lastName, $firstName, $street, $number, $city, $zip, $title = null, $district = null)
