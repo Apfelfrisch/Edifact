@@ -2,7 +2,6 @@
 
 namespace Proengeno\Edifact\Test\Validation;
 
-use Mockery as m;
 use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\Test\Fixtures\Message;
 use Proengeno\Edifact\Validation\MessageValidator;

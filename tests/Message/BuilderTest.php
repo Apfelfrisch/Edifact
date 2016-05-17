@@ -2,7 +2,6 @@
 
 namespace Proengeno\Edifact\Test\Message;
 
-use Mockery as m;
 use Proengeno\Edifact\EdifactFile;
 use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\Test\Fixtures\Builder;
