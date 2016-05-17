@@ -37,12 +37,12 @@ abstract class Builder
         }
     }
 
-    public function addMessage(array $array)
+    public function addMessage($message)
     {
         if ($this->messageIsEmpty()) {
             $this->edifactFile->write($this->getUna() . $this->getUnb());
         }
-        $this->edifactFile->write($this->getMessage($array));
+        $this->edifactFile->write($this->getMessage($message));
         $this->messageCount++;
 
         return $this;
