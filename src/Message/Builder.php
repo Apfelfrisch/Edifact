@@ -6,6 +6,7 @@ use ReflectionClass;
 use Proengeno\Edifact\EdifactFile;
 use Proengeno\Edifact\Message\Segments\Una;
 use Proengeno\Edifact\Message\Segments\Unz;
+use Proengeno\Edifact\Message\Segments\Segment;
 use Proengeno\Edifact\Exceptions\ValidationException;
 
 abstract class Builder
@@ -16,6 +17,7 @@ abstract class Builder
     protected $to;
     protected $from;
     protected $edifactFile;
+    protected $unhCounter;
 
     private $message;
     private $unbReference;
@@ -66,10 +68,20 @@ abstract class Builder
         return $this->unbReference;
     }
     
+    protected function writeSegment(Segment $segment)
+    {
+        if ($segment instanceof Unh) {
+            $this->unhCounter = 1;
+        } else {
+            $this->unhCounter ++;
+        }
+        $this->edifactFile->write($segment);
+    }
+    
     abstract protected function getMessage($array);
 
     abstract protected function getUnb();
-    
+
     private function messageIsEmpty()
     {
         return $this->edifactFile->tell() == 0;
