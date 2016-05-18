@@ -8,8 +8,8 @@ use Proengeno\Edifact\Message\Builder as BuilderCore;
 
 class Builder extends BuilderCore
 {
-    protected $messageType = 'RANDOM_MESSAGE';
-    protected $messageSubType = 'VL';
+    const MESSAGE_TYPE = 'RANDOM_MESSAGE';
+    const MESSAGE_SUBTYPE = 'VL';
 
     private $energyType;
 
@@ -30,7 +30,9 @@ class Builder extends BuilderCore
 
     protected function getUnb()
     {
-        return Unb::fromAttributes('UNOC', 3, $this->from, 500, $this->to, 500, new DateTime(), $this->unbReference(), $this->messageSubType);
+        return Unb::fromAttributes(
+            'UNOC', 3, $this->from, 500, $this->to, 500, new DateTime(), $this->unbReference(), self::MESSAGE_SUBTYPE
+        );
     }
 
 }

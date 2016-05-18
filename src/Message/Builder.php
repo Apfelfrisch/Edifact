@@ -110,7 +110,7 @@ abstract class Builder
     
     private function getFilename()
     {
-        return $this->messageType . '_' . $this->messageSubType . '_' . $this->from . '_' . $this->to . '_' . date('Ymd') . '_' . $this->unbReference() . '.txt';
+        return static::MESSAGE_TYPE . '_' . static::MESSAGE_SUBTYPE . '_' . $this->from . '_' . $this->to . '_' . date('Ymd') . '_' . $this->unbReference() . '.txt';
     }
     
     private function getFirstCharFromMessageClassname()
@@ -133,3 +133,5 @@ abstract class Builder
         return Unz::fromAttributes($this->messageCount, $this->unbReference());
     }
 }
+
+
