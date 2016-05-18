@@ -11,16 +11,16 @@ use Proengeno\Edifact\Exceptions\ValidationException;
 
 abstract class Builder
 {
-    private $messageCount = 0;
-    private $messageWasFetched = false;
 
     protected $to;
     protected $from;
     protected $edifactFile;
-    protected $unhCounter;
+    protected $unhCounter = 0;
 
     private $message;
     private $unbReference;
+    private $messageCount = 0;
+    private $messageWasFetched = false;
     
     public function __construct($message, $from, $to, $mode = 'w+')
     {
@@ -42,9 +42,10 @@ abstract class Builder
     public function addMessage($message)
     {
         if ($this->messageIsEmpty()) {
-            $this->edifactFile->write($this->getUna() . $this->getUnb());
+            $this->writeSegment(Una::fromAttributes());
+            $this->writeSegment($this->getUnb());
         }
-        $this->edifactFile->write($this->getMessage($message));
+        $this->writeMessage($message);
         $this->messageCount++;
 
         return $this;
@@ -70,15 +71,19 @@ abstract class Builder
     
     protected function writeSegment(Segment $segment)
     {
+        $this->edifactFile->write($segment);
+
+        if ($segment instanceof Una || $segment instanceof Unb) {
+            return;
+        }
         if ($segment instanceof Unh) {
             $this->unhCounter = 1;
-        } else {
-            $this->unhCounter ++;
+            return;
         }
-        $this->edifactFile->write($segment);
+        $this->unhCounter ++;
     }
     
-    abstract protected function getMessage($array);
+    abstract protected function writeMessage($array);
 
     abstract protected function getUnb();
 
@@ -133,5 +138,6 @@ abstract class Builder
         return Unz::fromAttributes($this->messageCount, $this->unbReference());
     }
 }
+
 
 
