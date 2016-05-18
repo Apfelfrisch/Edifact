@@ -56,6 +56,15 @@ class MessageTest extends TestCase
     }
 
     /** @test */
+    public function it_fetch_a_specific_segement_from_stream()
+    {
+        $messageCore = Message::fromString("UNH'UNB'UNT");
+        $this->assertInstanceOf('Proengeno\Edifact\Message\Segments\Unb', $messageCore->findNextSegment('UNB'));
+        $this->assertFalse($messageCore->findNextSegment('UNH'));
+        $this->assertInstanceOf('Proengeno\Edifact\Message\Segments\Unh', $messageCore->findNextSegment('UNH', $fromFileStart = true));
+    }
+
+    /** @test */
     public function it_can_validate_itself()
     {
         $file = m::mock(EdifactFile::class);

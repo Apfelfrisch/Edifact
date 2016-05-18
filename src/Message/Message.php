@@ -58,7 +58,23 @@ abstract class Message implements EdifactMessageInterface
         } 
         return $segment;
     }
-    
+
+    public function findNextSegment($searchSegment, $fromStart = false)
+    {
+        if ($fromStart) {
+            $this->file->rewind();
+        }
+
+        $searchObject = EdifactRegistrar::getSegment($searchSegment);
+        while ($segmentObject = $this->getNextSegment()) {
+            if ($segmentObject instanceof $searchObject) {
+                return $segmentObject;
+            }
+        }
+
+        return false;
+    }
+
     public function getPointerPosition()
     {
         return $this->file->tell();
@@ -72,11 +88,6 @@ abstract class Message implements EdifactMessageInterface
     public function getValidationBlueprint()
     {
         return static::$validationBlueprint;
-    }
-
-    public function findSegments($segmentSearch, $messageCount = null, $bodyCount = null)
-    {
-        //
     }
 
     public function validate()

@@ -23,7 +23,7 @@ class Builder extends BuilderCore
         return $this->edifactFile;
     }
 
-    protected function getMessage($array)
+    protected function writeMessage($array)
     {
         return null;
     }
