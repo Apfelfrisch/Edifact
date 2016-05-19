@@ -13,12 +13,8 @@ class Unb extends Segment
         'S003' => ['0010' => 'M|an|35', '0007' => 'M|an|4'],
         'S004' => ['0017' => 'M|n|6', '0019' => 'M|n|4'],
         '0020' => ['0020' => 'M|an|14'],
-        'S005' => ['0022' => 'M|an|14'],
-        '0026' => ['0026' => 'M|an|14'],
-        '0029' => ['0029' => 'M|a|1'],
-        '0031' => ['0031' => 'M|n|1'],
-        '0032' => ['0032' => 'M|an|35'],
-        '0035' => ['0035' => 'M|n|1'],
+        '0026' => ['0026' => 'O|an|14'],
+        '0035' => ['0035' => 'O|n|1'],
     ];
 
     public static function fromAttributes($syntaxId, $syntaxVersion, $sender, $senderQualifier, $receiver, $receiverQualifier, DateTime $creationDatetime, $referenzNumber, $usageType = null, $testMarker = null)
