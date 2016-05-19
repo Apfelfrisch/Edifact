@@ -92,7 +92,9 @@ abstract class Message implements EdifactMessageInterface
 
     public function validate()
     {
+        $this->file->rewind();
         $this->validator->validate($this);
+        $this->file->rewind();
 
         return $this;
     }
