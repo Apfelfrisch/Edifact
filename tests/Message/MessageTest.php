@@ -67,7 +67,9 @@ class MessageTest extends TestCase
     /** @test */
     public function it_can_validate_itself()
     {
-        $file = m::mock(EdifactFile::class);
+        $file = m::mock(EdifactFile::class, function($file) {
+            $file->shouldReceive('rewind')->twice();
+        });
         $validator = m::mock(MessageValidatorInterface::class, function($validator){
             $validator->shouldReceive('validate')->once();
         });
