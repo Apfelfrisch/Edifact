@@ -14,6 +14,7 @@ class MessageValidator implements MessageValidatorInterface
 {
     private $segValidator;
     private $trueLinecount = 1;
+    private $reLoopCount = 0;
     
     public function __construct($segValidator = null)
     {
@@ -39,7 +40,7 @@ class MessageValidator implements MessageValidatorInterface
             $this->validateSegment($line);
             $this->validateAgainstBlueprint($line, @$blueprint[$blueprintCount]);
 
-            if ($this->segmentHasLoop($blueprint[$blueprintCount])) {
+            if ($this->segmentIsLoopable($blueprint[$blueprintCount])) {
                 $this->reLoop($edifact, $blueprint, $lineCount, $blueprintCount);
             }
 
@@ -54,9 +55,17 @@ class MessageValidator implements MessageValidatorInterface
         return !isset($blueprint[$blueprintCount]);
     }
 
-    private function segmentHasLoop($segment)
+    private function segmentIsLoopable($segment)
     {
-        return isset($segment['maxLoops']);
+        if (!isset($segment['maxLoops'])) {
+            return false;
+        }
+        if ($this->reLoopCount <= $segment['maxLoops']) {
+            return true;
+        }
+        throw new ValidationException(
+            'Zeile ' . $this->trueLinecount . ', Segment ' . $segment['name'] . ', maximale Schleifendurchläufe (' . $segment['maxLoops'] . ') ereicht.'
+        );
     }
 
     private function reLoop($edifact, $blueprint, &$lineCount, &$blueprintCount)
@@ -64,6 +73,9 @@ class MessageValidator implements MessageValidatorInterface
         $lineCount += $this->loop($edifact, $blueprint[$blueprintCount]['segments']);
         if ($edifact->getCurrentSegment()->name() == $blueprint[$blueprintCount]['name']) {
             $blueprintCount--;
+            $this->reLoopCount ++;
+        } else {
+            $this->reLoopCount = 0;
         }
         $edifact->setPointerPosition($this->lastPosition);
     }

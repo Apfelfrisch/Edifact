@@ -37,6 +37,21 @@ class MessageValidatorTest extends TestCase
     }
 
     /** @test */
+    public function it_checks_the_maximal_reloops()
+    {
+        $validator = new MessageValidator;
+
+        foreach(range(1, 6) as $i) {
+            $loopedSegments[] = "LIN+1'DTM+137:201604221414:203'";
+        }
+        $edifactMessage = Message::fromString(
+            "UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'LIN+1'DTM+137:201604221414:203'" . implode($loopedSegments) . "UNS+D'UNT+18+2'UNZ+4+6910995E'"
+        );
+        $this->expectException(ValidationException::class);
+        $validator->validate($edifactMessage);
+    }
+
+    /** @test */
     public function it_finds_illegal_segments()
     {
         // $validationBlueprint = ['name' => 'BGM', 'templates' => ['docCode' => ['7', '380']] ]
