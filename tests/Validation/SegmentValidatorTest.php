@@ -37,6 +37,15 @@ class SegmentValidatorTest extends TestCase
     /** @test */
     public function it_checks_if_the_string_is_alpha()
     {
+        $blueprint = ['A' => ['A' => 'M|a|6']];
+        $data = ['A' => ['A' => 'APLHA ']];
+        
+        $this->validator->validate($blueprint, $data);
+    }
+
+    /** @test */
+    public function it_warns_if_the_string_is_not_alpha()
+    {
         $blueprint = ['A' => ['A' => 'M|a|1']];
         $data = ['A' => ['A' => '1']];
         

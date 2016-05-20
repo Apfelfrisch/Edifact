@@ -95,7 +95,7 @@ class SegmentValidator implements SegValidatorInterface
         if ($type == static::NUMERIC && !is_numeric($string)) {
             throw SegValidationException::forKeyValue($dataKey, $string, 'Daten-Element enthält nicht numerische Zeichen.', 2);
         }
-        if ($type == static::ALPHA && !ctype_alpha($string)) {
+        if ($type == static::ALPHA && !ctype_alpha(str_replace(' ', '', $string))) {
             throw SegValidationException::forKeyValue($dataKey, $string, 'Daten-Element darf nur ausschließlich Buchstaben enthalten.', 3);
         }
     }
