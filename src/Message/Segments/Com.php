@@ -6,7 +6,7 @@ class Com extends Segment
 {
     protected static $validationBlueprint = [
         'COM' => ['COM' => 'M|a|3'],
-        'C076' => ['3148' => 'M|a|512', '3155' => 'M|a|3'],
+        'C076' => ['3148' => 'M|an|512', '3155' => 'M|an|3'],
     ];
 
     public static function fromAttributes($id, $type)
