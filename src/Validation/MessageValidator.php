@@ -24,6 +24,10 @@ class MessageValidator implements MessageValidatorInterface
     public function validate(EdifactMessageInterface $edifact)
     {
         $this->loop($edifact, $edifact->getValidationBlueprint());
+        $segment = $edifact->getCurrentSegment();
+        if ($segment->name() != 'UNZ' || $edifact->getNextSegment()) {
+            throw new ValidationException('Zeile ' . $this->trueLinecount . ': Unerwartetes Segement ' . @$segment->name() . ', Ende erwaret.');
+        }
 
         return $this;
     }
@@ -40,6 +44,9 @@ class MessageValidator implements MessageValidatorInterface
             $this->validateAgainstBlueprint($line, @$blueprint[$blueprintCount]);
 
             if ($this->segmentIsLoopable($blueprint[$blueprintCount])) {
+                if ($this->singleSegmentReLoop($edifact, $blueprint, $blueprintCount)) {
+                    continue;
+                }
                 $this->reLoop($edifact, $blueprint, $blueprintCount);
             }
 
@@ -67,22 +74,25 @@ class MessageValidator implements MessageValidatorInterface
         );
     }
 
-    private function reLoop($edifact, $blueprint, &$blueprintCount)
+    private function singleSegmentReLoop($edifact, $blueprint, $blueprintCount)
     {
         if (!isset($blueprint[$blueprintCount]['segments'])) {
             $position = $edifact->getPointerPosition();
             if ($edifact->getNextSegment()->name() == $blueprint[$blueprintCount]['name']) {
                 $edifact->setPointerPosition($position);
-                $this->loop($edifact, $blueprint);
-                $this->reLoopCount ++;
-            } else {
-                $edifact->setPointerPosition($this->lastPosition);
-                $edifact->getNextSegment();
-                $edifact->getNextSegment();
+                return true;
             }
-            return;
+            $edifact->setPointerPosition($position);
         }
 
+        return false;
+    }
+
+    private function reLoop($edifact, $blueprint, &$blueprintCount)
+    {
+        if (!isset($blueprint[$blueprintCount]['segments'])) {
+            return;
+        }
         $this->loop($edifact, $blueprint[$blueprintCount]['segments']);
         if ($edifact->getCurrentSegment()->name() == $blueprint[$blueprintCount]['name']) {
             $blueprintCount --;

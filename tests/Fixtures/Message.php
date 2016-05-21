@@ -14,7 +14,7 @@ class Message extends MessageCore
                 ['name' => 'DTM', 'maxLoops' => 5],
             ]],
             ['name' => 'UNS'],
-            ['name' => 'UNT'],
+            ['name' => 'UNT', 'maxLoops' => 5],
         ]],
         ['name' => 'UNZ']
     ];
