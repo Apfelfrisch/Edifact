@@ -11,7 +11,7 @@ class Message extends MessageCore
         ['name' => 'UNH', 'maxLoops' => 10, 'necessity' => 'R', 'segments' => [
             ['name' => 'BGM', 'templates' => ['docCode' => ['7', '380']] ],
             ['name' => 'LIN', 'maxLoops' => 5, 'necessity' => 'R', 'segments' => [
-                ['name' => 'DTM'],
+                ['name' => 'DTM', 'maxLoops' => 5],
             ]],
             ['name' => 'UNS'],
             ['name' => 'UNT'],

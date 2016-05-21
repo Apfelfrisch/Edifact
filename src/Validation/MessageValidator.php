@@ -30,18 +30,17 @@ class MessageValidator implements MessageValidatorInterface
     
     public function loop($edifact, $blueprint)
     {
-        $lineCount = 0;
         $blueprintCount = 0;
         while ($line = $edifact->getNextSegment()) {
             // Gratz, Validation ist für die teilmenge erfolgreich durchgelaufen, gebe anzahl der durchläufe zurück
             if ($this->endOfBlueprint($blueprint, $blueprintCount)) {
-                return $lineCount;
+                return;
             }
             $this->validateSegment($line);
             $this->validateAgainstBlueprint($line, @$blueprint[$blueprintCount]);
 
             if ($this->segmentIsLoopable($blueprint[$blueprintCount])) {
-                $this->reLoop($edifact, $blueprint, $lineCount, $blueprintCount);
+                $this->reLoop($edifact, $blueprint, $blueprintCount);
             }
 
             $blueprintCount++;
@@ -68,11 +67,25 @@ class MessageValidator implements MessageValidatorInterface
         );
     }
 
-    private function reLoop($edifact, $blueprint, &$lineCount, &$blueprintCount)
+    private function reLoop($edifact, $blueprint, &$blueprintCount)
     {
-        $lineCount += $this->loop($edifact, $blueprint[$blueprintCount]['segments']);
+        if (!isset($blueprint[$blueprintCount]['segments'])) {
+            $position = $edifact->getPointerPosition();
+            if ($edifact->getNextSegment()->name() == $blueprint[$blueprintCount]['name']) {
+                $edifact->setPointerPosition($position);
+                $this->loop($edifact, $blueprint);
+                $this->reLoopCount ++;
+            } else {
+                $edifact->setPointerPosition($this->lastPosition);
+                $edifact->getNextSegment();
+                $edifact->getNextSegment();
+            }
+            return;
+        }
+
+        $this->loop($edifact, $blueprint[$blueprintCount]['segments']);
         if ($edifact->getCurrentSegment()->name() == $blueprint[$blueprintCount]['name']) {
-            $blueprintCount--;
+            $blueprintCount --;
             $this->reLoopCount ++;
         } else {
             $this->reLoopCount = 0;
