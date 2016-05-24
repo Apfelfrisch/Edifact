@@ -10,11 +10,14 @@ use Proengeno\Edifact\Exceptions\SegValidationException;
 use Proengeno\Edifact\Interfaces\EdifactMessageInterface;
 use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 
+/*
+ * Todo: Klasse komplett neuschreiben, die ist Mist
+ */
 class MessageValidator implements MessageValidatorInterface 
 {
     private $segValidator;
-    private $trueLinecount = 1;
-    private $reLoopCount = 0;
+    private $lineCount = 1;
+    private $reLoopCount = [];
     
     public function __construct($segValidator = null)
     {
@@ -26,7 +29,7 @@ class MessageValidator implements MessageValidatorInterface
         $this->loop($edifact, $edifact->getValidationBlueprint());
         $segment = $edifact->getCurrentSegment();
         if ($segment->name() != 'UNZ' || $edifact->getNextSegment()) {
-            throw new ValidationException('Zeile ' . $this->trueLinecount . ': Unerwartetes Segement ' . @$segment->name() . ', Ende erwaret.');
+            throw new ValidationException('Zeile ' . $this->lineCount . ': Unerwartetes Segement ' . @$segment->name() . ', Ende erwaret.');
         }
 
         return $this;
@@ -42,16 +45,15 @@ class MessageValidator implements MessageValidatorInterface
             }
             $this->validateSegment($line);
             $this->validateAgainstBlueprint($line, @$blueprint[$blueprintCount]);
-
-            if ($this->segmentIsLoopable($blueprint[$blueprintCount])) {
-                if ($this->singleSegmentReLoop($edifact, $blueprint, $blueprintCount)) {
-                    continue;
-                }
-                $this->reLoop($edifact, $blueprint, $blueprintCount);
+            
+            if ($this->isSubSegmentReloop($edifact, $blueprint, $blueprintCount)) {
+                $this->reLoopSubSegments($edifact, $blueprint, $blueprintCount);
+            } elseif ($this->isSingleSegmentReloop($edifact, $blueprint, $blueprintCount)) {
+                $blueprintCount--;
             }
 
+            $this->lineCount++;
             $blueprintCount++;
-            $this->trueLinecount++;
             $this->lastPosition = $edifact->getPointerPosition();
         }
     }
@@ -61,45 +63,65 @@ class MessageValidator implements MessageValidatorInterface
         return !isset($blueprint[$blueprintCount]);
     }
 
-    private function segmentIsLoopable($segment)
+    private function isSubSegmentReloop($edifact, $blueprint, $blueprintCount)
     {
-        if (!isset($segment['maxLoops'])) {
+        if (!$this->segmentIsLoopable($blueprint, $blueprintCount) ) {
             return false;
         }
-        if ($this->reLoopCount <= $segment['maxLoops']) {
-            return true;
+        if (!isset($blueprint[$blueprintCount]['segments'])) {
+            return false;
         }
-        throw new ValidationException(
-            'Zeile ' . $this->trueLinecount . ', Segment ' . $segment['name'] . ', maximale Schleifendurchläufe (' . $segment['maxLoops'] . ') ereicht.'
-        );
+        return true;
     }
 
-    private function singleSegmentReLoop($edifact, $blueprint, $blueprintCount)
+    private function isSingleSegmentReloop($edifact, $blueprint, $blueprintCount)
     {
+        if (!$this->segmentIsLoopable($blueprint, $blueprintCount) ) {
+            return false;
+        }
         if (!isset($blueprint[$blueprintCount]['segments'])) {
             $position = $edifact->getPointerPosition();
             if ($edifact->getNextSegment()->name() == $blueprint[$blueprintCount]['name']) {
                 $edifact->setPointerPosition($position);
+                // Hier sollten wir nicht hochzählen, den Methodenname suggeriert etwas anderes
+                isset($this->reLoopCount[$blueprintCount]) ? $this->reLoopCount[$blueprintCount] ++ : $this->reLoopCount[$blueprintCount] = 0;
                 return true;
+            } else {
+                $edifact->setPointerPosition($position);
+                $this->reLoopCount[$blueprintCount] = 0;
             }
-            $edifact->setPointerPosition($position);
         }
 
         return false;
     }
 
-    private function reLoop($edifact, $blueprint, &$blueprintCount)
+    private function segmentIsLoopable($blueprint, $blueprintCount)
     {
-        if (!isset($blueprint[$blueprintCount]['segments'])) {
-            return;
+        $segment = $blueprint[$blueprintCount];
+        if (!isset($segment['maxLoops'])) {
+            return false;
         }
+        if (!isset($this->reLoopCount[$blueprintCount])) {
+            return true;
+        }
+        if ($this->reLoopCount[$blueprintCount] < $segment['maxLoops']) {
+            return true;
+        }
+        throw new ValidationException(
+            'Zeile ' . $this->lineCount . ', Segment ' . $segment['name'] . ', maximale Schleifendurchläufe (' . $segment['maxLoops'] . ') ereicht.'
+        );
+    }
+
+    private function reLoopSubSegments($edifact, $blueprint, &$blueprintCount)
+    {
         $this->loop($edifact, $blueprint[$blueprintCount]['segments']);
         if ($edifact->getCurrentSegment()->name() == $blueprint[$blueprintCount]['name']) {
+            isset($this->reLoopCount[$blueprintCount]) ? $this->reLoopCount[$blueprintCount] ++ : $this->reLoopCount[$blueprintCount] = 0;
             $blueprintCount --;
-            $this->reLoopCount ++;
         } else {
-            $this->reLoopCount = 0;
+            $this->reLoopCount[$blueprintCount] = 0;
         }
+
         $edifact->setPointerPosition($this->lastPosition);
     }
     
@@ -116,9 +138,9 @@ class MessageValidator implements MessageValidatorInterface
     {
         if ($segment->name() != $blueprint['name']) {
             if (isset($blueprint['name'])) {
-                throw new ValidationException('Zeile ' . $this->trueLinecount . ': Unerwartetes Segement ' . @$segment->name() . ', ' . $blueprint['name'] . ' erwartet.');
+                throw new ValidationException('Zeile ' . $this->lineCount . ': Unerwartetes Segement ' . @$segment->name() . ', ' . $blueprint['name'] . ' erwartet.');
             }
-            throw new ValidationException('Zeile ' . $this->trueLinecount . ': Unerwartetes Segement ' . @$segment->name() . ', Ende erwartet.');
+            throw new ValidationException('Zeile ' . $this->lineCount . ': Unerwartetes Segement ' . @$segment->name() . ', Ende erwartet.');
         }
     }
 
@@ -127,7 +149,7 @@ class MessageValidator implements MessageValidatorInterface
         if (isset($blueprint['templates'])) {
             foreach ($blueprint['templates'] as $segmendMethod => $suggestions) {
                 if (!in_array($segment->$segmendMethod(), $suggestions)) {
-                    $message = 'Zeile ' . $this->trueLinecount
+                    $message = 'Zeile ' . $this->lineCount
                         . ', Segment ' . $segment->name()
                         . ', enthält unerlaubten Inhalt: "' . $segment->$segmendMethod() . '"'
                         . '. Erlaubt ist ("' . implode('" | "', $suggestions). '")';
@@ -142,7 +164,7 @@ class MessageValidator implements MessageValidatorInterface
         try {
             $segment->validate($this->segValidator);
         } catch (SegValidationException $e) {
-            throw new ValidationException('Zeile ' . $this->trueLinecount . ', Segment ' . $segment->name() . ', ' . $e->getMessage());
+            throw new ValidationException('Zeile ' . $this->lineCount . ', Segment ' . $segment->name() . ', ' . $e->getMessage());
         }
     }
 }

@@ -25,7 +25,7 @@ class MessageValidatorTest extends TestCase
         
         $edifactMessage = Message::fromString("UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'LIN+1'DTM+137:201604221414:203'LIN+1'DTM+137:201604221414:203'UNS+D'UNT+18+2'UNZ+4+6910995E'");
         $validator->validate($edifactMessage);
-    }
+    }'DTM+137:201604221414:203
 
     /** @test */
     public function it_can_vaildate_a_message_with_multiple_nested_reloops()
@@ -46,15 +46,30 @@ class MessageValidatorTest extends TestCase
     }
 
     /** @test */
-    public function it_checks_the_maximal_reloops()
+    public function it_checks_the_maximal_reloops_for_nested_segments()
     {
         $validator = new MessageValidator;
 
-        foreach(range(1, 6) as $i) {
-            $loopedSegments[] = "LIN+1'DTM+137:201604221414:203'";
+        foreach(range(0, 6) as $i) {
+            $loopedSegments[] = "LIN+1'DTM+137:201604221414:203'DTM+137:201604221414:203'DTM+137:201604221414:203'DTM+137:201604221414:203'DTM+137:201604221414:203";
         }
         $edifactMessage = Message::fromString(
-            "UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'LIN+1'DTM+137:201604221414:203'" . implode($loopedSegments) . "UNS+D'UNT+18+2'UNZ+4+6910995E'"
+            "UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'" . implode($loopedSegments) . "UNS+D'UNT+18+2'UNZ+4+6910995E'"
+        );
+        $this->expectException(ValidationException::class);
+        $validator->validate($edifactMessage);
+    }
+
+    /** @test */
+    public function it_checks_the_maximal_reloops_for_single_segments()
+    {
+        $validator = new MessageValidator;
+
+        foreach(range(0, 6) as $i) {
+            $loopedSegments[] = "DTM+137:201604221414:203'";
+        }
+        $edifactMessage = Message::fromString(
+            "UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'LIN+1'" . implode($loopedSegments) . "UNS+D'UNT+18+2'UNZ+4+6910995E'"
         );
         $this->expectException(ValidationException::class);
         $validator->validate($edifactMessage);
