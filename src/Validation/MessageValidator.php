@@ -95,23 +95,6 @@ class MessageValidator implements MessageValidatorInterface
         return false;
     }
 
-    private function segmentIsLoopable($blueprint, $blueprintCount)
-    {
-        $segment = $blueprint[$blueprintCount];
-        if (!isset($segment['maxLoops'])) {
-            return false;
-        }
-        if (!isset($this->reLoopCount[$blueprintCount])) {
-            return true;
-        }
-        if ($this->reLoopCount[$blueprintCount] < $segment['maxLoops']) {
-            return true;
-        }
-        throw new ValidationException(
-            'Zeile ' . $this->lineCount . ', Segment ' . $segment['name'] . ', maximale Schleifendurchläufe (' . $segment['maxLoops'] . ') ereicht.'
-        );
-    }
-
     private function reLoopSubSegments($edifact, $blueprint, &$blueprintCount)
     {
         $this->loop($edifact, $blueprint[$blueprintCount]['segments']);
@@ -124,7 +107,33 @@ class MessageValidator implements MessageValidatorInterface
 
         $edifact->setPointerPosition($this->lastPosition);
     }
-    
+
+    private function segmentIsLoopable($blueprint, $blueprintCount)
+    {
+        $segment = $blueprint[$blueprintCount];
+        if (!isset($segment['maxLoops']) && !isset($segment['segments']) ) {
+            return false;
+        }
+        if ($this->checkReLoopCount($blueprintCount, $segment)) {
+            return true;
+        }
+        throw new ValidationException(
+            'Zeile ' . $this->lineCount . ', Segment ' . $segment['name'] . ', maximale Schleifendurchläufe (' . $segment['maxLoops'] . ') ereicht.'
+        );
+    }
+
+    private function checkReLoopCount($blueprintCount, $segment)
+    {
+        $maxLoops = isset($segment['maxLoops']) ? $segment['maxLoops'] : 1;
+        if (!isset($this->reLoopCount[$blueprintCount])) {
+            return true;
+        }
+        if ($this->reLoopCount[$blueprintCount] < $maxLoops) {
+            return true;
+        }
+        return false;
+    }
+
     private function validateAgainstBlueprint($segment, $blueprint)
     {
         if ($segment == null) {
