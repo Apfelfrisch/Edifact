@@ -13,20 +13,15 @@ use Proengeno\Edifact\Message\Delimiter;
 
 class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIterator 
 {
-    const DROP_NEW_LINE = 1;
-    const READ_AHEAD = 2;
-    const SKIP_EMPTY = 4;
-    const READ_CSV = 8;
-    
     private $rsrc;
-    private $flags;
     private $filename;
     private $delimiter;
     private $maxLineLen = 0;
     private $currentSegment = false;
     private $currentSegmentNumber = 0;
     
-    public function __construct($filename, $open_mode = 'r', $use_include_path = false) {
+    public function __construct($filename, $open_mode = 'r', $use_include_path = false) 
+    {
         if (is_string($filename) && empty($filename)) {
             throw new RuntimeException( __METHOD__."({$filename}): Filename cannot be empty");
         }
@@ -60,15 +55,18 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
         return trim($result);
     }
 
-    public function eof() {
+    public function eof() 
+    {
         return feof($this->rsrc);
     }
     
-    public function flush() {
+    public function flush() 
+    {
         return fflush($this->rsrc);
     }
     
-    public function getChar() {
+    public function getChar() 
+    {
         $char = fgetc($this->rsrc);
         if ($char == "'") {
             $this->currentSegmentNumber++;
@@ -76,7 +74,8 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
         return $char;
     }
     
-    public function getSegment() {
+    public function getSegment() 
+    {
         if (false !== $this->currentSegment) {
             $this->next();
         }
@@ -84,38 +83,46 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
         return $this->currentSegment = $this->fetchSegment();
     }
     
-    public function lock($operation, &$wouldblock = false) {
+    public function lock($operation, &$wouldblock = false) 
+    {
         return flock($this->rsrc, $operation, $wouldblock);
     }
     
-    public function passthru() {
+    public function passthru() 
+    {
         return fpassthru($this->rsrc);
     }
     
-    public function read($length) {
+    public function read($length) 
+    {
         return fread($this->rsrc, $length);
     }
     
-    public function seek($offset, $whence = SEEK_SET) {
+    public function seek($offset, $whence = SEEK_SET) 
+    {
         if (0 == $result = fseek($this->rsrc, $offset, $whence)) {
             return true;
         }
         return false;
     }
     
-    public function stat() {
+    public function stat() 
+    {
         return fstat($this->rsrc);
     }
     
-    public function tell() {
+    public function tell() 
+    {
         return ftell($this->rsrc);
     }
     
-    public function truncate($size) {
+    public function truncate($size) 
+    {
         return ftruncate($this->rsrc, $size);
     }
     
-    public function write($str) {
+    public function write($str) 
+    {
         fwrite($this->rsrc, $str);
     }
 
@@ -125,11 +132,6 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
         $this->rewind();
     }
 
-    public function getFlags() 
-    {
-        return $this->flags;
-    }
-    
     public function getMaxLineLen() 
     {
         return $this->maxLineLen;
@@ -141,11 +143,6 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
             $this->delimiter = Delimiter::setFromFile($this);
         }
         return $this->delimiter;
-    }
-    
-    public function setFlags($flags) 
-    {
-        $this->flags = $flags;
     }
     
     public function setMaxLineLen($max_len) 
@@ -161,33 +158,15 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
         return $this->key();
     }
     
-    public function current() 
+    public function rewind() 
     {
-        if ($this->currentSegment === false) {
-            $this->currentSegment = $this->fetchSegment();
-        }
-        return $this->currentSegment;
-    }
-    
-    public function key() {
-        return $this->currentSegmentNumber;
-    }
-    
-    public function next() {
-        $this->currentSegment = false;
-        $this->currentSegmentNumber++;
-    }
-    
-    public function rewind() {
         rewind($this->rsrc);
         $this->currentSegmentNumber = 0;
         $this->currentSegment = false;
-        if ($this->flags & self::READ_AHEAD) {
-            $this->current();
-        }
     }
     
-    public function seekToSegment($segmentPosition) {
+    public function seekToSegment($segmentPosition) 
+    {
         if ($segmentPosition < 0) {
             throw new LogicException("Can't seek file " . $this->filename . " to negative Segment position $segmentPosition");
         }
@@ -203,18 +182,55 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
         $this->current();
     }
     
-    public function valid() {
-        if ($this->flags & self::READ_AHEAD) {
-            return $this->current() !== false;
+    /*
+     * Needed for RecursiveIterator Interface
+     */
+    public function current() 
+    {
+        if ($this->currentSegment === false) {
+            $this->currentSegment = $this->fetchSegment();
         }
-        return !$this->eof();
+        return $this->currentSegment;
+    }
+    
+    /*
+     * Needed for RecursiveIterator Interface
+     */
+    public function key() 
+    {
+        return $this->currentSegmentNumber;
+    }
+    
+    /*
+     * Needed for RecursiveIterator Interface
+     */
+    public function next() 
+    {
+        $this->currentSegment = false;
+        $this->currentSegmentNumber++;
+    }
+    
+    /*
+     * Needed for RecursiveIterator Interface
+     */
+    public function valid() 
+    {
+        return $this->current() !== false;
     }
 
-    public function getChildren() {
+    /*
+     * Needed for RecursiveIterator Interface
+     */
+    public function getChildren() 
+    {
         return null;
     }
 
-    public function hasChildren() {
+    /*
+     * Needed for RecursiveIterator Interface
+     */
+    public function hasChildren() 
+    {
         return false;
     }
 
@@ -222,14 +238,17 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
     {
         $mergedLines = '';
         while ($line = $this->streamGetLine()) {
+            // Skip empty Segments
+            if (ctype_cntrl($line) || empty($line)) {
+                continue;
+            }
             if ($this->delimiterWasTerminated($line)) {
                 $line[(strlen($line) -1 )] = $this->getDelimiter()->getSegment();
                 $mergedLines .= $line;
                 continue;
             }
-            $mergedLines .= $line;
 
-            return $mergedLines;
+            return $mergedLines . $line;
         }
 
         return $line;

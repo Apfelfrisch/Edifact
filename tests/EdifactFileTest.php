@@ -107,5 +107,18 @@ class EdifactFileTest extends TestCase
         $stream->rewind();
         $this->assertEquals(0, $stream->tell());
     }
+
+    public function testIterateOverClass()
+    {
+        $stream = new EdifactFile($filePath = __DIR__ . '/data/edifact.txt');
+
+        $content = "";
+        foreach ($stream as $segment) {
+            $content .= $segment . "'";
+        }
+          
+        $this->assertEquals((string)$stream, $content);
+    }
+    
 }
 
