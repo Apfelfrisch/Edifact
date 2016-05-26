@@ -162,11 +162,6 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
         $this->maxLineLen = $max_len;
     }
 
-    public function segmentCount()
-    {
-        return $this->key();
-    }
-    
     public function rewind() 
     {
         rewind($this->rsrc);
