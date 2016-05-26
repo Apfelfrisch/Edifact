@@ -40,8 +40,8 @@ abstract class Builder
     public function addMessage($message)
     {
         if ($this->messageIsEmpty()) {
-            $this->writeSegment($this->getSeg('una')::fromAttributes());
-            $this->writeSegment($this->getUnb());
+            $this->writeSeg('una');
+            $this->writeUnb();
         }
         $this->writeMessage($message);
         $this->messageCount++;
@@ -52,7 +52,7 @@ abstract class Builder
     public function get()
     {
         if (!$this->messageIsEmpty()) {
-            $this->edifactFile->write($this->getUnz());
+            $this->writeSeg('unz', [$this->messageCount, $this->unbReference()]);
             $this->edifactFile->rewind();
         }
         $this->messageWasFetched = true;
@@ -67,27 +67,23 @@ abstract class Builder
         return $this->unbReference;
     }
     
-    protected function writeSegment(Segment $segment)
+    protected function writeSeg($segment, $attributes = [], $method = 'fromAttributes')
     {
+        $segment = call_user_func_array([EdifactRegistrar::getSegment($segment), $method], $attributes);
         $this->edifactFile->write($segment);
-        if (is_a($segment, $this->getSeg('una')) || is_a($segment, $this->getSeg('unb')) ) {
+        if ($segment->name() == 'UNA' || $segment->name() == 'UNB') {
             return;
         }
-        if (is_a($segment, $this->getSeg('unh')) ) {
+        if ($segment->name() == 'UNH') {
             $this->unhCounter = 1;
             return;
         }
         $this->unhCounter ++;
     }
     
+    abstract protected function writeUnb();
+
     abstract protected function writeMessage($array);
-
-    abstract protected function getUnb();
-
-    protected function getSeg($seg)
-    {
-        return EdifactRegistrar::getSegment($seg);
-    }
 
     private function messageIsEmpty()
     {
@@ -128,16 +124,6 @@ abstract class Builder
     private function reflectMessageClass($class = null)
     {
         return new ReflectionClass($class ?: $this->message);
-    }
-
-    private function getUna()
-    {
-        return $this->getSeg('una')::fromAttributes();
-    }
-    
-    private function getUnz()
-    {
-        return $this->getSeg('unz')::fromAttributes($this->messageCount, $this->unbReference());
     }
 }
 
