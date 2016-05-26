@@ -99,6 +99,19 @@ class EdifactFileTest extends TestCase
         $this->assertTrue($stream->eof());
     }
 
+    public function testGettingCharAndCoutSegmentUpIfNeeded()
+    {
+        file_put_contents($this->tmpnam, "UNA:+.? 'UNB?'UNT'");
+        $stream = new EdifactFile($this->tmpnam, 'r');
+        
+        $stream->seek(0);
+        while(!$stream->eof() ) {
+            $stream->getChar();
+        }
+
+        $this->assertEquals(2, $stream->key());
+    }
+
     public function testRewindResetsToStartOfStream()
     {
         file_put_contents($this->tmpnam, 'FOO BAR');
