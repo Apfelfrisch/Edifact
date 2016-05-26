@@ -2,9 +2,9 @@
 
 namespace Proengeno\Edifact\Message;
 
+use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Interfaces\SegInterface;
 use Proengeno\Edifact\Validation\SegmentValidator;
-use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Interfaces\SegValidatorInterface;
 
 abstract class Segment implements SegInterface 

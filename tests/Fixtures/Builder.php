@@ -25,7 +25,14 @@ class Builder extends BuilderCore
 
     protected function writeMessage($array)
     {
-        return null;
+        $this->writeSegment($this->getSeg('unh')::fromAttributes(
+            $this->unbReference(), 
+            'REMADV',
+            'D',
+            '05A', 
+            'UN',
+            '2.7b'
+        ));
     }
 
     protected function getUnb()

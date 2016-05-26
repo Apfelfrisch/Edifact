@@ -6,32 +6,7 @@ use Proengeno\Edifact\Exceptions\ValidationException;
 
 class EdifactRegistrar
 {
-    private static $segments = [
-//        'AGR' => Message\Segments\Agr::class,
-//        'BGM' => Message\Segments\Bgm::class,
-//        'CAV' => Message\Segments\Cav::class,
-//        'CCI' => Message\Segments\Cci::class,
-//        'COM' => Message\Segments\Com::class,
-//        'CTA' => Message\Segments\Cta::class,
-//        'CUX' => Message\Segments\Cux::class,
-//        'DTM' => Message\Segments\Dtm::class,
-//        'DOC' => Message\Segments\Doc::class,
-//        'IDE' => Message\Segments\Ide::class,
-//        'IMD' => Message\Segments\Imd::class,
-//        'LIN' => Message\Segments\Lin::class,
-//        'LOC' => Message\Segments\Loc::class,
-//        'MOA' => Message\Segments\Moa::class,
-//        'NAD' => Message\Segments\Nad::class,
-//        'QTY' => Message\Segments\Qty::class,
-//        'RFF' => Message\Segments\Rff::class,
-//        'SEQ' => Message\Segments\Seq::class,
-//        'UNA' => Message\Segments\Una::class,
-//        'UNB' => Message\Segments\Unb::class,
-//        'UNH' => Message\Segments\Unh::class,
-//        'UNS' => Message\Segments\Uns::class,
-//        'UNT' => Message\Segments\Unt::class,
-//        'UNZ' => Message\Segments\Unz::class,
-    ];
+    private static $segments = [];
     private static $messages = [];
 
     public static function addSegement($key, $path)

@@ -21,6 +21,7 @@ class BuilderTest extends TestCase
 
     public function tearDown()
     {
+        parent::tearDown();
         $filepath = $this->file->getRealPath();
         if (file_exists($filepath)) {
             unlink($filepath);
@@ -68,7 +69,22 @@ class BuilderTest extends TestCase
         $message = $this->builder->addMessage([])->get();
 
         $this->assertStringStartsWith("UNA:+.? 'UNB+UNOC:3+from:500+to:500", (string)$message);
-        $this->assertStringEndsWith("M_unique_id+VL'UNZ+1+M_unique_id'", (string)$message);
+        $this->assertStringEndsWith("UNZ+1+M_unique_id'", (string)$message);
+    }
+
+    /** @test */
+    public function it_counts_the_given_messages_and_writes_the_right_unz_segment()
+    {
+        $messageCount = 2;
+
+        foreach (range(1, $messageCount) as $i ) {
+            $this->builder->addMessage(['']);
+        }
+
+        $message = $this->builder->get();
+
+        $this->assertStringStartsWith("UNA:+.? 'UNB+UNOC:3+from:500+to:500", (string)$message);
+        $this->assertStringEndsWith("UNZ+" . $messageCount . "+M_unique_id'", (string)$message);
     }
 }
 

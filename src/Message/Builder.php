@@ -40,7 +40,7 @@ abstract class Builder
     public function addMessage($message)
     {
         if ($this->messageIsEmpty()) {
-            $this->writeSegment(EdifactRegistrar::getSegment('UNA')::fromAttributes());
+            $this->writeSegment($this->getSeg('una')::fromAttributes());
             $this->writeSegment($this->getUnb());
         }
         $this->writeMessage($message);
@@ -70,10 +70,10 @@ abstract class Builder
     protected function writeSegment(Segment $segment)
     {
         $this->edifactFile->write($segment);
-        if (is_a($segment, EdifactRegistrar::getSegment('UNA')) || is_a($segment, EdifactRegistrar::getSegment('UNB')) ) {
+        if (is_a($segment, $this->getSeg('una')) || is_a($segment, $this->getSeg('unb')) ) {
             return;
         }
-        if (is_a($segment, EdifactRegistrar::getSegment('UNA')) ) {
+        if (is_a($segment, $this->getSeg('unh')) ) {
             $this->unhCounter = 1;
             return;
         }
@@ -83,6 +83,11 @@ abstract class Builder
     abstract protected function writeMessage($array);
 
     abstract protected function getUnb();
+
+    protected function getSeg($seg)
+    {
+        return EdifactRegistrar::getSegment($seg);
+    }
 
     private function messageIsEmpty()
     {
@@ -127,12 +132,12 @@ abstract class Builder
 
     private function getUna()
     {
-        return EdifactRegistrar::getSegment('UNA')::fromAttributes();
+        return $this->getSeg('una')::fromAttributes();
     }
     
     private function getUnz()
     {
-        return EdifactRegistrar::getSegment('UNZ')::fromAttributes($this->messageCount, $this->unbReference());
+        return $this->getSeg('unz')::fromAttributes($this->messageCount, $this->unbReference());
     }
 }
 
