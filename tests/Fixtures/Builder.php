@@ -3,7 +3,7 @@
 namespace Proengeno\Edifact\Test\Fixtures;
 
 use DateTime;
-use Proengeno\Edifact\Message\Segments\Unb;
+use Proengeno\Edifact\Test\Fixtures\Segments\Unb;
 use Proengeno\Edifact\Message\Builder as BuilderCore;
 
 class Builder extends BuilderCore

@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact\Test\Fixtures;
 
-use Proengeno\Edifact\Message\Segments\Segment as SegmentCore;
+use Proengeno\Edifact\Message\Segment as SegmentCore;
 
 class Segment extends SegmentCore
 {

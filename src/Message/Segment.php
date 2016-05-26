@@ -1,6 +1,6 @@
 <?php 
 
-namespace Proengeno\Edifact\Message\Segments;
+namespace Proengeno\Edifact\Message;
 
 use Proengeno\Edifact\Interfaces\SegInterface;
 use Proengeno\Edifact\Validation\SegmentValidator;

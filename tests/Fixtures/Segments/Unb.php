@@ -1,8 +1,9 @@
 <?php 
 
-namespace Proengeno\Edifact\Message\Segments;
+namespace Proengeno\Edifact\Test\Fixtures\Segments;
 
 use DateTime;
+use Proengeno\Edifact\Message\Segment;
 
 class Unb extends Segment 
 {

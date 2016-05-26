@@ -4,14 +4,12 @@ namespace Proengeno\Edifact\Message;
 
 use ReflectionClass;
 use Proengeno\Edifact\EdifactFile;
-use Proengeno\Edifact\Message\Segments\Una;
-use Proengeno\Edifact\Message\Segments\Unz;
-use Proengeno\Edifact\Message\Segments\Segment;
+use Proengeno\Edifact\Message\Segment;
+use Proengeno\Edifact\EdifactRegistrar;
 use Proengeno\Edifact\Exceptions\ValidationException;
 
 abstract class Builder
 {
-
     protected $to;
     protected $from;
     protected $edifactFile;
@@ -42,7 +40,7 @@ abstract class Builder
     public function addMessage($message)
     {
         if ($this->messageIsEmpty()) {
-            $this->writeSegment(Una::fromAttributes());
+            $this->writeSegment(EdifactRegistrar::getSegment('UNA')::fromAttributes());
             $this->writeSegment($this->getUnb());
         }
         $this->writeMessage($message);
@@ -72,11 +70,10 @@ abstract class Builder
     protected function writeSegment(Segment $segment)
     {
         $this->edifactFile->write($segment);
-
-        if ($segment instanceof Una || $segment instanceof Unb) {
+        if (is_a($segment, EdifactRegistrar::getSegment('UNA')) || is_a($segment, EdifactRegistrar::getSegment('UNB')) ) {
             return;
         }
-        if ($segment instanceof Unh) {
+        if (is_a($segment, EdifactRegistrar::getSegment('UNA')) ) {
             $this->unhCounter = 1;
             return;
         }
@@ -130,12 +127,12 @@ abstract class Builder
 
     private function getUna()
     {
-        return Una::fromAttributes();
+        return EdifactRegistrar::getSegment('UNA')::fromAttributes();
     }
     
     private function getUnz()
     {
-        return Unz::fromAttributes($this->messageCount, $this->unbReference());
+        return EdifactRegistrar::getSegment('UNZ')::fromAttributes($this->messageCount, $this->unbReference());
     }
 }
 

@@ -16,8 +16,7 @@ class MessageTest extends TestCase
     public function setUp()
     {
         $file = new EdifactFile(__DIR__ . '/../data/edifact.txt');
-        $validator = m::mock(MessageValidatorInterface::class);
-        $this->messageCore = new Message($file, $validator);
+        $this->messageCore = new Message($file, m::mock(MessageValidatorInterface::class));
     }
 
     /** @test */
@@ -43,25 +42,25 @@ class MessageTest extends TestCase
     public function it_fetch_the_current_segement_from_stream()
     {
         $messageCore = Message::fromString("UNH'UNB");
-        $this->assertInstanceOf('Proengeno\Edifact\Message\Segments\Unh', $messageCore->getNextSegment());
-        $this->assertInstanceOf('Proengeno\Edifact\Message\Segments\Unh', $messageCore->getCurrentSegment());
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getNextSegment());
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getCurrentSegment());
     }
 
     /** @test */
     public function it_fetch_the_next_segement_from_stream()
     {
         $messageCore = Message::fromString("UNH'UNB");
-        $this->assertInstanceOf('Proengeno\Edifact\Message\Segments\Unh', $messageCore->getNextSegment());
-        $this->assertInstanceOf('Proengeno\Edifact\Message\Segments\Unb', $messageCore->getNextSegment());
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getNextSegment());
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unb', $messageCore->getNextSegment());
     }
 
     /** @test */
     public function it_fetch_a_specific_segement_from_stream()
     {
         $messageCore = Message::fromString("UNH'UNB'UNT");
-        $this->assertInstanceOf('Proengeno\Edifact\Message\Segments\Unb', $messageCore->findNextSegment('UNB'));
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unb', $messageCore->findNextSegment('UNB'));
         $this->assertFalse($messageCore->findNextSegment('UNH'));
-        $this->assertInstanceOf('Proengeno\Edifact\Message\Segments\Unh', $messageCore->findNextSegment('UNH', $fromFileStart = true));
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->findNextSegment('UNH', $fromFileStart = true));
     }
 
     /** @test */
@@ -80,10 +79,6 @@ class MessageTest extends TestCase
     /** @test */
     public function it_can_return_the_delimter()
     {
-        $validator = m::mock(MessageValidatorInterface::class, function($validator){
-            $validator->shouldReceive('validate')->once();
-        });
-
         $unaValues = [":+.? '", "abcdef"];
         foreach ($unaValues as $unaValue) {
             $messageCore = Message::fromString("UNA" . $unaValue . "'UNH");
