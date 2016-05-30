@@ -15,7 +15,7 @@ class BuilderTest extends TestCase
 
     public function setUp()
     {
-        $this->builder = new Builder(Message::class, 'from', 'to', 'wb+');
+        $this->builder = new Builder('from', 'to', 'wb+');
         $this->file = $this->builder->getEdifactFile();
     }
 

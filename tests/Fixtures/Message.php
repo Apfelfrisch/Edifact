@@ -6,6 +6,7 @@ use Proengeno\Edifact\Message\Message as MessageCore;
 
 class Message extends MessageCore
 {
+    protected static $builderClass = Builder::class;
     protected static $validationBlueprint = [
         ['name' => 'UNA'],
         ['name' => 'UNH', 'maxLoops' => 10, 'necessity' => 'R', 'segments' => [
@@ -18,10 +19,5 @@ class Message extends MessageCore
         ]],
         ['name' => 'UNZ']
     ];
-    
-    public static function build($from, $to)
-    {
-        return new Builder(static::class, $from, $to);
-    }
 }
     

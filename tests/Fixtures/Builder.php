@@ -13,6 +13,10 @@ class Builder extends BuilderCore
 
     private $energyType;
 
+    public function __construct($from, $to, $mode = 'w+')
+    {
+        parent::__construct(Message::class, $from, $to, $mode);
+    }
     /*
      * Methode nur zur Testzwecken.
      * Nicht in Produktion nutzten, da das Object nach Rückgabe noch 
