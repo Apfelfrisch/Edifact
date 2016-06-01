@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Message;
 
 use Proengeno\Edifact\EdifactFile;
-use Proengeno\Edifact\EdifactRegistrar;
 use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Validation\MessageValidator;
 use Proengeno\Edifact\Exceptions\ValidationException;
@@ -71,8 +70,8 @@ abstract class Message implements EdifactMessageInterface
         if ($fromStart) {
             $this->file->rewind();
         }
-
-        $searchObject = EdifactRegistrar::getSegment($searchSegment);
+        
+        $searchObject = static::getSegmentClass($searchSegment);
         while ($segmentObject = $this->getNextSegment()) {
             if ($segmentObject instanceof $searchObject) {
                 return $segmentObject;
@@ -110,10 +109,20 @@ abstract class Message implements EdifactMessageInterface
     {
         return $this->file->getDelimiter();
     }
-    
-    private function getSegmentObject($segLine)
+
+    public static function getSegmentClass($segmentName)
     {
-        return call_user_func_array(EdifactRegistrar::getSegment($this->getSegname($segLine)) . '::fromSegLine', [$segLine, $this->getDelimiter()]);
+        $segmentName = strtoupper($segmentName);
+        if (isset(static::$segments[$segmentName])) {
+            return static::$segments[$segmentName];
+        }
+
+        throw ValidationException::segmentUnknown($segmentName);
+    }
+    
+    public function getSegmentObject($segLine)
+    {
+        return call_user_func_array(static::getSegmentClass($this->getSegname($segLine)) . '::fromSegLine', [$segLine, $this->getDelimiter()]);
     }
 
     private function getSegname($segLine) 

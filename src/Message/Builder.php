@@ -5,7 +5,6 @@ namespace Proengeno\Edifact\Message;
 use ReflectionClass;
 use Proengeno\Edifact\EdifactFile;
 use Proengeno\Edifact\Message\Segment;
-use Proengeno\Edifact\EdifactRegistrar;
 use Proengeno\Edifact\Exceptions\ValidationException;
 
 abstract class Builder
@@ -69,7 +68,8 @@ abstract class Builder
     
     protected function writeSeg($segment, $attributes = [], $method = 'fromAttributes')
     {
-        $segment = call_user_func_array([EdifactRegistrar::getSegment($segment), $method], $attributes);
+        $message = $this->message;
+        $segment = call_user_func_array([$message::getSegmentClass($segment), $method], $attributes);
         $this->edifactFile->write($segment);
         if ($segment->name() == 'UNA' || $segment->name() == 'UNB') {
             return;
@@ -126,6 +126,3 @@ abstract class Builder
         return new ReflectionClass($class ?: $this->message);
     }
 }
-
-
-
