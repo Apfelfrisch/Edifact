@@ -22,6 +22,7 @@ abstract class Message implements EdifactMessageInterface
     {
         $this->file = $file;
         $this->validator = $validator ?: new MessageValidator;
+        $this->segmentBuilder = new SegmentFactory($this->getDelimiter());
     }
     
     public static function fromString($string)
@@ -120,9 +121,9 @@ abstract class Message implements EdifactMessageInterface
         throw ValidationException::segmentUnknown($segmentName);
     }
     
-    public function getSegmentObject($segLine)
+    private function getSegmentObject($segLine)
     {
-        return call_user_func_array(static::getSegmentClass($this->getSegname($segLine)) . '::fromSegLine', [$segLine, $this->getDelimiter()]);
+        return $this->segmentBuilder->fromSegline(static::getSegmentClass($this->getSegname($segLine)), $segLine);
     }
 
     private function getSegname($segLine) 

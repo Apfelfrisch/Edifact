@@ -68,6 +68,7 @@ class MessageTest extends TestCase
     {
         $file = m::mock(EdifactFile::class, function($file) {
             $file->shouldReceive('rewind')->twice();
+            $file->shouldReceive('getDelimiter')->once();
         });
         $validator = m::mock(MessageValidatorInterface::class, function($validator){
             $validator->shouldReceive('validate')->once();

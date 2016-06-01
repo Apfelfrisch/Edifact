@@ -24,6 +24,7 @@ abstract class Builder
         $this->to = $to;
         $this->from = $from;
         $this->setMessageClass($message);
+        $this->segmentBuilder = new SegmentFactory;
         $this->edifactFile = new EdifactFile($this->getFilename(), $mode);
     }
 
@@ -69,7 +70,7 @@ abstract class Builder
     protected function writeSeg($segment, $attributes = [], $method = 'fromAttributes')
     {
         $message = $this->message;
-        $segment = call_user_func_array([$message::getSegmentClass($segment), $method], $attributes);
+        $segment = $this->segmentBuilder->fromAttributes($message::getSegmentClass($segment), $attributes, $method);
         $this->edifactFile->write($segment);
         if ($segment->name() == 'UNA' || $segment->name() == 'UNB') {
             return;
