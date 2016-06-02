@@ -52,7 +52,7 @@ class BuilderTest extends TestCase
     /** @test */
     public function it_provides_the_unb_ref()
     {
-        $this->assertEquals('M_unique_id', $this->builder->unbReference());
+        $this->assertEquals('unique_id', $this->builder->unbReference());
     }
 
     /** @test */
@@ -64,12 +64,12 @@ class BuilderTest extends TestCase
     /** @test */
     public function it_sets_the_header_an_footer_from_the_edifact_message()
     {
-        $expectedMessage = "UNA:+.? 'UNB+UNOC:3+from:500+to:500+160510:0143+M_unique_id+VL'UNZ+1+M_unique_id'";
+        $expectedMessage = "UNA:+.? 'UNB+UNOC:3+from:500+to:500+160510:0143+unique_id+VL'UNZ+1+unique_id'";
 
         $message = $this->builder->addMessage([])->get();
 
         $this->assertStringStartsWith("UNA:+.? 'UNB+UNOC:3+from:500+to:500", (string)$message);
-        $this->assertStringEndsWith("UNZ+1+M_unique_id'", (string)$message);
+        $this->assertStringEndsWith("UNZ+1+unique_id'", (string)$message);
     }
 
     /** @test */
@@ -84,12 +84,12 @@ class BuilderTest extends TestCase
         $message = $this->builder->get();
 
         $this->assertStringStartsWith("UNA:+.? 'UNB+UNOC:3+from:500+to:500", (string)$message);
-        $this->assertStringEndsWith("UNZ+" . $messageCount . "+M_unique_id'", (string)$message);
+        $this->assertStringEndsWith("UNZ+" . $messageCount . "+unique_id'", (string)$message);
     }
 }
 
 namespace Proengeno\Edifact\Message;
 
 function uniqid($prefix = null) {
-    return $prefix . '_unique_id';
+    return $prefix . 'unique_id';
 }

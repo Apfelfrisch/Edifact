@@ -12,10 +12,14 @@ class Builder extends BuilderCore
     const MESSAGE_SUBTYPE = 'VL';
 
     private $energyType;
+    private $from;
+    private $to;
 
-    public function __construct($from, $to, $mode = 'w+')
+    public function __construct($from, $to, $filepath)
     {
-        parent::__construct(Message::class, $from, $to, $mode);
+        $this->from = $from;
+        $this->to = $to;
+        parent::__construct(Message::class, $filepath.$from.$to.'.txt');
     }
     /*
      * Methode nur zur Testzwecken.
@@ -45,5 +49,4 @@ class Builder extends BuilderCore
             'UNOC', 3, $this->from, 500, $this->to, 500, new DateTime(), $this->unbReference(), self::MESSAGE_SUBTYPE
         ]);
     }
-
 }

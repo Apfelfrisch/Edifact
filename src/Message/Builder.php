@@ -9,31 +9,29 @@ use Proengeno\Edifact\Exceptions\ValidationException;
 
 abstract class Builder
 {
-    protected $to;
-    protected $from;
     protected $edifactFile;
     protected $unhCounter = 0;
 
-    private $message;
+    private $edifactClass;
     private $unbReference;
     private $messageCount = 0;
     private $messageWasFetched = false;
     
-    public function __construct($message, $from, $to, $mode = 'w+')
+    public function __construct($edifactClass, $filepath)
     {
-        $this->to = $to;
-        $this->from = $from;
-        $this->setMessageClass($message);
+        $this->setMessageClass($edifactClass);
         $this->segmentBuilder = new SegmentFactory;
-        $this->edifactFile = new EdifactFile($this->getFilename(), $mode);
+        $this->edifactFile = new EdifactFile($filepath, 'w+');
     }
 
     public function __destruct()
     {
-        $filepath = $this->edifactFile->getRealPath();
         // Datei löschen falls Sie nicht Vollständig erstellt wurde (Exceptions o.ä) 
-        if ($this->messageWasFetched === false && file_exists($filepath)) {
-            unlink($filepath);
+        if ($this->edifactFile) {
+            $filepath = $this->edifactFile->getRealPath();
+            if ($this->messageWasFetched === false && file_exists($filepath)) {
+                unlink($filepath);
+            }
         }
     }
 
@@ -56,21 +54,21 @@ abstract class Builder
             $this->edifactFile->rewind();
         }
         $this->messageWasFetched = true;
-        return new $this->message($this->edifactFile);
+        return new $this->edifactClass($this->edifactFile);
     }
 
     public function unbReference()
     {
         if (!$this->unbReference) {
-            return $this->unbReference = uniqid($this->getFirstCharFromMessageClassname());
+            return $this->unbReference = uniqid();
         }
         return $this->unbReference;
     }
     
     protected function writeSeg($segment, $attributes = [], $method = 'fromAttributes')
     {
-        $message = $this->message;
-        $segment = $this->segmentBuilder->fromAttributes($message::getSegmentClass($segment), $attributes, $method);
+        $edifactClass = $this->edifactClass;
+        $segment = $this->segmentBuilder->fromAttributes($edifactClass::getSegmentClass($segment), $attributes, $method);
         $this->edifactFile->write($segment);
         if ($segment->name() == 'UNA' || $segment->name() == 'UNB') {
             return;
@@ -91,13 +89,13 @@ abstract class Builder
         return $this->edifactFile->tell() == 0;
     }
 
-    private function setMessageClass($message)
+    private function setMessageClass($edifactClass)
     {
-        if (! $this->classesAreRelated($message, Message::class)) {
-            throw new ValidationException('Class "' . $message . '" not Child of "'. Builder::class . '"');
+        if (! $this->classesAreRelated($edifactClass, Message::class)) {
+            throw new ValidationException('Class "' . $edifactClass . '" not Child of "'. Builder::class . '"');
         }
 
-        $this->message = $message;
+        $this->edifactClass = $edifactClass;
     }
 
     private function classesAreRelated($subclass, $superclass)
@@ -112,18 +110,8 @@ abstract class Builder
         return false;
     }
     
-    private function getFilename()
-    {
-        return static::MESSAGE_TYPE . '_' . static::MESSAGE_SUBTYPE . '_' . $this->from . '_' . $this->to . '_' . date('Ymd') . '_' . $this->unbReference() . '.txt';
-    }
-    
-    private function getFirstCharFromMessageClassname()
-    {
-        return $this->reflectMessageClass()->getShortName()[0];
-    }
-
     private function reflectMessageClass($class = null)
     {
-        return new ReflectionClass($class ?: $this->message);
+        return new ReflectionClass($class ?: $this->edifactClass);
     }
 }
