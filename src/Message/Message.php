@@ -6,7 +6,7 @@ use Closure;
 use Proengeno\Edifact\EdifactFile;
 use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Validation\MessageValidator;
-use Proengeno\Edifact\Exceptions\ValidationException;
+use Proengeno\Edifact\Exceptions\EdifactException;
 use Proengeno\Edifact\Interfaces\EdifactMessageInterface;
 use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 
@@ -36,7 +36,7 @@ abstract class Message implements EdifactMessageInterface
     public static function build($from, $to, $filepath)
     {
         if (!isset(static::$builderClass)) {
-            throw new ValidationException("No static variable $builderClass definied!");
+            throw new EdifactException("No static variable $builderClass definied!");
         }
         return new static::$builderClass($from, $to, $filepath);
     }
@@ -121,7 +121,7 @@ abstract class Message implements EdifactMessageInterface
             return static::$segments[$segmentName];
         }
 
-        throw ValidationException::segmentUnknown($segmentName);
+        throw EdifactException::segmentUnknown($segmentName);
     }
     
     private function getSegmentObject($segLine)

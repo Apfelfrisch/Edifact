@@ -9,6 +9,7 @@ use Proengeno\Edifact\Interfaces\SegValidatorInterface;
 use Proengeno\Edifact\Exceptions\SegValidationException;
 use Proengeno\Edifact\Interfaces\EdifactMessageInterface;
 use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
+use Proengeno\Edifact\Exceptions\EdifactException;
 
 /*
  * Todo: Klasse komplett neuschreiben, die ist Mist
@@ -26,10 +27,14 @@ class MessageValidator implements MessageValidatorInterface
 
     public function validate(EdifactMessageInterface $edifact)
     {
-        $this->loop($edifact, $edifact->getValidationBlueprint());
-        $segment = $edifact->getCurrentSegment();
-        if ($segment->name() != 'UNZ' || $edifact->getNextSegment()) {
-            throw new ValidationException('Zeile ' . $this->lineCount . ': Unerwartetes Segement ' . @$segment->name() . ', Ende erwaret.');
+        try {
+            $this->loop($edifact, $edifact->getValidationBlueprint());
+            $segment = $edifact->getCurrentSegment();
+            if ($segment->name() != 'UNZ' || $edifact->getNextSegment()) {
+                throw new ValidationException('Zeile ' . $this->lineCount . ': Unerwartetes Segement ' . @$segment->name() . ', Ende erwaret.');
+            }
+        } catch (EdifactException $e) {
+            throw new ValidationException($e);
         }
 
         return $this;

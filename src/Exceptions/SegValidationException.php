@@ -2,9 +2,7 @@
 
 namespace Proengeno\Edifact\Exceptions;
 
-use RuntimeException;
-
-class SegValidationException extends RuntimeException
+class SegValidationException extends EdifactException
 {
     protected $key;
     protected $value;

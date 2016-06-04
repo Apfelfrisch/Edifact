@@ -92,7 +92,7 @@ abstract class Builder
     private function setMessageClass($edifactClass)
     {
         if (! $this->classesAreRelated($edifactClass, Message::class)) {
-            throw new ValidationException('Class "' . $edifactClass . '" not Child of "'. Builder::class . '"');
+            throw new ValidationException('Class "' . $edifactClass . '" is no Child of "'. Builder::class . '"');
         }
 
         $this->edifactClass = $edifactClass;
