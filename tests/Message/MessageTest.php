@@ -57,10 +57,28 @@ class MessageTest extends TestCase
     /** @test */
     public function it_fetch_a_specific_segement_from_stream()
     {
-        $messageCore = Message::fromString("UNH'UNB'UNT");
-        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unb', $messageCore->findNextSegment('UNB'));
+        $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNT");
+
+        $this->assertInstanceOf(
+            'Proengeno\Edifact\Test\Fixtures\Segments\Unb', 
+            $messageCore->findNextSegment('UNB')
+        );
         $this->assertFalse($messageCore->findNextSegment('UNH'));
-        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->findNextSegment('UNH', $fromFileStart = true));
+        $this->assertInstanceOf(
+            'Proengeno\Edifact\Test\Fixtures\Segments\Unh', 
+            $messageCore->findNextSegment('UNH', $fromFileStart = true)
+        );
+        $this->assertInstanceOf(
+            'Proengeno\Edifact\Test\Fixtures\Segments\Unh', 
+            $messageCore->findNextSegment('UNH', $fromFileStart = true, function($segment) {
+                return $segment->referenz() == 'O160482A7C2';
+            }
+        ));
+        $this->assertFalse(
+            $messageCore->findNextSegment('UNH', $fromFileStart = true, function($segment) {
+                return $segment->referenz() == 'UNKNOW';
+            })
+        );
     }
 
     /** @test */

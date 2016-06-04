@@ -2,6 +2,7 @@
 
 namespace Proengeno\Edifact\Message;
 
+use Closure;
 use Proengeno\Edifact\EdifactFile;
 use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Validation\MessageValidator;
@@ -65,7 +66,7 @@ abstract class Message implements EdifactMessageInterface
         return $segment;
     }
 
-    public function findNextSegment($searchSegment, $fromStart = false)
+    public function findNextSegment($searchSegment, $fromStart = false, closure $criteria = null)
     {
         if ($fromStart) {
             $this->file->rewind();
@@ -74,6 +75,9 @@ abstract class Message implements EdifactMessageInterface
         $searchObject = static::getSegmentClass($searchSegment);
         while ($segmentObject = $this->getNextSegment()) {
             if ($segmentObject instanceof $searchObject) {
+                if ($criteria && !$criteria($segmentObject)) {
+                    continue;
+                }
                 return $segmentObject;
             }
         }
