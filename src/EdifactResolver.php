@@ -5,11 +5,10 @@ namespace Proengeno\Edifact;
 class EdifactResolver
 {
     private $allocationRules;
-    private $rulesMatchcount;
+
     public function addAllocationRule($edifactClass, $allocationRules)
     {
         $this->allocationRules[$edifactClass] = $allocationRules;
-        $this->rulesMatchcount[$edifactClass] = 0;
 
         return $this;
     }
