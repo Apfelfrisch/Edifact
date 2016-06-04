@@ -268,4 +268,3 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
         return $line[(strlen($line) -1 )] == $this->getDelimiter()->getTerminator();
     }
 }
-

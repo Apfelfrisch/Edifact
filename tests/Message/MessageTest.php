@@ -64,6 +64,7 @@ class MessageTest extends TestCase
             $messageCore->findNextSegment('UNB')
         );
         $this->assertFalse($messageCore->findNextSegment('UNH'));
+
         $this->assertInstanceOf(
             'Proengeno\Edifact\Test\Fixtures\Segments\Unh', 
             $messageCore->findNextSegment('UNH', $fromFileStart = true)
