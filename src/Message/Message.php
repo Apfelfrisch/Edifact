@@ -27,8 +27,7 @@ abstract class Message implements EdifactMessageInterface
     
     public static function fromString($string)
     {
-        $tmpnam = tempnam(sys_get_temp_dir(), 'edifact');
-        $file = new EdifactFile($tmpnam, 'w+');
+        $file = new EdifactFile('php://temp', 'w+');
         $file->writeAndRewind($string);
         return new static($file);
     }
