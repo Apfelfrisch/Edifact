@@ -2,8 +2,6 @@
 
 namespace Proengeno\Edifact\Message;
 
-use Proengeno\Edifact\EdifactFile;
-
 class Delimiter 
 {
     const UNA_SEGMENT = 'UNA';

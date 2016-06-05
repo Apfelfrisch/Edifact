@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact\Test\Message;
 
-use Proengeno\Edifact\EdifactFile;
+use Proengeno\Edifact\Message\EdifactFile;
 use Proengeno\Edifact\Test\TestCase;
 
 class EdifactFileTest extends TestCase
@@ -29,12 +29,12 @@ class EdifactFileTest extends TestCase
     
     public function testCanInstantiateWithStreamIdentifier()
     {
-        $this->assertInstanceOf('Proengeno\Edifact\EdifactFile', $this->stream);
+        $this->assertInstanceOf('Proengeno\Edifact\Message\EdifactFile', $this->stream);
     }
 
     public function testCanGetEdifactSegments()
     {
-        $stream = new EdifactFile($filePath = __DIR__ . '/data/edifact.txt');
+        $stream = new EdifactFile($filePath = __DIR__ . '/../data/edifact.txt');
 
         while (! $stream->eof()) {
             $string[] = $stream->getSegment();
@@ -123,7 +123,7 @@ class EdifactFileTest extends TestCase
 
     public function testIterateOverClass()
     {
-        $stream = new EdifactFile($filePath = __DIR__ . '/data/edifact.txt');
+        $stream = new EdifactFile($filePath = __DIR__ . '/../data/edifact.txt');
 
         $content = "";
         foreach ($stream as $segment) {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Proengeno\Edifact;
+namespace Proengeno\Edifact\Message;
 
 use Exception;
 use SplFileInfo;

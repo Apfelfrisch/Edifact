@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Message;
 
 use Closure;
-use Proengeno\Edifact\EdifactFile;
 use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Validation\MessageValidator;
 use Proengeno\Edifact\Exceptions\EdifactException;

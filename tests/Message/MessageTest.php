@@ -3,8 +3,8 @@
 namespace Proengeno\Edifact\Test\Message;
 
 use Mockery as m;
-use Proengeno\Edifact\EdifactFile;
 use Proengeno\Edifact\Test\TestCase;
+use Proengeno\Edifact\Message\EdifactFile;
 use Proengeno\Edifact\Test\Fixtures\Message;
 use Proengeno\Edifact\Message\Message as MessageCore;
 use Proengeno\Edifact\Interfaces\MessageValidatorInterface;

@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Message;
 
 use ReflectionClass;
-use Proengeno\Edifact\EdifactFile;
 use Proengeno\Edifact\Message\Segment;
 use Proengeno\Edifact\Exceptions\ValidationException;
 

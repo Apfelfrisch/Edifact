@@ -2,6 +2,8 @@
 
 namespace Proengeno\Edifact;
 
+use Proengeno\Edifact\Message\EdifactFile;
+
 class EdifactResolver
 {
     private $allocationRules;

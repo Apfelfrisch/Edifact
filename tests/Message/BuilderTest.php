@@ -2,8 +2,8 @@
 
 namespace Proengeno\Edifact\Test\Message;
 
-use Proengeno\Edifact\EdifactFile;
 use Proengeno\Edifact\Test\TestCase;
+use Proengeno\Edifact\Message\EdifactFile;
 use Proengeno\Edifact\Test\Fixtures\Builder;
 use Proengeno\Edifact\Test\Fixtures\Message;
 use Proengeno\Edifact\Message\Builder as BuilderCore;
