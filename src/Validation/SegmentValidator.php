@@ -43,7 +43,7 @@ class SegmentValidator implements SegValidatorInterface
         }
 
         $keys = array_keys($data);
-        throw SegValidationException::forKey(array_shift($keys), 'Datengruppe nicht erlaubt', 7);
+        throw SegValidationException::forKey(array_shift($keys), 'Data-Group not allowed.', 7);
     }
 
     private function checkUnknowDatafields($data)
@@ -54,7 +54,7 @@ class SegmentValidator implements SegValidatorInterface
         $key = current(array_keys($data));
         $value = current($data);
 
-        throw SegValidationException::forKeyValue($key, $value, 'Daten-Element nicht erlaubt', 6);
+        throw SegValidationException::forKeyValue($key, $value, 'Data-Element not allowed.', 6);
     }
 
     private function cleanUp(&$data, $dataGroupKey, $dataKey = null)
@@ -77,7 +77,7 @@ class SegmentValidator implements SegValidatorInterface
             return;
         }
 
-        throw SegValidationException::forKey($dataKey, 'Daten-Element nicht enthalten, aber benötigt.', 1);
+        throw SegValidationException::forKey($dataKey, 'Data-Element not unavailable, but needed.', 1);
     }
 
     private function isDatafieldOptional($necessaryStatus)
@@ -93,10 +93,10 @@ class SegmentValidator implements SegValidatorInterface
             return;
         }
         if ($type == static::NUMERIC && !is_numeric($string)) {
-            throw SegValidationException::forKeyValue($dataKey, $string, 'Daten-Element enthält nicht numerische Zeichen.', 2);
+            throw SegValidationException::forKeyValue($dataKey, $string, 'Data-Element contains non-numeric characters.', 2);
         }
         if ($type == static::ALPHA && !ctype_alpha(str_replace(' ', '', $string))) {
-            throw SegValidationException::forKeyValue($dataKey, $string, 'Daten-Element darf nur ausschließlich Buchstaben enthalten.', 3);
+            throw SegValidationException::forKeyValue($dataKey, $string, 'Data-Element contains non-alpha characters.', 3);
         }
     }
     
@@ -106,10 +106,10 @@ class SegmentValidator implements SegValidatorInterface
 
         $strLen = strlen($string);
         if ($strLen == 0 ) {
-            throw SegValidationException::forKeyValue($dataKey, $string, 'Daten-Element fehlt oder ist leer.', 4);
+            throw SegValidationException::forKeyValue($dataKey, $string, 'Data-Element unavailable or empty.', 4);
         }
         if ($lenght < $strLen) {
-            throw SegValidationException::forKeyValue($dataKey, $string, 'Daten-Element ist länger als ' . $lenght . ' Zeichen.', 5);
+            throw SegValidationException::forKeyValue($dataKey, $string, 'Data-Element has more than' . $lenght . ' Characters.', 5);
         }
     }
 }

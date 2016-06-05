@@ -22,7 +22,7 @@ class SegValidationExceptionTest extends TestCase
     public function it_can_instanciate_over_key_value_named_constructor()
     {
         $givenMessage = 'Message';
-        $expectedMessage = $this->key . ' (' . $this->value . '): ' . $givenMessage;
+        $expectedMessage = $this->key . ' (' . $this->value . ') : ' . $givenMessage;
 
         $exception = SegValidationException::forKeyValue($this->key, $this->value, $givenMessage, $this->code);
 

@@ -31,10 +31,10 @@ class MessageValidator implements MessageValidatorInterface
             $this->loop($edifact, $edifact->getValidationBlueprint());
             $segment = $edifact->getCurrentSegment();
             if ($segment->name() != 'UNZ' || $edifact->getNextSegment()) {
-                throw new ValidationException('Zeile ' . $this->lineCount . ': Unerwartetes Segement ' . @$segment->name() . ', Ende erwaret.');
+                throw ValidationException::unexpectedSegment($this->lineCount, @$segment->name());
             }
         } catch (EdifactException $e) {
-            throw new ValidationException($e);
+            throw new ValidationException($e->getMessage(), $this->lineCount, null);
         }
 
         return $this;
@@ -122,9 +122,7 @@ class MessageValidator implements MessageValidatorInterface
         if ($this->checkReLoopCount($blueprintCount, $segment)) {
             return true;
         }
-        throw new ValidationException(
-            'Zeile ' . $this->lineCount . ', Segment ' . $segment['name'] . ', maximale Schleifendurchläufe (' . $segment['maxLoops'] . ') ereicht.'
-        );
+        throw ValidationException::maxLoopsExceeded($this->lineCount, $segment['name']);
     }
 
     private function checkReLoopCount($blueprintCount, $segment)
@@ -142,7 +140,7 @@ class MessageValidator implements MessageValidatorInterface
     private function validateAgainstBlueprint($segment, $blueprint)
     {
         if ($segment == null) {
-            throw new ValidationException('Unerwartetes Edifact-Ende.');
+            throw ValidationException::unexpectedEnd();
         }
         $this->validateBlueprintNames($segment, $blueprint);
         $this->validateBlueprintTemplates($segment, $blueprint);
@@ -152,9 +150,9 @@ class MessageValidator implements MessageValidatorInterface
     {
         if ($segment->name() != $blueprint['name']) {
             if (isset($blueprint['name'])) {
-                throw new ValidationException('Zeile ' . $this->lineCount . ': Unerwartetes Segement ' . @$segment->name() . ', ' . $blueprint['name'] . ' erwartet.');
+                throw ValidationException::unexpectedSegment($this->lineCount, @$segment->name(), $blueprint['name']);
             }
-            throw new ValidationException('Zeile ' . $this->lineCount . ': Unerwartetes Segement ' . @$segment->name() . ', Ende erwartet.');
+            throw ValidationException::unexpectedSegment($this->lineCount, @$segment->name());
         }
     }
 
@@ -163,11 +161,12 @@ class MessageValidator implements MessageValidatorInterface
         if (isset($blueprint['templates'])) {
             foreach ($blueprint['templates'] as $segmendMethod => $suggestions) {
                 if (!in_array($segment->$segmendMethod(), $suggestions)) {
-                    $message = 'Zeile ' . $this->lineCount
-                        . ', Segment ' . $segment->name()
-                        . ', enthält unerlaubten Inhalt: "' . $segment->$segmendMethod() . '"'
-                        . '. Erlaubt ist ("' . implode('" | "', $suggestions). '")';
-                    throw new ValidationException($message);
+                    throw ValidationException::illegalContent(
+                        $this->lineCount, 
+                        $segment->name(), 
+                        $segment->$segmendMethod(), 
+                        implode('" | "', $suggestions)
+                    );
                 }
             }
         }
@@ -178,7 +177,7 @@ class MessageValidator implements MessageValidatorInterface
         try {
             $segment->validate($this->segValidator);
         } catch (SegValidationException $e) {
-            throw new ValidationException('Zeile ' . $this->lineCount . ', Segment ' . $segment->name() . ', ' . $e->getMessage());
+            throw new ValidationException($e->getMessage(), $this->lineCount);
         }
     }
 }
