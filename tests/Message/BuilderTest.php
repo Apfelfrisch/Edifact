@@ -56,7 +56,7 @@ class BuilderTest extends TestCase
     }
 
     /** @test */
-    public function it_dont_sets_the_header_an_footer_when_no_message_was_added()
+    public function it_does_not_set_the_header_an_footer_when_no_message_was_added()
     {
         $this->assertEmpty((string)$this->builder->get());
     }
