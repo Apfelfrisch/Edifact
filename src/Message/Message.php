@@ -12,8 +12,6 @@ use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 
 abstract class Message implements EdifactMessageInterface
 {
-    const UNA_SEGMENT = 'UNA';
-
     private $file;
     private $delimiter;
     private $validator;
