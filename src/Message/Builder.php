@@ -100,7 +100,7 @@ abstract class Builder
 
     private function classesAreRelated($subclass, $superclass)
     {
-        while ($object = $this->reflectMessageClass($subclass)->getParentClass() ) {
+        while ($object = (new ReflectionClass($subclass))->getParentClass() ) {
             if ($object->getName() == $superclass) {
                 return true;
             }
@@ -108,10 +108,5 @@ abstract class Builder
         }
 
         return false;
-    }
-    
-    private function reflectMessageClass($class = null)
-    {
-        return new ReflectionClass($class ?: $this->edifactClass);
     }
 }
