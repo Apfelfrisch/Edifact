@@ -15,11 +15,11 @@ class Builder extends BuilderCore
     private $from;
     private $to;
 
-    public function __construct($from, $to, $filepath)
+    public function __construct($from, $to, $filepath = null)
     {
         $this->from = $from;
         $this->to = $to;
-        parent::__construct(Message::class, $filepath.$from.$to.'.txt');
+        parent::__construct(Message::class, $filepath);
     }
     /*
      * Methode nur zur Testzwecken.

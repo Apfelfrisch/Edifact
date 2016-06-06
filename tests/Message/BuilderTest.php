@@ -15,7 +15,7 @@ class BuilderTest extends TestCase
 
     public function setUp()
     {
-        $this->builder = new Builder('from', 'to', 'wb+');
+        $this->builder = new Builder('from', 'to');
         $this->file = $this->builder->getEdifactFile();
     }
 
@@ -37,9 +37,11 @@ class BuilderTest extends TestCase
     /** @test */
     public function it_deletes_the_file_if_the_building_was_interrupted()
     {
-        $filepath = $this->file->getRealPath();
+        $builder = new Builder('from', 'to', tempnam(sys_get_temp_dir(), 'edifFile'));
+        $file = $builder->getEdifactFile();
+        $filepath = $file->getRealPath();
         $this->assertFileExists($filepath);
-        unset($this->builder);
+        unset($builder);
         $this->assertFalse(file_exists($filepath));
     }
 

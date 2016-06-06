@@ -30,7 +30,7 @@ abstract class Message implements EdifactMessageInterface
         return new static($file);
     }
 
-    public static function build($from, $to, $filepath)
+    public static function build($from, $to, $filepath = null)
     {
         if (!isset(static::$builderClass)) {
             throw new EdifactException("No static variable $builderClass definied!");

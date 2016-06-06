@@ -16,11 +16,11 @@ abstract class Builder
     private $messageCount = 0;
     private $messageWasFetched = false;
     
-    public function __construct($edifactClass, $filepath)
+    public function __construct($edifactClass, $filepath = null)
     {
         $this->setMessageClass($edifactClass);
         $this->segmentBuilder = new SegmentFactory;
-        $this->edifactFile = new EdifactFile($filepath, 'w+');
+        $this->edifactFile = new EdifactFile($filepath ?: 'php://temp', 'w+');
     }
 
     public function __destruct()
