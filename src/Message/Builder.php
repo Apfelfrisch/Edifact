@@ -46,6 +46,16 @@ abstract class Builder
         return $this;
     }
 
+    public function getOrFail()
+    {
+        $message = $this->get();
+        $this->messageWasFetched = false;
+        $message->validate();
+        $this->messageWasFetched = true;
+
+        return $message;
+    }
+
     public function get()
     {
         if (!$this->messageIsEmpty()) {

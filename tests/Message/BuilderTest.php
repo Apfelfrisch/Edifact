@@ -7,6 +7,7 @@ use Proengeno\Edifact\Message\EdifactFile;
 use Proengeno\Edifact\Test\Fixtures\Builder;
 use Proengeno\Edifact\Test\Fixtures\Message;
 use Proengeno\Edifact\Message\Builder as BuilderCore;
+use Proengeno\Edifact\Exceptions\ValidationException;
 
 class BuilderTest extends TestCase 
 {
@@ -69,9 +70,16 @@ class BuilderTest extends TestCase
         $expectedMessage = "UNA:+.? 'UNB+UNOC:3+from:500+to:500+160510:0143+unique_id+VL'UNZ+1+unique_id'";
 
         $message = $this->builder->addMessage([])->get();
-
         $this->assertStringStartsWith("UNA:+.? 'UNB+UNOC:3+from:500+to:500", (string)$message);
         $this->assertStringEndsWith("UNZ+1+unique_id'", (string)$message);
+    }
+    
+    /** @test */
+    public function it_runs_validation_before_it_provides_the_message()
+    {
+        $this->builder->addMessage([]);
+        $this->expectException(ValidationException::class);
+        $this->builder->getOrFail();
     }
 
     /** @test */
