@@ -55,6 +55,17 @@ class MessageTest extends TestCase
     }
 
     /** @test */
+    public function it_iterates_over_the_stream()
+    {
+        $messageCore = Message::fromString("UNH'UNB'");
+        $message = "";
+        foreach ($messageCore as $segment) {
+            $message .= (string)$segment;
+        }
+        $this->assertEquals($message, (string)$messageCore);
+    }
+
+    /** @test */
     public function it_fetch_a_specific_segement_from_stream()
     {
         $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNT");

@@ -3,18 +3,20 @@
 namespace Proengeno\Edifact\Message;
 
 use Closure;
+use Iterator;
 use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Validation\MessageValidator;
 use Proengeno\Edifact\Exceptions\EdifactException;
 use Proengeno\Edifact\Interfaces\EdifactMessageInterface;
 use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 
-abstract class Message implements EdifactMessageInterface
+abstract class Message implements Iterator, EdifactMessageInterface
 {
     private $file;
     private $delimiter;
     private $validator;
     private $currentSegment;
+    private $currentSegmentNumber = 0;
     
     public function __construct(EdifactFile $file, MessageValidatorInterface $validator = null)
     {
@@ -50,11 +52,15 @@ abstract class Message implements EdifactMessageInterface
 
     public function getCurrentSegment()
     {
+        if ($this->currentSegment === false) {
+            $this->currentSegment = $this->getNextSegment();
+        }
         return $this->currentSegment;
     }
     
     public function getNextSegment()
     {
+        $this->currentSegmentNumber++;
         $segment = $this->file->getSegment();
 
         if ($segment !== false) {
@@ -66,7 +72,7 @@ abstract class Message implements EdifactMessageInterface
     public function findNextSegment($searchSegment, $fromStart = false, closure $criteria = null)
     {
         if ($fromStart) {
-            $this->file->rewind();
+            $this->rewind();
         }
         
         $searchObject = static::getSegmentClass($searchSegment);
@@ -99,9 +105,9 @@ abstract class Message implements EdifactMessageInterface
 
     public function validate()
     {
-        $this->file->rewind();
+        $this->rewind();
         $this->validator->validate($this);
-        $this->file->rewind();
+        $this->rewind();
 
         return $this;
     }
@@ -119,6 +125,34 @@ abstract class Message implements EdifactMessageInterface
         }
 
         throw EdifactException::segmentUnknown($segmentName);
+    }
+
+    public function current()
+    {
+        return $this->getCurrentSegment();
+    }
+
+    public function key()
+    {
+        return $this->currentSegmentNumber;
+    }
+
+    public function next()
+    {
+        $this->currentSegment = false;
+        $this->currentSegmentNumber++;
+    }
+
+    public function rewind()
+    {
+        $this->file->rewind();
+        $this->currentSegmentNumber = 0;
+        $this->currentSegment = false;
+    }
+
+    public function valid()
+    {
+        return $this->current() !== false;
     }
     
     private function getSegmentObject($segLine)
