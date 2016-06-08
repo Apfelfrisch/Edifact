@@ -16,6 +16,7 @@ abstract class Message implements Iterator, EdifactMessageInterface
     private $delimiter;
     private $validator;
     private $currentSegment;
+    private $pinnedPointer = false;
     private $currentSegmentNumber = 0;
     
     public function __construct(EdifactFile $file, MessageValidatorInterface $validator = null)
@@ -88,16 +89,23 @@ abstract class Message implements Iterator, EdifactMessageInterface
         return false;
     }
 
-    public function getPointerPosition()
+    public function pinPointer()
     {
-        return $this->file->tell();
+        $this->pinnedPointer = $this->file->tell();
     }
 
-    public function setPointerPosition($position)
+    public function jumpToPinnedPointer()
     {
-        return $this->file->seek($position);
-    }
+        if ($this->pinnedPointer === false) {
+            return $this->file->tell();
+        }
 
+        $pinnedPointer = $this->pinnedPointer;
+        $this->pinnedPointer = false;
+
+        return $this->file->seek($pinnedPointer);
+    }
+    
     public function getValidationBlueprint()
     {
         return static::$validationBlueprint;

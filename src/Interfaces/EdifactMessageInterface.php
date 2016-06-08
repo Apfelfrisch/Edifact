@@ -9,8 +9,8 @@ interface EdifactMessageInterface
     public function getCurrentSegment();
     public function getNextSegment();
     public function findNextSegment($searchSegment);
-    public function getPointerPosition();
-    public function setPointerPosition($position);
+    public function jumpToPinnedPointer();
+    public function pinPointer();
     public function validate();
     public function __toString();
 } 

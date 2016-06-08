@@ -59,7 +59,7 @@ class MessageValidator implements MessageValidatorInterface
 
             $this->lineCount++;
             $blueprintCount++;
-            $this->lastPosition = $edifact->getPointerPosition();
+            $edifact->pinPointer();
         }
     }
 
@@ -85,14 +85,14 @@ class MessageValidator implements MessageValidatorInterface
             return false;
         }
         if (!isset($blueprint[$blueprintCount]['segments'])) {
-            $position = $edifact->getPointerPosition();
+            $edifact->pinPointer();
             if ($edifact->getNextSegment()->name() == $blueprint[$blueprintCount]['name']) {
-                $edifact->setPointerPosition($position);
+                $edifact->jumpToPinnedPointer();
                 // Hier sollten wir nicht hochzählen, den Methodenname suggeriert etwas anderes
                 isset($this->reLoopCount[$blueprintCount]) ? $this->reLoopCount[$blueprintCount] ++ : $this->reLoopCount[$blueprintCount] = 0;
                 return true;
             } else {
-                $edifact->setPointerPosition($position);
+                $edifact->jumpToPinnedPointer();
                 $this->reLoopCount[$blueprintCount] = 0;
             }
         }
@@ -110,7 +110,7 @@ class MessageValidator implements MessageValidatorInterface
             $this->reLoopCount[$blueprintCount] = 0;
         }
 
-        $edifact->setPointerPosition($this->lastPosition);
+        $edifact->jumpToPinnedPointer();
     }
 
     private function segmentIsLoopable($blueprint, $blueprintCount)
