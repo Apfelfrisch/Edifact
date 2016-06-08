@@ -12,6 +12,7 @@ abstract class Builder
     protected $to;
     protected $from;
     protected $edifactFile;
+    protected $configuration = [];
 
     private $edifactClass;
     private $unbReference;
@@ -19,7 +20,6 @@ abstract class Builder
     private $unhCounter = 0;
     private $messageCount = 0;
     private $messageWasFetched = false;
-    private $configuration = [];
     
     public function __construct($from, $to, $filepath = null)
     {
