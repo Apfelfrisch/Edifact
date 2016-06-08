@@ -2,25 +2,35 @@
 
 namespace Proengeno\Edifact\Message;
 
+use Closure;
 use ReflectionClass;
 use Proengeno\Edifact\Message\Segment;
 use Proengeno\Edifact\Exceptions\ValidationException;
 
 abstract class Builder
 {
+    protected $to;
+    protected $from;
     protected $edifactFile;
-    protected $unhCounter = 0;
 
     private $edifactClass;
     private $unbReference;
+    
+    private $unhCounter = 0;
     private $messageCount = 0;
     private $messageWasFetched = false;
+    private $configuration = [];
     
-    public function __construct($edifactClass, $filepath = null)
+    public function __construct($from, $to, $filepath = null)
     {
-        $this->setMessageClass($edifactClass);
+        $this->to = $to;
+        $this->from = $from;
         $this->segmentBuilder = new SegmentFactory;
+        $this->edifactClass = $this->getMessageClass();
         $this->edifactFile = new EdifactFile($filepath ?: 'php://temp', 'w+');
+        $this->configuration['unbReference'] = function() { 
+            return uniqid();
+        };
     }
 
     public function __destruct()
@@ -32,6 +42,11 @@ abstract class Builder
                 unlink($filepath);
             }
         }
+    }
+
+    public function addConfiguration($key, Closure $config)
+    {
+        $this->configuration[$key] = $config;
     }
 
     public function addMessage($message)
@@ -69,11 +84,22 @@ abstract class Builder
     public function unbReference()
     {
         if (!$this->unbReference) {
-            return $this->unbReference = uniqid();
+            return $this->configuration['unbReference']();
         }
         return $this->unbReference;
     }
+
+    public function unhCount()
+    {
+        return $this->unhCounter;
+    }
     
+    abstract protected function getMessageClass();
+
+    abstract protected function writeUnb();
+
+    abstract protected function writeMessage($array);
+
     protected function writeSeg($segment, $attributes = [], $method = 'fromAttributes')
     {
         $edifactClass = $this->edifactClass;
@@ -89,22 +115,9 @@ abstract class Builder
         $this->unhCounter ++;
     }
     
-    abstract protected function writeUnb();
-
-    abstract protected function writeMessage($array);
-
     private function messageIsEmpty()
     {
         return $this->edifactFile->tell() == 0;
-    }
-
-    private function setMessageClass($edifactClass)
-    {
-        if (! $this->classesAreRelated($edifactClass, Message::class)) {
-            throw new ValidationException('Class "' . $edifactClass . '" is no Child of "'. Builder::class . '"');
-        }
-
-        $this->edifactClass = $edifactClass;
     }
 
     private function classesAreRelated($subclass, $superclass)

@@ -11,15 +11,9 @@ class Builder extends BuilderCore
     const MESSAGE_TYPE = 'RANDOM_MESSAGE';
     const MESSAGE_SUBTYPE = 'VL';
 
-    private $energyType;
-    private $from;
-    private $to;
-
-    public function __construct($from, $to, $filepath = null)
+    protected function getMessageClass()
     {
-        $this->from = $from;
-        $this->to = $to;
-        parent::__construct(Message::class, $filepath);
+        return Message::class;
     }
     /*
      * Methode nur zur Testzwecken.

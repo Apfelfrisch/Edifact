@@ -42,7 +42,9 @@ class BuilderTest extends TestCase
         $file = $builder->getEdifactFile();
         $filepath = $file->getRealPath();
         $this->assertFileExists($filepath);
-        unset($builder);
+        // Because the Closure in the Constructor, we cant simple unset the Class
+        // and have to call teh desstructor manually (The destructor is called anyway, but not at this time)
+        $builder->__destruct();
         $this->assertFalse(file_exists($filepath));
     }
 
@@ -56,6 +58,16 @@ class BuilderTest extends TestCase
     public function it_provides_the_unb_ref()
     {
         $this->assertEquals('unique_id', $this->builder->unbReference());
+    }
+
+    /** @test */
+    public function it_provides_a_configurable_unb_ref()
+    {
+        $ownRef = 'OWN_REF';
+        $this->builder->addConfiguration('unbReference', function() use ($ownRef) {
+            return $ownRef;
+        });
+        $this->assertEquals($ownRef, $this->builder->unbReference());
     }
 
     /** @test */
