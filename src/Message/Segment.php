@@ -72,8 +72,8 @@ abstract class Segment implements SegInterface
     public function __toString()
     {
         if (!isset($this->cache['segLine'])) {
-            $dataFields = array_map(function ($dataGroups) {
-                return implode( static::$delimiter->getData(), static::$delimiter->terminate($this->deleteEmptyArrayEnds($dataGroups)) );
+            $dataFields = array_map(function($dataGroups) {
+                return implode(static::$delimiter->getData(), static::$delimiter->terminate($this->deleteEmptyArrayEnds($dataGroups)));
             }, $this->elements);
 
             $this->cache['segLine'] = implode(static::$delimiter->getDataGroup(), $this->deleteEmptyArrayEnds($dataFields));

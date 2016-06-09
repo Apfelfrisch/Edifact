@@ -129,7 +129,7 @@ abstract class Builder
             $this->unhCounter = 1;
             return;
         }
-        $this->unhCounter ++;
+        $this->unhCounter++;
     }
     
     private function messageIsEmpty()

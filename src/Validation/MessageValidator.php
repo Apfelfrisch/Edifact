@@ -75,7 +75,7 @@ class MessageValidator implements MessageValidatorInterface
 
     private function isSingleSegmentReloop($edifact, $blueprint, $blueprintCount)
     {
-        if (!$this->segmentIsLoopable($blueprint, $blueprintCount) ) {
+        if (!$this->segmentIsLoopable($blueprint, $blueprintCount)) {
             return false;
         }
         if (!isset($blueprint[$blueprintCount]['segments'])) {
@@ -83,7 +83,7 @@ class MessageValidator implements MessageValidatorInterface
             if ($edifact->getNextSegment()->name() == $blueprint[$blueprintCount]['name']) {
                 $edifact->jumpToPinnedPointer();
                 // Hier sollten wir nicht hochzählen, den Methodenname suggeriert etwas anderes
-                isset($this->reLoopCount[$blueprintCount]) ? $this->reLoopCount[$blueprintCount] ++ : $this->reLoopCount[$blueprintCount] = 0;
+                isset($this->reLoopCount[$blueprintCount]) ? $this->reLoopCount[$blueprintCount]++ : $this->reLoopCount[$blueprintCount] = 0;
                 return true;
             } else {
                 $edifact->jumpToPinnedPointer();
@@ -98,8 +98,8 @@ class MessageValidator implements MessageValidatorInterface
     {
         $this->loop($edifact, $blueprint[$blueprintCount]['segments']);
         if ($edifact->getCurrentSegment()->name() == $blueprint[$blueprintCount]['name']) {
-            isset($this->reLoopCount[$blueprintCount]) ? $this->reLoopCount[$blueprintCount] ++ : $this->reLoopCount[$blueprintCount] = 0;
-            $blueprintCount --;
+            isset($this->reLoopCount[$blueprintCount]) ? $this->reLoopCount[$blueprintCount]++ : $this->reLoopCount[$blueprintCount] = 0;
+            $blueprintCount--;
         } else {
             $this->reLoopCount[$blueprintCount] = 0;
         }
@@ -110,7 +110,7 @@ class MessageValidator implements MessageValidatorInterface
     private function segmentIsLoopable($blueprint, $blueprintCount)
     {
         $segment = $blueprint[$blueprintCount];
-        if (!isset($segment['maxLoops']) && !isset($segment['segments']) ) {
+        if (!isset($segment['maxLoops']) && !isset($segment['segments'])) {
             return false;
         }
         if ($this->checkReLoopCount($blueprintCount, $segment)) {

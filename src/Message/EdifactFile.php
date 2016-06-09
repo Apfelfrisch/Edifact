@@ -23,17 +23,17 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
     public function __construct($filename, $open_mode = 'r', $use_include_path = false) 
     {
         if (is_string($filename) && empty($filename)) {
-            throw new RuntimeException( __METHOD__."({$filename}): Filename cannot be empty");
+            throw new RuntimeException(__METHOD__ . "({$filename}): Filename cannot be empty");
         }
         if (!is_string($open_mode)) {
-            throw new Exception( 'SplFileObject::__construct() expects parameter 2 to be string, '.  gettype($open_mode).' given');
+            throw new Exception('SplFileObject::__construct() expects parameter 2 to be string, ' . gettype($open_mode) . ' given');
         }
 
         parent::__construct($filename);
         $this->filename = $filename;
         $this->rsrc = @fopen($filename, $open_mode, $use_include_path);
         if (false === $this->rsrc) {
-            throw new RuntimeException( __METHOD__.  "({$filename}): failed to open stream: No such file or directory");
+            throw new RuntimeException(__METHOD__ . "({$filename}): failed to open stream: No such file or directory");
         }
     }
 
@@ -247,7 +247,7 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
                 continue;
             }
             if ($this->delimiterWasTerminated($line)) {
-                $line[(strlen($line) -1 )] = $this->getDelimiter()->getSegment();
+                $line[(strlen($line) - 1)] = $this->getDelimiter()->getSegment();
                 $mergedLines .= $line;
                 continue;
             }
@@ -265,6 +265,6 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
     
     private function delimiterWasTerminated($line)
     {
-        return $line[(strlen($line) -1 )] == $this->getDelimiter()->getTerminator();
+        return $line[(strlen($line) - 1)] == $this->getDelimiter()->getTerminator();
     }
 }

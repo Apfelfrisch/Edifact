@@ -82,7 +82,7 @@ class SegmentValidator implements SegValidatorInterface
 
     private function isDatafieldOptional($necessaryStatus)
     {
-        return ! ($necessaryStatus == 'M' || $necessaryStatus == 'R');
+        return !($necessaryStatus == 'M' || $necessaryStatus == 'R');
     }
 
     private function checkStringType($type, $data, $dataGroupKey, $dataKey)
@@ -105,7 +105,7 @@ class SegmentValidator implements SegValidatorInterface
         $string = $data[$dataGroupKey][$dataKey];
 
         $strLen = strlen($string);
-        if ($strLen == 0 ) {
+        if ($strLen == 0) {
             throw SegValidationException::forKeyValue($dataKey, $string, 'Data-Element unavailable or empty.', 4);
         }
         if ($lenght < $strLen) {
