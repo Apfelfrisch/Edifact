@@ -42,7 +42,7 @@ class EdifactResolver
                 if (isset($rules[$segmenName])) {
                     if (preg_match($rules[$segmenName], $segment)) {
                         unset($tmpAllocationRules[$edifactClass][$segmenName]);
-                        if (count($tmpAllocationRules[$edifactClass]) == 0 ) {
+                        if (count($tmpAllocationRules[$edifactClass]) == 0) {
                             return new $edifactClass($this->edifactFile);
                         }
                     }

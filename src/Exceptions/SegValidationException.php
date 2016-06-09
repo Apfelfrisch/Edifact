@@ -25,7 +25,7 @@ class SegValidationException extends EdifactException
     {
         $message = $key . ': ' . $message;
 
-        return new static($key, null, $message , $code);
+        return new static($key, null, $message, $code);
     }
 
     public static function forValue($value, $message, $code = 0)

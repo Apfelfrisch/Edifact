@@ -94,8 +94,8 @@ class Delimiter
     {
         $string = $this->removeLineBreaks($string);
 
-        if ($foundTermination = (boolean)strpos($string, $this->terminator.$pattern) ) {
-            $string = str_replace($this->terminator.$pattern, self::PLACE_HOLDER, $string);
+        if ($foundTermination = (boolean)strpos($string, $this->terminator . $pattern)) {
+            $string = str_replace($this->terminator . $pattern, self::PLACE_HOLDER, $string);
         }
 
         $explodedString = explode($pattern, $string);
