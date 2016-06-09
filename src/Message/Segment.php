@@ -11,8 +11,7 @@ abstract class Segment implements SegInterface
 {
     protected static $delimiter;
     protected static $validator;
-
-    protected $elements;
+    protected $elements = [];
 
     private $cache = [];
 
@@ -86,6 +85,7 @@ abstract class Segment implements SegInterface
     protected static function mapToBlueprint($segLine)
     {
         $inputDataGroups = static::getDelimiter()->explodeSegments($segLine);
+        $elements = [];
         $i = 0;
         foreach (static::$validationBlueprint as $BpDataKey => $BPdataGroups) {
             if (isset($inputDataGroups[$i])) {
@@ -99,7 +99,7 @@ abstract class Segment implements SegInterface
             $i++;
         }
 
-        return @$elements ?: [];
+        return $elements;
     }
 
     private function deleteEmptyArrayEnds(array $array)

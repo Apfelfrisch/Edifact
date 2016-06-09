@@ -17,6 +17,7 @@ abstract class Builder
 
     private $edifactClass;
     private $unbReference;
+    private $segmentBuilder;
     
     private $unhCounter = 0;
     private $messageCount = 0;
@@ -97,7 +98,10 @@ abstract class Builder
     public function unbReference()
     {
         if (!$this->unbReference) {
-            return $this->prebuildConfig['unbReference']();
+            if (isset($this->prebuildConfig['unbReference'])) {
+                return $this->unbReference = $this->prebuildConfig['unbReference']();
+            }
+            return $this->unbReference = uniqid();
         }
         return $this->unbReference;
     }
@@ -131,17 +135,5 @@ abstract class Builder
     private function messageIsEmpty()
     {
         return $this->edifactFile->tell() == 0;
-    }
-
-    private function classesAreRelated($subclass, $superclass)
-    {
-        while ($object = (new ReflectionClass($subclass))->getParentClass() ) {
-            if ($object->getName() == $superclass) {
-                return true;
-            }
-            $class = $parent;
-        }
-
-        return false;
     }
 }

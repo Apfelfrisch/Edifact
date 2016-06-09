@@ -6,6 +6,7 @@ use Proengeno\Edifact\Message\EdifactFile;
 
 class EdifactResolver
 {
+    private $edifactFile;
     private $allocationRules;
 
     public function addAllocationRule($edifactClass, $allocationRules)

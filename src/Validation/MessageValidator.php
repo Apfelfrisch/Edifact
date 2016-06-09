@@ -16,15 +16,9 @@ use Proengeno\Edifact\Exceptions\EdifactException;
  */
 class MessageValidator implements MessageValidatorInterface 
 {
-    private $segValidator;
     private $lineCount = 1;
     private $reLoopCount = [];
     
-    public function __construct($segValidator = null)
-    {
-        $this->segValidator = $segValidator ?: new SegmentValidator;
-    }
-
     public function validate(EdifactMessageInterface $edifact)
     {
         try {
@@ -51,7 +45,7 @@ class MessageValidator implements MessageValidatorInterface
             $this->validateSegment($line);
             $this->validateAgainstBlueprint($line, @$blueprint[$blueprintCount]);
             
-            if ($this->isSubSegmentReloop($edifact, $blueprint, $blueprintCount)) {
+            if ($this->isSubSegmentReloop($blueprint, $blueprintCount)) {
                 $this->reLoopSubSegments($edifact, $blueprint, $blueprintCount);
             } elseif ($this->isSingleSegmentReloop($edifact, $blueprint, $blueprintCount)) {
                 $blueprintCount--;
@@ -68,7 +62,7 @@ class MessageValidator implements MessageValidatorInterface
         return !isset($blueprint[$blueprintCount]);
     }
 
-    private function isSubSegmentReloop($edifact, $blueprint, $blueprintCount)
+    private function isSubSegmentReloop($blueprint, $blueprintCount)
     {
         if (!$this->segmentIsLoopable($blueprint, $blueprintCount) ) {
             return false;
@@ -175,7 +169,7 @@ class MessageValidator implements MessageValidatorInterface
     private function validateSegment(SegInterface $segment)
     {
         try {
-            $segment->validate($this->segValidator);
+            $segment->validate();
         } catch (SegValidationException $e) {
             throw new ValidationException($e->getMessage(), $this->lineCount);
         }

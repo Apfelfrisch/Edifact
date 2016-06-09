@@ -33,7 +33,7 @@ class Delimiter
             $instance = new self();
         } else {
             $instance = new self(
-                $file->getChar(1), $file->getChar(1), $file->getChar(1), $file->getChar(1), $file->getChar(1), $file->getChar(1)
+                $file->getChar(), $file->getChar(), $file->getChar(), $file->getChar(), $file->getChar(), $file->getChar()
             );
         }
         $file->seek($position);
@@ -101,7 +101,7 @@ class Delimiter
         $explodedString = explode($pattern, $string);
 
         if ($foundTermination) {
-            for ($i = 0; $i < count($explodedString); $i++) {
+            for ($i = 0, $count = count($explodedString); $i < $count; $i++) {
                 $explodedString[$i] = str_replace(self::PLACE_HOLDER, $pattern, $explodedString[$i]);
             }
         }

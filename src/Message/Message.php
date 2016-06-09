@@ -15,10 +15,10 @@ abstract class Message implements Iterator, EdifactMessageInterface
     protected $configuration = [];
 
     private $file;
-    private $delimiter;
     private $validator;
+    private $pinnedPointer;
     private $currentSegment;
-    private $pinnedPointer = false;
+    private $segmentBuilder;
     private $currentSegmentNumber = 0;
     
     public function __construct(EdifactFile $file, MessageValidatorInterface $validator = null)
@@ -95,12 +95,12 @@ abstract class Message implements Iterator, EdifactMessageInterface
 
     public function jumpToPinnedPointer()
     {
-        if ($this->pinnedPointer === false) {
+        if ($this->pinnedPointer === null) {
             return $this->file->tell();
         }
 
         $pinnedPointer = $this->pinnedPointer;
-        $this->pinnedPointer = false;
+        $this->pinnedPointer = null;
 
         return $this->file->seek($pinnedPointer);
     }

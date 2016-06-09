@@ -71,14 +71,14 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
         if ($char == "'") {
             if ($this->tell() < 10) {
                 $this->currentSegmentNumber++;
-            } else {
-                $this->seek($this->tell() - 2);
-                $preChar = fgetc($this->rsrc);
-                if ($preChar != $this->getDelimiter()->getTerminator() && $preChar != $this->getDelimiter()->getEmpty()) {
-                    $this->currentSegmentNumber++;
-                }
-                $this->seek($this->tell() + 1);
+                return $char;
             }
+            $this->seek($this->tell() - 2);
+            $preChar = fgetc($this->rsrc);
+            if ($preChar != $this->getDelimiter()->getTerminator() && $preChar != $this->getDelimiter()->getEmpty()) {
+                $this->currentSegmentNumber++;
+            }
+            $this->seek($this->tell() + 1);
         }
         return $char;
     }
