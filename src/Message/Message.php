@@ -12,6 +12,8 @@ use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 
 abstract class Message implements Iterator, EdifactMessageInterface
 {
+    protected $configuration = [];
+
     private $file;
     private $delimiter;
     private $validator;
@@ -31,6 +33,11 @@ abstract class Message implements Iterator, EdifactMessageInterface
         $file = new EdifactFile('php://temp', 'w+');
         $file->writeAndRewind($string);
         return new static($file);
+    }
+
+    public function addConfiguration($key, Closure $config)
+    {
+        $this->configuration[$key] = $config;
     }
 
     public static function build($from, $to, $filepath = null)
@@ -163,7 +170,7 @@ abstract class Message implements Iterator, EdifactMessageInterface
         return $this->current() !== false;
     }
     
-    private function getSegmentObject($segLine)
+    protected function getSegmentObject($segLine)
     {
         return $this->segmentBuilder->fromSegline(static::getSegmentClass($this->getSegname($segLine)), $segLine);
     }
