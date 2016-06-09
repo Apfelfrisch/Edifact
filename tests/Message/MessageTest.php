@@ -124,13 +124,5 @@ class MessageTest extends TestCase
            );
         }
     }
-
-    /** @test */
-    public function it_return_the_message_builder_class()
-    {
-        $message = Message::build('from', 'to');
-
-        $this->assertInstanceOf('Proengeno\Edifact\Message\Builder', $message);
-    }
 }
     

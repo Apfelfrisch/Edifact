@@ -40,14 +40,6 @@ abstract class Message implements Iterator, EdifactMessageInterface
         $this->configuration[$key] = $config;
     }
 
-    public static function build($from, $to, $filepath = null)
-    {
-        if (!isset(static::$builderClass)) {
-            throw new EdifactException("No static variable $builderClass definied!");
-        }
-        return new static::$builderClass($from, $to, $filepath);
-    }
-    
     public function __toString()
     {
         return $this->file->__toString();

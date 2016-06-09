@@ -31,5 +31,10 @@ class Message extends MessageCore
         ]],
         ['name' => 'UNZ']
     ];
+
+    public function testConfiguration()
+    {
+        return $this->configuration['test']();
+    }
 }
     

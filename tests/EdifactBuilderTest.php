@@ -30,14 +30,27 @@ class EdifactBuilderTest extends TestCase
     }
 
     /** @test */
-    public function it_forwards_the_configuration_to_target_class()
+    public function it_forwards_the_prebuild_configuration_to_builder_class()
     {
         $ownRef = 'OWN_REF';
         $this->edifactBuilder->addBuilder('Message', Builder::class, 'from', './test.txt');
-        $this->edifactBuilder->addConfiguration('unbReference', function() use ($ownRef) {
+        $this->edifactBuilder->addPrebuildConfig('unbReference', function() use ($ownRef) {
             return $ownRef;
         });
         $this->assertEquals($ownRef, $this->edifactBuilder->build('Message', 'to')->unbReference());
+    }
+
+    /** @test */
+    public function it_forwards_the_postbuild_configuration_to_builder_class()
+    {
+        $this->edifactBuilder->addBuilder('Message', Builder::class, 'from', './test.txt');
+        $this->edifactBuilder->addPostbuildConfig('test', function() {
+            return 'TEST';
+        });
+
+        $builder = $this->edifactBuilder->build('Message', 'to')->addMessage([]);
+
+        $this->assertEquals('TEST', $builder->get()->testConfiguration());
     }
 
     /** @test */

@@ -64,7 +64,7 @@ class BuilderTest extends TestCase
     public function it_provides_a_configurable_unb_ref()
     {
         $ownRef = 'OWN_REF';
-        $this->builder->addConfiguration('unbReference', function() use ($ownRef) {
+        $this->builder->addPrebuildConfig('unbReference', function() use ($ownRef) {
             return $ownRef;
         });
         $this->assertEquals($ownRef, $this->builder->unbReference());

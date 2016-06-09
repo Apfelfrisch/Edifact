@@ -12,7 +12,8 @@ abstract class Builder
     protected $to;
     protected $from;
     protected $edifactFile;
-    protected $configuration = [];
+    protected $prebuildConfig = [];
+    protected $postbuildConfig = [];
 
     private $edifactClass;
     private $unbReference;
@@ -28,7 +29,7 @@ abstract class Builder
         $this->segmentBuilder = new SegmentFactory;
         $this->edifactClass = $this->getMessageClass();
         $this->edifactFile = new EdifactFile($filepath ?: 'php://temp', 'w+');
-        $this->configuration['unbReference'] = function() { 
+        $this->prebuildConfig['unbReference'] = function() { 
             return uniqid();
         };
     }
@@ -44,9 +45,14 @@ abstract class Builder
         }
     }
 
-    public function addConfiguration($key, Closure $config)
+    public function addPrebuildConfig($key, Closure $config)
     {
-        $this->configuration[$key] = $config;
+        $this->prebuildConfig[$key] = $config;
+    }
+
+    public function addPostbuildConfig($key, Closure $config)
+    {
+        $this->postbuildConfig[$key] = $config;
     }
 
     public function addMessage($message)
@@ -77,14 +83,21 @@ abstract class Builder
             $this->writeSeg('unz', [$this->messageCount, $this->unbReference()]);
             $this->edifactFile->rewind();
         }
+
+        $edifactObject = new $this->edifactClass($this->edifactFile);
+        foreach ($this->postbuildConfig as $key => $postbuildConfig) {
+            $edifactObject->addConfiguration($key, $postbuildConfig);
+        }
+
         $this->messageWasFetched = true;
-        return new $this->edifactClass($this->edifactFile);
+
+        return $edifactObject;
     }
 
     public function unbReference()
     {
         if (!$this->unbReference) {
-            return $this->configuration['unbReference']();
+            return $this->prebuildConfig['unbReference']();
         }
         return $this->unbReference;
     }

@@ -8,7 +8,8 @@ use Proengeno\Edifact\Exceptions\EdifactException;
 
 class EdifactBuilder
 {
-    private $configurations = [];
+    private $prebuildConfig = [];
+    private $postbuildConfig = [];
     private $classes = [];
 
     public function addBuilder($key, $builderClass, $from, $filepath = null)
@@ -17,16 +18,24 @@ class EdifactBuilder
         $this->classes[$key]['construct'] = [$from, $filepath];
     }
     
-    public function addConfiguration($key, Closure $config)
+    public function addPrebuildConfig($key, Closure $config)
     {
-        $this->configurations[$key] = $config;
+        $this->prebuildConfig[$key] = $config;
+    }
+
+    public function addPostbuildConfig($key, Closure $config)
+    {
+        $this->postbuildConfig[$key] = $config;
     }
     
     public function build($key, $to)
     {
         $edifact = $this->instanceClass($key, $to);
-        foreach ($this->configurations as $configKey => $config) {
-            $edifact->addConfiguration($configKey, $config);
+        foreach ($this->prebuildConfig as $configKey => $config) {
+            $edifact->addPrebuildConfig($configKey, $config);
+        }
+        foreach ($this->postbuildConfig as $configKey => $config) {
+            $edifact->addPostbuildConfig($configKey, $config);
         }
         return $edifact;
     }
