@@ -1,6 +1,7 @@
 # PHP - Edifact
 
 ![Build Status](https://travis-ci.org/Apfelfrisch/Edifact.svg?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Apfelfrisch/Edifact/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Apfelfrisch/Edifact/?branch=master)
 
 A PHP library, wich provides a Framework to parse, build, serialize and validate UN/EDIFACT messages.
 
