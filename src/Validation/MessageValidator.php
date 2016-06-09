@@ -64,7 +64,7 @@ class MessageValidator implements MessageValidatorInterface
 
     private function isSubSegmentReloop($blueprint, $blueprintCount)
     {
-        if (!$this->segmentIsLoopable($blueprint, $blueprintCount) ) {
+        if (!$this->segmentIsLoopable($blueprint, $blueprintCount)) {
             return false;
         }
         if (!isset($blueprint[$blueprintCount]['segments'])) {
