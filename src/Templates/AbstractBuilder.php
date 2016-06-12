@@ -26,7 +26,6 @@ abstract class AbstractBuilder
     {
         $this->to = $to;
         $this->from = $from;
-        $this->segmentFactory = new SegmentFactory;
         $this->edifactClass = $this->getMessageClass();
         $this->edifactFile = new EdifactFile($filepath ?: 'php://temp', 'w+');
     }
