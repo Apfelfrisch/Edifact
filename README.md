@@ -12,7 +12,6 @@ Highlights
 * Parse each Segment to its specific Class, this way we can define getter, setter and validation it
 * Parse each Message to its specfic Class, see above.
 * Validate the Message, with predefined rules. 
-* Fully unit tested
 
 Notes
 -------
