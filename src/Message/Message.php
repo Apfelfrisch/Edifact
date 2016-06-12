@@ -14,7 +14,7 @@ class Message
         $this->ediMessage = $ediMessage;
     }
 
-    public function getAdapterName($param)
+    public function getAdapterName()
     {
         return (new ReflectionClass($this->ediMessage))->getShortName();
     }

@@ -2,7 +2,6 @@
 
 namespace Proengeno\Edifact;
 
-use Closure;
 use Proengeno\Edifact\Message\EdifactFile;
 use Proengeno\Edifact\Exceptions\EdifactException;
 

@@ -3,12 +3,10 @@
 namespace Proengeno\Edifact\Templates;
 
 use Closure;
-use ReflectionClass;
 use Proengeno\Edifact\Message\Message;
 use Proengeno\Edifact\Message\EdifactFile;
 use Proengeno\Edifact\Message\SegmentFactory;
 use Proengeno\Edifact\Exceptions\EdifactException;
-use Proengeno\Edifact\Exceptions\ValidationException;
 
 abstract class AbstractBuilder
 {
