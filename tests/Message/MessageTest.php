@@ -103,18 +103,26 @@ class MessageTest extends TestCase
         );
         $this->assertFalse($messageCore->findNextSegment('UNH'));
 
+    }
+
+    /** @test */
+    public function it_fetch_a_specific_segement_from_start_of_the_stream()
+    {
+        $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNT");
+        $messageCore->findSegmentFromBeginn('UNH');
+
         $this->assertInstanceOf(
             'Proengeno\Edifact\Test\Fixtures\Segments\Unh', 
-            $messageCore->findNextSegment('UNH', $fromFileStart = true)
+            $messageCore->findSegmentFromBeginn('UNH')
         );
         $this->assertInstanceOf(
             'Proengeno\Edifact\Test\Fixtures\Segments\Unh', 
-            $messageCore->findNextSegment('UNH', $fromFileStart = true, function($segment) {
+            $messageCore->findSegmentFromBeginn('UNH', function($segment) {
                 return $segment->referenz() == 'O160482A7C2';
             }
         ));
         $this->assertFalse(
-            $messageCore->findNextSegment('UNH', $fromFileStart = true, function($segment) {
+            $messageCore->findSegmentFromBeginn('UNH', function($segment) {
                 return $segment->referenz() == 'UNKNOW';
             })
         );

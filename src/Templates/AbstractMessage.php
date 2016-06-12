@@ -70,12 +70,15 @@ abstract class AbstractMessage implements MessageInterface
         return $segment;
     }
 
-    public function findNextSegment($searchSegment, $fromStart = false, closure $criteria = null)
+    public function findSegmentFromBeginn($searchSegment, closure $criteria = null)
     {
-        if ($fromStart) {
-            $this->rewind();
-        }
-        
+        $this->rewind();
+
+        return $this->findNextSegment($searchSegment, $criteria);
+    }
+
+    public function findNextSegment($searchSegment, closure $criteria = null)
+    {
         $searchObject = static::getSegmentClass($searchSegment);
         while ($segmentObject = $this->getNextSegment()) {
             if ($segmentObject instanceof $searchObject) {
