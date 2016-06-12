@@ -30,14 +30,14 @@ class EdifactBuilder
     
     public function build($key, $to)
     {
-        $edifact = $this->instanceClass($key, $to);
+        $builder = $this->instanceClass($key, $to);
         foreach ($this->prebuildConfig as $configKey => $config) {
-            $edifact->addPrebuildConfig($configKey, $config);
+            $builder->addPrebuildConfig($configKey, $config);
         }
         foreach ($this->postbuildConfig as $configKey => $config) {
-            $edifact->addPostbuildConfig($configKey, $config);
+            $builder->addPostbuildConfig($configKey, $config);
         }
-        return $edifact;
+        return $builder;
     }
 
     private function instanceClass($key, $to)
