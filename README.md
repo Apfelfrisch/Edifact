@@ -2,6 +2,7 @@
 
 ![Build Status](https://travis-ci.org/Apfelfrisch/Edifact.svg?branch=master)
 [![Quality Score](https://scrutinizer-ci.com/g/Apfelfrisch/Edifact/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Apfelfrisch/Edifact/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/Apfelfrisch/Edifact/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/Apfelfrisch/Edifact/?branch=master)
 
 A PHP library, wich provides a Framework to parse, build, serialize and validate UN/EDIFACT messages.
 
