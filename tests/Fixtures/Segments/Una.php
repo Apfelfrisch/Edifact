@@ -3,9 +3,9 @@
 namespace Proengeno\Edifact\Test\Fixtures\Segments;
 
 use Proengeno\Edifact\Message\Delimiter;
-use Proengeno\Edifact\Message\Segment;
+use Proengeno\Edifact\Templates\AbstractSegment;
 
-class Una extends Segment 
+class Una extends AbstractSegment 
 {
     protected static $validationBlueprint = [
         'UNA' => ['Una' => 'M|a|3', 'data' => 'M|an|1', 'dataGroup' => 'M|an|1', 'decimal' => 'M|an|1', 'terminator' => 'M|an|1', 'empty' => 'M|an|1'],
@@ -13,10 +13,9 @@ class Una extends Segment
 
     public static function fromAttributes($data = ':', $dataGroup = '+', $decimal = '.', $terminator = '?', $empty = ' ')
     {
-        static::setDelimiter(new Delimiter($data, $dataGroup, $decimal, $terminator, $empty));
         return new static([
             'UNA' => ['UNA' => 'UNA', 'data' => $data, 'dataGroup' => $dataGroup, 'decimal' => $decimal, 'terminator' => $terminator, 'empty' => $empty],
-        ]);
+        ], static::$buildDelimiter);
     }
 
     public function data()

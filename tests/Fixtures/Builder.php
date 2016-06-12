@@ -3,10 +3,10 @@
 namespace Proengeno\Edifact\Test\Fixtures;
 
 use DateTime;
+use Proengeno\Edifact\Templates\AbstractBuilder;
 use Proengeno\Edifact\Test\Fixtures\Segments\Unb;
-use Proengeno\Edifact\Message\Builder as BuilderCore;
 
-class Builder extends BuilderCore
+class Builder extends AbstractBuilder
 {
     const MESSAGE_TYPE = 'RANDOM_MESSAGE';
     const MESSAGE_SUBTYPE = 'VL';

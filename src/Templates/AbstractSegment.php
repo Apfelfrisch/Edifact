@@ -1,31 +1,27 @@
 <?php 
 
-namespace Proengeno\Edifact\Message;
+namespace Proengeno\Edifact\Templates;
 
 use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Interfaces\SegInterface;
 use Proengeno\Edifact\Validation\SegmentValidator;
 use Proengeno\Edifact\Interfaces\SegValidatorInterface;
 
-abstract class Segment implements SegInterface 
+abstract class AbstractSegment implements SegInterface 
 {
-    protected static $delimiter;
-    protected static $validator;
+    protected static $buildValidator;
+    protected static $buildDelimiter;
     protected $elements = [];
+    protected $delimiter;
+    protected $validator;
 
     private $cache = [];
 
     protected function __construct(array $elements)
     {
         $this->elements = $elements;
-
-        if (static::$delimiter === null) {
-            static::setDelimiter(static::getDelimiter());
-        }
-
-        if (static::$validator === null) {
-            static::setValidator(static::getValidator());
-        }
+        $this->delimiter = static::getBuildDelimiter();
+        $this->validator = static::$buildValidator ?: new SegmentValidator;
     }
 
     public static function fromSegLine($segLine) 
@@ -33,28 +29,29 @@ abstract class Segment implements SegInterface
         return new static(static::mapToBlueprint($segLine));
     }
 
-    public static function setDelimiter(Delimiter $delimiter = null)
+    public static function setBuildDelimiter(Delimiter $buildDelimiter = null)
     {
-        static::$delimiter = $delimiter;
+        self::$buildDelimiter = $buildDelimiter;
     }
 
-    public static function getDelimiter()
+    public static function getBuildDelimiter()
     {
-        if (static::$delimiter === null) {
-            static::$delimiter = new Delimiter;
-        }
-
-        return static::$delimiter;
+        return self::$buildDelimiter ?: new Delimiter;
     }
 
-    public static function setValidator(SegValidatorInterface $validator = null)
+    public static function setBuildValidator(SegValidatorInterface $buildValidator = null)
     {
-        static::$validator = $validator;
+        self::$buildValidator = $buildValidator;
     }
 
-    public static function getValidator()
+    public function getValidator()
     {
-        return static::$validator ?: new SegmentValidator;
+        return $this->validator;
+    }
+
+    public function getDelimiter()
+    {
+        return $this->delimiter;
     }
 
     public function name()
@@ -64,7 +61,7 @@ abstract class Segment implements SegInterface
 
     public function validate()
     {
-        static::$validator->validate(static::$validationBlueprint, $this->elements);
+        $this->validator->validate(static::$validationBlueprint, $this->elements);
         
         return $this;
     }
@@ -73,23 +70,23 @@ abstract class Segment implements SegInterface
     {
         if (!isset($this->cache['segLine'])) {
             $dataFields = array_map(function($dataGroups) {
-                return implode(static::$delimiter->getData(), static::$delimiter->terminate($this->deleteEmptyArrayEnds($dataGroups)));
+                return implode($this->delimiter->getData(), $this->delimiter->terminate($this->deleteEmptyArrayEnds($dataGroups)));
             }, $this->elements);
 
-            $this->cache['segLine'] = implode(static::$delimiter->getDataGroup(), $this->deleteEmptyArrayEnds($dataFields));
+            $this->cache['segLine'] = implode($this->delimiter->getDataGroup(), $this->deleteEmptyArrayEnds($dataFields));
         }
         
-        return $this->cache['segLine'] . static::$delimiter->getSegment();
+        return $this->cache['segLine'] . $this->delimiter->getSegment();
     }
 
     protected static function mapToBlueprint($segLine)
     {
-        $inputDataGroups = static::getDelimiter()->explodeSegments($segLine);
+        $inputDataGroups = static::getBuildDelimiter()->explodeSegments($segLine);
         $elements = [];
         $i = 0;
         foreach (static::$validationBlueprint as $BpDataKey => $BPdataGroups) {
             if (isset($inputDataGroups[$i])) {
-                $inputElement = static::$delimiter->explodeElements($inputDataGroups[$i]);
+                $inputElement = static::getBuildDelimiter()->explodeElements($inputDataGroups[$i]);
                 $j = 0;
                 foreach ($BPdataGroups as $key => $value) {
                     $elements[$BpDataKey][$key] = isset($inputElement[$j]) ? $inputElement[$j] : null;

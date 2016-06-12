@@ -3,10 +3,10 @@
 namespace Proengeno\Edifact\Test\Fixtures\Segments;
 
 use DateTime;
-use Proengeno\Edifact\Message\Segment;
+use Proengeno\Edifact\Templates\AbstractSegment;
 use Proengeno\Edifact\Exceptions\SegValidationException;
 
-class Dtm extends Segment 
+class Dtm extends AbstractSegment 
 {
     private static $timecodes = [
         102 => 'YmdH',

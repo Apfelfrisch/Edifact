@@ -81,6 +81,11 @@ class EdifactFileTest extends TestCase
         $this->assertEquals(2, $stream->tell());
     }
 
+    public function testStat()
+    {
+        $this->assertTrue(is_array($this->stream->stat()));
+    }
+
     public function testEofReportsFalseWhenNotAtEndOfStream()
     {
         file_put_contents($this->tmpnam, 'FOO BAR');
@@ -99,17 +104,18 @@ class EdifactFileTest extends TestCase
         $this->assertTrue($stream->eof());
     }
 
-    public function testGettingCharAndCoutSegmentUpIfNeeded()
+    public function testGettingChar()
     {
-        file_put_contents($this->tmpnam, "UNA:+.? 'UNB?'UNT'");
+        $string = "UNA:+.? 'UNB?'UNT'";
+        file_put_contents($this->tmpnam, $string);
         $stream = new EdifactFile($this->tmpnam, 'r');
         
         $stream->seek(0);
-        while(!$stream->eof() ) {
-            $stream->getChar();
+        $i = 0;
+        while (isset($string[$i])) {
+            $this->assertEquals($stream->getChar(), $string[$i]);
+            $i++;
         }
-
-        $this->assertEquals(2, $stream->key());
     }
 
     public function testRewindResetsToStartOfStream()
@@ -120,18 +126,5 @@ class EdifactFileTest extends TestCase
         $stream->rewind();
         $this->assertEquals(0, $stream->tell());
     }
-
-    public function testIterateOverClass()
-    {
-        $stream = new EdifactFile($filePath = __DIR__ . '/../data/edifact.txt');
-
-        $content = "";
-        foreach ($stream as $segment) {
-            $content .= $segment . "'";
-        }
-          
-        $this->assertEquals((string)$stream, $content);
-    }
-    
 }
 

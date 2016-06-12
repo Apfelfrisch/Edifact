@@ -13,17 +13,16 @@ class SegmentTest extends TestCase
 {
     protected function setUp()
     {
-        Segment::setDelimiter(null);
-        Segment::setValidator(null);
+        Segment::setBuildDelimiter(null);
+        Segment::setBuildValidator(null);
     }
 
     /** @test */
     public function it_can_set_a_costum_delimter()
     {
         $customDelimiter = new Delimiter;
+        Segment::setBuildDelimiter($customDelimiter);
         $segment = Segment::fromAttributes('A');
-
-        $segment->setDelimiter($customDelimiter);
 
         $this->assertEquals($customDelimiter, $segment->getDelimiter());
     }
@@ -42,7 +41,7 @@ class SegmentTest extends TestCase
         $customValidator = new SegmentValidator;
         $segment = Segment::fromAttributes('A');
 
-        Segment::setValidator($customValidator);
+        Segment::setBuildValidator($customValidator);
 
         $this->assertEquals($customValidator, $segment->getValidator());
     }
@@ -69,9 +68,8 @@ class SegmentTest extends TestCase
         $customValidator = m::mock(SegValidatorInterface::class, function($customValidator) {
             $customValidator->shouldReceive('validate')->once();
         });
+        Segment::setBuildValidator($customValidator);
         $segment = Segment::fromSegLine('A');
-
-        Segment::setValidator($customValidator);
 
         $segment->validate();
     }

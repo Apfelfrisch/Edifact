@@ -2,23 +2,19 @@
 
 namespace Proengeno\Edifact\Message;
 
+use Iterator;
 use Exception;
 use SplFileInfo;
 use LogicException;
 use DomainException;
 use RuntimeException;
-use SeekableIterator;
-use RecursiveIterator;
 use Proengeno\Edifact\Message\Delimiter;
 
-class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIterator 
+class EdifactFile extends SplFileInfo
 {
     private $rsrc;
     private $filename;
     private $delimiter;
-    private $maxLineLen = 0;
-    private $currentSegment = false;
-    private $currentSegmentNumber = 0;
     
     public function __construct($filename, $open_mode = 'r', $use_include_path = false) 
     {
@@ -26,7 +22,7 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
             throw new RuntimeException(__METHOD__ . "({$filename}): Filename cannot be empty");
         }
         if (!is_string($open_mode)) {
-            throw new Exception('SplFileObject::__construct() expects parameter 2 to be string, ' . gettype($open_mode) . ' given');
+            throw new Exception('EdifactFile::__construct() expects parameter 2 to be string, ' . gettype($open_mode) . ' given');
         }
 
         parent::__construct($filename);
@@ -49,10 +45,7 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
 
     public function getContents()
     {
-        if (false === $result = stream_get_contents($this->rsrc)) {
-            throw new RuntimeException('Error reading from stream');
-        }
-        return trim($result);
+        return trim(stream_get_contents($this->rsrc));
     }
 
     public function eof() 
@@ -67,29 +60,12 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
     
     public function getChar() 
     {
-        $char = fgetc($this->rsrc);
-        if ($char == "'") {
-            if ($this->tell() < 10) {
-                $this->currentSegmentNumber++;
-                return $char;
-            }
-            $this->seek($this->tell() - 2);
-            $preChar = fgetc($this->rsrc);
-            if ($preChar != $this->getDelimiter()->getTerminator() && $preChar != $this->getDelimiter()->getEmpty()) {
-                $this->currentSegmentNumber++;
-            }
-            $this->seek($this->tell() + 1);
-        }
-        return $char;
+        return fgetc($this->rsrc);
     }
     
     public function getSegment() 
     {
-        if (false !== $this->currentSegment) {
-            $this->next();
-        }
-        
-        return $this->currentSegment = $this->fetchSegment();
+        return $this->fetchSegment();
     }
     
     public function lock($operation, &$wouldblock = false) 
@@ -125,11 +101,6 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
         return ftell($this->rsrc);
     }
     
-    public function truncate($size) 
-    {
-        return ftruncate($this->rsrc, $size);
-    }
-    
     public function write($str) 
     {
         fwrite($this->rsrc, $str);
@@ -141,11 +112,6 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
         $this->rewind();
     }
 
-    public function getMaxLineLen() 
-    {
-        return $this->maxLineLen;
-    }
-
     public function getDelimiter()
     {
         if ($this->delimiter === null) {
@@ -153,91 +119,12 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
         }
         return $this->delimiter;
     }
-    
-    public function setMaxLineLen($max_len) 
-    {
-        if ($max_len < 0) {
-            throw new DomainException('Maximum line length must be greater than or equal zero');
-        }
-        $this->maxLineLen = $max_len;
-    }
 
     public function rewind() 
     {
         rewind($this->rsrc);
-        $this->currentSegmentNumber = 0;
-        $this->currentSegment = false;
     }
     
-    public function seekToSegment($segmentPosition) 
-    {
-        if ($segmentPosition < 0) {
-            throw new LogicException("Can't seek file " . $this->filename . " to negative Segment position $segmentPosition");
-        }
-        $this->rewind();
-        for ($i = 0; $i < $segmentPosition; $i++) {
-            $this->current();
-            $this->next();
-            if ($this->eof()) {
-                $this->currentSegmentNumber--;
-                break;
-            }
-        }
-        $this->current();
-    }
-    
-    /*
-     * Needed for RecursiveIterator Interface
-     */
-    public function current() 
-    {
-        if ($this->currentSegment === false) {
-            $this->currentSegment = $this->fetchSegment();
-        }
-        return $this->currentSegment;
-    }
-    
-    /*
-     * Needed for RecursiveIterator Interface
-     */
-    public function key() 
-    {
-        return $this->currentSegmentNumber;
-    }
-    
-    /*
-     * Needed for RecursiveIterator Interface
-     */
-    public function next() 
-    {
-        $this->currentSegment = false;
-        $this->currentSegmentNumber++;
-    }
-    
-    /*
-     * Needed for RecursiveIterator Interface
-     */
-    public function valid() 
-    {
-        return $this->current() !== false;
-    }
-
-    /*
-     * Needed for RecursiveIterator Interface
-     */
-    public function getChildren() 
-    {
-        return null;
-    }
-
-    /*
-     * Needed for RecursiveIterator Interface
-     */
-    public function hasChildren() 
-    {
-        return false;
-    }
-
     private function fetchSegment()
     {
         $mergedLines = '';
@@ -260,7 +147,7 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
 
     private function streamGetLine()
     {
-        return stream_get_line($this->rsrc, $this->maxLineLen, $this->getDelimiter()->getSegment());
+        return stream_get_line($this->rsrc, 0, $this->getDelimiter()->getSegment());
     }
     
     private function delimiterWasTerminated($line)
@@ -268,3 +155,4 @@ class EdifactFile extends SplFileInfo implements RecursiveIterator, SeekableIter
         return $line[(strlen($line) - 1)] == $this->getDelimiter()->getTerminator();
     }
 }
+

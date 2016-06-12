@@ -7,7 +7,7 @@ use Proengeno\Edifact\Validation\SegmentValidator;
 use Proengeno\Edifact\Exceptions\ValidationException;
 use Proengeno\Edifact\Interfaces\SegValidatorInterface;
 use Proengeno\Edifact\Exceptions\SegValidationException;
-use Proengeno\Edifact\Interfaces\EdifactMessageInterface;
+use Proengeno\Edifact\Interfaces\MessageInterface;
 use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 use Proengeno\Edifact\Exceptions\EdifactException;
 
@@ -19,7 +19,7 @@ class MessageValidator implements MessageValidatorInterface
     private $lineCount = 1;
     private $reLoopCount = [];
     
-    public function validate(EdifactMessageInterface $edifact)
+    public function validate(MessageInterface $edifact)
     {
         try {
             $this->loop($edifact, $edifact->getValidationBlueprint());

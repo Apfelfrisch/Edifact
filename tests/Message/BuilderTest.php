@@ -3,10 +3,12 @@
 namespace Proengeno\Edifact\Test\Message;
 
 use Proengeno\Edifact\Test\TestCase;
+use Proengeno\Edifact\Message\Message;
+use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Message\EdifactFile;
 use Proengeno\Edifact\Test\Fixtures\Builder;
-use Proengeno\Edifact\Test\Fixtures\Message;
-use Proengeno\Edifact\Message\Builder as BuilderCore;
+use Proengeno\Edifact\Templates\AbstractBuilder;
+use Proengeno\Edifact\Exceptions\EdifactException;
 use Proengeno\Edifact\Exceptions\ValidationException;
 
 class BuilderTest extends TestCase 
@@ -32,7 +34,7 @@ class BuilderTest extends TestCase
     /** @test */
     public function it_instanciates_with_file_and_validator()
     {
-        $this->assertInstanceOf(BuilderCore::class, $this->builder);
+        $this->assertInstanceOf(AbstractBuilder::class, $this->builder);
     }
 
     /** @test */
@@ -68,6 +70,14 @@ class BuilderTest extends TestCase
             return $ownRef;
         });
         $this->assertEquals($ownRef, $this->builder->unbReference());
+    }
+
+    /** @test */
+    public function it_builds_with_the_configurable_delimiter()
+    {
+        $this->builder->addPrebuildConfig('delimiter', function() {
+            return new Delimiter;
+        });
     }
 
     /** @test */
@@ -108,9 +118,20 @@ class BuilderTest extends TestCase
         $this->assertStringStartsWith("UNA:+.? 'UNB+UNOC:3+from:500+to:500", (string)$message);
         $this->assertStringEndsWith("UNZ+" . $messageCount . "+unique_id'", (string)$message);
     }
+
+    /** @test */
+    public function it_throws_an_expection_if_pre_build_config_was_addet_while_building_process_has_begun()
+    {
+        $ownRef = 'OWN_REF';
+        $this->builder->unbReference();
+        $this->expectException(EdifactException::class);
+        $this->builder->addPrebuildConfig('unbReference', function() use ($ownRef) {
+            return $ownRef;
+        });
+    }
 }
 
-namespace Proengeno\Edifact\Message;
+namespace Proengeno\Edifact\Templates;
 
 function uniqid($prefix = null) {
     return $prefix . 'unique_id';

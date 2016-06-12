@@ -2,11 +2,11 @@
 
 namespace Proengeno\Edifact\Test\Fixtures;
 
-use Proengeno\Edifact\Message\Message as MessageCore;
+use Proengeno\Edifact\Message\EdifactFile;
+use Proengeno\Edifact\Templates\AbstractMessage;
 
-class Message extends MessageCore
+class Message extends AbstractMessage
 {
-    protected static $builderClass = Builder::class;
     protected static $segments = [
         'BGM' => \Proengeno\Edifact\Test\Fixtures\Segments\Bgm::class,
         'DTM' => \Proengeno\Edifact\Test\Fixtures\Segments\Dtm::class,
@@ -19,18 +19,29 @@ class Message extends MessageCore
         'UNS' => \Proengeno\Edifact\Test\Fixtures\Segments\Uns::class,
         'UNZ' => \Proengeno\Edifact\Test\Fixtures\Segments\Unz::class,
     ];
-    protected static $validationBlueprint = [
-        ['name' => 'UNA'],
-        ['name' => 'UNH', 'maxLoops' => 10, 'necessity' => 'R', 'segments' => [
-            ['name' => 'BGM', 'templates' => ['docCode' => ['7', '380']] ],
-            ['name' => 'LIN', 'maxLoops' => 5, 'necessity' => 'R', 'segments' => [
-                ['name' => 'DTM', 'maxLoops' => 5],
+
+    public static function fromString($string)
+    {
+        $file = new EdifactFile('php://temp', 'w+');
+        $file->writeAndRewind($string);
+        return new static($file);
+    }
+
+    public function getValidationBlueprint()
+    {
+        return [
+            ['name' => 'UNA'],
+            ['name' => 'UNH', 'maxLoops' => 10, 'necessity' => 'R', 'segments' => [
+                ['name' => 'BGM', 'templates' => ['docCode' => ['7', '380']] ],
+                ['name' => 'LIN', 'maxLoops' => 5, 'necessity' => 'R', 'segments' => [
+                    ['name' => 'DTM', 'maxLoops' => 5],
+                ]],
+                ['name' => 'UNS'],
+                ['name' => 'UNT', 'maxLoops' => 5],
             ]],
-            ['name' => 'UNS'],
-            ['name' => 'UNT', 'maxLoops' => 5],
-        ]],
-        ['name' => 'UNZ']
-    ];
+            ['name' => 'UNZ']
+        ];
+    }
 
     public function testConfiguration()
     {

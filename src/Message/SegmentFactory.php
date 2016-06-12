@@ -13,11 +13,17 @@ class SegmentFactory
     
     public function fromSegline($segment, $segline)
     {
-        return call_user_func_array($segment . '::fromSegLine', [$segline, $this->delimiter]);
+        call_user_func_array($segment . '::setBuildDelimiter', [$this->delimiter]);
+        $segment = call_user_func_array($segment . '::fromSegLine', [$segline]);
+
+        return $segment;
     }
 
     public function fromAttributes($segment, $attributes = [], $method = 'fromAttributes')
     {
-        return call_user_func_array([$segment, $method], $attributes);
+        call_user_func_array($segment . '::setBuildDelimiter', [$this->delimiter]);
+        $segment = call_user_func_array([$segment, $method], $attributes);
+
+        return $segment;
     }
 }

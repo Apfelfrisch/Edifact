@@ -1,13 +1,16 @@
 <?php 
 
-namespace Proengeno\Edifact\Message;
+namespace Proengeno\Edifact\Templates;
 
 use Closure;
 use ReflectionClass;
-use Proengeno\Edifact\Message\Segment;
+use Proengeno\Edifact\Message\Message;
+use Proengeno\Edifact\Message\EdifactFile;
+use Proengeno\Edifact\Message\SegmentFactory;
+use Proengeno\Edifact\Exceptions\EdifactException;
 use Proengeno\Edifact\Exceptions\ValidationException;
 
-abstract class Builder
+abstract class AbstractBuilder
 {
     protected $to;
     protected $from;
@@ -16,10 +19,8 @@ abstract class Builder
     protected $postbuildConfig = [];
 
     private $edifactClass;
-    private $unbReference;
-    private $segmentBuilder;
-    
     private $unhCounter = 0;
+    private $buildCache = [];
     private $messageCount = 0;
     private $messageWasFetched = false;
     
@@ -27,17 +28,14 @@ abstract class Builder
     {
         $this->to = $to;
         $this->from = $from;
-        $this->segmentBuilder = new SegmentFactory;
+        $this->segmentFactory = new SegmentFactory;
         $this->edifactClass = $this->getMessageClass();
         $this->edifactFile = new EdifactFile($filepath ?: 'php://temp', 'w+');
-        $this->prebuildConfig['unbReference'] = function() { 
-            return uniqid();
-        };
     }
 
     public function __destruct()
     {
-        // Datei löschen falls Sie nicht Vollständig erstellt wurde (Exceptions o.ä) 
+        // Delete File if build process could not finshed (Expetion, etc)
         if ($this->edifactFile) {
             $filepath = $this->edifactFile->getRealPath();
             if ($this->messageWasFetched === false && file_exists($filepath)) {
@@ -48,6 +46,10 @@ abstract class Builder
 
     public function addPrebuildConfig($key, Closure $config)
     {
+        if (!empty($this->buildCache)) {
+            throw new EdifactException('Message already building, could not add PrebuildConfig');
+        }
+
         $this->prebuildConfig[$key] = $config;
     }
 
@@ -68,6 +70,34 @@ abstract class Builder
         return $this;
     }
 
+    public function unbReference()
+    {
+        if (!isset($this->buildCache['unbReference'])) {
+            if (isset($this->prebuildConfig['unbReference'])) {
+                return $this->buildCache['unbReference'] = $this->prebuildConfig['unbReference']();
+            }
+            return $this->buildCache['unbReference'] = uniqid();
+        }
+        return $this->buildCache['unbReference'];
+    }
+    
+    public function getSegmentFactory()
+    {
+        if (!$this->buildCache['segmentFactory']) {
+            if (isset($this->prebuildConfig['delimiter'])) {
+                return $this->buildCache['segmentFactory'] = new SegmentFactory($this->prebuildConfig['delimiter']());
+            }
+            return $this->buildCache['segmentFactory'] = new SegmentFactory;
+        }
+
+        return $this->buildCache['segmentFactory'];
+    }
+
+    public function unhCount()
+    {
+        return $this->unhCounter;
+    }
+    
     public function getOrFail()
     {
         $message = $this->get();
@@ -92,25 +122,9 @@ abstract class Builder
 
         $this->messageWasFetched = true;
 
-        return $edifactObject;
+        return new Message($edifactObject);
     }
 
-    public function unbReference()
-    {
-        if (!$this->unbReference) {
-            if (isset($this->prebuildConfig['unbReference'])) {
-                return $this->unbReference = $this->prebuildConfig['unbReference']();
-            }
-            return $this->unbReference = uniqid();
-        }
-        return $this->unbReference;
-    }
-
-    public function unhCount()
-    {
-        return $this->unhCounter;
-    }
-    
     abstract protected function getMessageClass();
 
     abstract protected function writeUnb();
@@ -120,7 +134,7 @@ abstract class Builder
     protected function writeSeg($segment, $attributes = [], $method = 'fromAttributes')
     {
         $edifactClass = $this->edifactClass;
-        $segment = $this->segmentBuilder->fromAttributes($edifactClass::getSegmentClass($segment), $attributes, $method);
+        $segment = $this->segmentFactory->fromAttributes($edifactClass::getSegmentClass($segment), $attributes, $method);
         $this->edifactFile->write($segment);
         if ($segment->name() == 'UNA' || $segment->name() == 'UNB') {
             return;

@@ -2,12 +2,16 @@
 
 namespace Proengeno\Edifact;
 
+use Closure;
+use Proengeno\Edifact\Message\Message;
 use Proengeno\Edifact\Message\EdifactFile;
+use Proengeno\Edifact\Exceptions\EdifactException;
 
 class EdifactResolver
 {
     private $edifactFile;
     private $allocationRules;
+    private $postbuildConfig = [];
 
     public function addAllocationRule($edifactClass, $allocationRules)
     {
@@ -16,23 +20,37 @@ class EdifactResolver
         return $this;
     }
 
+    public function addPostbuildConfig($key, Closure $config)
+    {
+        $this->postbuildConfig[$key] = $config;
+    }
+
     public function fromFile($filepath)
     {
         $this->edifactFile = new EdifactFile($filepath);
 
-        return $this->resolveEdifactClass();
+        return new Message($this->applyPostbuildConfig($this->resolvEdifactObject()));
     }
     
     public function fromString($string)
     {
         $this->edifactFile = new EdifactFile('php://temp', 'w+');
         $this->edifactFile->writeAndRewind($string);
-        
-        return $this->resolveEdifactClass();
+
+        $message = $this->applyPostbuildConfig($this->resolvEdifactObject());
+        return new Message($message);
+    }
+
+    private function applyPostbuildConfig($edifactObject)
+    {
+        foreach ($this->postbuildConfig as $configKey => $config) {
+            $edifactObject->addConfiguration($configKey, $config);
+        }
+        return $edifactObject;
     }
 
     // Need Refactoring
-    private function resolveEdifactClass()
+    private function resolvEdifactObject()
     {
         $tmpAllocationRules = $this->allocationRules;
         while ($segment = $this->edifactFile->getSegment()) {
@@ -49,6 +67,6 @@ class EdifactResolver
                 }
             }
         }
+        throw new EdifactException('Could find Message, for given rules');
     }
-    
 }

@@ -2,9 +2,9 @@
 
 namespace Proengeno\Edifact\Test\Fixtures\Segments;
 
-use Proengeno\Edifact\Message\Segment;
+use Proengeno\Edifact\Templates\AbstractSegment;
 
-class Unz extends Segment 
+class Unz extends AbstractSegment 
 {
     protected static $validationBlueprint = [
         'UNZ' => ['UNZ' => 'M|an|3'],

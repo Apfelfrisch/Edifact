@@ -2,8 +2,8 @@
 
 namespace Proengeno\Edifact\Interfaces;
 
-use Proengeno\Edifact\Interfaces\EdifactMessageInterface;
+use Proengeno\Edifact\Interfaces\MessageInterface;
 
 interface MessageValidatorInterface {
-    public function validate(EdifactMessageInterface $edifact);
+    public function validate(MessageInterface $edifact);
 } 

@@ -2,9 +2,9 @@
 
 namespace Proengeno\Edifact\Test\Fixtures\Segments;
 
-use Proengeno\Edifact\Message\Segment;
+use Proengeno\Edifact\Templates\AbstractSegment;
 
-class Rff extends Segment 
+class Rff extends AbstractSegment 
 {
     protected static $validationBlueprint = [
         'RFF' => ['RFF' => 'M|a|3'],

@@ -1,174 +1,76 @@
-<?php 
+<?php
 
 namespace Proengeno\Edifact\Message;
 
-use Closure;
-use Iterator;
-use Proengeno\Edifact\Message\Delimiter;
-use Proengeno\Edifact\Validation\MessageValidator;
-use Proengeno\Edifact\Exceptions\EdifactException;
-use Proengeno\Edifact\Interfaces\EdifactMessageInterface;
-use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
+use ReflectionClass;
+use Proengeno\Edifact\Interfaces\MessageInterface;
 
-abstract class Message implements Iterator, EdifactMessageInterface
+class Message
 {
-    protected $configuration = [];
-
-    private $file;
-    private $validator;
-    private $pinnedPointer;
-    private $currentSegment;
-    private $segmentBuilder;
-    private $currentSegmentNumber = 0;
+    protected $ediMessage;
     
-    public function __construct(EdifactFile $file, MessageValidatorInterface $validator = null)
+    public function __construct(MessageInterface $ediMessage)
     {
-        $this->file = $file;
-        $this->validator = $validator ?: new MessageValidator;
-        $this->segmentBuilder = new SegmentFactory($this->getDelimiter());
+        $this->ediMessage = $ediMessage;
     }
-    
-    public static function fromString($string)
+
+    public function getAdapterName($param)
     {
-        $file = new EdifactFile('php://temp', 'w+');
-        $file->writeAndRewind($string);
-        return new static($file);
+        return (new ReflectionClass($this->ediMessage))->getShortName();
+    }
+
+    public function getValidationBlueprint()
+    {
+        return $this->ediMessage->getValidationBlueprint();
     }
 
     public function addConfiguration($key, Closure $config)
     {
-        $this->configuration[$key] = $config;
-    }
-
-    public function __toString()
-    {
-        return $this->file->__toString();
-    }
-
-    public function getFilepath()
-    {
-        return $this->file->getRealPath();
-    }
-
-    public function getCurrentSegment()
-    {
-        if ($this->currentSegment === false) {
-            $this->currentSegment = $this->getNextSegment();
-        }
-        return $this->currentSegment;
-    }
-    
-    public function getNextSegment()
-    {
-        $this->currentSegmentNumber++;
-        $segment = $this->file->getSegment();
-
-        if ($segment !== false) {
-            $segment = $this->currentSegment = $this->getSegmentObject($segment);
-        } 
-        return $segment;
-    }
-
-    public function findNextSegment($searchSegment, $fromStart = false, closure $criteria = null)
-    {
-        if ($fromStart) {
-            $this->rewind();
-        }
-        
-        $searchObject = static::getSegmentClass($searchSegment);
-        while ($segmentObject = $this->getNextSegment()) {
-            if ($segmentObject instanceof $searchObject) {
-                if ($criteria && !$criteria($segmentObject)) {
-                    continue;
-                }
-                return $segmentObject;
-            }
-        }
-
-        return false;
-    }
-
-    public function pinPointer()
-    {
-        $this->pinnedPointer = $this->file->tell();
-    }
-
-    public function jumpToPinnedPointer()
-    {
-        if ($this->pinnedPointer === null) {
-            return $this->file->tell();
-        }
-
-        $pinnedPointer = $this->pinnedPointer;
-        $this->pinnedPointer = null;
-
-        return $this->file->seek($pinnedPointer);
-    }
-    
-    public function getValidationBlueprint()
-    {
-        return static::$validationBlueprint;
-    }
-
-    public function validate()
-    {
-        $this->rewind();
-        $this->validator->validate($this);
-        $this->rewind();
-
-        return $this;
+        return $this->ediMessage->addConfiguration($key, $config);
     }
 
     public function getDelimiter()
     {
-        return $this->file->getDelimiter();
+        return $this->ediMessage->getDelimiter();
     }
 
-    public static function getSegmentClass($segmentName)
+    public function getFilepath()
     {
-        $segmentName = strtoupper($segmentName);
-        if (isset(static::$segments[$segmentName])) {
-            return static::$segments[$segmentName];
-        }
-
-        throw EdifactException::segmentUnknown($segmentName);
+        return $this->ediMessage->getFilepath();
     }
 
-    public function current()
+    public function getCurrentSegment()
     {
-        return $this->getCurrentSegment();
+        return $this->ediMessage->getCurrentSegment();
     }
 
-    public function key()
+    public function getNextSegment()
     {
-        return $this->currentSegmentNumber;
+        return $this->ediMessage->getNextSegment();
     }
 
-    public function next()
+    public function findNextSegment($searchSegment)
     {
-        $this->currentSegment = false;
-        $this->currentSegmentNumber++;
+        return $this->ediMessage->findNextSegment($searchSegment);
     }
 
-    public function rewind()
+    public function pinPointer()
     {
-        $this->file->rewind();
-        $this->currentSegmentNumber = 0;
-        $this->currentSegment = false;
+        return $this->ediMessage->pinPointer();
     }
 
-    public function valid()
+    public function jumpToPinnedPointer()
     {
-        return $this->current() !== false;
-    }
-    
-    protected function getSegmentObject($segLine)
-    {
-        return $this->segmentBuilder->fromSegline(static::getSegmentClass($this->getSegname($segLine)), $segLine);
+        return $this->ediMessage->jumpToPinnedPointer();
     }
 
-    private function getSegname($segLine) 
+    public function validate()
     {
-        return substr($segLine, 0, 3);
+        return $this->ediMessage->validate();
+    }
+
+    public function __toString()
+    {
+        return $this->ediMessage->__toString();
     }
 }

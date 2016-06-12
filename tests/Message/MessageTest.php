@@ -6,10 +6,10 @@ use Mockery as m;
 use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\Message\EdifactFile;
 use Proengeno\Edifact\Test\Fixtures\Message;
-use Proengeno\Edifact\Message\Message as MessageCore;
+use Proengeno\Edifact\Templates\AbstractMessage;
 use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 
-class MessageTest extends TestCase 
+class MessageTest extends TestCase
 {
     private $messageCore;
 
@@ -22,7 +22,7 @@ class MessageTest extends TestCase
     /** @test */
     public function it_instanciates_with_file_and_validator()
     {
-        $this->assertInstanceOf(MessageCore::class, $this->messageCore);
+        $this->assertInstanceOf(AbstractMessage::class, $this->messageCore);
     }
 
     /** @test */
@@ -54,6 +54,33 @@ class MessageTest extends TestCase
         $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unb', $messageCore->getNextSegment());
     }
 
+    /** @test */
+    public function it_pinns_and_jumps_to_the_pointer_position()
+    {
+        $messageCore = Message::fromString("UNH'UNB");
+        $messageCore->pinPointer();
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getNextSegment());
+        $messageCore->jumpToPinnedPointer();
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getNextSegment());
+    }
+    
+    /** @test */
+    public function it_jumps_to_the_actual_position_if_no_pointer_was_pinned()
+    {
+        $messageCore = Message::fromString("UNH'UNB");
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getNextSegment());
+        $messageCore->jumpToPinnedPointer();
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unb', $messageCore->getNextSegment());
+    }
+    
+    /** @test */
+    public function it_provides_the_count_of_the_parsed_segments()
+    {
+        $messageCore = Message::fromString("UNH'UNB");
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getNextSegment());
+        $messageCore->jumpToPinnedPointer();
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unb', $messageCore->getNextSegment());
+    }
     /** @test */
     public function it_iterates_over_the_stream()
     {

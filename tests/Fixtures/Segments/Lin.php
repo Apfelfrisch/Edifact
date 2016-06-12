@@ -2,9 +2,9 @@
 
 namespace Proengeno\Edifact\Test\Fixtures\Segments;
 
-use Proengeno\Edifact\Message\Segment;
+use Proengeno\Edifact\Templates\AbstractSegment;
 
-class Lin extends Segment 
+class Lin extends AbstractSegment 
 {
     protected static $validationBlueprint = [
         'LIN' => ['LIN' => 'M|a|3'],
