@@ -80,7 +80,7 @@ abstract class AbstractBuilder
     
     public function getSegmentFactory()
     {
-        if (!$this->buildCache['segmentFactory']) {
+        if (!isset($this->buildCache['segmentFactory'])) {
             if (isset($this->prebuildConfig['delimiter'])) {
                 return $this->buildCache['segmentFactory'] = new SegmentFactory($this->prebuildConfig['delimiter']());
             }
@@ -131,7 +131,7 @@ abstract class AbstractBuilder
     protected function writeSeg($segment, $attributes = [], $method = 'fromAttributes')
     {
         $edifactClass = $this->edifactClass;
-        $segment = $this->segmentFactory->fromAttributes($edifactClass::getSegmentClass($segment), $attributes, $method);
+        $segment = $this->getSegmentFactory()->fromAttributes($edifactClass::getSegmentClass($segment), $attributes, $method);
         $this->edifactFile->write($segment);
         if ($segment->name() == 'UNA' || $segment->name() == 'UNB') {
             return;
