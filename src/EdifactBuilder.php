@@ -28,9 +28,9 @@ class EdifactBuilder
         $this->postbuildConfig[$key] = $config;
     }
     
-    public function build($key, $to)
+    public function build($key, $to, $filename = null)
     {
-        $builder = $this->instanceClass($key, $to);
+        $builder = $this->instanceClass($key, $to, $filename);
         foreach ($this->prebuildConfig as $configKey => $config) {
             $builder->addPrebuildConfig($configKey, $config);
         }
@@ -40,13 +40,24 @@ class EdifactBuilder
         return $builder;
     }
 
-    private function instanceClass($key, $to)
+    private function instanceClass($key, $to, $filename)
     {
         if (isset($this->classes[$key])) {
             list($from, $filepath) = $this->classes[$key]['construct'];
-            return new $this->classes[$key]['builder']($from, $to, $filepath);
+            return new $this->classes[$key]['builder']($from, $to, $this->getFullpath($filepath, $filename));
         }
 
         throw new EdifactException("Class with Key '$key' not registered.");
+    }
+
+    private function getFullpath($filepath, $filename)
+    {
+        if ($filename === null) {
+            return null;
+        }
+        if ($filepath === null && $filename != null) {
+            return $filename;
+        }
+        return $filepath . '/' . $filename;
     }
 }

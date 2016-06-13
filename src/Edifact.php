@@ -16,9 +16,9 @@ class Edifact
         $this->resolver = $resolver;
     }
 
-    public function build($key, $to)
+    public function build($key, $to, $filename = null)
     {
-        return $this->builder->build($key, $to);
+        return $this->builder->build($key, $to, $filename);
     }
     
     public function resolveFromFile($filepath)

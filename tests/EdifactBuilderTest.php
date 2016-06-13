@@ -6,6 +6,7 @@ use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\EdifactBuilder;
 use Proengeno\Edifact\Test\Fixtures\Builder;
 use Proengeno\Edifact\Exceptions\EdifactException;
+use Proengeno\Edifact\Message\Message;
 
 class EdifactBuilderTest extends TestCase
 {
@@ -27,6 +28,42 @@ class EdifactBuilderTest extends TestCase
     {
         $this->edifactBuilder->addBuilder('Message', Builder::class, 'from');
         $this->edifactBuilder->build('Message', 'to');
+    }
+
+    /** @test */
+    public function it_build_the_file_in_memory_if_only_path_is_given()
+    {
+        $path = '/tmp';
+
+        $this->edifactBuilder->addBuilder('Message', Builder::class, 'from', '/tmp');
+        $file = $this->edifactBuilder->build('Message', 'to')->get();
+        
+        $this->assertInstanceOf(Message::class, $file);
+    }
+
+    /** @test */
+    public function it_build_the_file_in_current_path_if_only_a_filname_was_given()
+    {
+        $filename = 'test.csv';
+
+        $this->edifactBuilder->addBuilder('Message', Builder::class, 'from');
+        $this->edifactBuilder->build('Message', 'to', 'test.csv')->get();
+
+        $this->assertFileExists($filename);
+        @unlink($filename);
+    }
+
+    /** @test */
+    public function it_build_the_file_in_given_path_if_path_and_filname_was_given()
+    {
+        $path = '/tmp';
+        $filename = 'test.csv';
+
+        $this->edifactBuilder->addBuilder('Message', Builder::class, 'from', '/tmp');
+        $this->edifactBuilder->build('Message', 'to', 'test.csv')->get();
+
+        $this->assertFileExists($path . '/' . $filename);
+        @unlink($path . '/' . $filename);
     }
 
     /** @test */
