@@ -91,7 +91,8 @@ class BuilderTest extends TestCase
     {
         $expectedMessage = "UNA:+.? 'UNB+UNOC:3+from:500+to:500+160510:0143+unique_id+VL'UNZ+1+unique_id'";
 
-        $message = $this->builder->addMessage([])->get();
+        $this->builder->addMessage([]);
+        $message = $this->builder->get();
         $this->assertStringStartsWith("UNA:+.? 'UNB+UNOC:3+from:500+to:500", (string)$message);
         $this->assertStringEndsWith("UNZ+1+unique_id'", (string)$message);
     }

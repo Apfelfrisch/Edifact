@@ -18,7 +18,8 @@ class SegmentValidator implements SegValidatorInterface
                 if ($validation !== null) {
                     list($necessaryStatus, $type, $lenght) = explode('|', $validation);
 
-                    if ($this->isDatafieldOptional($necessaryStatus) && !$this->isDatafieldIsAvailable($data, $dataGroupKey, $dataKey)) {
+                    if ($this->isDatafieldOptional($necessaryStatus) && !$this->isDataIsAvailable($data, $dataGroupKey, $dataKey)) {
+                        $this->cleanUp($data, $dataGroupKey, $dataKey);
                         continue;
                     }
 
@@ -65,7 +66,14 @@ class SegmentValidator implements SegValidatorInterface
             unset($data[$dataGroupKey]);
         }
     }
-    
+
+    private function isDataIsAvailable($data, $dataGroupKey, $dataKey)
+    {
+        return $this->isDatafieldIsAvailable($data, $dataGroupKey, $dataKey)
+            && $data[$dataGroupKey][$dataKey] !== null
+            && $data[$dataGroupKey][$dataKey] !== '';
+    }
+
     private function isDatafieldIsAvailable($data, $dataGroupKey, $dataKey)
     {
         return isset($data[$dataGroupKey][$dataKey]);

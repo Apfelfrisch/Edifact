@@ -40,19 +40,6 @@ class EdifactBuilderTest extends TestCase
         $this->assertEquals($ownRef, $this->edifactBuilder->build('Message', 'to')->unbReference());
     }
 
-    ///** @test */
-    //public function it_forwards_the_postbuild_configuration_to_builder_class()
-    //{
-    //    $this->edifactBuilder->addBuilder('Message', Builder::class, 'from');
-    //    $this->edifactBuilder->addPostbuildConfig('test', function() {
-    //        return 'TEST';
-    //    });
-
-    //    $builder = $this->edifactBuilder->build('Message', 'to')->addMessage([]);
-
-    //    $this->assertEquals('TEST', $builder->get()->testConfiguration());
-    //}
-
     /** @test */
     public function it_throw_an_expetion_if_building_class_is_unknown()
     {
