@@ -63,8 +63,6 @@ abstract class AbstractBuilder
         }
         $this->writeMessage($message);
         $this->messageCount++;
-
-        return $this;
     }
 
     public function unbReference()
