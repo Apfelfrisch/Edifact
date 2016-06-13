@@ -10,14 +10,12 @@ use Proengeno\Edifact\Exceptions\EdifactException;
 class EdifactResolver
 {
     private $edifactFile;
-    private $allocationRules;
+    private $allocationRules = [];
     private $postbuildConfig = [];
 
     public function addAllocationRule($edifactClass, $allocationRules)
     {
         $this->allocationRules[$edifactClass] = $allocationRules;
-
-        return $this;
     }
 
     public function addPostbuildConfig($key, Closure $config)
