@@ -2,15 +2,15 @@
 
 namespace Proengeno\Edifact;
 
-use Proengeno\Edifact\Message\EdifactFile;
-use Proengeno\Edifact\Exceptions\EdifactException;
+use Proengeno\Edifact\EdifactBuilder;
+use Proengeno\Edifact\EdifactResolver;
 
 class Edifact
 {
     protected $builder;
     protected $resolver;
     
-    public function __construct($builder, $resolver)
+    public function __construct(EdifactBuilder $builder, EdifactResolver $resolver)
     {
         $this->builder = $builder;
         $this->resolver = $resolver;
