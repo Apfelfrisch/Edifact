@@ -14,6 +14,7 @@ abstract class AbstractBuilder
     protected $to;
     protected $from;
     protected $edifactFile;
+    protected $buildCache = [];
     protected $prebuildConfig = [
         'unbReference' => null, 'delimiter' => null
     ];
@@ -21,7 +22,6 @@ abstract class AbstractBuilder
 
     private $edifactClass;
     private $unhCounter = 0;
-    private $buildCache = [];
     private $messageCount = 0;
     private $messageWasFetched = false;
     
