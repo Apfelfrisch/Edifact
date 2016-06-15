@@ -7,6 +7,7 @@ use Proengeno\Edifact\Message\Message;
 use Proengeno\Edifact\Message\EdifactFile;
 use Proengeno\Edifact\Message\SegmentFactory;
 use Proengeno\Edifact\Exceptions\EdifactException;
+use Proengeno\Edifact\Message\Delimiter;
 
 abstract class AbstractBuilder
 {
@@ -140,12 +141,14 @@ abstract class AbstractBuilder
 
     protected function getPrebuildConfig($key)
     {
-        if (isset($this->prebuildConfig[$key])) {
+        if (isset($this->prebuildConfig[$key]) && $this->prebuildConfig[$key] !== null) {
             if (is_callable($this->prebuildConfig[$key])) {
                 return $this->prebuildConfig[$key]();
             }
             return $this->prebuildConfig[$key];
         }
+
+        throw new EdifactException("PrebuildConfig $key not set.");
     }
 
     private function setPrebuildConfigDefaults()
@@ -167,6 +170,6 @@ abstract class AbstractBuilder
 
     private function getDefaultDelimiter()
     {
-        return;
+        return new Delimiter;
     }
 }

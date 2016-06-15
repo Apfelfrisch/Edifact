@@ -158,12 +158,14 @@ abstract class AbstractMessage implements MessageInterface
 
     protected function getConfiguration($key)
     {
-        if (isset($this->configuration[$key])) {
+        if (isset($this->configuration[$key]) && $this->configuration[$key] !== null) {
             if (is_callable($this->configuration[$key])) {
                 return $this->configuration[$key]();
             }
             return $this->configuration[$key];
         }
+
+        throw new EdifactException("Configuration $key not set.");
     }
 
     protected function getSegmentObject($segLine)
