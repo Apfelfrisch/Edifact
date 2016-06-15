@@ -27,6 +27,7 @@ abstract class AbstractMessage implements MessageInterface
         $this->file = $file;
         $this->validator = $validator ?: new MessageValidator;
         $this->segmentFactory = new SegmentFactory($this->getDelimiter());
+        $this->setConfigDefaults();
     }
 
     public static function getSegmentClass($segmentName)
@@ -171,6 +172,17 @@ abstract class AbstractMessage implements MessageInterface
     protected function getSegmentObject($segLine)
     {
         return $this->segmentFactory->fromSegline(static::getSegmentClass($this->getSegname($segLine)), $segLine);
+    }
+
+    private function setConfigDefaults()
+    {
+        foreach ($this->configuration as $configKey => $config) {
+            $methodName = 'getDefault' . ucfirst($configKey);
+
+            if (method_exists($this, $methodName)) {
+                $this->configuration[$configKey] = $this->$methodName();
+            }
+        }
     }
 
     private function getSegname($segLine) 

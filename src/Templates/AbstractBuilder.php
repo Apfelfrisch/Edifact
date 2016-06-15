@@ -154,8 +154,22 @@ abstract class AbstractBuilder
     private function setPrebuildConfigDefaults()
     {
         foreach ($this->prebuildConfig as $configKey => $config) {
-            $this->prebuildConfig[$configKey] = $this->{'getDefault' . ucfirst($configKey)}();
+            $methodName = 'getDefault' . ucfirst($configKey);
+
+            if (method_exists($this, $methodName)) {
+                $this->prebuildConfig[$configKey] = $this->$methodName();
+            }
         }
+    }
+
+    protected function getDefaultUnbReference()
+    {
+        return uniqid();
+    }
+
+    protected function getDefaultDelimiter()
+    {
+        return new Delimiter;
     }
 
     private function messageIsEmpty()
@@ -163,13 +177,4 @@ abstract class AbstractBuilder
         return $this->edifactFile->tell() == 0;
     }
 
-    private function getDefaultUnbReference()
-    {
-        return uniqid();
-    }
-
-    private function getDefaultDelimiter()
-    {
-        return new Delimiter;
-    }
 }
