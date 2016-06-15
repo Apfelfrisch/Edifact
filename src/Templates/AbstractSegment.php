@@ -12,10 +12,9 @@ abstract class AbstractSegment implements SegInterface
     protected static $buildValidator;
     protected static $buildDelimiter;
     protected $elements = [];
+    protected $cache = [];
     protected $delimiter;
     protected $validator;
-
-    private $cache = [];
 
     protected function __construct(array $elements)
     {
