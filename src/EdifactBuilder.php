@@ -18,12 +18,12 @@ class EdifactBuilder
         $this->classes[$key]['construct'] = [$from, $filepath];
     }
     
-    public function addPrebuildConfig($key, Closure $config)
+    public function addPrebuildConfig($key, $config)
     {
         $this->prebuildConfig[$key] = $config;
     }
 
-    public function addPostbuildConfig($key, Closure $config)
+    public function addPostbuildConfig($key, $config)
     {
         $this->postbuildConfig[$key] = $config;
     }

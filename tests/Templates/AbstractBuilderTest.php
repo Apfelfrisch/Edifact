@@ -1,6 +1,6 @@
 <?php
 
-namespace Proengeno\Edifact\Test\Message;
+namespace Proengeno\Edifact\Test\Templates;
 
 use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\Message\Message;
@@ -11,7 +11,7 @@ use Proengeno\Edifact\Templates\AbstractBuilder;
 use Proengeno\Edifact\Exceptions\EdifactException;
 use Proengeno\Edifact\Exceptions\ValidationException;
 
-class BuilderTest extends TestCase 
+class AbstractBuilderTest extends TestCase 
 {
     private $builder;
     private $file;
@@ -63,7 +63,15 @@ class BuilderTest extends TestCase
     }
 
     /** @test */
-    public function it_provides_a_configurable_unb_ref()
+    public function it_provides_a_configurable_pre_build_configuration()
+    {
+        $ownRef = 'OWN_REF';
+        $this->builder->addPrebuildConfig('unbReference', $ownRef);
+        $this->assertEquals($ownRef, $this->builder->unbReference());
+    }
+
+    /** @test */
+    public function it_provides_a_configurable_pre_build_configuration_over_closures()
     {
         $ownRef = 'OWN_REF';
         $this->builder->addPrebuildConfig('unbReference', function() use ($ownRef) {

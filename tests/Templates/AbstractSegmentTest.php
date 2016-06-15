@@ -1,6 +1,6 @@
 <?php
 
-namespace Proengeno\Edifact\Test\Message\Segments;
+namespace Proengeno\Edifact\Test\Templates;
 
 use Mockery as m;
 use Proengeno\Edifact\Test\TestCase;
@@ -9,7 +9,7 @@ use Proengeno\Edifact\Test\Fixtures\Segment;
 use Proengeno\Edifact\Validation\SegmentValidator;
 use Proengeno\Edifact\Interfaces\SegValidatorInterface;
 
-class SegmentTest extends TestCase 
+class AbstractSegmentTest extends TestCase 
 {
     protected function setUp()
     {

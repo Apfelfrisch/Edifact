@@ -18,7 +18,7 @@ class EdifactResolver
         $this->allocationRules[$edifactClass] = $allocationRules;
     }
 
-    public function addPostbuildConfig($key, Closure $config)
+    public function addPostbuildConfig($key, $config)
     {
         $this->postbuildConfig[$key] = $config;
     }

@@ -41,7 +41,7 @@ abstract class AbstractMessage implements MessageInterface
 
     abstract public function getValidationBlueprint();
 
-    public function addConfiguration($key, Closure $config)
+    public function addConfiguration($key, $config)
     {
         $this->configuration[$key] = $config;
     }
@@ -154,6 +154,16 @@ abstract class AbstractMessage implements MessageInterface
     public function __toString()
     {
         return $this->file->__toString();
+    }
+
+    protected function getConfiguration($key)
+    {
+        if (isset($this->configuration[$key])) {
+            if (is_callable($this->configuration[$key])) {
+                return $this->configuration[$key]();
+            }
+            return $this->configuration[$key];
+        }
     }
 
     protected function getSegmentObject($segLine)

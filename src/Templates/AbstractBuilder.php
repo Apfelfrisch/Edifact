@@ -13,7 +13,9 @@ abstract class AbstractBuilder
     protected $to;
     protected $from;
     protected $edifactFile;
-    protected $prebuildConfig = [];
+    protected $prebuildConfig = [
+        'unbReference' => null, 'delimiter' => null
+    ];
     protected $postbuildConfig = [];
 
     private $edifactClass;
@@ -28,6 +30,7 @@ abstract class AbstractBuilder
         $this->from = $from;
         $this->edifactClass = $this->getMessageClass();
         $this->edifactFile = new EdifactFile($filepath ?: 'php://temp', 'w+');
+        $this->setPrebuildConfigDefaults();
     }
 
     public function __destruct()
@@ -41,7 +44,7 @@ abstract class AbstractBuilder
         }
     }
 
-    public function addPrebuildConfig($key, Closure $config)
+    public function addPrebuildConfig($key, $config)
     {
         if (!empty($this->buildCache)) {
             throw new EdifactException('Message already building, could not add PrebuildConfig');
@@ -50,7 +53,7 @@ abstract class AbstractBuilder
         $this->prebuildConfig[$key] = $config;
     }
 
-    public function addPostbuildConfig($key, Closure $config)
+    public function addPostbuildConfig($key, $config)
     {
         $this->postbuildConfig[$key] = $config;
     }
@@ -68,10 +71,7 @@ abstract class AbstractBuilder
     public function unbReference()
     {
         if (!isset($this->buildCache['unbReference'])) {
-            if (isset($this->prebuildConfig['unbReference'])) {
-                return $this->buildCache['unbReference'] = $this->prebuildConfig['unbReference']();
-            }
-            return $this->buildCache['unbReference'] = uniqid();
+            return $this->buildCache['unbReference'] = $this->getPrebuildConfig('unbReference');
         }
         return $this->buildCache['unbReference'];
     }
@@ -79,10 +79,7 @@ abstract class AbstractBuilder
     public function getSegmentFactory()
     {
         if (!isset($this->buildCache['segmentFactory'])) {
-            if (isset($this->prebuildConfig['delimiter'])) {
-                return $this->buildCache['segmentFactory'] = new SegmentFactory($this->prebuildConfig['delimiter']());
-            }
-            return $this->buildCache['segmentFactory'] = new SegmentFactory;
+            return $this->buildCache['segmentFactory'] = new SegmentFactory($this->getPrebuildConfig('delimiter'));
         }
 
         return $this->buildCache['segmentFactory'];
@@ -140,9 +137,36 @@ abstract class AbstractBuilder
         }
         $this->unhCounter++;
     }
-    
+
+    protected function getPrebuildConfig($key)
+    {
+        if (isset($this->prebuildConfig[$key])) {
+            if (is_callable($this->prebuildConfig[$key])) {
+                return $this->prebuildConfig[$key]();
+            }
+            return $this->prebuildConfig[$key];
+        }
+    }
+
+    private function setPrebuildConfigDefaults()
+    {
+        foreach ($this->prebuildConfig as $configKey => $config) {
+            $this->prebuildConfig[$configKey] = $this->{'getDefault' . ucfirst($configKey)}();
+        }
+    }
+
     private function messageIsEmpty()
     {
         return $this->edifactFile->tell() == 0;
+    }
+
+    private function getDefaultUnbReference()
+    {
+        return uniqid();
+    }
+
+    private function getDefaultDelimiter()
+    {
+        return;
     }
 }

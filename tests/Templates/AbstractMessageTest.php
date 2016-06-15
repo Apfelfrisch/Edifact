@@ -1,6 +1,6 @@
 <?php
 
-namespace Proengeno\Edifact\Test\Message;
+namespace Proengeno\Edifact\Test\Templates;
 
 use Mockery as m;
 use Proengeno\Edifact\Test\TestCase;
@@ -9,7 +9,7 @@ use Proengeno\Edifact\Test\Fixtures\Message;
 use Proengeno\Edifact\Templates\AbstractMessage;
 use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 
-class MessageTest extends TestCase
+class AbstractMessageTest extends TestCase
 {
     private $messageCore;
 
