@@ -129,14 +129,7 @@ abstract class AbstractBuilder
         $edifactClass = $this->edifactClass;
         $segment = $this->getSegmentFactory()->fromAttributes($edifactClass::getSegmentClass($segment), $attributes, $method);
         $this->edifactFile->write($segment);
-        if ($segment->name() == 'UNA' || $segment->name() == 'UNB') {
-            return;
-        }
-        if ($segment->name() == 'UNH') {
-            $this->unhCounter = 1;
-            return;
-        }
-        $this->unhCounter++;
+        $this->countSegments($segment);
     }
 
     protected function getPrebuildConfig($key)
@@ -177,4 +170,16 @@ abstract class AbstractBuilder
         return $this->edifactFile->tell() == 0;
     }
 
+    private function countSegments($segment)
+    {
+        if ($segment->name() == 'UNA' || $segment->name() == 'UNB') {
+            return;
+        }
+        if ($segment->name() == 'UNH') {
+            $this->unhCounter = 1;
+            return;
+        }
+        $this->unhCounter++;
+    }
 }
+
