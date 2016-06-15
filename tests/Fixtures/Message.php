@@ -33,6 +33,7 @@ class Message extends AbstractMessage
             ['name' => 'UNA'],
             ['name' => 'UNH', 'maxLoops' => 10, 'necessity' => 'R', 'segments' => [
                 ['name' => 'BGM', 'templates' => ['docCode' => ['7', '380']] ],
+                ['name' => 'RFF', 'necessity' => 'O'],
                 ['name' => 'LIN', 'maxLoops' => 5, 'necessity' => 'R', 'segments' => [
                     ['name' => 'DTM', 'maxLoops' => 5],
                 ]],

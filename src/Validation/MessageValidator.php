@@ -41,7 +41,7 @@ class MessageValidator implements MessageValidatorInterface
                 return;
             }
             $this->validateSegment($line);
-            $this->validateAgainstBlueprint($line, @$blueprint[$blueprintCount]);
+            $this->validateAgainstBlueprint($edifact, $line, @$blueprint[$blueprintCount]);
             
             if ($this->isSubSegmentReloop($blueprint, $blueprintCount)) {
                 $this->reLoopSubSegments($edifact, $blueprint, $blueprintCount);
@@ -129,22 +129,23 @@ class MessageValidator implements MessageValidatorInterface
         return false;
     }
 
-    private function validateAgainstBlueprint($segment, $blueprint)
+    private function validateAgainstBlueprint($edifact, $segment, $blueprint)
     {
         if ($segment == null) {
             throw ValidationException::unexpectedEnd();
         }
-        $this->validateBlueprintNames($segment, $blueprint);
         $this->validateBlueprintTemplates($segment, $blueprint);
+        $this->validateBlueprintNames($edifact, $segment, $blueprint);
     }
 
-    private function validateBlueprintNames($segment, $blueprint)
+    private function validateBlueprintNames($edifact, $segment, $blueprint)
     {
         if ($segment->name() != $blueprint['name']) {
-            if (isset($blueprint['name'])) {
-                throw ValidationException::unexpectedSegment($this->lineCount, @$segment->name(), $blueprint['name']);
+            if (isset($blueprint['necessity']) && $blueprint['necessity'] == 'O') {
+                $edifact->jumpToPinnedPointer();
+                return;
             }
-            throw ValidationException::unexpectedSegment($this->lineCount, @$segment->name());
+            throw ValidationException::unexpectedSegment($this->lineCount, @$segment->name(), $blueprint['name']);
         }
     }
 
