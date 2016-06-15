@@ -3,13 +3,11 @@
 namespace Proengeno\Edifact\Validation;
 
 use Proengeno\Edifact\Interfaces\SegInterface;
-use Proengeno\Edifact\Validation\SegmentValidator;
-use Proengeno\Edifact\Exceptions\ValidationException;
-use Proengeno\Edifact\Interfaces\SegValidatorInterface;
-use Proengeno\Edifact\Exceptions\SegValidationException;
-use Proengeno\Edifact\Interfaces\MessageInterface;
-use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 use Proengeno\Edifact\Exceptions\EdifactException;
+use Proengeno\Edifact\Interfaces\MessageInterface;
+use Proengeno\Edifact\Exceptions\ValidationException;
+use Proengeno\Edifact\Exceptions\SegValidationException;
+use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 
 /*
  * Todo: Klasse komplett neuschreiben, die ist Mist
@@ -171,7 +169,7 @@ class MessageValidator implements MessageValidatorInterface
         try {
             $segment->validate();
         } catch (SegValidationException $e) {
-            throw new ValidationException($e->getMessage(), $this->lineCount);
+            throw new ValidationException($e->getMessage(), null, @$segment->name());
         }
     }
 }

@@ -85,7 +85,7 @@ class SegmentValidator implements SegValidatorInterface
             return;
         }
 
-        throw SegValidationException::forKey($dataKey, 'Data-Element not unavailable, but needed.', 1);
+        throw SegValidationException::forKey($dataKey, 'Data-Element not available, but needed.', 1);
     }
 
     private function isDatafieldOptional($necessaryStatus)
