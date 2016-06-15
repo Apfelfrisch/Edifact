@@ -24,7 +24,7 @@ class Message
         return $this->ediMessage->getValidationBlueprint();
     }
 
-    public function addConfiguration($key, Closure $config)
+    public function addConfiguration($key, $config)
     {
         return $this->ediMessage->addConfiguration($key, $config);
     }
