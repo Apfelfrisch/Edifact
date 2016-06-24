@@ -90,6 +90,11 @@ abstract class AbstractBuilder
     {
         return $this->unhCounter;
     }
+
+    public function messageCount()
+    {
+        return $this->messageCount;
+    }
     
     public function getOrFail()
     {

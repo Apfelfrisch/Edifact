@@ -114,16 +114,28 @@ class AbstractBuilderTest extends TestCase
     }
 
     /** @test */
-    public function it_counts_the_given_messages_and_writes_the_right_unz_segment()
+    public function it_provides_the_messages_count()
     {
         $messageCount = 2;
 
         foreach (range(1, $messageCount) as $i ) {
             $this->builder->addMessage(['']);
         }
+        
+        $this->assertEquals($messageCount, $this->builder->messageCount());
 
-        $message = $this->builder->get();
+        return $this->builder;
+    }
 
+    /** 
+     * @test 
+     * @depends it_provides_the_messages_count
+     */
+    public function it_counts_the_given_messages_and_writes_the_right_unz_segment($builder)
+    {
+        $messageCount = 2;
+
+        $message = $builder->get();
         $this->assertStringStartsWith("UNA:+.? 'UNB+UNOC:3+from:500+to:500", (string)$message);
         $this->assertStringEndsWith("UNZ+" . $messageCount . "+unique_id'", (string)$message);
     }
