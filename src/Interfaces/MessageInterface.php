@@ -9,7 +9,6 @@ use Proengeno\Edifact\Interfaces\SegInterface;
 
 interface MessageInterface extends Iterator
 {
-    public static function getSegmentClass($segmentName);
     public function getValidationBlueprint();
     public function addConfiguration($key, $config);
     public function getFilepath();

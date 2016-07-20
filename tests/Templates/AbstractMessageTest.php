@@ -81,6 +81,7 @@ class AbstractMessageTest extends TestCase
         $messageCore->jumpToPinnedPointer();
         $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unb', $messageCore->getNextSegment());
     }
+
     /** @test */
     public function it_iterates_over_the_stream()
     {
