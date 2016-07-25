@@ -119,6 +119,14 @@ abstract class AbstractMessage implements MessageInterface
         return $this;
     }
 
+    public function validateSegments()
+    {
+        $this->rewind();
+        while($segment = $this->getNextSegment()) {
+            $segment->validate();
+        }
+    }
+
     public function getDelimiter()
     {
         return $this->file->getDelimiter();

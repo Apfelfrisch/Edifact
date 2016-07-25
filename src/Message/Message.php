@@ -69,6 +69,11 @@ class Message implements MessageInterface
         return $this->ediMessage->validate();
     }
 
+    public function validateSegments()
+    {
+        return $this->ediMessage->validateSegments();
+    }
+
     public function current()
     {
         return $this->ediMessage->current();

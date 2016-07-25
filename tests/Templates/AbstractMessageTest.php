@@ -130,7 +130,21 @@ class AbstractMessageTest extends TestCase
     }
 
     /** @test */
-    public function it_can_validate_itself()
+    public function it_can_validate_the_message()
+    {
+        $file = m::mock(EdifactFile::class, function($file) {
+            $file->shouldReceive('rewind')->twice();
+            $file->shouldReceive('getDelimiter')->once();
+        });
+        $validator = m::mock(MessageValidatorInterface::class, function($validator){
+            $validator->shouldReceive('validate')->once();
+        });
+        $messageCore = new Message($file, $validator);
+        $messageCore->validate();
+    }
+
+    /** @test */
+    public function it_can_validate_the_message_segments()
     {
         $file = m::mock(EdifactFile::class, function($file) {
             $file->shouldReceive('rewind')->twice();
