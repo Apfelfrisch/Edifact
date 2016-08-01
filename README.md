@@ -9,8 +9,8 @@ A PHP library, wich provides a Framework to parse, build, serialize and validate
 Highlights
 -------
 * Parse and Write Files in a memory efficient and scalable way 
-* Parse each Segment to its specific Class, this way we can define getter, setter and validation it
-* Parse each Message to its specfic Class, see above.
+* Parse each Segment to its specific Object, this way we can define getter, setter and validation it
+* Parse each Message to its specfic Object, see above.
 * Validate the Message, with predefined rules. 
 
 Notes
