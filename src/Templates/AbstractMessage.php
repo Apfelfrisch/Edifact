@@ -9,6 +9,8 @@ use Proengeno\Edifact\Message\SegmentFactory;
 use Proengeno\Edifact\Validation\MessageValidator;
 use Proengeno\Edifact\Exceptions\EdifactException;
 use Proengeno\Edifact\Interfaces\MessageInterface;
+use Proengeno\Edifact\Exceptions\ValidationException;
+use Proengeno\Edifact\Exceptions\SegValidationException;
 use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 
 abstract class AbstractMessage implements MessageInterface
@@ -122,8 +124,14 @@ abstract class AbstractMessage implements MessageInterface
     public function validateSegments()
     {
         $this->rewind();
-        while($segment = $this->getNextSegment()) {
-            $segment->validate();
+        try {
+            while($segment = $this->getNextSegment()) {
+                $segment->validate();
+            }
+        } catch (SegValidationException $e) {
+            throw new ValidationException(
+                $e->getMessage(), $this->currentSegmentNumber, $segment->name()
+            );
         }
     }
 

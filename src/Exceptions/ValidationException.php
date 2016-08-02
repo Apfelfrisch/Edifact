@@ -11,15 +11,15 @@ class ValidationException extends EdifactException
     {
         $message = '';
         if ($lineCount) {
-            $message = "Line $lineCount ";
+            $message = "Line $lineCount";
         }
         if ($lineCount && $segment) {
-            $message .= ", ";
+            $message .= ",";
         }
         if ($segment) {
-            $message .= "Segment $segment ";
+            $message .= " Segment $segment";
         }
-        $message .= ": " . $postMessage;
+        $message .= ", " . $postMessage;
         $this->lineCount = $lineCount;
         $this->segment = $segment;
 
