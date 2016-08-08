@@ -11,6 +11,7 @@ class Blueprint
     private $loopLevelCount = [];
     private $blueprintCount = [];
     private $loopIsNecessary = true;
+    private $optinalSegmentException;
     
     public function __construct($blueprint)
     {
@@ -19,6 +20,7 @@ class Blueprint
 
     public function validate($segment)
     {
+        validationStart:
         if ($this->unnecessarySegmentIsMissing($segment) || $this->unnecessaryLoopIsMissing($segment)) {
             $this->countUpBlueprint();
         }
@@ -36,12 +38,24 @@ class Blueprint
         }
 
         if ($segment->name() == $this->getBlueprintAttribute('name')) {
-            $this->validateBlueprintTemplates($segment);
+            try {
+                $this->validateBlueprintTemplates($segment);
+            } catch (ValidationException $e) {
+                if ($this->getBlueprintAttribute('necessity') != 'O') {
+                    throw $e;
+                }
+                $this->countUpBlueprint();
+                $this->optinalSegmentException = $e;
+                goto validationStart;
+            }
             $this->loopIsNecessary = true;
             $this->countUpBlueprint();
             return;
         }
 
+        if ($this->optinalSegmentException) {
+            throw $this->optinalSegmentException;
+        }
         throw ValidationException::unexpectedSegment('', @$segment->name(), $this->getBlueprintAttribute('name'));
     }
 
@@ -52,6 +66,7 @@ class Blueprint
                 if (in_array($segment->$segmendMethod(), $suggestions)) {
                     continue;
                 }
+
                 throw ValidationException::illegalContent('', $segment->name(), $segment->$segmendMethod(), implode('" | "', $suggestions));
             }
         }

@@ -14,7 +14,7 @@ class MessageValidatorTest extends TestCase
     {
         $validator = new MessageValidator;
         
-        $edifactMessage = Message::fromString("UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'LIN+1'DTM+137:201604221414:203'UNS+D'UNT+18+2'UNZ+4+6910995E'");
+        $edifactMessage = Message::fromString("UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'RFF+Z13:123'LIN+1'DTM+137:201604221414:203'UNS+D'UNT+18+2'UNZ+4+6910995E'");
         $validator->validate($edifactMessage);
     }
 
@@ -23,7 +23,7 @@ class MessageValidatorTest extends TestCase
     {
         $validator = new MessageValidator;
         
-        $edifactMessage = Message::fromString("UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'LIN+1'DTM+137:201604221414:203'LIN+1'DTM+137:201604221414:203'UNS+D'UNT+18+2'UNZ+4+6910995E'");
+        $edifactMessage = Message::fromString("UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'RFF+Z13:123'LIN+1'DTM+137:201604221414:203'LIN+1'DTM+137:201604221414:203'UNS+D'UNT+18+2'UNZ+4+6910995E'");
         $validator->validate($edifactMessage);
     }
 
@@ -32,7 +32,7 @@ class MessageValidatorTest extends TestCase
     {
         $validator = new MessageValidator;
         
-        $edifactMessage = Message::fromString("UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'LIN+1'DTM+137:201604221414:203'LIN+1'DTM+137:201604221414:203'UNS+D'UNT+18+2'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'LIN+1'DTM+137:201604221414:203'LIN+1'DTM+137:201604221414:203'UNS+D'UNT+18+2'UNZ+4+6910995E'");
+        $edifactMessage = Message::fromString("UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'RFF+Z13:123'LIN+1'DTM+137:201604221414:203'LIN+1'DTM+137:201604221414:203'UNS+D'UNT+18+2'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'RFF+Z13:123'LIN+1'DTM+137:201604221414:203'LIN+1'DTM+137:201604221414:203'UNS+D'UNT+18+2'UNZ+4+6910995E'");
         $validator->validate($edifactMessage);
     }
 
@@ -41,7 +41,7 @@ class MessageValidatorTest extends TestCase
     {
         $validator = new MessageValidator;
         
-        $edifactMessage = Message::fromString("UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'LIN+1'DTM+137:201504221414:203'UNS+D'UNS+D'UNT+18+2'UNZ+4+6910995E'");
+        $edifactMessage = Message::fromString("UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'RFF+Z13:123'LIN+1'DTM+137:201504221414:203'UNS+D'UNS+D'UNT+18+2'UNZ+4+6910995E'");
         $validator->validate($edifactMessage);
     }
 
@@ -95,6 +95,17 @@ class MessageValidatorTest extends TestCase
         $validator = new MessageValidator;
         
         $edifactMessage = Message::fromString("UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'" . $illegallyBgm . "'LIN+1'DTM+137:201604221414:203'UNS+D'UNT+18+2'UNZ+4+6910995E'");
+        $this->expectException(ValidationException::class);
+        $validator->validate($edifactMessage);
+    }
+
+    /** @test */
+    public function it_finds_illage_content_from_legal_segment_even_if_the_segment_before_has_the_same_type_and_is_optional()
+    {
+        $illegallyBgm = 'RFF+Z15:123';
+        $validator = new MessageValidator;
+        
+        $edifactMessage = Message::fromString("UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'" . $illegallyBgm . "'RFF+Z13:123'LIN+1'DTM+137:201604221414:203'UNS+D'UNT+18+2'UNZ+4+6910995E'");
         $this->expectException(ValidationException::class);
         $validator->validate($edifactMessage);
     }
