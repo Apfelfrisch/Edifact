@@ -125,7 +125,7 @@ abstract class AbstractMessage implements MessageInterface
     {
         $this->rewind();
         try {
-            while($segment = $this->getNextSegment()) {
+            while ($segment = $this->getNextSegment()) {
                 $segment->validate();
             }
         } catch (SegValidationException $e) {
