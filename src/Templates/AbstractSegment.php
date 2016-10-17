@@ -99,7 +99,7 @@ abstract class AbstractSegment implements SegInterface
 
     public static function meta()
     {
-        return new SegmentDescription(static::$jsonDescribtion);
+        return SegmentDescription::make(static::$jsonDescribtion);
     }
 
     protected static function mapToBlueprint($segLine)

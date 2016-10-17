@@ -12,7 +12,7 @@ class SegmentDescriptionTest extends TestCase
 
     protected function setUp()
     {
-        $this->segDescription = new SegmentDescription(__DIR__ . '/../Fixtures/Segments/meta/dummy.json');
+        $this->segDescription = SegmentDescription::make(__DIR__ . '/../Fixtures/Segments/meta/dummy.json');
     }
 
     /** @test */
@@ -28,5 +28,15 @@ class SegmentDescriptionTest extends TestCase
     {
         $this->expectException(SegmentDesciptionException::class);
         $this->assertEquals('DUMMY_NAME', $this->segDescription->name('invaild_method', 'dummyKey'));
+    }
+
+    /** @test */
+    public function it_intanciate_only_one_differnt_object_per_json_file()
+    {
+        $sameSegDescription = SegmentDescription::make(__DIR__ . '/../Fixtures/Segments/meta/dummy.json');
+        $differtSegDescription = SegmentDescription::make();
+
+        $this->assertEquals($this->segDescription, $sameSegDescription);
+        $this->assertNotEquals($this->segDescription, $differtSegDescription);
     }
 }

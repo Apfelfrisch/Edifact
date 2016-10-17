@@ -6,12 +6,22 @@ use Proengeno\Edifact\Exceptions\SegmentDesciptionException;
 
 class SegmentDescription
 {
+    public static $instanceLookup = [];
+
     private $jsonPath;
     private $method;
 
-    public function __construct($jsonPath = null)
+    private function __construct($jsonPath = null)
     {
         $this->json = $jsonPath ? json_decode(file_get_contents($jsonPath)) : '{}';
+    }
+
+    public function make($jsonPath = null)
+    {
+        if (!isset(self::$instanceLookup[$jsonPath])) {
+            self::$instanceLookup[$jsonPath] = new self($jsonPath);
+        }
+        return self::$instanceLookup[$jsonPath];
     }
 
     public function description($method, $key)
