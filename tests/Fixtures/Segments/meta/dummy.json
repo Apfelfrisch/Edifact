@@ -1,0 +1,9 @@
+{
+    "dummyMethod": {
+        "dummyKey": {
+            "name": "DUMMY_NAME",
+            "tags": ["dummy_tag"],
+            "description": "Dummy description"
+        }
+    }
+}

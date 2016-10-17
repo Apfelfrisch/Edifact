@@ -6,6 +6,8 @@ use Proengeno\Edifact\Templates\AbstractSegment;
 
 class Segment extends AbstractSegment
 {
+    protected static $jsonDescribtion = __DIR__ . '/Segments/meta/dummy.json';
+
     protected static $validationBlueprint = [
         'A' => ['A' => 'M|an|3'],
         'B' => ['B' => 'O'],
@@ -22,9 +24,8 @@ class Segment extends AbstractSegment
         ]);
     }
 
-    public function getB()
+    public function dummyMethod()
     {
         return @$this->elements['B']['B'] ?: null;
     }
 }
-    

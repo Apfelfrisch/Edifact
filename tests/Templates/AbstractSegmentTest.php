@@ -6,10 +6,12 @@ use Mockery as m;
 use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Test\Fixtures\Segment;
+use Proengeno\Edifact\Message\SegmentDescription;
+use Proengeno\Edifact\Exceptions\EdifactException;
 use Proengeno\Edifact\Validation\SegmentValidator;
 use Proengeno\Edifact\Interfaces\SegValidatorInterface;
 
-class AbstractSegmentTest extends TestCase 
+class AbstractSegmentTest extends TestCase
 {
     protected function setUp()
     {
@@ -103,6 +105,44 @@ class AbstractSegmentTest extends TestCase
         $expectedString = "A+B+1:2+D'";
 
         $segment = Segment::fromSegLine($givenString);
-        $this->assertEquals('B+', $segment->getB());
+        $this->assertEquals('B+', $segment->dummyMethod());
+    }
+
+    /** @test */
+    public function it_returns_the_metadata()
+    {
+        $this->assertInstanceOf(SegmentDescription::class, Segment::meta());
+    }
+
+    /** @test */
+    public function it_returns_the_metadata_with_magic_calls()
+    {
+        $segment = Segment::fromSegLine('A+dummyKey');
+
+        $this->assertEquals('DUMMY_NAME', $segment->dummyMethodMeta('name'));
+        $this->assertEquals(['dummy_tag'], $segment->dummyMethodMeta('tags'));
+        $this->assertEquals('Dummy description', $segment->dummyMethodMeta('description'));
+    }
+
+    /** @test */
+    public function it_throws_an_exception_if_the_magic_call_has_more_then_one_attribute()
+    {
+        $segment = Segment::fromSegLine('A+dummyKey');
+
+        $this->expectException(EdifactException::class);
+
+        $segment->invaldCall('description');
+        $segment->dummyMethodMeta();
+    }
+
+    /** @test */
+    public function it_throws_an_exception_if_the_magic_call_can_not_method_could_not_resolve()
+    {
+        $segment = Segment::fromSegLine('A+dummyKey');
+
+        $this->expectException(EdifactException::class);
+
+        $segment->invaldCall('description');
+        $segment->dummyMethodMeta();
     }
 }
