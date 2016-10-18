@@ -16,11 +16,12 @@ class SegmentDescriptionTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_the_metadata()
+    public function it_returns_the_meta_attributes()
     {
         $this->assertEquals('DUMMY_NAME', $this->segDescription->name('dummyMethod', 'dummyKey'));
         $this->assertEquals('Dummy description', $this->segDescription->description('dummyMethod', 'dummyKey'));
         $this->assertEquals(['dummy_tag'], $this->segDescription->tags('dummyMethod', 'dummyKey'));
+        $this->assertEquals(['dummyKey'], $this->segDescription->keys('dummyMethod'));
     }
 
     /** @test */

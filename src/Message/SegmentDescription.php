@@ -13,7 +13,7 @@ class SegmentDescription
 
     private function __construct($jsonPath = null)
     {
-        $this->json = $jsonPath ? json_decode(file_get_contents($jsonPath)) : '{}';
+        $this->json = $jsonPath ? json_decode(file_get_contents($jsonPath), 1) : '{}';
     }
 
     public function make($jsonPath = null)
@@ -39,15 +39,24 @@ class SegmentDescription
         return $this->getData('tags', $method, $key);
     }
 
-    private function getData($catergory, $method, $key)
+    public function keys($method)
     {
-        if (!isset($this->json->$method)) {
+        if (!isset($this->json[$method])) {
             throw new SegmentDesciptionException("No $catergory available for Method named '$method'.");
         }
-        if (!isset($this->json->$method->$key)) {
+
+        return array_keys($this->json[$method]);
+    }
+
+    private function getData($catergory, $method, $key)
+    {
+        if (!isset($this->json[$method])) {
+            throw new SegmentDesciptionException("No $catergory available for Method named '$method'.");
+        }
+        if (!isset($this->json[$method][$key])) {
             throw new SegmentDesciptionException("No $catergory available for Key named '$key'.");
         }
 
-        return $this->json->$method->$key->$catergory;
+        return $this->json[$method][$key][$catergory];
     }
 }
