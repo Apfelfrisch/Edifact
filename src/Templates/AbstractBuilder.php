@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Proengeno\Edifact\Templates;
 
@@ -11,6 +11,8 @@ use Proengeno\Edifact\Message\Delimiter;
 
 abstract class AbstractBuilder
 {
+    protected $edifactClass = null;
+
     protected $to;
     protected $from;
     protected $edifactFile;
@@ -20,16 +22,14 @@ abstract class AbstractBuilder
     ];
     protected $postbuildConfig = [];
 
-    private $edifactClass;
     private $unhCounter = 0;
     private $messageCount = 0;
     private $messageWasFetched = false;
-    
+
     public function __construct($from, $to, $filepath = null)
     {
         $this->to = $to;
         $this->from = $from;
-        $this->edifactClass = $this->getMessageClass();
         $this->edifactFile = new EdifactFile($filepath ?: 'php://temp', 'w+');
         $this->setPrebuildConfigDefaults();
     }
@@ -76,7 +76,7 @@ abstract class AbstractBuilder
         }
         return $this->buildCache['unbReference'];
     }
-    
+
     public function getSegmentFactory()
     {
         if (!isset($this->buildCache['segmentFactory'])) {
@@ -95,7 +95,7 @@ abstract class AbstractBuilder
     {
         return $this->messageCount;
     }
-    
+
     public function getOrFail()
     {
         $message = $this->get();
@@ -122,8 +122,6 @@ abstract class AbstractBuilder
 
         return new Message($edifactObject);
     }
-
-    abstract protected function getMessageClass();
 
     abstract protected function writeUnb();
 

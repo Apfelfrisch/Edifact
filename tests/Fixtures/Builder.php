@@ -8,16 +8,14 @@ use Proengeno\Edifact\Test\Fixtures\Segments\Unb;
 
 class Builder extends AbstractBuilder
 {
+    protected $edifactClass = Message::class;
+
     const MESSAGE_TYPE = 'RANDOM_MESSAGE';
     const MESSAGE_SUBTYPE = 'VL';
 
-    protected function getMessageClass()
-    {
-        return Message::class;
-    }
     /*
      * Methode nur zur Testzwecken.
-     * Nicht in Produktion nutzten, da das Object nach Rückgabe noch 
+     * Nicht in Produktion nutzten, da das Object nach Rückgabe noch
      * zerstört werden kann.
      */
     public function getEdifactFile()
@@ -28,10 +26,10 @@ class Builder extends AbstractBuilder
     protected function writeMessage($array)
     {
         $this->writeSeg('unh', [
-            $this->unbReference(), 
+            $this->unbReference(),
             'REMADV',
             'D',
-            '05A', 
+            '05A',
             'UN',
             '2.7b'
         ]);
