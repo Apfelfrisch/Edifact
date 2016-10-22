@@ -4,10 +4,9 @@ namespace Proengeno\Edifact\Templates;
 
 use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Interfaces\SegInterface;
-use Proengeno\Edifact\Message\SegmentDescription;
+use Proengeno\Edifact\Exceptions\EdifactException;
 use Proengeno\Edifact\Validation\SegmentValidator;
 use Proengeno\Edifact\Interfaces\SegValidatorInterface;
-use Proengeno\Edifact\Exceptions\EdifactException;
 
 abstract class AbstractSegment implements SegInterface
 {
@@ -79,27 +78,6 @@ abstract class AbstractSegment implements SegInterface
         }
 
         return $this->cache['segLine'] . $this->delimiter->getSegment();
-    }
-
-    public function __call($name, $arguments)
-    {
-        $selfMethod = substr($name, 0, -4);
-
-        if (! method_exists(static::class, $selfMethod)) {
-            throw new EdifactException("Unkow Method '$name'.");
-        }
-        if (count($arguments) != 1) {
-            throw new EdifactException("Metacall requiere exact 1 Argument.");
-        }
-
-        $metaMethod = $arguments[0];
-
-        return static::meta()->$metaMethod($selfMethod, $this->$selfMethod());
-    }
-
-    public static function meta()
-    {
-        return SegmentDescription::make(static::$jsonDescribtion);
     }
 
     protected static function mapToBlueprint($segLine)
