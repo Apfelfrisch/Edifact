@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Proengeno\Edifact\Templates;
 
@@ -15,6 +15,9 @@ use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 
 abstract class AbstractMessage implements MessageInterface
 {
+    protected static $segments;
+    protected static $blueprint;
+
     protected $configuration = [];
 
     private $file;
@@ -23,7 +26,7 @@ abstract class AbstractMessage implements MessageInterface
     private $currentSegment;
     private $segmentFactory;
     private $currentSegmentNumber = 0;
-    
+
     public function __construct(EdifactFile $file, MessageValidatorInterface $validator = null)
     {
         $this->file = $file;
@@ -42,7 +45,12 @@ abstract class AbstractMessage implements MessageInterface
         throw EdifactException::segmentUnknown($segmentName);
     }
 
-    abstract public function getValidationBlueprint();
+    public function getValidationBlueprint()
+    {
+        if (static::$blueprint !== null) {
+            return static::$blueprint;
+        }
+    }
 
     public function addConfiguration($key, $config)
     {
@@ -61,7 +69,7 @@ abstract class AbstractMessage implements MessageInterface
         }
         return $this->currentSegment;
     }
-    
+
     public function getNextSegment()
     {
         $this->currentSegmentNumber++;
@@ -69,7 +77,7 @@ abstract class AbstractMessage implements MessageInterface
 
         if ($segment !== false) {
             $segment = $this->currentSegment = $this->getSegmentObject($segment);
-        } 
+        }
         return $segment;
     }
 
@@ -111,7 +119,7 @@ abstract class AbstractMessage implements MessageInterface
 
         return $this->file->seek($pinnedPointer);
     }
-    
+
     public function validate()
     {
         $this->rewind();
@@ -201,7 +209,7 @@ abstract class AbstractMessage implements MessageInterface
         }
     }
 
-    private function getSegname($segLine) 
+    private function getSegname($segLine)
     {
         return substr($segLine, 0, 3);
     }

@@ -20,6 +20,27 @@ class Message extends AbstractMessage
         'UNZ' => \Proengeno\Edifact\Test\Fixtures\Segments\Unz::class,
     ];
 
+    protected static $blueprint = [
+        ['name' => 'UNA'],
+        ['name' => 'LOOP', 'maxLoops' => 10, 'necessity' => 'R', 'segments' => [
+            ['name' => 'UNH'],
+            ['name' => 'BGM', 'templates' => ['docCode' => ['7', '380']] ],
+            ['name' => 'RFF', 'necessity' => 'O', 'templates' => ['code' => ['Z12']]],
+            ['name' => 'RFF', 'templates' => ['code' => ['Z13']]],
+            ['name' => 'LOOP', 'maxLoops' => 10, 'necessity' => 'O', 'segments' => [
+                ['name' => 'LIN'],
+                ['name' => 'LOOP', 'maxLoops' => 10, 'necessity' => 'O', 'segments' => [
+                    ['name' => 'DTM'],
+                ]],
+            ]],
+            ['name' => 'LOOP', 'maxLoops' => 10, 'necessity' => 'O', 'segments' => [
+                ['name' => 'UNS'],
+            ]],
+            ['name' => 'UNT', 'maxLoops' => 5],
+        ]],
+        ['name' => 'UNZ']
+    ];
+
     public static function fromString($string)
     {
         $file = new EdifactFile('php://temp', 'w+');
@@ -27,33 +48,8 @@ class Message extends AbstractMessage
         return new static($file);
     }
 
-    public function getValidationBlueprint()
-    {
-        return [
-            ['name' => 'UNA'],
-            ['name' => 'LOOP', 'maxLoops' => 10, 'necessity' => 'R', 'segments' => [
-                ['name' => 'UNH'],
-                ['name' => 'BGM', 'templates' => ['docCode' => ['7', '380']] ],
-                ['name' => 'RFF', 'necessity' => 'O', 'templates' => ['code' => ['Z12']]],
-                ['name' => 'RFF', 'templates' => ['code' => ['Z13']]],
-                ['name' => 'LOOP', 'maxLoops' => 10, 'necessity' => 'O', 'segments' => [
-                    ['name' => 'LIN'],
-                    ['name' => 'LOOP', 'maxLoops' => 10, 'necessity' => 'O', 'segments' => [
-                        ['name' => 'DTM'],
-                    ]],
-                ]],
-                ['name' => 'LOOP', 'maxLoops' => 10, 'necessity' => 'O', 'segments' => [
-                    ['name' => 'UNS'],
-                ]],
-                ['name' => 'UNT', 'maxLoops' => 5],
-            ]],
-            ['name' => 'UNZ']
-        ];
-    }
-
     public function testConfiguration()
     {
         return $this->configuration['test']();
     }
 }
-    
