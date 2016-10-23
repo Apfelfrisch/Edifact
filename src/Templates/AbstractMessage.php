@@ -31,7 +31,7 @@ abstract class AbstractMessage implements MessageInterface
     {
         $this->file = $file;
         $this->validator = $validator ?: new MessageValidator;
-        $this->segmentFactory = new SegmentFactory($this->getDelimiter());
+        $this->segmentFactory = new SegmentFactory(static::class, $this->getDelimiter());
         $this->setConfigDefaults();
     }
 
@@ -73,12 +73,13 @@ abstract class AbstractMessage implements MessageInterface
     public function getNextSegment()
     {
         $this->currentSegmentNumber++;
-        $segment = $this->file->getSegment();
+        $segLine = $this->file->getSegment();
 
-        if ($segment !== false) {
-            $segment = $this->currentSegment = $this->getSegmentObject($segment);
+        if ($segLine == false) {
+            return false;
         }
-        return $segment;
+
+        return $this->currentSegment = $this->getSegmentObject($segLine);
     }
 
     public function findSegmentFromBeginn($searchSegment, closure $criteria = null)
@@ -181,6 +182,11 @@ abstract class AbstractMessage implements MessageInterface
         return $this->file->__toString();
     }
 
+    protected function getSegmentObject($segLine)
+    {
+        return $this->segmentFactory->fromSegline($segLine);
+    }
+
     protected function getConfiguration($key)
     {
         if (isset($this->configuration[$key]) && $this->configuration[$key] !== null) {
@@ -191,11 +197,6 @@ abstract class AbstractMessage implements MessageInterface
         }
 
         throw new EdifactException("Configuration $key not set.");
-    }
-
-    protected function getSegmentObject($segLine)
-    {
-        return $this->segmentFactory->fromSegline(static::getSegmentClass($this->getSegname($segLine)), $segLine);
     }
 
     private function setConfigDefaults()

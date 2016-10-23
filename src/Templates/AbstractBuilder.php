@@ -80,7 +80,10 @@ abstract class AbstractBuilder
     public function getSegmentFactory()
     {
         if (!isset($this->buildCache['segmentFactory'])) {
-            return $this->buildCache['segmentFactory'] = new SegmentFactory($this->getPrebuildConfig('delimiter'));
+            return $this->buildCache['segmentFactory'] = new SegmentFactory(
+                $this->edifactClass,
+                $this->getPrebuildConfig('delimiter')
+            );
         }
 
         return $this->buildCache['segmentFactory'];
@@ -127,10 +130,9 @@ abstract class AbstractBuilder
 
     abstract protected function writeMessage($array);
 
-    protected function writeSeg($segment, $attributes = [], $method = 'fromAttributes')
+    protected function writeSeg($segmentName, $attributes = [], $method = 'fromAttributes')
     {
-        $edifactClass = $this->edifactClass;
-        $segment = $this->getSegmentFactory()->fromAttributes($edifactClass::getSegmentClass($segment), $attributes, $method);
+        $segment = $this->getSegmentFactory()->fromAttributes($segmentName, $attributes, $method);
         $this->edifactFile->write($segment);
         $this->countSegments($segment);
     }
