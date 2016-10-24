@@ -38,7 +38,7 @@ class SegmentFactory
 
     private function getSegmentClass($segmentName)
     {
-        return $this->messageClass::getSegmentClass($segmentName);
+        return call_user_func([$this->messageClass, 'getSegmentClass'], $segmentName);
     }
 
     private function getSegname($segLine)
