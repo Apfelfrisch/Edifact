@@ -82,17 +82,19 @@ abstract class AbstractSegment implements SegInterface
 
     protected static function mapToBlueprint($segLine)
     {
-        $inputDataGroups = static::getBuildDelimiter()->explodeSegments($segLine);
-        $elements = [];
         $i = 0;
+        $elements = [];
+        $inputDataGroups = static::getBuildDelimiter()->explodeSegments($segLine);
         foreach (static::$validationBlueprint as $BpDataKey => $BPdataGroups) {
+            $inputElement = [];
             if (isset($inputDataGroups[$i])) {
                 $inputElement = static::getBuildDelimiter()->explodeElements($inputDataGroups[$i]);
-                $j = 0;
-                foreach ($BPdataGroups as $key => $value) {
-                    $elements[$BpDataKey][$key] = isset($inputElement[$j]) ? $inputElement[$j] : null;
-                    $j++;
-                }
+            }
+
+            $j = 0;
+            foreach ($BPdataGroups as $key => $value) {
+                $elements[$BpDataKey][$key] = isset($inputElement[$j]) ? $inputElement[$j] : null;
+                $j++;
             }
             $i++;
         }
