@@ -18,6 +18,8 @@ abstract class AbstractMessage implements MessageInterface
     protected static $segments;
     protected static $blueprint;
 
+    protected $configuration;
+
     private $file;
     private $pinnedPointer;
     private $currentSegment;
