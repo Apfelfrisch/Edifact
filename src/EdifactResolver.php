@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact;
 
-use Closure;
+use Proengeno\Edifact\Configuration;
 use Proengeno\Edifact\Message\Message;
 use Proengeno\Edifact\Message\EdifactFile;
 use Proengeno\Edifact\Exceptions\EdifactException;
@@ -10,41 +10,32 @@ use Proengeno\Edifact\Exceptions\EdifactException;
 class EdifactResolver
 {
     private $edifactFile;
+    private $configuration;
     private $allocationRules = [];
-    private $postbuildConfig = [];
+
+    public function __construct(Configuration $configuration = null)
+    {
+        $this->configuration = $configuration ?: new Configuration;
+    }
 
     public function addAllocationRule($edifactClass, $allocationRules)
     {
         $this->allocationRules[$edifactClass] = $allocationRules;
     }
 
-    public function addPostbuildConfig($key, $config)
-    {
-        $this->postbuildConfig[$key] = $config;
-    }
-
     public function fromFile($filepath)
     {
         $this->edifactFile = new EdifactFile($filepath);
 
-        return new Message($this->applyPostbuildConfig($this->resolvEdifactObject()));
+        return new Message($this->resolvEdifactObject());
     }
-    
+
     public function fromString($string)
     {
         $this->edifactFile = new EdifactFile('php://temp', 'w+');
         $this->edifactFile->writeAndRewind($string);
 
-        $message = $this->applyPostbuildConfig($this->resolvEdifactObject());
-        return new Message($message);
-    }
-
-    private function applyPostbuildConfig($edifactObject)
-    {
-        foreach ($this->postbuildConfig as $configKey => $config) {
-            $edifactObject->addConfiguration($configKey, $config);
-        }
-        return $edifactObject;
+        return new Message($this->resolvEdifactObject());
     }
 
     // Need Refactoring
@@ -59,7 +50,7 @@ class EdifactResolver
                     if (preg_match($rules[$segmenName], $segment)) {
                         unset($tmpAllocationRules[$edifactClass][$segmenName]);
                         if (count($tmpAllocationRules[$edifactClass]) == 0) {
-                            return new $edifactClass($this->edifactFile);
+                            return new $edifactClass($this->edifactFile, $this->configuration);
                         }
                     }
                 }

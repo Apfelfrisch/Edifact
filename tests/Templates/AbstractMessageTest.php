@@ -3,6 +3,7 @@
 namespace Proengeno\Edifact\Test\Templates;
 
 use Mockery as m;
+use Proengeno\Edifact\Configuration;
 use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\Message\EdifactFile;
 use Proengeno\Edifact\Test\Fixtures\Message;
@@ -16,7 +17,7 @@ class AbstractMessageTest extends TestCase
     public function setUp()
     {
         $file = new EdifactFile(__DIR__ . '/../data/edifact.txt');
-        $this->messageCore = new Message($file, m::mock(MessageValidatorInterface::class));
+        $this->messageCore = new Message($file, new Configuration);
     }
 
     /** @test */
@@ -63,7 +64,7 @@ class AbstractMessageTest extends TestCase
         $messageCore->jumpToPinnedPointer();
         $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getNextSegment());
     }
-    
+
     /** @test */
     public function it_jumps_to_the_actual_position_if_no_pointer_was_pinned()
     {
@@ -72,7 +73,7 @@ class AbstractMessageTest extends TestCase
         $messageCore->jumpToPinnedPointer();
         $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unb', $messageCore->getNextSegment());
     }
-    
+
     /** @test */
     public function it_provides_the_count_of_the_parsed_segments()
     {
@@ -99,7 +100,7 @@ class AbstractMessageTest extends TestCase
         $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNT");
 
         $this->assertInstanceOf(
-            'Proengeno\Edifact\Test\Fixtures\Segments\Unb', 
+            'Proengeno\Edifact\Test\Fixtures\Segments\Unb',
             $messageCore->findNextSegment('UNB')
         );
         $this->assertFalse($messageCore->findNextSegment('UNH'));
@@ -113,11 +114,11 @@ class AbstractMessageTest extends TestCase
         $messageCore->findSegmentFromBeginn('UNH');
 
         $this->assertInstanceOf(
-            'Proengeno\Edifact\Test\Fixtures\Segments\Unh', 
+            'Proengeno\Edifact\Test\Fixtures\Segments\Unh',
             $messageCore->findSegmentFromBeginn('UNH')
         );
         $this->assertInstanceOf(
-            'Proengeno\Edifact\Test\Fixtures\Segments\Unh', 
+            'Proengeno\Edifact\Test\Fixtures\Segments\Unh',
             $messageCore->findSegmentFromBeginn('UNH', function($segment) {
                 return $segment->referenz() == 'O160482A7C2';
             }
@@ -136,10 +137,13 @@ class AbstractMessageTest extends TestCase
             $file->shouldReceive('rewind')->twice();
             $file->shouldReceive('getDelimiter')->once();
         });
-        $validator = m::mock(MessageValidatorInterface::class, function($validator){
-            $validator->shouldReceive('validate')->once();
-        });
-        $messageCore = new Message($file, $validator);
+        $configuration = new Configuration;
+        $configuration->setMessageValidator(
+            m::mock(MessageValidatorInterface::class, function($validator){
+                $validator->shouldReceive('validate')->once();
+            })
+        );
+        $messageCore = new Message($file, $configuration);
         $messageCore->validate();
     }
 
@@ -150,10 +154,13 @@ class AbstractMessageTest extends TestCase
             $file->shouldReceive('rewind')->twice();
             $file->shouldReceive('getDelimiter')->once();
         });
-        $validator = m::mock(MessageValidatorInterface::class, function($validator){
-            $validator->shouldReceive('validate')->once();
-        });
-        $messageCore = new Message($file, $validator);
+        $configuration = new Configuration;
+        $configuration->setMessageValidator(
+            m::mock(MessageValidatorInterface::class, function($validator){
+                $validator->shouldReceive('validate')->once();
+            })
+        );
+        $messageCore = new Message($file, $configuration);
         $messageCore->validate();
     }
 
@@ -164,7 +171,7 @@ class AbstractMessageTest extends TestCase
         foreach ($unaValues as $unaValue) {
             $messageCore = Message::fromString("UNA" . $unaValue . "'UNH");
             $delimiter = $messageCore->getDelimiter();
-            $this->assertEquals($unaValue, 
+            $this->assertEquals($unaValue,
                  $delimiter->getData()
                . $delimiter->getDataGroup()
                . $delimiter->getDecimal()
@@ -175,4 +182,3 @@ class AbstractMessageTest extends TestCase
         }
     }
 }
-    

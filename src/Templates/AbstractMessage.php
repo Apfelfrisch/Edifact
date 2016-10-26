@@ -3,7 +3,7 @@
 namespace Proengeno\Edifact\Templates;
 
 use Closure;
-use Proengeno\Edifact\Message\Delimiter;
+use Proengeno\Edifact\Configuration;
 use Proengeno\Edifact\Message\EdifactFile;
 use Proengeno\Edifact\Message\SegmentFactory;
 use Proengeno\Edifact\Validation\MessageValidator;
@@ -18,21 +18,17 @@ abstract class AbstractMessage implements MessageInterface
     protected static $segments;
     protected static $blueprint;
 
-    protected $configuration = [];
-
     private $file;
-    private $validator;
     private $pinnedPointer;
     private $currentSegment;
     private $segmentFactory;
     private $currentSegmentNumber = 0;
 
-    public function __construct(EdifactFile $file, MessageValidatorInterface $validator = null)
+    public function __construct(EdifactFile $file, Configuration $configuration = null)
     {
         $this->file = $file;
-        $this->validator = $validator ?: new MessageValidator;
+        $this->configuration = $configuration ?: new Configuration;
         $this->segmentFactory = new SegmentFactory(static::class, $this->getDelimiter());
-        $this->setConfigDefaults();
     }
 
     public static function getSegmentClass($segmentName)
@@ -50,11 +46,6 @@ abstract class AbstractMessage implements MessageInterface
         if (static::$blueprint !== null) {
             return static::$blueprint;
         }
-    }
-
-    public function addConfiguration($key, $config)
-    {
-        $this->configuration[$key] = $config;
     }
 
     public function getFilepath()
@@ -124,7 +115,7 @@ abstract class AbstractMessage implements MessageInterface
     public function validate()
     {
         $this->rewind();
-        $this->validator->validate($this);
+        $this->configuration->getMessageValidator()->validate($this);
         $this->rewind();
 
         return $this;
@@ -185,29 +176,6 @@ abstract class AbstractMessage implements MessageInterface
     protected function getSegmentObject($segLine)
     {
         return $this->segmentFactory->fromSegline($segLine);
-    }
-
-    protected function getConfiguration($key)
-    {
-        if (isset($this->configuration[$key]) && $this->configuration[$key] !== null) {
-            if (is_callable($this->configuration[$key])) {
-                return $this->configuration[$key]();
-            }
-            return $this->configuration[$key];
-        }
-
-        throw new EdifactException("Configuration $key not set.");
-    }
-
-    private function setConfigDefaults()
-    {
-        foreach ($this->configuration as $configKey => $config) {
-            $methodName = 'getDefault' . ucfirst($configKey);
-
-            if (method_exists($this, $methodName)) {
-                $this->configuration[$configKey] = $this->$methodName();
-            }
-        }
     }
 
     private function getSegname($segLine)

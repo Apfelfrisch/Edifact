@@ -3,6 +3,7 @@
 namespace Proengeno\Edifact\Test\Message;
 
 use Mockery as m;
+use Proengeno\Edifact\Configuration;
 use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\Message\EdifactFile;
 use Proengeno\Edifact\Interfaces\MessageInterface;
@@ -18,10 +19,10 @@ class AbstractMessageTest extends TestCase
     public function setUp()
     {
         $file = new EdifactFile(__DIR__ . '/../data/edifact.txt');
-        $this->message = new Message($file, m::mock(MessageValidatorInterface::class));
-        $this->messageProxy = new MessageProxy(new Message($file, m::mock(MessageValidatorInterface::class)));
+        $this->message = new Message($file, new Configuration);
+        $this->messageProxy = new MessageProxy(new Message($file, new Configuration));
     }
-    
+
     /** @test */
     public function it_provides_the_adapter_name()
     {

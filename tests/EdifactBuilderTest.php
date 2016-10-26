@@ -7,6 +7,7 @@ use Proengeno\Edifact\EdifactBuilder;
 use Proengeno\Edifact\Test\Fixtures\Builder;
 use Proengeno\Edifact\Exceptions\EdifactException;
 use Proengeno\Edifact\Message\Message;
+use Proengeno\Edifact\Configuration;
 
 class EdifactBuilderTest extends TestCase
 {
@@ -37,7 +38,7 @@ class EdifactBuilderTest extends TestCase
 
         $this->edifactBuilder->addBuilder('Message', Builder::class, 'from', '/tmp');
         $file = $this->edifactBuilder->build('Message', 'to')->get();
-        
+
         $this->assertInstanceOf(Message::class, $file);
     }
 
@@ -70,11 +71,15 @@ class EdifactBuilderTest extends TestCase
     public function it_forwards_the_prebuild_configuration_to_builder_class()
     {
         $ownRef = 'OWN_REF';
-        $this->edifactBuilder->addBuilder('Message', Builder::class, 'from');
-        $this->edifactBuilder->addPrebuildConfig('unbReference', function() use ($ownRef) {
+        $configuration = new Configuration;
+        $configuration->setUnbRefGenerator(function() use ($ownRef) {
             return $ownRef;
         });
-        $this->assertEquals($ownRef, $this->edifactBuilder->build('Message', 'to')->unbReference());
+
+        $edifactBuilder = new EdifactBuilder($configuration);
+        $edifactBuilder->addBuilder('Message', Builder::class, 'from');
+
+        $this->assertEquals($ownRef, $edifactBuilder->build('Message', 'to')->unbReference());
     }
 
     /** @test */

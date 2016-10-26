@@ -3,11 +3,12 @@
 namespace Proengeno\Edifact\Templates;
 
 use Closure;
+use Proengeno\Edifact\Configuration;
 use Proengeno\Edifact\Message\Message;
+use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Message\EdifactFile;
 use Proengeno\Edifact\Message\SegmentFactory;
 use Proengeno\Edifact\Exceptions\EdifactException;
-use Proengeno\Edifact\Message\Delimiter;
 
 abstract class AbstractBuilder
 {
@@ -16,22 +17,19 @@ abstract class AbstractBuilder
     protected $to;
     protected $from;
     protected $edifactFile;
+    protected $configuration;
     protected $buildCache = [];
-    protected $prebuildConfig = [
-        'unbReference' => null, 'delimiter' => null
-    ];
-    protected $postbuildConfig = [];
 
     private $unhCounter = 0;
     private $messageCount = 0;
     private $messageWasFetched = false;
 
-    public function __construct($from, $to, $filepath = null)
+    public function __construct($from, $to, $filepath = null, Configuration $configuration = null)
     {
         $this->to = $to;
         $this->from = $from;
         $this->edifactFile = new EdifactFile($filepath ?: 'php://temp', 'w+');
-        $this->setPrebuildConfigDefaults();
+        $this->configuration = $configuration ?: new Configuration;
     }
 
     public function __destruct()
@@ -43,20 +41,6 @@ abstract class AbstractBuilder
                 unlink($filepath);
             }
         }
-    }
-
-    public function addPrebuildConfig($key, $config)
-    {
-        if (!empty($this->buildCache)) {
-            throw new EdifactException('Message already building, could not add PrebuildConfig');
-        }
-
-        $this->prebuildConfig[$key] = $config;
-    }
-
-    public function addPostbuildConfig($key, $config)
-    {
-        $this->postbuildConfig[$key] = $config;
     }
 
     public function addMessage($message)
@@ -72,8 +56,10 @@ abstract class AbstractBuilder
     public function unbReference()
     {
         if (!isset($this->buildCache['unbReference'])) {
-            return $this->buildCache['unbReference'] = $this->getPrebuildConfig('unbReference');
+            $generateUnbRef = $this->configuration->getUnbRefGenerator();
+            $this->buildCache['unbReference'] = $generateUnbRef();
         }
+
         return $this->buildCache['unbReference'];
     }
 
@@ -82,7 +68,7 @@ abstract class AbstractBuilder
         if (!isset($this->buildCache['segmentFactory'])) {
             return $this->buildCache['segmentFactory'] = new SegmentFactory(
                 $this->edifactClass,
-                $this->getPrebuildConfig('delimiter')
+                $this->configuration->getDelimiter()
             );
         }
 
@@ -116,10 +102,7 @@ abstract class AbstractBuilder
             $this->edifactFile->rewind();
         }
 
-        $edifactObject = new $this->edifactClass($this->edifactFile);
-        foreach ($this->postbuildConfig as $key => $postbuildConfig) {
-            $edifactObject->addConfiguration($key, $postbuildConfig);
-        }
+        $edifactObject = new $this->edifactClass($this->edifactFile, $this->configuration);
 
         $this->messageWasFetched = true;
 
@@ -135,39 +118,6 @@ abstract class AbstractBuilder
         $segment = $this->getSegmentFactory()->fromAttributes($segmentName, $attributes, $method);
         $this->edifactFile->write($segment);
         $this->countSegments($segment);
-    }
-
-    protected function getPrebuildConfig($key)
-    {
-        if (isset($this->prebuildConfig[$key]) && $this->prebuildConfig[$key] !== null) {
-            if (is_callable($this->prebuildConfig[$key])) {
-                return $this->prebuildConfig[$key]();
-            }
-            return $this->prebuildConfig[$key];
-        }
-
-        throw new EdifactException("PrebuildConfig $key not set.");
-    }
-
-    private function setPrebuildConfigDefaults()
-    {
-        foreach ($this->prebuildConfig as $configKey => $config) {
-            $methodName = 'getDefault' . ucfirst($configKey);
-
-            if (method_exists($this, $methodName)) {
-                $this->prebuildConfig[$configKey] = $this->$methodName();
-            }
-        }
-    }
-
-    protected function getDefaultUnbReference()
-    {
-        return uniqid();
-    }
-
-    protected function getDefaultDelimiter()
-    {
-        return new Delimiter;
     }
 
     private function messageIsEmpty()

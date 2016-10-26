@@ -2,6 +2,7 @@
 
 namespace Proengeno\Edifact\Test\Fixtures;
 
+use Proengeno\Edifact\Configuration;
 use Proengeno\Edifact\Message\EdifactFile;
 use Proengeno\Edifact\Templates\AbstractMessage;
 
@@ -45,7 +46,7 @@ class Message extends AbstractMessage
     {
         $file = new EdifactFile('php://temp', 'w+');
         $file->writeAndRewind($string);
-        return new static($file);
+        return new static($file, new Configuration);
     }
 
     public function testConfiguration()
