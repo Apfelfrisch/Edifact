@@ -19,8 +19,8 @@ class AbstractMessageTest extends TestCase
     public function setUp()
     {
         $file = new EdifactFile(__DIR__ . '/../data/edifact.txt');
-        $this->message = new Message($file, new Configuration);
-        $this->messageProxy = new MessageProxy(new Message($file, new Configuration));
+        $this->message = new Message($file, $this->getConfiguration());
+        $this->messageProxy = new MessageProxy(new Message($file, $this->getConfiguration()));
     }
 
     /** @test */

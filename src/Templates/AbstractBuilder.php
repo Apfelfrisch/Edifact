@@ -67,7 +67,7 @@ abstract class AbstractBuilder
     {
         if (!isset($this->buildCache['segmentFactory'])) {
             $this->buildCache['segmentFactory'] = new SegmentFactory(
-                $this->edifactClass,
+                $this->configuration->getSegmentNamespace(),
                 $this->configuration->getDelimiter()
             );
         }

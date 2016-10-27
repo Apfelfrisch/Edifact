@@ -19,7 +19,7 @@ class AbstractBuilderTest extends TestCase
 
     public function setUp()
     {
-        $this->builder = new Builder('from', 'to');
+        $this->builder = new Builder('from', 'to', null, $this->getConfiguration());
         $this->file = $this->builder->getEdifactFile();
     }
 

@@ -9,8 +9,19 @@ use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 class Configuration
 {
     private $delimiter;
-    private $messageValidator;
     private $unbRefGenerator;
+    private $messageValidator;
+    private $segmentNamespace;
+
+    public function setSegmentNamespace($segmentNamespace)
+    {
+        $this->segmentNamespace = $segmentNamespace;
+    }
+
+    public function getSegmentNamespace()
+    {
+        return $this->segmentNamespace;
+    }
 
     public function setMessageValidator(MessageValidatorInterface $messageValidator)
     {

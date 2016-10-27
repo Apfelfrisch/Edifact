@@ -8,19 +8,6 @@ use Proengeno\Edifact\Templates\AbstractMessage;
 
 class Message extends AbstractMessage
 {
-    protected static $segments = [
-        'BGM' => \Proengeno\Edifact\Test\Fixtures\Segments\Bgm::class,
-        'DTM' => \Proengeno\Edifact\Test\Fixtures\Segments\Dtm::class,
-        'LIN' => \Proengeno\Edifact\Test\Fixtures\Segments\Lin::class,
-        'RFF' => \Proengeno\Edifact\Test\Fixtures\Segments\Rff::class,
-        'UNA' => \Proengeno\Edifact\Test\Fixtures\Segments\Una::class,
-        'UNB' => \Proengeno\Edifact\Test\Fixtures\Segments\Unb::class,
-        'UNH' => \Proengeno\Edifact\Test\Fixtures\Segments\Unh::class,
-        'UNT' => \Proengeno\Edifact\Test\Fixtures\Segments\Unt::class,
-        'UNS' => \Proengeno\Edifact\Test\Fixtures\Segments\Uns::class,
-        'UNZ' => \Proengeno\Edifact\Test\Fixtures\Segments\Unz::class,
-    ];
-
     protected static $blueprint = [
         ['name' => 'UNA'],
         ['name' => 'LOOP', 'maxLoops' => 10, 'necessity' => 'R', 'segments' => [
@@ -42,11 +29,11 @@ class Message extends AbstractMessage
         ['name' => 'UNZ']
     ];
 
-    public static function fromString($string)
+    public static function fromString($string, Configuration $configuration = null)
     {
         $file = new EdifactFile('php://temp', 'w+');
         $file->writeAndRewind($string);
-        return new static($file, new Configuration);
+        return new static($file, $configuration);
     }
 
     public function testConfiguration()

@@ -12,6 +12,9 @@
         }
     },
     "autoload-dev": {
+        "psr-4": {
+            "Proengeno\\Edifact\\Test\\": "tests/"
+        },
         "classmap": [
             "tests/TestCase.php",
             "tests/Fixtures/Segment.php",

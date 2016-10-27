@@ -2,14 +2,16 @@
 
 namespace Proengeno\Edifact\Message;
 
+use Proengeno\Edifact\Exceptions\ValidationException;
+
 class SegmentFactory
 {
-    protected $messageClass;
+    protected $segmentNamespace;
     protected $delimiter;
 
-    public function __construct($messageClass, Delimiter $delimiter = null)
+    public function __construct($segmentNamespace, Delimiter $delimiter = null)
     {
-        $this->messageClass = $messageClass;
+        $this->segmentNamespace = $segmentNamespace;
         $this->delimiter = $delimiter ?: new Delimiter;
     }
 
@@ -17,28 +19,27 @@ class SegmentFactory
     {
         $segment = $this->getSegmentClass($this->getSegname($segline));
 
-        $this->setDelimiter($segment);
+        if (is_callable([$segment, 'setBuildDelimiter'])) {
+            $segment::setBuildDelimiter($this->delimiter);
 
-        return call_user_func_array($segment . '::fromSegLine', [$segline]);
+            return $segment::fromSegLine($segline);
+        }
+
+        throw new ValidationException("Unknown Segment '" . $this->getSegname($segline) . "'");
     }
 
     public function fromAttributes($segmentName, $attributes = [], $method = 'fromAttributes')
     {
         $segment = $this->getSegmentClass($segmentName);
 
-        $this->setDelimiter($segment);
+        $segment::setBuildDelimiter($this->delimiter);
 
         return call_user_func_array([$segment, $method], $attributes);
     }
 
-    private function setDelimiter($segment)
-    {
-        call_user_func_array($segment . '::setBuildDelimiter', [$this->delimiter]);
-    }
-
     private function getSegmentClass($segmentName)
     {
-        return call_user_func([$this->messageClass, 'getSegmentClass'], $segmentName);
+        return $this->segmentNamespace . '\\' . ucfirst(strtolower($segmentName));
     }
 
     private function getSegname($segLine)

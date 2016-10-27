@@ -17,7 +17,7 @@ class AbstractMessageTest extends TestCase
     public function setUp()
     {
         $file = new EdifactFile(__DIR__ . '/../data/edifact.txt');
-        $this->messageCore = new Message($file, new Configuration);
+        $this->messageCore = new Message($file, $this->getConfiguration());
     }
 
     /** @test */
@@ -29,7 +29,7 @@ class AbstractMessageTest extends TestCase
     /** @test */
     public function it_instanciates_with_string()
     {
-        $messageCore = Message::fromString("UNH");
+        $messageCore = Message::fromString("UNH", $this->getConfiguration());
         $this->assertEquals('UNH', (string)$messageCore);
     }
 
@@ -42,7 +42,7 @@ class AbstractMessageTest extends TestCase
     /** @test */
     public function it_fetch_the_current_segement_from_stream()
     {
-        $messageCore = Message::fromString("UNH'UNB");
+        $messageCore = Message::fromString("UNH'UNB", $this->getConfiguration());
         $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getNextSegment());
         $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getCurrentSegment());
     }
@@ -50,7 +50,7 @@ class AbstractMessageTest extends TestCase
     /** @test */
     public function it_fetch_the_next_segement_from_stream()
     {
-        $messageCore = Message::fromString("UNH'UNB");
+        $messageCore = Message::fromString("UNH'UNB", $this->getConfiguration());
         $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getNextSegment());
         $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unb', $messageCore->getNextSegment());
     }
@@ -58,7 +58,7 @@ class AbstractMessageTest extends TestCase
     /** @test */
     public function it_pinns_and_jumps_to_the_pointer_position()
     {
-        $messageCore = Message::fromString("UNH'UNB");
+        $messageCore = Message::fromString("UNH'UNB", $this->getConfiguration());
         $messageCore->pinPointer();
         $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getNextSegment());
         $messageCore->jumpToPinnedPointer();
@@ -68,7 +68,7 @@ class AbstractMessageTest extends TestCase
     /** @test */
     public function it_jumps_to_the_actual_position_if_no_pointer_was_pinned()
     {
-        $messageCore = Message::fromString("UNH'UNB");
+        $messageCore = Message::fromString("UNH'UNB", $this->getConfiguration());
         $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getNextSegment());
         $messageCore->jumpToPinnedPointer();
         $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unb', $messageCore->getNextSegment());
@@ -77,7 +77,7 @@ class AbstractMessageTest extends TestCase
     /** @test */
     public function it_provides_the_count_of_the_parsed_segments()
     {
-        $messageCore = Message::fromString("UNH'UNB");
+        $messageCore = Message::fromString("UNH'UNB", $this->getConfiguration());
         $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getNextSegment());
         $messageCore->jumpToPinnedPointer();
         $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unb', $messageCore->getNextSegment());
@@ -86,7 +86,7 @@ class AbstractMessageTest extends TestCase
     /** @test */
     public function it_iterates_over_the_stream()
     {
-        $messageCore = Message::fromString("UNH'UNB'");
+        $messageCore = Message::fromString("UNH'UNB'", $this->getConfiguration());
         $message = "";
         foreach ($messageCore as $segment) {
             $message .= (string)$segment;
@@ -97,7 +97,7 @@ class AbstractMessageTest extends TestCase
     /** @test */
     public function it_fetch_a_specific_segement_from_stream()
     {
-        $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNT");
+        $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNT", $this->getConfiguration());
 
         $this->assertInstanceOf(
             'Proengeno\Edifact\Test\Fixtures\Segments\Unb',
@@ -110,7 +110,7 @@ class AbstractMessageTest extends TestCase
     /** @test */
     public function it_fetch_a_specific_segement_from_start_of_the_stream()
     {
-        $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNT");
+        $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNT", $this->getConfiguration());
         $messageCore->findSegmentFromBeginn('UNH');
 
         $this->assertInstanceOf(

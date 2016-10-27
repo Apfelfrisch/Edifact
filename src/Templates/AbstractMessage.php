@@ -30,17 +30,10 @@ abstract class AbstractMessage implements MessageInterface
     {
         $this->file = $file;
         $this->configuration = $configuration ?: new Configuration;
-        $this->segmentFactory = new SegmentFactory(static::class, $this->getDelimiter());
-    }
-
-    public static function getSegmentClass($segmentName)
-    {
-        $segmentName = strtoupper($segmentName);
-        if (isset(static::$segments[$segmentName])) {
-            return static::$segments[$segmentName];
-        }
-
-        throw EdifactException::segmentUnknown($segmentName);
+        $this->segmentFactory = new SegmentFactory(
+            $this->configuration->getSegmentNamespace(),
+            $this->getDelimiter()
+        );
     }
 
     public function getConfiguration($key)
@@ -94,7 +87,8 @@ abstract class AbstractMessage implements MessageInterface
 
     public function findNextSegment($searchSegment, closure $criteria = null)
     {
-        $searchObject = static::getSegmentClass($searchSegment);
+        $searchObject = $this->segmentFactory->fromSegline($searchSegment);
+
         while ($segmentObject = $this->getNextSegment()) {
             if ($segmentObject instanceof $searchObject) {
                 if ($criteria && !$criteria($segmentObject)) {
@@ -188,10 +182,5 @@ abstract class AbstractMessage implements MessageInterface
     protected function getSegmentObject($segLine)
     {
         return $this->segmentFactory->fromSegline($segLine);
-    }
-
-    private function getSegname($segLine)
-    {
-        return substr($segLine, 0, 3);
     }
 }
