@@ -15,7 +15,7 @@ class EdifactResolverTest extends TestCase
     public function setUp()
     {
         $configuration = $this->getConfiguration();
-        $configuration->setImportAllocationRule(MessageFixure::class, [
+        $configuration->addImportAllocationRule(MessageFixure::class, [
             'UNH' => '/UNH\+(.*?)\+ORDERS\:/',
             'RFF' => '/RFF\+Z13\:17103/',
         ]);

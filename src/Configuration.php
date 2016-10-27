@@ -8,13 +8,40 @@ use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 
 class Configuration
 {
+    protected $filePath;
     protected $delimiter;
+    protected $exportSender;
     protected $unbRefGenerator;
     protected $messageValidator;
     protected $segmentNamespace;
     protected $importAllocationRules;
 
-    public function setImportAllocationRule($edifactClass, $allocationRules)
+    public function setFilePath($filePath)
+    {
+        $this->filePath = $filePath;
+    }
+
+    public function getFilePath()
+    {
+        return $this->filePath;
+    }
+
+    public function setExportSender($exportSender)
+    {
+        $this->exportSender = $exportSender;
+    }
+
+    public function getExportSender()
+    {
+        return $this->exportSender;
+    }
+
+    public function setImportAllocationRule(array $allocationRules)
+    {
+        $this->importAllocationRules = $allocationRules;
+    }
+
+    public function addImportAllocationRule($edifactClass, $allocationRules)
     {
         $this->importAllocationRules[$edifactClass] = $allocationRules;
     }

@@ -3,9 +3,9 @@
 namespace Proengeno\Edifact;
 
 use Closure;
+use Proengeno\Edifact\Configuration;
 use Proengeno\Edifact\Message\EdifactFile;
 use Proengeno\Edifact\Exceptions\EdifactException;
-use Proengeno\Edifact\Configuration;
 
 class EdifactBuilder
 {
@@ -18,22 +18,20 @@ class EdifactBuilder
         $this->configuration = $configuration ?: new Configuration;
     }
 
-    public function addBuilder($key, $builderClass, $from, $filepath = null)
+    public function addBuilder($key, $builderClass)
     {
         $this->classes[$key]['builder'] = $builderClass;
-        $this->classes[$key]['construct'] = [$from, $filepath];
     }
 
     public function build($key, $to, $filename = null)
     {
-        return $this->instanceClass($key, $to, $filename);
-    }
-
-    private function instanceClass($key, $to, $filename)
-    {
         if (isset($this->classes[$key])) {
-            list($from, $filepath) = $this->classes[$key]['construct'];
-            return new $this->classes[$key]['builder']($from, $to, $this->getFullpath($filepath, $filename), $this->configuration);
+            return new $this->classes[$key]['builder'](
+                $this->configuration->getExportSender(),
+                $to,
+                $this->getFullpath($this->configuration->getFilePath(), $filename),
+                $this->configuration
+            );
         }
 
         throw new EdifactException("Class with Key '$key' not registered.");

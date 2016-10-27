@@ -16,6 +16,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     {
         $configuration = new Configuration;
         $configuration->setSegmentNamespace('\Proengeno\Edifact\Test\Fixtures\Segments');
+        $configuration->setExportSender('from');
 
         return $configuration;
     }
