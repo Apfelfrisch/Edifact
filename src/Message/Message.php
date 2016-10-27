@@ -4,14 +4,20 @@ namespace Proengeno\Edifact\Message;
 
 use ReflectionClass;
 use Proengeno\Edifact\Interfaces\MessageInterface;
+use Proengeno\Edifact\Exceptions\EdifactException;
 
 class Message implements MessageInterface
 {
     protected $ediMessage;
-    
+
     public function __construct(MessageInterface $ediMessage)
     {
         $this->ediMessage = $ediMessage;
+    }
+
+    public function getConfiguration($key)
+    {
+        return $this->ediMessage->getConfiguration($key);
     }
 
     public function getAdapterName()

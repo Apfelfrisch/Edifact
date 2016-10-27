@@ -43,6 +43,16 @@ abstract class AbstractMessage implements MessageInterface
         throw EdifactException::segmentUnknown($segmentName);
     }
 
+    public function getConfiguration($key)
+    {
+        $method = 'get' . ucfirst($key);
+        if (method_exists($this->configuration, $method)) {
+            return $this->configuration->$method();
+        }
+
+        throw new EdifactException("Unknown Configuration '$key'.");
+    }
+
     public function getValidationBlueprint()
     {
         if (static::$blueprint !== null) {
