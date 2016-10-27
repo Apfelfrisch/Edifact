@@ -11,16 +11,10 @@ class EdifactResolver
 {
     private $edifactFile;
     private $configuration;
-    private $allocationRules = [];
 
     public function __construct(Configuration $configuration = null)
     {
         $this->configuration = $configuration ?: new Configuration;
-    }
-
-    public function addAllocationRule($edifactClass, $allocationRules)
-    {
-        $this->allocationRules[$edifactClass] = $allocationRules;
     }
 
     public function fromFile($filepath)
@@ -41,7 +35,8 @@ class EdifactResolver
     // Need Refactoring
     private function resolvEdifactObject()
     {
-        $tmpAllocationRules = $this->allocationRules;
+        $tmpAllocationRules = $this->configuration->getAllImportAllocationRules();
+
         while ($segment = $this->edifactFile->getSegment()) {
             $segmenName = substr($segment, 0, 3);
 

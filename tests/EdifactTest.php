@@ -16,11 +16,13 @@ class EdifactTest extends TestCase
 
     public function setUp()
     {
+        $configuration = $this->getConfiguration();
+        $configuration->setImportAllocationRule(MessageFixure::class, ['UNH' => '/ORDERS/']);
+
         $builder = new EdifactBuilder;
         $builder->addBuilder('Message', Builder::class, 'from');
 
-        $ediResolver = new EdifactResolver;
-        $ediResolver->addAllocationRule(MessageFixure::class, ['UNH' => '/ORDERS/']);
+        $ediResolver = new EdifactResolver($configuration);
 
         $this->edifact = new Edifact($builder, $ediResolver);
     }

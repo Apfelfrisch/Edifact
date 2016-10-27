@@ -14,13 +14,14 @@ class EdifactResolverTest extends TestCase
 
     public function setUp()
     {
-        $this->ediResolver = new EdifactResolver;
-        $this->ediResolver->addAllocationRule(MessageFixure::class, [
+        $configuration = $this->getConfiguration();
+        $configuration->setImportAllocationRule(MessageFixure::class, [
             'UNH' => '/UNH\+(.*?)\+ORDERS\:/',
             'RFF' => '/RFF\+Z13\:17103/',
         ]);
+        $this->ediResolver = new EdifactResolver($configuration);
     }
-    
+
     /** @test */
     public function it_resolves_the_object_from_a_given_string()
     {

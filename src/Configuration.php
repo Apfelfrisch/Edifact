@@ -8,10 +8,26 @@ use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 
 class Configuration
 {
-    private $delimiter;
-    private $unbRefGenerator;
-    private $messageValidator;
-    private $segmentNamespace;
+    protected $delimiter;
+    protected $unbRefGenerator;
+    protected $messageValidator;
+    protected $segmentNamespace;
+    protected $importAllocationRules;
+
+    public function setImportAllocationRule($edifactClass, $allocationRules)
+    {
+        $this->importAllocationRules[$edifactClass] = $allocationRules;
+    }
+
+    public function getImportAllocationRule($edifactClass)
+    {
+        return $this->importAllocationRules[$edifactClass];
+    }
+
+    public function getAllImportAllocationRules()
+    {
+        return $this->importAllocationRules;
+    }
 
     public function setSegmentNamespace($segmentNamespace)
     {
