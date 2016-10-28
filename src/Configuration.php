@@ -8,7 +8,8 @@ use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 
 class Configuration
 {
-    protected $filePath;
+    protected $filename = 'php://temp';
+    protected $filepath;
     protected $delimiter;
     protected $exportSender;
     protected $unbRefGenerator;
@@ -16,14 +17,24 @@ class Configuration
     protected $segmentNamespace;
     protected $importAllocationRules;
 
-    public function setFilePath($filePath)
+    public function setFilename($filename)
     {
-        $this->filePath = $filePath;
+        $this->filename = $filename;
     }
 
-    public function getFilePath()
+    public function getFilename()
     {
-        return $this->filePath;
+        return $this->filename;
+    }
+
+    public function setFilepath($filepath)
+    {
+        $this->filepath = $filepath;
+    }
+
+    public function getFilepath()
+    {
+        return $this->filepath;
     }
 
     public function setExportSender($exportSender)

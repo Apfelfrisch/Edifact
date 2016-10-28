@@ -20,16 +20,15 @@ class EdifactBuilder
 
     public function addBuilder($key, $builderClass)
     {
-        $this->classes[$key]['builder'] = $builderClass;
+        $this->classes[$key] = $builderClass;
     }
 
     public function build($key, $to, $filename = null)
     {
         if (isset($this->classes[$key])) {
-            return new $this->classes[$key]['builder'](
-                $this->configuration->getExportSender(),
+            return new $this->classes[$key](
                 $to,
-                $this->getFullpath($this->configuration->getFilePath(), $filename),
+                $filename,
                 $this->configuration
             );
         }
@@ -37,14 +36,4 @@ class EdifactBuilder
         throw new EdifactException("Class with Key '$key' not registered.");
     }
 
-    private function getFullpath($filepath, $filename)
-    {
-        if ($filename === null) {
-            return null;
-        }
-        if ($filepath === null && $filename != null) {
-            return $filename;
-        }
-        return $filepath . '/' . $filename;
-    }
 }

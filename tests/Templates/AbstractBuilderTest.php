@@ -19,7 +19,7 @@ class AbstractBuilderTest extends TestCase
 
     public function setUp()
     {
-        $this->builder = new Builder('from', 'to', null, $this->getConfiguration());
+        $this->builder = new Builder('to', null, $this->getConfiguration());
         $this->file = $this->builder->getEdifactFile();
     }
 
@@ -41,7 +41,7 @@ class AbstractBuilderTest extends TestCase
     /** @test */
     public function it_deletes_the_file_if_the_building_was_interrupted()
     {
-        $builder = new Builder('from', 'to', tempnam(sys_get_temp_dir(), 'edifFile'));
+        $builder = new Builder('to', tempnam(sys_get_temp_dir(), 'edifFile'));
         $file = $builder->getEdifactFile();
         $filepath = $file->getRealPath();
         $this->assertFileExists($filepath);
@@ -72,7 +72,7 @@ class AbstractBuilderTest extends TestCase
             return $ownRef;
         });
 
-        $builder = new Builder('from', 'to', 'php://temp', $configuration);
+        $builder = new Builder('to', 'php://temp', $configuration);
         $this->assertEquals($ownRef, $builder->unbReference());
     }
 

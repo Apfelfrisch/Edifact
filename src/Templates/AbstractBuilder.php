@@ -24,12 +24,13 @@ abstract class AbstractBuilder
     private $messageCount = 0;
     private $messageWasFetched = false;
 
-    public function __construct($from, $to, $filepath = null, Configuration $configuration = null)
+    public function __construct($to, $filename = null, Configuration $configuration = null)
     {
-        $this->to = $to;
-        $this->from = $from;
-        $this->edifactFile = new EdifactFile($filepath ?: 'php://temp', 'w+');
         $this->configuration = $configuration ?: new Configuration;
+
+        $this->to = $to;
+        $this->from = $this->configuration->getExportSender();
+        $this->edifactFile = new EdifactFile($this->getFullpath($filename), 'w+');
     }
 
     public function __destruct()
@@ -135,6 +136,17 @@ abstract class AbstractBuilder
             return;
         }
         $this->unhCounter++;
+    }
+
+    private function getFullpath($filename)
+    {
+        if ($filename === null) {
+            return $this->configuration->getFilename();
+        }
+        if ($this->configuration->getFilepath() === null) {
+            return $filename;
+        }
+        return $this->configuration->getFilepath() . '/' . $filename;
     }
 }
 
