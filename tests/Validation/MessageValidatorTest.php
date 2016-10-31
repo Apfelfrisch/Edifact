@@ -57,6 +57,18 @@ class MessageValidatorTest extends TestCase
         $validator->validate($edifactMessage);
     }
 
+    /** @test */
+    public function it_ignores_unrequiered_fiedls_if_they_are_not_set()
+    {
+        $validator = new MessageValidator;
+
+        $edifactMessage = Message::fromString(
+            "UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'LIN+1'DTM+137:201504221414:203'UNS+D'UNS+D'UNT+18+2'UNZ+4+6910995E'",
+            $this->getConfiguration()
+        );
+        $validator->validate($edifactMessage);
+    }
+
 //    /** @test */
 //    public function it_checks_the_maximal_reloops_for_nested_segments()
 //    {

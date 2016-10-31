@@ -14,7 +14,7 @@ class Message extends AbstractMessage
             ['name' => 'UNH'],
             ['name' => 'BGM', 'templates' => ['docCode' => ['7', '380']] ],
             ['name' => 'RFF', 'necessity' => 'O', 'templates' => ['code' => ['Z12']]],
-            ['name' => 'RFF', 'templates' => ['code' => ['Z13']]],
+            ['name' => 'RFF', 'necessity' => 'O', 'templates' => ['code' => ['Z13']]],
             ['name' => 'LOOP', 'maxLoops' => 10, 'necessity' => 'O', 'segments' => [
                 ['name' => 'LIN'],
                 ['name' => 'LOOP', 'maxLoops' => 10, 'necessity' => 'O', 'segments' => [
