@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Proengeno\Edifact\Validation;
 
@@ -12,11 +12,11 @@ use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 /*
  * Todo: Klasse komplett neuschreiben, die ist Mist
  */
-class MessageValidator implements MessageValidatorInterface 
+class MessageValidator implements MessageValidatorInterface
 {
-    private $lineCount = 1;
+    private $lineCount = 0;
     private $blueprintValidator;
-    
+
     public function validate(MessageInterface $edifact)
     {
         $this->blueprintValidator = new Blueprint($edifact->getValidationBlueprint());
@@ -32,6 +32,7 @@ class MessageValidator implements MessageValidatorInterface
     public function loop($edifact)
     {
         while ($line = $edifact->getNextSegment()) {
+            $this->lineCount++;
             $this->blueprintValidator->validate($line);
             $this->validateSegment($line);
         }
