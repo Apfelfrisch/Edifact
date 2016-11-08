@@ -15,8 +15,8 @@ class EdifactFile extends SplFileInfo
     private $rsrc;
     private $filename;
     private $delimiter;
-    
-    public function __construct($filename, $open_mode = 'r', $use_include_path = false) 
+
+    public function __construct($filename, $open_mode = 'r', $use_include_path = false)
     {
         if (is_string($filename) && empty($filename)) {
             throw new RuntimeException(__METHOD__ . "({$filename}): Filename cannot be empty");
@@ -31,6 +31,14 @@ class EdifactFile extends SplFileInfo
         if (false === $this->rsrc) {
             throw new RuntimeException(__METHOD__ . "({$filename}): failed to open stream: No such file or directory");
         }
+    }
+
+    public function fromString($string)
+    {
+        $instance = new self('php://temp', 'w+');
+        $instance->writeAndRewind($string);
+
+        return $instance;
     }
 
     public function __toString()
@@ -48,60 +56,60 @@ class EdifactFile extends SplFileInfo
         return trim(stream_get_contents($this->rsrc));
     }
 
-    public function eof() 
+    public function eof()
     {
         return feof($this->rsrc);
     }
-    
-    public function flush() 
+
+    public function flush()
     {
         return fflush($this->rsrc);
     }
-    
-    public function getChar() 
+
+    public function getChar()
     {
         return fgetc($this->rsrc);
     }
-    
-    public function getSegment() 
+
+    public function getSegment()
     {
         return $this->fetchSegment();
     }
-    
-    public function lock($operation, &$wouldblock = false) 
+
+    public function lock($operation, &$wouldblock = false)
     {
         return flock($this->rsrc, $operation, $wouldblock);
     }
-    
-    public function passthru() 
+
+    public function passthru()
     {
         return fpassthru($this->rsrc);
     }
-    
-    public function read($length) 
+
+    public function read($length)
     {
         return fread($this->rsrc, $length);
     }
-    
-    public function seek($offset, $whence = SEEK_SET) 
+
+    public function seek($offset, $whence = SEEK_SET)
     {
         if (0 == $result = fseek($this->rsrc, $offset, $whence)) {
             return true;
         }
         return false;
     }
-    
-    public function stat() 
+
+    public function stat()
     {
         return fstat($this->rsrc);
     }
-    
-    public function tell() 
+
+    public function tell()
     {
         return ftell($this->rsrc);
     }
-    
-    public function write($str) 
+
+    public function write($str)
     {
         fwrite($this->rsrc, $str);
     }
@@ -120,11 +128,11 @@ class EdifactFile extends SplFileInfo
         return $this->delimiter;
     }
 
-    public function rewind() 
+    public function rewind()
     {
         rewind($this->rsrc);
     }
-    
+
     private function fetchSegment()
     {
         $mergedLines = '';
@@ -149,7 +157,7 @@ class EdifactFile extends SplFileInfo
     {
         return stream_get_line($this->rsrc, 0, $this->getDelimiter()->getSegment());
     }
-    
+
     private function delimiterWasTerminated($line)
     {
         return $line[(strlen($line) - 1)] == $this->getDelimiter()->getTerminator();

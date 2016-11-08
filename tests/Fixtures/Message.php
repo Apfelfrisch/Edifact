@@ -31,9 +31,7 @@ class Message extends AbstractMessage
 
     public static function fromString($string, Configuration $configuration = null)
     {
-        $file = new EdifactFile('php://temp', 'w+');
-        $file->writeAndRewind($string);
-        return new static($file, $configuration);
+        return new static(EdifactFile::fromString($string), $configuration);
     }
 
     public function testConfiguration()
