@@ -46,13 +46,13 @@ class EdifactFileTest extends TestCase
 
     public function testTerminateSegmentDelimiter()
     {
-        $message = "UNB'NAD+Up?'Verd'UNZ";
+        $message = "UNB'NAD+Up?'Verd?''UNZ";
         $this->stream->writeAndRewind($message);
 
         while (! $this->stream->eof()) {
             $string[] = $this->stream->getSegment();
         }
-        $this->assertEquals("NAD+Up'Verd", $string[1]);
+        $this->assertEquals("NAD+Up'Verd'", $string[1]);
     }
 
     public function testToStringRetrievesFullContentsOfStream()

@@ -150,7 +150,7 @@ class EdifactFile extends SplFileInfo
             return $mergedLines . $line;
         }
 
-        return $line;
+        return $mergedLines;
     }
 
     private function streamGetLine()
