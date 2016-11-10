@@ -36,6 +36,16 @@ abstract class AbstractMessage implements MessageInterface
         );
     }
 
+    public static function fromFilepath($string, Configuration $configuration = null)
+    {
+        return new static(new EdifactFile($string), $configuration);
+    }
+
+    public static function fromString($string, Configuration $configuration = null)
+    {
+        return new static(EdifactFile::fromString($string), $configuration);
+    }
+
     public function getConfiguration($key)
     {
         $method = 'get' . ucfirst($key);

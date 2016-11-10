@@ -27,10 +27,17 @@ class AbstractMessageTest extends TestCase
     }
 
     /** @test */
-    public function it_instanciates_with_string()
+    public function it_instanciates_from_a_string()
     {
         $messageCore = Message::fromString("UNH", $this->getConfiguration());
-        $this->assertEquals('UNH', (string)$messageCore);
+        $this->assertInstanceOf(AbstractMessage::class, $messageCore);
+    }
+
+    /** @test */
+    public function it_instanciates_from_a_filepath()
+    {
+        $messageCore = Message::fromFilepath(__DIR__ . '/../data/edifact.txt', $this->getConfiguration());
+        $this->assertInstanceOf(AbstractMessage::class, $messageCore);
     }
 
     /** @test */

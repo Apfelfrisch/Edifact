@@ -29,11 +29,6 @@ class Message extends AbstractMessage
         ['name' => 'UNZ']
     ];
 
-    public static function fromString($string, Configuration $configuration = null)
-    {
-        return new static(EdifactFile::fromString($string), $configuration);
-    }
-
     public function testConfiguration()
     {
         return $this->configuration['test']();
