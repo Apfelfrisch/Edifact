@@ -1,11 +1,11 @@
-<?php 
+<?php
 
 namespace Proengeno\Edifact\Message;
 
-class Delimiter 
+class Delimiter
 {
     const UNA_SEGMENT = 'UNA';
-    const PLACE_HOLDER = ' #-|-# ';
+    const PLACE_HOLDER = '«>~<«';
 
     private $data;
     private $dataGroup;
@@ -13,7 +13,7 @@ class Delimiter
     private $terminator;
     private $empty;
     private $segment;
-    
+
     public function __construct($data = ':', $dataGroup = '+', $decimal = '.', $terminator = '?', $empty = ' ', $segment = '\'')
     {
         $this->data = $data;
@@ -23,7 +23,7 @@ class Delimiter
         $this->empty = $empty;
         $this->segment = $segment;
     }
-    
+
     public static function setFromFile(EdifactFile $file)
     {
         $position = $file->tell();
@@ -44,7 +44,7 @@ class Delimiter
     public function terminate($string)
     {
         return str_replace(
-            [$this->data, $this->dataGroup, '\\n'], 
+            [$this->data, $this->dataGroup, '\\n'],
             [$this->terminator . $this->data, $this->terminator . $this->dataGroup, ''],
             $string
         );
@@ -54,12 +54,12 @@ class Delimiter
     {
         return $this->explodeString($string, $this->dataGroup);
     }
-    
+
     public function explodeElements($string)
     {
         return $this->explodeString($string, $this->data);
     }
-    
+
     public function getData()
     {
         return $this->data;

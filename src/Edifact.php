@@ -2,32 +2,40 @@
 
 namespace Proengeno\Edifact;
 
+use Proengeno\Edifact\Configuration;
 use Proengeno\Edifact\EdifactBuilder;
-use Proengeno\Edifact\EdifactResolver;
+use Proengeno\Edifact\Message\Message;
+use Proengeno\Edifact\Exceptions\EdifactException;
 
 class Edifact
 {
-    protected $builder;
-    protected $resolver;
-    
-    public function __construct(EdifactBuilder $builder, EdifactResolver $resolver)
+    protected $configuration;
+
+    public function __construct(Configuration $configuration)
     {
-        $this->builder = $builder;
-        $this->resolver = $resolver;
+        $this->configuration = $configuration;
     }
 
     public function build($key, $to, $filename = null)
     {
-        return $this->builder->build($key, $to, $filename);
+        if ($builder = $this->configuration->getBuilder($key)) {
+            return new $builder(
+                $to,
+                $filename,
+                $this->configuration
+            );
+        }
+
+        throw new EdifactException("Class with Key '$key' not registered.");
     }
-    
+
     public function resolveFromFile($filepath)
     {
-        return $this->resolver->fromFile($filepath);
+        return Message::fromFilepath($filepath, $this->configuration);
     }
 
     public function resolveFromString($string)
     {
-        return $this->resolver->fromString($string);
+        return Message::fromString($string, $this->configuration);
     }
 }

@@ -5,10 +5,9 @@ namespace Proengeno\Edifact\Test\Message;
 use Proengeno\Edifact\Edifact;
 use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\EdifactBuilder;
-use Proengeno\Edifact\EdifactResolver;
 use Proengeno\Edifact\Message\Message;
+use Proengeno\Edifact\EdifactResolver;
 use Proengeno\Edifact\Test\Fixtures\Builder;
-use Proengeno\Edifact\Test\Fixtures\Message as MessageFixure;
 
 class EdifactTest extends TestCase
 {
@@ -17,14 +16,9 @@ class EdifactTest extends TestCase
     public function setUp()
     {
         $configuration = $this->getConfiguration();
-        $configuration->addImportAllocationRule(MessageFixure::class, ['UNH' => '/ORDERS/']);
+        $configuration->addBuilder('Message', Builder::class, 'from');
 
-        $builder = new EdifactBuilder;
-        $builder->addBuilder('Message', Builder::class, 'from');
-
-        $ediResolver = new EdifactResolver($configuration);
-
-        $this->edifact = new Edifact($builder, $ediResolver);
+        $this->edifact = new Edifact($configuration);
     }
 
     /** @test */

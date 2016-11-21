@@ -1,14 +1,7 @@
 <?php
-
-namespace Proengeno\Edifact\Test\Fixtures;
-
-use Proengeno\Edifact\Configuration;
-use Proengeno\Edifact\Message\EdifactFile;
-use Proengeno\Edifact\Templates\AbstractMessage;
-
-class Message extends AbstractMessage
-{
-    protected static $blueprint = [
+return [
+    'name' => 'TestMessage',
+    'validation' => [
         ['name' => 'UNA'],
         ['name' => 'LOOP', 'maxLoops' => 10, 'necessity' => 'R', 'segments' => [
             ['name' => 'UNH'],
@@ -27,10 +20,5 @@ class Message extends AbstractMessage
             ['name' => 'UNT', 'maxLoops' => 5],
         ]],
         ['name' => 'UNZ']
-    ];
-
-    public function testConfiguration()
-    {
-        return $this->configuration['test']();
-    }
-}
+    ]
+];

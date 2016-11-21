@@ -4,22 +4,41 @@ namespace Proengeno\Edifact;
 
 use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Validation\MessageValidator;
-use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 
 class Configuration
 {
     protected $filename = 'php://temp';
+    protected $builder;
     protected $filepath;
     protected $delimiter;
     protected $exportSender;
     protected $unbRefGenerator;
-    protected $messageValidator;
     protected $segmentNamespace;
-    protected $importAllocationRules;
+    protected $streamFilter = [
+        STREAM_FILTER_READ => [],
+        STREAM_FILTER_WRITE => [],
+    ];
+    protected $messageDescriptions = [];
 
     public function setFilename($filename)
     {
         $this->filename = $filename;
+    }
+
+    public function addBuilder($key, $class)
+    {
+        if (!isset($this->builder[$key])) {
+            $this->builder[$key] = $class;
+        }
+    }
+
+    public function getBuilder($key)
+    {
+        if (isset($this->builder[$key])) {
+            return $this->builder[$key];
+        }
+
+        return null;
     }
 
     public function getFilename()
@@ -37,6 +56,21 @@ class Configuration
         return $this->filepath;
     }
 
+    public function setStreamFilter($name, $direction)
+    {
+        if (in_array($direction, array_keys($this->streamFilter)) && !in_array($name, $this->streamFilter[$direction])) {
+            $this->streamFilter[$direction][] = $name;
+        }
+    }
+
+    public function getStreamFilter($direction)
+    {
+        if (!in_array($direction, array_keys($this->streamFilter))) {
+            return [];
+        }
+        return $this->streamFilter[$direction];
+    }
+
     public function setExportSender($exportSender)
     {
         $this->exportSender = $exportSender;
@@ -47,24 +81,14 @@ class Configuration
         return $this->exportSender;
     }
 
-    public function setImportAllocationRule(array $allocationRules)
+    public function addMessageDescription($descriptionFile, $allocationRules)
     {
-        $this->importAllocationRules = $allocationRules;
+        $this->messageDescriptions[$descriptionFile] = $allocationRules;
     }
 
-    public function addImportAllocationRule($edifactClass, $allocationRules)
+    public function getMessageDescriptions()
     {
-        $this->importAllocationRules[$edifactClass] = $allocationRules;
-    }
-
-    public function getImportAllocationRule($edifactClass)
-    {
-        return $this->importAllocationRules[$edifactClass];
-    }
-
-    public function getAllImportAllocationRules()
-    {
-        return $this->importAllocationRules;
+        return $this->messageDescriptions;
     }
 
     public function setSegmentNamespace($segmentNamespace)
@@ -75,19 +99,6 @@ class Configuration
     public function getSegmentNamespace()
     {
         return $this->segmentNamespace;
-    }
-
-    public function setMessageValidator(MessageValidatorInterface $messageValidator)
-    {
-        $this->messageValidator = $messageValidator;
-    }
-
-    public function getMessageValidator()
-    {
-        if (null === $this->messageValidator) {
-            $this->messageValidator = new MessageValidator;
-        }
-        return $this->messageValidator;
     }
 
     public function setUnbRefGenerator(callable $unbRefGenerator)

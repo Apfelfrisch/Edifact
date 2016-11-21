@@ -9,10 +9,11 @@ use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Message\EdifactFile;
 use Proengeno\Edifact\Message\SegmentFactory;
 use Proengeno\Edifact\Exceptions\EdifactException;
+use Proengeno\Edifact\Message\Describer;
 
 abstract class AbstractBuilder
 {
-    protected $edifactClass = null;
+    protected $descriptionPath = null;
 
     protected $to;
     protected $from;
@@ -31,6 +32,9 @@ abstract class AbstractBuilder
         $this->to = $to;
         $this->from = $this->configuration->getExportSender();
         $this->edifactFile = new EdifactFile($this->getFullpath($filename), 'w+');
+        foreach ($this->configuration->getStreamFilter(STREAM_FILTER_WRITE) as $name) {
+            $this->edifactFile->appendFilter($name, STREAM_FILTER_WRITE);
+        }
     }
 
     public function __destruct()
@@ -103,11 +107,9 @@ abstract class AbstractBuilder
             $this->edifactFile->rewind();
         }
 
-        $edifactObject = new $this->edifactClass($this->edifactFile, $this->configuration);
-
         $this->messageWasFetched = true;
 
-        return new Message($edifactObject);
+        return new Message($this->edifactFile, Describer::build($this->descriptionPath), $this->configuration);
     }
 
     abstract protected function writeUnb();

@@ -5,79 +5,167 @@ namespace Proengeno\Edifact\Test\Message;
 use Mockery as m;
 use Proengeno\Edifact\Configuration;
 use Proengeno\Edifact\Test\TestCase;
+use Proengeno\Edifact\Message\Message;
 use Proengeno\Edifact\Message\EdifactFile;
-use Proengeno\Edifact\Interfaces\MessageInterface;
-use Proengeno\Edifact\Message\Message as MessageProxy;
-use Proengeno\Edifact\Test\Fixtures\Message as Message;
-use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
+use Proengeno\Edifact\Validation\MessageValidator;
 
-class AbstractMessageTest extends TestCase
+class MessageTest extends TestCase
 {
-    private $message;
-    private $messageProxy;
+    private $messageCore;
 
     public function setUp()
     {
         $file = new EdifactFile(__DIR__ . '/../data/edifact.txt');
-        $this->message = new Message($file, $this->getConfiguration());
-        $this->messageProxy = new MessageProxy(new Message($file, $this->getConfiguration()));
+        $this->messageCore = new Message($file, $this->getDescriber(), $this->getConfiguration());
     }
 
     /** @test */
-    public function it_provides_the_adapter_name()
+    public function it_instanciates_with_file_and_validator()
     {
-        $this->assertEquals('Message', $this->messageProxy->getAdapterName());
+        $this->assertInstanceOf(Message::class, $this->messageCore);
     }
 
     /** @test */
-    public function it_provides_the_delimter_from_the_root_class()
+    public function it_instanciates_from_a_string()
     {
-        $this->assertEquals($this->message->getDelimiter(), $this->messageProxy->getDelimiter());
+        $messageCore = Message::fromString("UNH", $this->getConfiguration());
+        $this->assertInstanceOf(Message::class, $messageCore);
     }
 
     /** @test */
-    public function it_provides_the_file_path_from_the_root_class()
+    public function it_instanciates_from_a_filepath()
     {
-        $this->assertEquals($this->message->getFilepath(), $this->messageProxy->getFilepath());
+        $messageCore = Message::fromFilepath(__DIR__ . '/../data/edifact.txt', $this->getConfiguration());
+        $this->assertInstanceOf(Message::class, $messageCore);
     }
 
     /** @test */
-    public function it_provides_the_current_segment_from_the_root_class()
+    public function it_can_cast_the_edifact_content_to_a_string()
     {
-        $this->assertEquals($this->message->getCurrentSegment(), $this->messageProxy->getCurrentSegment());
+        $this->assertEquals("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'RFF+Z13:17103'", (string)$this->messageCore);
     }
 
     /** @test */
-    public function it_provides_the_next_segment_from_the_root_class()
+    public function it_fetch_the_current_segement_from_stream()
     {
-        $segment = $this->message->getNextSegment();
-        $this->message->rewind();
-        $segmentProxy = $this->messageProxy->getNextSegment();
-        $this->assertEquals($segment, $segmentProxy);
+        $messageCore = Message::fromString("UNH'UNB", $this->getConfiguration());
+
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getNextSegment());
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getCurrentSegment());
     }
 
     /** @test */
-    public function it_finds_segment_from_the_root_class()
+    public function it_fetch_the_next_segement_from_stream()
     {
-        $segment = $this->message->findNextSegment('UNH');
-        $this->message->rewind();
-        $segmentProxy = $this->messageProxy->findNextSegment('UNH');
-        $this->assertEquals($segment, $segmentProxy);
+        $messageCore = Message::fromString("UNH'UNB", $this->getConfiguration());
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getNextSegment());
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unb', $messageCore->getNextSegment());
     }
 
     /** @test */
-    public function it_iterates_over_the_message_proxy()
+    public function it_pinns_and_jumps_to_the_pointer_position()
     {
-        $message = '';
-        $messageProxy = '';
+        $messageCore = Message::fromString("UNH'UNB", $this->getConfiguration());
+        $messageCore->pinPointer();
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getNextSegment());
+        $messageCore->jumpToPinnedPointer();
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getNextSegment());
+    }
 
-        foreach ($this->message as $segment) {
+    /** @test */
+    public function it_jumps_to_the_actual_position_if_no_pointer_was_pinned()
+    {
+        $messageCore = Message::fromString("UNH'UNB", $this->getConfiguration());
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getNextSegment());
+        $messageCore->jumpToPinnedPointer();
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unb', $messageCore->getNextSegment());
+    }
+
+    /** @test */
+    public function it_provides_the_count_of_the_parsed_segments()
+    {
+        $messageCore = Message::fromString("UNH'UNB", $this->getConfiguration());
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getNextSegment());
+        $messageCore->jumpToPinnedPointer();
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unb', $messageCore->getNextSegment());
+    }
+
+    /** @test */
+    public function it_iterates_over_the_stream()
+    {
+        $messageCore = Message::fromString("UNH'UNB'", $this->getConfiguration());
+        $message = "";
+        foreach ($messageCore as $segment) {
             $message .= (string)$segment;
         }
-        foreach ($this->messageProxy as $segment) {
-            $messageProxy .= (string)$segment;
-        }
+        $this->assertEquals($message, (string)$messageCore);
+    }
 
-        $this->assertEquals($message, $messageProxy);
+    /** @test */
+    public function it_fetch_a_specific_segement_from_stream()
+    {
+        $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNT", $this->getConfiguration());
+
+        $this->assertInstanceOf(
+            'Proengeno\Edifact\Test\Fixtures\Segments\Unb',
+            $messageCore->findNextSegment('UNB')
+        );
+        $this->assertFalse($messageCore->findNextSegment('UNH'));
+
+    }
+
+    /** @test */
+    public function it_fetch_a_specific_segement_from_start_of_the_stream()
+    {
+        $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNT", $this->getConfiguration());
+        $messageCore->findSegmentFromBeginn('UNH');
+
+        $this->assertInstanceOf(
+            'Proengeno\Edifact\Test\Fixtures\Segments\Unh',
+            $messageCore->findSegmentFromBeginn('UNH')
+        );
+        $this->assertInstanceOf(
+            'Proengeno\Edifact\Test\Fixtures\Segments\Unh',
+            $messageCore->findSegmentFromBeginn('UNH', function($segment) {
+                return $segment->referenz() == 'O160482A7C2';
+            }
+        ));
+        $this->assertFalse(
+            $messageCore->findSegmentFromBeginn('UNH', function($segment) {
+                return $segment->referenz() == 'UNKNOW';
+            })
+        );
+    }
+
+    /** @test */
+    public function it_can_validate_the_message()
+    {
+        $file = m::mock(EdifactFile::class, function($file) {
+            $file->shouldReceive('rewind');
+            $file->shouldReceive('getDelimiter')->once();
+        });
+        $validator = m::mock(MessageValidator::class, function($validator){
+            $validator->shouldReceive('validate')->once();
+        });
+        $messageCore = new Message($file, $this->getDescriber());
+        $messageCore->validate($validator);
+    }
+
+    /** @test */
+    public function it_can_return_the_delimter()
+    {
+        $unaValues = [":+.? '", "abcdef"];
+        foreach ($unaValues as $unaValue) {
+            $messageCore = Message::fromString("UNA" . $unaValue . "UNH+'", $this->getConfiguration());
+            $delimiter = $messageCore->getDelimiter();
+            $this->assertEquals($unaValue,
+                 $delimiter->getData()
+               . $delimiter->getDataGroup()
+               . $delimiter->getDecimal()
+               . $delimiter->getTerminator()
+               . $delimiter->getEmpty()
+               . $delimiter->getSegment()
+           );
+        }
     }
 }

@@ -8,7 +8,7 @@ use Proengeno\Edifact\Test\Fixtures\Segments\Unb;
 
 class Builder extends AbstractBuilder
 {
-    protected $edifactClass = Message::class;
+    protected $descriptionPath = __DIR__ . '/../data/message_description.php';
 
     const MESSAGE_TYPE = 'RANDOM_MESSAGE';
     const MESSAGE_SUBTYPE = 'VL';

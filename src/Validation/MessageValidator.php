@@ -2,29 +2,36 @@
 
 namespace Proengeno\Edifact\Validation;
 
+use Proengeno\Edifact\Message\Message;
 use Proengeno\Edifact\Interfaces\SegInterface;
 use Proengeno\Edifact\Exceptions\EdifactException;
-use Proengeno\Edifact\Interfaces\MessageInterface;
 use Proengeno\Edifact\Exceptions\ValidationException;
 use Proengeno\Edifact\Exceptions\SegValidationException;
-use Proengeno\Edifact\Interfaces\MessageValidatorInterface;
 
 /*
  * Todo: Klasse komplett neuschreiben, die ist Mist
  */
-class MessageValidator implements MessageValidatorInterface
+class MessageValidator
 {
+    private $blueprint;
     private $lineCount = 0;
     private $blueprintValidator;
 
-    public function validate(MessageInterface $edifact)
+    public function validate(Message $edifact)
     {
-        $this->blueprintValidator = new Blueprint($edifact->getValidationBlueprint());
+        $edifact->pinPointer();
+
+        $this->blueprintValidator = new Blueprint($edifact->getDescription('validation'));
+
+        $edifact->rewind();
+
         try {
             $this->loop($edifact);
         } catch (EdifactException $e) {
             throw new ValidationException($e->getMessage(), $this->lineCount, null);
         }
+
+        $edifact->jumpToPinnedPointer();
 
         return $this;
     }

@@ -33,7 +33,7 @@ class EdifactFile extends SplFileInfo
         }
     }
 
-    public function fromString($string)
+    public static function fromString($string)
     {
         $instance = new self('php://temp', 'w+');
         $instance->writeAndRewind($string);
@@ -49,6 +49,12 @@ class EdifactFile extends SplFileInfo
         } catch (RuntimeException $e) {
             return '';
         }
+    }
+
+    public function appendFilter($name, $direction)
+    {
+        stream_filter_register($name, $name);
+        stream_filter_append($this->rsrc, $name, $direction);
     }
 
     public function getContents()
@@ -155,7 +161,22 @@ class EdifactFile extends SplFileInfo
 
     private function streamGetLine()
     {
-        return stream_get_line($this->rsrc, 0, $this->getDelimiter()->getSegment());
+        // stream_get_line doesnt Return the rest of the string when the last char is not the
+        // Delimiter and a read filter is appended. To avoid this Problem we have to check if
+        // the stream is on its and, if not simply return the rest of the string with fread
+
+        if ($this->eof()) {
+            return false;
+        }
+
+        $position = $this->tell();
+
+        if (false === $line = stream_get_line($this->rsrc, 0, $this->getDelimiter()->getSegment())) {
+            $this->seek($position);
+            $line = $this->read(1024);
+        }
+
+        return $line;
     }
 
     private function delimiterWasTerminated($line)
