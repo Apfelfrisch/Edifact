@@ -13,8 +13,6 @@ use Proengeno\Edifact\Message\Describer;
 
 abstract class AbstractBuilder
 {
-    protected $descriptionPath = null;
-
     protected $to;
     protected $from;
     protected $edifactFile;
@@ -109,8 +107,10 @@ abstract class AbstractBuilder
 
         $this->messageWasFetched = true;
 
-        return new Message($this->edifactFile, Describer::build($this->descriptionPath), $this->configuration);
+        return new Message($this->edifactFile, Describer::build($this->getDescriptionPath()), $this->configuration);
     }
+
+    abstract protected function getDescriptionPath();
 
     abstract protected function writeUnb();
 
