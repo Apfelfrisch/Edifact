@@ -8,14 +8,12 @@ use Proengeno\Edifact\Test\Fixtures\Segments\Unb;
 
 class Builder extends AbstractBuilder
 {
-    private $descriptionPath = __DIR__ . '/../data/message_description.php';
-
     const MESSAGE_TYPE = 'RANDOM_MESSAGE';
     const MESSAGE_SUBTYPE = 'VL';
 
     public function getDescriptionPath()
     {
-        return $this->descriptionPath;
+        return __DIR__ . '/../data/message_description.php';
     }
 
     /*
