@@ -57,6 +57,12 @@ class EdifactFile extends SplFileInfo
         stream_filter_append($this->rsrc, $name, $direction);
     }
 
+    public function prependFilter($name, $direction)
+    {
+        stream_filter_register($name, $name);
+        stream_filter_prepend($this->rsrc, $name, $direction);
+    }
+
     public function getContents()
     {
         return trim(stream_get_contents($this->rsrc));
