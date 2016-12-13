@@ -30,8 +30,8 @@ abstract class AbstractBuilder
         $this->to = $to;
         $this->from = $this->configuration->getExportSender();
         $this->edifactFile = new EdifactFile($this->getFullpath($filename), 'w+');
-        foreach ($this->configuration->getStreamFilter(STREAM_FILTER_WRITE) as $name) {
-            $this->edifactFile->appendFilter($name, STREAM_FILTER_WRITE);
+        foreach ($this->configuration->getWriteFilter() as $callable) {
+            $this->edifactFile->addWriteFilter($callable);
         }
     }
 

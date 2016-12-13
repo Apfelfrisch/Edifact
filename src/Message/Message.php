@@ -35,8 +35,8 @@ class Message implements \Iterator
             $this->getDelimiter()
         );
 
-        foreach ($this->configuration->getStreamFilter(STREAM_FILTER_READ) as $name) {
-            $this->edifactFile->appendFilter($name, STREAM_FILTER_READ);
+        foreach ($this->configuration->getReadFilter() as $callable) {
+            $this->edifactFile->addReadFilter($callable);
         }
     }
 

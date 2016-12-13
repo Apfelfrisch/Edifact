@@ -125,5 +125,46 @@ class EdifactFileTest extends TestCase
         $stream->rewind();
         $this->assertEquals(0, $stream->tell());
     }
+
+    public function testUsingReadFilter()
+    {
+        file_put_contents($this->tmpnam, 'FOO BAR');
+        $stream = new EdifactFile($this->tmpnam, 'r+');
+
+        $stream->addReadFilter(function($content) {
+            return str_replace("F", "G", $content);
+        });
+
+        $this->assertEquals('GOO BAR', (string)$stream);
+        $stream->rewind();
+        $this->assertEquals('GOO BAR', $stream->getContents());
+        $stream->rewind();
+        $this->assertEquals('GOO BAR', $stream->getSegment());
+        $stream->rewind();
+        $this->assertEquals('GOO BAR', $stream->read(1024));
+        $stream->rewind();
+        $this->assertEquals('G', $stream->getChar());
+    }
+
+    public function testUsingWriteFilter()
+    {
+        $stream = new EdifactFile('php://temp', 'w+');
+        $stream->addWriteFilter(function($content) {
+            return str_replace("F", "G", $content);
+        });
+        $stream->write('FOO BAR');
+        $stream->rewind();
+        $this->assertEquals('GOO BAR', $stream->getContents());
+    }
+
+    public function testUsingWriteFilterOverStaticConstructor()
+    {
+        $stream = EdifactFile::fromString('FOO BAR', [
+            function($content) {
+                return str_replace("F", "G", $content);
+            }
+        ]);
+        $this->assertEquals('GOO BAR', $stream->getContents());
+    }
 }
 

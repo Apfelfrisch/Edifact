@@ -14,10 +14,8 @@ class Configuration
     protected $exportSender;
     protected $unbRefGenerator;
     protected $segmentNamespace;
-    protected $streamFilter = [
-        STREAM_FILTER_READ => [],
-        STREAM_FILTER_WRITE => [],
-    ];
+    protected $readFilter = [];
+    protected $writeFilter = [];
     protected $messageDescriptions = [];
 
     public function setFilename($filename)
@@ -56,19 +54,24 @@ class Configuration
         return $this->filepath;
     }
 
-    public function setStreamFilter($name, $direction)
+    public function setReadFilter(Callable $callable)
     {
-        if (in_array($direction, array_keys($this->streamFilter)) && !in_array($name, $this->streamFilter[$direction])) {
-            $this->streamFilter[$direction][] = $name;
-        }
+        $this->readFilter[] = $callable;
     }
 
-    public function getStreamFilter($direction)
+    public function setWriteFilter(Callable $callable)
     {
-        if (!in_array($direction, array_keys($this->streamFilter))) {
-            return [];
-        }
-        return $this->streamFilter[$direction];
+        $this->writeFilter[] = $callable;
+    }
+
+    public function getReadFilter()
+    {
+        return $this->readFilter;
+    }
+
+    public function getWriteFilter()
+    {
+        return $this->writeFilter;
     }
 
     public function setExportSender($exportSender)

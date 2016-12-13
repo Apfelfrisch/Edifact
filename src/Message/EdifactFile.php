@@ -15,6 +15,8 @@ class EdifactFile extends SplFileInfo
     private $rsrc;
     private $filename;
     private $delimiter;
+    private $readFilter = [];
+    private $writeFilter = [];
 
     public function __construct($filename, $open_mode = 'r', $use_include_path = false)
     {
@@ -33,9 +35,14 @@ class EdifactFile extends SplFileInfo
         }
     }
 
-    public static function fromString($string)
+    public static function fromString($string, $writeFilter = [])
     {
         $instance = new self('php://temp', 'w+');
+
+        foreach ($writeFilter as $callable) {
+            $instance->addWriteFilter($callable);
+        }
+
         $instance->writeAndRewind($string);
 
         return $instance;
@@ -51,21 +58,25 @@ class EdifactFile extends SplFileInfo
         }
     }
 
-    public function appendFilter($name, $direction)
+    public function addReadFilter(Callable $filter)
     {
-        stream_filter_register($name, $name);
-        stream_filter_append($this->rsrc, $name, $direction);
+        $id = spl_object_hash($filter);
+        if (!isset($this->readFilter[$id])) {
+            $this->readFilter[$id] = $filter;
+        }
     }
 
-    public function prependFilter($name, $direction)
+    public function addWriteFilter(Callable $filter)
     {
-        stream_filter_register($name, $name);
-        stream_filter_prepend($this->rsrc, $name, $direction);
+        $id = spl_object_hash($filter);
+        if (!isset($this->writeFilter[$id])) {
+            $this->writeFilter[$id] = $filter;
+        }
     }
 
     public function getContents()
     {
-        return trim(stream_get_contents($this->rsrc));
+        return $this->applyReadFilter(trim(stream_get_contents($this->rsrc)));
     }
 
     public function eof()
@@ -80,12 +91,12 @@ class EdifactFile extends SplFileInfo
 
     public function getChar()
     {
-        return fgetc($this->rsrc);
+        return $this->applyReadFilter(fgetc($this->rsrc));
     }
 
     public function getSegment()
     {
-        return $this->fetchSegment();
+        return $this->applyReadFilter($this->fetchSegment());
     }
 
     public function lock($operation, &$wouldblock = false)
@@ -100,7 +111,7 @@ class EdifactFile extends SplFileInfo
 
     public function read($length)
     {
-        return fread($this->rsrc, $length);
+        return $this->applyReadFilter(fread($this->rsrc, $length));
     }
 
     public function seek($offset, $whence = SEEK_SET)
@@ -123,7 +134,7 @@ class EdifactFile extends SplFileInfo
 
     public function write($str)
     {
-        fwrite($this->rsrc, $str);
+        fwrite($this->rsrc, $this->applyWriteFilter($str));
     }
 
     public function writeAndRewind($str)
@@ -144,6 +155,23 @@ class EdifactFile extends SplFileInfo
     {
         rewind($this->rsrc);
     }
+
+    private function applyReadFilter($content)
+    {
+        foreach ($this->readFilter as $filter) {
+            $content = $filter($content);
+        }
+        return $content;
+    }
+
+    private function applyWriteFilter($content)
+    {
+        foreach ($this->writeFilter as $filter) {
+            $content = $filter($content);
+        }
+        return $content;
+    }
+
 
     private function fetchSegment()
     {
