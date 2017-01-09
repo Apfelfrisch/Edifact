@@ -3,10 +3,12 @@
 namespace Proengeno\Edifact;
 
 use Proengeno\Edifact\Message\Delimiter;
+use Proengeno\Edifact\Message\GenericSegment;
 use Proengeno\Edifact\Validation\MessageValidator;
 
 class Configuration
 {
+    protected $genericSegment = GenericSegment::class;
     protected $filename = 'php://temp';
     protected $builder;
     protected $filepath;
@@ -17,6 +19,16 @@ class Configuration
     protected $readFilter = [];
     protected $writeFilter = [];
     protected $messageDescriptions = [];
+
+    public function setGenericSegment($genericSegment)
+    {
+        $this->genericSegment = $genericSegment;
+    }
+
+    public function getGenericSegment()
+    {
+        return $this->genericSegment;
+    }
 
     public function setFilename($filename)
     {

@@ -9,33 +9,48 @@ class SegmentFactory
     protected $segmentNamespace;
     protected $delimiter;
 
-    public function __construct($segmentNamespace, Delimiter $delimiter = null)
+    private $genericSegment;
+
+    public function __construct($segmentNamespace, Delimiter $delimiter = null, $genericSegment = null)
     {
         $this->segmentNamespace = $segmentNamespace;
         $this->delimiter = $delimiter ?: new Delimiter;
+        $this->genericSegment = $genericSegment;
     }
 
     public function fromSegline($segline)
     {
-        $segment = $this->getSegmentClass($this->getSegname($segline));
-
-        if (is_callable([$segment, 'setBuildDelimiter'])) {
-            $segment::setBuildDelimiter($this->delimiter);
-
-            return $segment::fromSegLine($segline);
-        }
-
-        throw new ValidationException("Unknown Segment '" . $this->getSegname($segline) . "'");
+        return $this->instanciateSegment($this->getSegname($segline), 'fromSegLine', $segline);
     }
 
     public function fromAttributes($segmentName, $attributes = [], $method = 'fromAttributes')
     {
+        return $this->instanciateSegment($segmentName, $method, $attributes);
+    }
+
+    private function instanciateSegment($segmentName, $method, $attributes)
+    {
+        if (!is_array($attributes)) {
+            $attributes = [$attributes];
+        }
+
         $segment = $this->getSegmentClass($segmentName);
 
-        $segment::setBuildDelimiter($this->delimiter);
+        if (is_callable([$segment, 'setBuildDelimiter'])) {
+            call_user_func_array([$segment, 'setBuildDelimiter'], [$this->delimiter]);
 
-        return call_user_func_array([$segment, $method], $attributes);
+            return call_user_func_array([$segment, $method], $attributes);
+        }
+
+        if ($this->genericSegment !== null) {
+            call_user_func_array([$this->genericSegment, 'setBuildDelimiter'], [$this->delimiter]);
+
+            return call_user_func_array([$this->genericSegment, $method], $attributes);
+        }
+
+        throw new ValidationException("Unknown Segment '" . $segmentName . "'");
     }
+
 
     private function getSegmentClass($segmentName)
     {

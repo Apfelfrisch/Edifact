@@ -207,7 +207,7 @@ class Message implements \Iterator
 
     protected function getSegmentObject($segLine)
     {
-        return $this->segmentFactory->fromSegline($segLine);
+        return $this->segmentFactory->fromSegline($segLine, null, $this->configuration->getGenericSegment());
     }
 
     private static function findDescrtiptionFile($file, $configuration)
@@ -226,5 +226,4 @@ class Message implements \Iterator
         }
         throw new EdifactException('Could not find a Description for Message.');
     }
-
 }
