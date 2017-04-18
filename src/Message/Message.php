@@ -224,6 +224,5 @@ class Message implements \Iterator
                 }
             }
         }
-        throw new EdifactException('Could not find a Description for Message.');
     }
 }

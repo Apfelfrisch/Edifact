@@ -2,17 +2,21 @@
 
 namespace Proengeno\Edifact\Message;
 
+use Proengeno\Edifact\Exceptions\ValidationException;
+
 class Describer
 {
     private static $distincInstances = [];
-    private $description;
+    private $description = [];
 
-    private function __construct($file)
+    private function __construct($file = null)
     {
-        if (!is_file($file)) {
-            throw new \InvalidArgumentException("$file not found.");
+        if ($file !== null) {
+            if (!is_file($file)) {
+                throw new \InvalidArgumentException("$file not found.");
+            }
+            $this->description = include($file);
         }
-        $this->description = include($file);
     }
 
     public static function build($file)
@@ -35,6 +39,10 @@ class Describer
             return $this->description[$key];
         }
 
-        return null;
+        if ($this->description === null) {
+            throw new ValidationException('No Description set.');
+        }
+
+        throw new ValidationException("Description '$key' not found.");
     }
 }
