@@ -13,6 +13,16 @@ class DescriberTest extends TestCase
     public function setUp()
     {
         $this->description = Describer::build(__DIR__ . '/../data/message_description.php');
+        Describer::clean();
+    }
+
+    /** @test **/
+    public function it_instanciates_only_one_object_per_description()
+    {
+        $description1 = Describer::build(__DIR__ . '/../data/message_description.php');
+        $description2 = Describer::build(__DIR__ . '/../data/message_description.php');
+
+        $this->assertSame($description1, $description2);
     }
 
     /**
@@ -40,6 +50,16 @@ class DescriberTest extends TestCase
     public function it_return_the_requested_key()
     {
         $this->assertEquals('TestMessage', $this->description->get('name'));
+    }
+
+    /** @test **/
+    public function it_returns_the_given_default_if_no_key_was_found()
+    {
+        $default = 'Key not found';
+        $descriptionWithDefault = Describer::buildWithDefaultDescription(__DIR__ . '/../data/message_description.php', $default);
+
+        $this->assertEquals($default, $this->description->get('unknow-key', $default));
+        $this->assertEquals($default, $descriptionWithDefault->get('unknow-key'));
     }
 
     /** @test **/
