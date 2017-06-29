@@ -13,7 +13,7 @@ class Describer
     {
         if ($file !== null) {
             if (!is_file($file)) {
-                throw new \InvalidArgumentException("$file not found.");
+                throw new \InvalidArgumentException("Description-File '$file' not found.");
             }
             $this->description = include($file);
         }
@@ -30,19 +30,49 @@ class Describer
 
     public function has($key)
     {
-        return isset($this->description[$key]);
+        if (is_null($key)) {
+            return false;
+        }
+
+        if (array_key_exists($key, $this->description)) {
+            return true;
+        }
+
+        $matchedDescription = $this->description;
+        foreach (explode('.', $key) as $segment) {
+            if (! is_array($matchedDescription) || ! array_key_exists($segment, $matchedDescription)) {
+                return false;
+            }
+
+            $matchedDescription = $matchedDescription[$segment];
+        }
+
+        return true;
     }
 
     public function get($key)
     {
-        if ($this->has($key)) {
-            return $this->description[$key];
-        }
-
         if ($this->description === null) {
             throw new ValidationException('No Description set.');
         }
 
-        throw new ValidationException("Description '$key' not found.");
+        if (is_null($key)) {
+            return null;
+        }
+
+        if (isset($this->description[$key])) {
+            return $this->description[$key];
+        }
+
+        $matchedDescription = $this->description;
+        foreach (explode('.', $key) as $segment) {
+            if (! is_array($matchedDescription) || ! array_key_exists($segment, $matchedDescription)) {
+                throw new ValidationException("Description '$key' not found.");
+            }
+
+            $matchedDescription = $matchedDescription[$segment];
+        }
+
+        return $matchedDescription;
     }
 }

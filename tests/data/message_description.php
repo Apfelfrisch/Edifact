@@ -20,5 +20,8 @@ return [
             ['name' => 'UNT', 'maxLoops' => 5],
         ]],
         ['name' => 'UNZ']
+    ],
+    'explanation' => [
+        'utilmd' => 'Edifact Message'
     ]
 ];
