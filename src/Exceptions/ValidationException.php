@@ -6,7 +6,7 @@ class ValidationException extends EdifactException
 {
     protected $lineCount;
     protected $segment;
-    
+
     public function __construct($postMessage, $lineCount = null, $segment = null)
     {
         $message = '';
@@ -19,13 +19,16 @@ class ValidationException extends EdifactException
         if ($segment) {
             $message .= " Segment $segment";
         }
-        $message .= ", " . $postMessage;
+        if ($message != '') {
+            $message .= ", ";
+        }
+        $message .= $postMessage;
         $this->lineCount = $lineCount;
         $this->segment = $segment;
 
         parent::__construct($message);
     }
-    
+
     public static function unexpectedSegment($lineCount, $segment, $expectedSegment = null)
     {
         if ($expectedSegment) {
