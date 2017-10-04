@@ -45,6 +45,11 @@ abstract class AbstractSegment implements SegInterface
         self::$buildValidator = $buildValidator;
     }
 
+    public function getValue($dataGroup, $element)
+    {
+        return array_values(array_values($this->elements)[$dataGroup])[$element];
+    }
+
     public function getValidator()
     {
         return $this->validator;
@@ -57,7 +62,7 @@ abstract class AbstractSegment implements SegInterface
 
     public function name()
     {
-        return array_values(array_values($this->elements)[0])[0];
+        return $this->getValue(0,0);
     }
 
     public function validate()
