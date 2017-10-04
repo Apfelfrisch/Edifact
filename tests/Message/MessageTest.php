@@ -55,6 +55,25 @@ class MessageTest extends TestCase
     }
 
     /** @test */
+    public function it_parses_to_a_generic_segment_if_a_segment_is_unkown()
+    {
+        $messageCore = Message::fromString("UKN", $this->getConfiguration());
+
+        $this->assertInstanceOf('Proengeno\Edifact\Message\GenericSegment', $messageCore->getNextSegment());
+    }
+
+    /** @test */
+    public function it_throw_an_exception_if_no_generic_segment_is_set_and_a_segment_is_uknown()
+    {
+        $configuration = $this->getConfiguration();
+        $configuration->setGenericSegment(null);
+        $messageCore = Message::fromString("UKN", $configuration);
+
+        $this->expectException('Proengeno\Edifact\Exceptions\ValidationException');
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getNextSegment());
+    }
+
+    /** @test */
     public function it_fetch_the_next_segement_from_stream()
     {
         $messageCore = Message::fromString("UNH'UNB", $this->getConfiguration());
@@ -104,11 +123,15 @@ class MessageTest extends TestCase
     /** @test */
     public function it_fetch_a_specific_segement_from_stream()
     {
-        $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNT", $this->getConfiguration());
+        $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UKN'UNT", $this->getConfiguration());
 
         $this->assertInstanceOf(
             'Proengeno\Edifact\Test\Fixtures\Segments\Unb',
             $messageCore->findNextSegment('UNB')
+        );
+        $this->assertInstanceOf(
+            'Proengeno\Edifact\Message\GenericSegment',
+            $messageCore->findNextSegment('UKN')
         );
         $this->assertFalse($messageCore->findNextSegment('UNH'));
 

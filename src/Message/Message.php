@@ -32,7 +32,8 @@ class Message implements \Iterator
         $this->configuration = $configuration ?: new Configuration;
         $this->segmentFactory = new SegmentFactory(
             $this->configuration->getSegmentNamespace(),
-            $this->getDelimiter()
+            $this->getDelimiter(),
+            $this->configuration->getGenericSegment()
         );
 
         foreach ($this->configuration->getReadFilter() as $callable) {
@@ -113,10 +114,8 @@ class Message implements \Iterator
 
     public function findNextSegment($searchSegment, \Closure $criteria = null)
     {
-        $searchObject = $this->segmentFactory->fromSegline($searchSegment);
-
         while ($segmentObject = $this->getNextSegment()) {
-            if ($segmentObject instanceof $searchObject) {
+            if ($segmentObject->name() == $searchSegment) {
                 if ($criteria && !$criteria($segmentObject)) {
                     continue;
                 }
