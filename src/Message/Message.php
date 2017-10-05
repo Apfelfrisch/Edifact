@@ -15,19 +15,27 @@ class Message implements \Iterator
 {
     protected static $segments;
 
+    /* Proengeno\Edifact\Configuration\Configuration */
     protected $configuration;
+
+    /* Proengeno\Edifact\Message\Describer\Describer */
     protected $description;
 
-    private $file;
-    private $pinnedPointer;
+    /* Proengeno\Edifact\Message\EdifactFile */
+    private $edifactFile;
+
+    /* Proengeno\Edifact\Message\SegmentFactory */
     private $segmentFactory;
+
+    private $pinnedPointer;
     private $currentSegment;
     private $currentSegmentNumber = 0;
 
-    public function __construct(EdifactFile $file, Describer $description, Configuration $configuration = null)
+    public function __construct(EdifactFile $edifactFile, Configuration $configuration = null, Describer $description = null)
     {
-        $this->edifactFile = $file;
+        $this->edifactFile = $edifactFile;
         $this->rewind();
+
         $this->description = $description;
         $this->configuration = $configuration ?: new Configuration;
         $this->segmentFactory = new SegmentFactory(
@@ -41,22 +49,20 @@ class Message implements \Iterator
         }
     }
 
-    public static function fromFilepath($string, Configuration $configuration = null)
+    public static function fromFilepath($string, Configuration $configuration = null, Describer $description = null)
     {
-        $file = new EdifactFile($string);
+        $edifactFile = new EdifactFile($string);
         $configuration = $configuration ?: new Configuration;
-        $description = Describer::build(self::findDescrtiptionFile($file, $configuration));
 
-        return new static($file, $description, $configuration);
+        return new static($edifactFile, $configuration, $description);
     }
 
-    public static function fromString($string, Configuration $configuration = null)
+    public static function fromString($string, Configuration $configuration = null, Describer $description = null)
     {
-        $file = EdifactFile::fromString($string);
+        $edifactFile = EdifactFile::fromString($string);
         $configuration = $configuration ?: new Configuration;
-        $description = Describer::build(self::findDescrtiptionFile($file, $configuration));
 
-        return new static($file, $description, $configuration);
+        return new static($edifactFile, $configuration, $description);
     }
 
     public function getConfiguration($key)
@@ -71,6 +77,9 @@ class Message implements \Iterator
 
     public function getDescription($key)
     {
+        if ($this->description === null) {
+            $this->description = Describer::build(self::findDescrtiptionFile($this->edifactFile, $this->configuration));
+        }
         return $this->description->get($key);
     }
 
@@ -209,10 +218,10 @@ class Message implements \Iterator
         return $this->segmentFactory->fromSegline($segLine, null, $this->configuration->getGenericSegment());
     }
 
-    private static function findDescrtiptionFile($file, $configuration)
+    private static function findDescrtiptionFile($edifactFile, $configuration)
     {
         $tmpAllocationRules = $configuration->getMessageDescriptions();
-        while ($segment = $file->getSegment()) {
+        while ($segment = $edifactFile->getSegment()) {
             $segmenName = substr($segment, 0, 3);
             foreach ($tmpAllocationRules as $descriptionFile => $allocationRules) {
                 if (isset($allocationRules[$segmenName]) && preg_match($allocationRules[$segmenName], $segment)) {

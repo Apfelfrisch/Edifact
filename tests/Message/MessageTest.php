@@ -16,7 +16,7 @@ class MessageTest extends TestCase
     public function setUp()
     {
         $file = new EdifactFile(__DIR__ . '/../data/edifact.txt');
-        $this->messageCore = new Message($file, $this->getDescriber(), $this->getConfiguration());
+        $this->messageCore = new Message($file, $this->getConfiguration(), $this->getDescriber());
     }
 
     /** @test */
@@ -170,7 +170,7 @@ class MessageTest extends TestCase
         $validator = m::mock(MessageValidator::class, function($validator){
             $validator->shouldReceive('validate')->once();
         });
-        $messageCore = new Message($file, $this->getDescriber());
+        $messageCore = new Message($file, null, $this->getDescriber());
         $messageCore->validate($validator);
     }
 

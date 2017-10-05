@@ -6,10 +6,10 @@ use Closure;
 use Proengeno\Edifact\Configuration;
 use Proengeno\Edifact\Message\Message;
 use Proengeno\Edifact\Message\Delimiter;
+use Proengeno\Edifact\Message\Describer;
 use Proengeno\Edifact\Message\EdifactFile;
 use Proengeno\Edifact\Message\SegmentFactory;
 use Proengeno\Edifact\Exceptions\EdifactException;
-use Proengeno\Edifact\Message\Describer;
 
 abstract class AbstractBuilder
 {
@@ -107,7 +107,7 @@ abstract class AbstractBuilder
 
         $this->messageWasFetched = true;
 
-        return new Message($this->edifactFile, Describer::build($this->getDescriptionPath()), $this->configuration);
+        return new Message($this->edifactFile, $this->configuration, Describer::build($this->getDescriptionPath()));
     }
 
     abstract protected function getDescriptionPath();
