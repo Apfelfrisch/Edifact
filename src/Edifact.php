@@ -29,13 +29,18 @@ class Edifact
         throw new EdifactException("Class with Key '$key' not registered.");
     }
 
+    public function buildFromString($string, $filename = 'php://temp')
+    {
+        return Message::fromString($string, $this->configuration, $filename);
+    }
+
     public function resolveFromFile($filepath)
     {
         return Message::fromFilepath($filepath, $this->configuration);
     }
 
-    public function resolveFromString($string, $filename = 'php://temp')
+    public function resolveFromString($string)
     {
-        return Message::fromString($string, $this->configuration, $filename);
+        return $this->buildFromString($string);
     }
 }
