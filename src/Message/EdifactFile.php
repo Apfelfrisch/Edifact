@@ -35,9 +35,9 @@ class EdifactFile extends SplFileInfo
         }
     }
 
-    public static function fromString($string, $writeFilter = [])
+    public static function fromString($string, $filename = 'php://temp', $writeFilter = [])
     {
-        $instance = new self('php://temp', 'w+');
+        $instance = new self($filename, 'w+');
 
         foreach ($writeFilter as $callable) {
             $instance->addWriteFilter($callable);

@@ -34,8 +34,8 @@ class Edifact
         return Message::fromFilepath($filepath, $this->configuration);
     }
 
-    public function resolveFromString($string)
+    public function resolveFromString($string, $filename = 'php://temp')
     {
-        return Message::fromString($string, $this->configuration);
+        return Message::fromString($string, $this->configuration, $filename);
     }
 }

@@ -159,7 +159,7 @@ class EdifactFileTest extends TestCase
 
     public function testUsingWriteFilterOverStaticConstructor()
     {
-        $stream = EdifactFile::fromString('FOO BAR', [
+        $stream = EdifactFile::fromString('FOO BAR', 'php://temp', [
             function($content) {
                 return str_replace("F", "G", $content);
             }

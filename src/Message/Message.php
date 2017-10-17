@@ -57,10 +57,10 @@ class Message implements \Iterator
         return new static($edifactFile, $configuration, $description);
     }
 
-    public static function fromString($string, Configuration $configuration = null, Describer $description = null)
+    public static function fromString($string, Configuration $configuration = null, $filename = 'php://temp', Describer $description = null)
     {
         $configuration = $configuration ?: new Configuration;
-        $edifactFile = EdifactFile::fromString($string, $configuration->getWriteFilter());
+        $edifactFile = EdifactFile::fromString($string, $filename, $configuration->getWriteFilter());
 
         return new static($edifactFile, $configuration, $description);
     }
