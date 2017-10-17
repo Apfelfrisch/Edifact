@@ -59,8 +59,8 @@ class Message implements \Iterator
 
     public static function fromString($string, Configuration $configuration = null, Describer $description = null)
     {
-        $edifactFile = EdifactFile::fromString($string);
         $configuration = $configuration ?: new Configuration;
+        $edifactFile = EdifactFile::fromString($string, $configuration->getWriteFilter());
 
         return new static($edifactFile, $configuration, $description);
     }

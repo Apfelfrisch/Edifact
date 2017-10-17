@@ -161,6 +161,22 @@ class MessageTest extends TestCase
     }
 
     /** @test */
+    public function it_uses_the_filters_from_configuration_class()
+    {
+        $configuration = $this->getConfiguration();
+        $configuration->setWriteFilter(function($content) {
+            return str_replace("F", "X", $content);
+        });
+        $configuration->setReadFilter(function($content) {
+            return str_replace("B", "X", $content);
+        });
+
+        $messageCore = Message::fromString("FOO BAR", $configuration);
+
+        $this->assertEquals("XOO XAR", (string)$messageCore);
+    }
+
+    /** @test */
     public function it_can_validate_the_message()
     {
         $file = m::mock(EdifactFile::class, function($file) {
