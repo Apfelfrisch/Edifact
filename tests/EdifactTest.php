@@ -45,4 +45,16 @@ class EdifactTest extends TestCase
     {
         $this->assertInstanceOf(Message::class, $this->edifact->resolveFromFile(__DIR__ . "/data/edifact.txt"));
     }
+
+    /** @test */
+    public function it_build_the_object_from_a_given_string()
+    {
+        $string = "UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'";
+        $filename = 'test.txt';
+        $ediObject = $this->edifact->buildFromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'", $filename);
+
+        $this->assertEquals($string, file_get_contents($filename));
+
+        unlink($filename);
+    }
 }
