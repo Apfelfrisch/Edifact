@@ -107,13 +107,6 @@ class Message implements \Iterator
         return $this->currentSegment = $this->getSegmentObject($segLine);
     }
 
-    private function getNextSegLine()
-    {
-        $this->currentSegmentNumber++;
-
-        return $this->edifactFile->getSegment();
-    }
-
     public function findSegmentFromBeginn($searchSegment, \Closure $criteria = null)
     {
         $this->rewind();
@@ -216,6 +209,13 @@ class Message implements \Iterator
     protected function getSegmentObject($segLine)
     {
         return $this->segmentFactory->fromSegline($segLine, null, $this->configuration->getGenericSegment());
+    }
+
+    private function getNextSegLine()
+    {
+        $this->currentSegmentNumber++;
+
+        return $this->edifactFile->getSegment();
     }
 
     private static function findDescrtiptionFile($edifactFile, $configuration)

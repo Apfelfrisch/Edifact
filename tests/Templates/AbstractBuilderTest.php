@@ -19,7 +19,7 @@ class AbstractBuilderTest extends TestCase
 
     public function setUp()
     {
-        $this->builder = new Builder('to', null, $this->getConfiguration());
+        $this->builder = new Builder('to', 'php://temp', $this->getConfiguration());
         $this->file = $this->builder->getEdifactFile();
     }
 
@@ -89,6 +89,7 @@ class AbstractBuilderTest extends TestCase
 
         $this->builder->addMessage([]);
         $message = $this->builder->get();
+
         $this->assertStringStartsWith("UNA:+.? 'UNB+UNOC:3+from:500+to:500", (string)$message);
         $this->assertStringEndsWith("UNZ+1+" . $this->builder->unbReference() . "'", (string)$message);
     }

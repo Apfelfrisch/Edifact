@@ -9,7 +9,6 @@ use Proengeno\Edifact\Validation\MessageValidator;
 class Configuration
 {
     protected $genericSegment = GenericSegment::class;
-    protected $filename = 'php://temp';
     protected $builder;
     protected $filepath;
     protected $delimiter;
@@ -30,11 +29,6 @@ class Configuration
         return $this->genericSegment;
     }
 
-    public function setFilename($filename)
-    {
-        $this->filename = $filename;
-    }
-
     public function addBuilder($key, $class)
     {
         if (!isset($this->builder[$key])) {
@@ -49,11 +43,6 @@ class Configuration
         }
 
         return null;
-    }
-
-    public function getFilename()
-    {
-        return $this->filename;
     }
 
     public function setFilepath($filepath)

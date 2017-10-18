@@ -16,7 +16,7 @@ class Edifact
         $this->configuration = $configuration;
     }
 
-    public function build($key, $to, $filename = null)
+    public function build($key, $to, $filename = 'php://temp')
     {
         if ($builder = $this->configuration->getBuilder($key)) {
             return new $builder(

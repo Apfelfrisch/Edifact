@@ -23,7 +23,7 @@ abstract class AbstractBuilder
     private $messageCount = 0;
     private $messageWasFetched = false;
 
-    public function __construct($to, $filename = null, Configuration $configuration = null)
+    public function __construct($to, $filename = 'php://temp', Configuration $configuration = null)
     {
         $this->configuration = $configuration ?: new Configuration;
 
@@ -142,8 +142,8 @@ abstract class AbstractBuilder
 
     private function getFullpath($filename)
     {
-        if ($filename === null) {
-            return $this->configuration->getFilename();
+        if (substr($filename, 0, 4) === 'php:') {
+            return $filename;
         }
         if ($this->configuration->getFilepath() === null) {
             return $filename;
