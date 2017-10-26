@@ -27,8 +27,8 @@ abstract class AbstractBuilder
     {
         $this->configuration = $configuration ?: new Configuration;
 
-        $this->to = $to;
-        $this->from = $this->configuration->getExportSender();
+        $this->to = (string)$to;
+        $this->from = (string)$this->configuration->getExportSender();
         $this->edifactFile = new EdifactFile($this->getFullpath($filename), 'w+');
         foreach ($this->configuration->getWriteFilter() as $callable) {
             $this->edifactFile->addWriteFilter($callable);
