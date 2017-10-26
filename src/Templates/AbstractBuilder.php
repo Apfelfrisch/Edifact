@@ -23,12 +23,11 @@ abstract class AbstractBuilder
     private $messageCount = 0;
     private $messageWasFetched = false;
 
-    public function __construct($to, $filename = 'php://temp', Configuration $configuration = null)
+    public function __construct($to, Configuration $configuration, $filename = 'php://temp')
     {
-        $this->configuration = $configuration ?: new Configuration;
-
-        $this->to = (string)$to;
-        $this->from = (string)$this->configuration->getExportSender();
+        $this->configuration = $configuration;
+        $this->to = $to;
+        $this->from = $this->configuration->getExportSender();
         $this->edifactFile = new EdifactFile($this->getFullpath($filename), 'w+');
         foreach ($this->configuration->getWriteFilter() as $callable) {
             $this->edifactFile->addWriteFilter($callable);

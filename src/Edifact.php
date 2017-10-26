@@ -21,8 +21,8 @@ class Edifact
         if ($builder = $this->configuration->getBuilder($key)) {
             return new $builder(
                 $to,
-                $filename,
-                $this->configuration
+                $this->configuration,
+                $filename
             );
         }
 
