@@ -28,6 +28,7 @@ abstract class AbstractBuilder
         $this->configuration = $configuration;
         $this->to = $to;
         $this->from = $this->configuration->getExportSender();
+        $this->description = Describer::build($this->getDescriptionPath());
         $this->edifactFile = new EdifactFile($this->getFullpath($filename), 'w+');
         foreach ($this->configuration->getWriteFilter() as $callable) {
             $this->edifactFile->addWriteFilter($callable);
@@ -106,7 +107,7 @@ abstract class AbstractBuilder
 
         $this->messageWasFetched = true;
 
-        return new Message($this->edifactFile, $this->configuration, Describer::build($this->getDescriptionPath()));
+        return new Message($this->edifactFile, $this->configuration, $this->description);
     }
 
     abstract protected function getDescriptionPath();
