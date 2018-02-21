@@ -35,6 +35,13 @@ class EdifactFile extends SplFileInfo
         }
     }
 
+    public function __destruct()
+    {
+        if (isset($this->rsrc)) {
+            fclose($this->rsrc);
+        }
+    }
+
     public static function fromString($string, $filename = 'php://temp', $writeFilter = [])
     {
 

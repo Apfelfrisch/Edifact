@@ -49,6 +49,13 @@ class Message implements \Iterator
         }
     }
 
+    public function __destruct()
+    {
+        if (isset($this->edifactFile)) {
+            unset($this->edifactFile);
+        }
+    }
+
     public static function fromFilepath($string, Configuration $configuration = null, Describer $description = null)
     {
         $edifactFile = new EdifactFile($string);
