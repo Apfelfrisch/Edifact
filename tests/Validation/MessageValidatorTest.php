@@ -18,7 +18,7 @@ class MessageValidatorTest extends TestCase
             "UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'RFF+Z13:123'LIN+1'DTM+137:201604221414:203'UNS+D'UNT+18+2'UNZ+4+6910995E'",
             $this->getConfiguration()
         );
-        $validator->validate($edifactMessage);
+        $this->assertInstanceOf(get_class($edifactMessage), $edifactMessage->validate());
     }
 
     /** @test */
@@ -30,7 +30,7 @@ class MessageValidatorTest extends TestCase
             "UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'RFF+Z13:123'LIN+1'DTM+137:201604221414:203'LIN+1'DTM+137:201604221414:203'UNS+D'UNT+18+2'UNZ+4+6910995E'",
             $this->getConfiguration()
         );
-        $validator->validate($edifactMessage);
+        $this->assertInstanceOf(get_class($edifactMessage), $edifactMessage->validate());
     }
 
     /** @test */
@@ -42,7 +42,7 @@ class MessageValidatorTest extends TestCase
             "UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'RFF+Z13:123'LIN+1'DTM+137:201604221414:203'LIN+1'DTM+137:201604221414:203'UNS+D'UNT+18+2'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'RFF+Z13:123'LIN+1'DTM+137:201604221414:203'LIN+1'DTM+137:201604221414:203'UNS+D'UNT+18+2'UNZ+4+6910995E'",
             $this->getConfiguration()
         );
-        $validator->validate($edifactMessage);
+        $this->assertInstanceOf(get_class($edifactMessage), $edifactMessage->validate());
     }
 
     /** @test */
@@ -54,7 +54,7 @@ class MessageValidatorTest extends TestCase
             "UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'RFF+Z13:123'LIN+1'DTM+137:201504221414:203'UNS+D'UNS+D'UNT+18+2'UNZ+4+6910995E'",
             $this->getConfiguration()
         );
-        $validator->validate($edifactMessage);
+        $this->assertInstanceOf(get_class($edifactMessage), $edifactMessage->validate());
     }
 
     /** @test */
@@ -66,7 +66,7 @@ class MessageValidatorTest extends TestCase
             "UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'LIN+1'DTM+137:201504221414:203'UNS+D'UNS+D'UNT+18+2'UNZ+4+6910995E'",
             $this->getConfiguration()
         );
-        $validator->validate($edifactMessage);
+        $this->assertInstanceOf(get_class($edifactMessage), $edifactMessage->validate());
     }
 
 //    /** @test */

@@ -187,7 +187,7 @@ class MessageTest extends TestCase
             $validator->shouldReceive('validate')->once();
         });
         $messageCore = new Message($file, null, $this->getDescriber());
-        $messageCore->validate($validator);
+        $this->assertInstanceOf(get_class($messageCore), $messageCore->validate($validator));
     }
 
     /** @test */

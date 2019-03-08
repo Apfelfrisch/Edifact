@@ -72,7 +72,7 @@ class AbstractSegmentTest extends TestCase
         Segment::setBuildValidator($customValidator);
         $segment = Segment::fromSegLine('A');
 
-        $segment->validate();
+        $this->assertInstanceOf(get_class($segment), $segment->validate());
     }
 
     /** @test */

@@ -6,7 +6,7 @@ use Mockery as m;
 use Proengeno\Edifact\Configuration;
 use Proengeno\Edifact\Message\Describer;
 
-abstract class TestCase extends \PHPUnit_Framework_TestCase
+abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
     protected function tearDown()
     {
