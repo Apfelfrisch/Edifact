@@ -29,7 +29,7 @@ class Message implements \Iterator
 
     private $pinnedPointer;
     private $currentSegment;
-    private $currentSegmentNumber = 0;
+    private $currentSegmentNumber = -1;
 
     public function __construct(EdifactFile $edifactFile, Configuration $configuration = null, Describer $description = null)
     {
@@ -193,19 +193,25 @@ class Message implements \Iterator
     public function next()
     {
         $this->currentSegment = false;
-        $this->currentSegmentNumber++;
     }
 
     public function rewind()
     {
         $this->edifactFile->rewind();
-        $this->currentSegmentNumber = 0;
+        $this->currentSegmentNumber = -1;
         $this->currentSegment = false;
     }
 
     public function valid()
     {
         return $this->current() !== false;
+    }
+
+    public function toArray()
+    {
+        return array_map(function($segment) {
+            return [$segment->name() => $segment->toArray()];
+        }, iterator_to_array($this));
     }
 
     public function __toString()
