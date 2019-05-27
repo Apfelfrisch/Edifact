@@ -72,6 +72,19 @@ abstract class AbstractSegment implements SegInterface
         return $this;
     }
 
+    public function toArray()
+    {
+        $result = [];
+        foreach ((new \ReflectionClass(static::class))->getMethods() as $method) {
+            if ($method->class === static::class && !$method->isStatic() && $method->isPublic()) {
+                if (null !== $value = $this->{$method->name}()) {
+                    $result[$method->name] = $value;
+                }
+            }
+        }
+        return $result;
+    }
+
     public function __toString()
     {
         if (!isset($this->cache['segLine'])) {

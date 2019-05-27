@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Proengeno\Edifact\Interfaces;
 
@@ -11,5 +11,6 @@ interface SegInterface {
     public function getDelimiter();
     public function name();
     public function validate();
+    public function toArray();
     public function __toString();
-} 
+}
