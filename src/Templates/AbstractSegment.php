@@ -75,11 +75,9 @@ abstract class AbstractSegment implements SegInterface
     public function toArray()
     {
         $result = [];
-        foreach ((new \ReflectionClass(static::class))->getMethods() as $method) {
-            if ($method->class === static::class && !$method->isStatic() && $method->isPublic()) {
-                if (null !== $value = $this->{$method->name}()) {
-                    $result[$method->name] = $value;
-                }
+        foreach ($this->getGetterMethods() as $method) {
+            if (null !== $value = $this->{$method}()) {
+                $result[$method] = $value;
             }
         }
         return $result;
@@ -96,6 +94,17 @@ abstract class AbstractSegment implements SegInterface
         }
 
         return $this->cache['segLine'] . $this->delimiter->getSegment();
+    }
+
+    public function __get($attribute)
+    {
+        try {
+            if (in_array($attribute, $this->getGetterMethods())) {
+                return $this->$attribute();
+            }
+        } catch (\Throwable $e) { }
+
+        return null;
     }
 
     protected static function mapToBlueprint($segLine)
@@ -130,5 +139,21 @@ abstract class AbstractSegment implements SegInterface
             unset($reversed[$key]);
         }
         return array_reverse($reversed);
+    }
+
+    private function getGetterMethods()
+    {
+        if (isset($this->cache['getterMethods'])) {
+            return $this->cache['getterMethods'];
+        }
+
+        $this->cache['getterMethods'] = [];
+        foreach ((new \ReflectionClass(static::class))->getMethods() as $method) {
+            if ($method->class === static::class && !$method->isStatic() && $method->isPublic()) {
+                $this->cache['getterMethods'][] = $method->name;
+            }
+        }
+
+        return $this->cache['getterMethods'];
     }
 }

@@ -12,5 +12,6 @@ interface SegInterface {
     public function name();
     public function validate();
     public function toArray();
+    public function __get($attribute);
     public function __toString();
 }
