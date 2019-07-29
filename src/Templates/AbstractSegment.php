@@ -107,6 +107,23 @@ abstract class AbstractSegment implements SegInterface
         return null;
     }
 
+    public function __call($name, $arguments)
+    {
+        if (strpos($name, 'get') === false) {
+            throw new \BadMethodCallException;
+        }
+
+        $pattern = substr($name, 3);
+
+        foreach ($this->elements as $element) {
+            if (array_key_exists($pattern, $element)) {
+                return $element[$pattern];
+            }
+        }
+
+        throw new \BadMethodCallException;
+    }
+
     protected static function mapToBlueprint($segLine)
     {
         $i = 0;

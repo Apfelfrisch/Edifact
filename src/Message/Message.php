@@ -114,19 +114,21 @@ class Message implements \Iterator
         return $this->currentSegment = $this->getSegmentObject($segLine);
     }
 
-    public function findSegmentFromBeginn($searchSegment, \Closure $criteria = null)
+    public function findSegmentFromBeginn($searchSegment, $criteria = null)
     {
         $this->rewind();
 
         return $this->findNextSegment($searchSegment, $criteria);
     }
 
-    public function findNextSegment($searchSegment, \Closure $criteria = null)
+    public function findNextSegment($searchSegment, $criteria = null)
     {
         while ($segmentObject = $this->getNextSegment()) {
             if ($segmentObject->name() == $searchSegment) {
-                if ($criteria && !$criteria($segmentObject)) {
-                    continue;
+                foreach ($this->cretariaToClosures($criteria) as $criteria) {
+                    if (!$criteria($segmentObject)) {
+                        continue 2;
+                    }
                 }
                 return $segmentObject;
             }
@@ -245,5 +247,24 @@ class Message implements \Iterator
                 }
             }
         }
+    }
+
+    private function cretariaToClosures($criteria)
+    {
+        if ($criteria == null) {
+            return [];
+        }
+
+        if (!is_array($criteria)) {
+            return [$criteria];
+        }
+
+        $criterias = [];
+        foreach ($criteria as $method => $value) {
+            $criterias[] = function($segment) use ($method, $value) {
+                return $segment->$method() == $value;
+            };
+        }
+        return $criterias;
     }
 }

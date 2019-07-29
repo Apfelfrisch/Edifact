@@ -106,4 +106,14 @@ class AbstractSegmentTest extends TestCase
         $segment = Segment::fromSegLine($givenString);
         $this->assertEquals('B+', $segment->dummyMethod());
     }
+
+    /** @test */
+    public function it_can_grap_a_value_over_an_element_key()
+    {
+        $givenString = "Aa+Bb";
+
+        $segment = Segment::fromSegLine($givenString);
+        $this->assertEquals('Aa', $segment->getA());
+        $this->assertEquals('Bb', $segment->getB());
+    }
 }

@@ -153,6 +153,10 @@ class MessageTest extends TestCase
                 return $segment->referenz() == 'O160482A7C2';
             }
         ));
+        $this->assertInstanceOf(
+            'Proengeno\Edifact\Test\Fixtures\Segments\Unh',
+            $messageCore->findSegmentFromBeginn('UNH', ['referenz' => 'O160482A7C2'])
+        );
         $this->assertFalse(
             $messageCore->findSegmentFromBeginn('UNH', function($segment) {
                 return $segment->referenz() == 'UNKNOW';
