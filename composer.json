@@ -1,7 +1,7 @@
 {
     "name": "proengeno/edifact",
     "license": "MIT",
-    "require": { "php": ">=7.0" },
+    "require": { "php": ">=7.1" },
     "require-dev": {
         "phpunit/phpunit": "^7.0",
         "mockery/mockery": "^0.9.4"
