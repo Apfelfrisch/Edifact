@@ -124,6 +124,22 @@ abstract class AbstractSegment implements SegInterface
         throw new \BadMethodCallException;
     }
 
+    protected function getGetterMethods()
+    {
+        if (isset($this->cache['getterMethods'])) {
+            return $this->cache['getterMethods'];
+        }
+
+        $this->cache['getterMethods'] = [];
+        foreach ((new \ReflectionClass(static::class))->getMethods() as $method) {
+            if ($method->class === static::class && !$method->isStatic() && $method->isPublic()) {
+                $this->cache['getterMethods'][] = $method->name;
+            }
+        }
+
+        return $this->cache['getterMethods'];
+    }
+
     protected static function mapToBlueprint($segLine)
     {
         $i = 0;
@@ -156,21 +172,5 @@ abstract class AbstractSegment implements SegInterface
             unset($reversed[$key]);
         }
         return array_reverse($reversed);
-    }
-
-    private function getGetterMethods()
-    {
-        if (isset($this->cache['getterMethods'])) {
-            return $this->cache['getterMethods'];
-        }
-
-        $this->cache['getterMethods'] = [];
-        foreach ((new \ReflectionClass(static::class))->getMethods() as $method) {
-            if ($method->class === static::class && !$method->isStatic() && $method->isPublic()) {
-                $this->cache['getterMethods'][] = $method->name;
-            }
-        }
-
-        return $this->cache['getterMethods'];
     }
 }
