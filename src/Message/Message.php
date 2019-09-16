@@ -125,12 +125,10 @@ class Message implements \Iterator
     {
         while ($segmentObject = $this->getNextSegment()) {
             if ($segmentObject->name() == $searchSegment) {
-                foreach ($this->cretariaToClosures($criteria) as $criteria) {
-                    if (!$criteria($segmentObject)) {
-                        continue 2;
-                    }
+                if ($this->checkCriteria($criteria, $segmentObject) === true) {
+                    return $segmentObject;
                 }
-                return $segmentObject;
+                continue;
             }
         }
 
@@ -249,22 +247,21 @@ class Message implements \Iterator
         }
     }
 
-    private function cretariaToClosures($criteria)
+    private function checkCriteria($criteria, $segmentObject)
     {
         if ($criteria == null) {
-            return [];
+            return true;
         }
 
-        if (!is_array($criteria)) {
-            return [$criteria];
+        if (is_array($criteria)) {
+            foreach ($criteria as $getter => $pattern) {
+                if ($segmentObject->$getter() != $pattern) {
+                    return false;
+                }
+            }
+            return true;
         }
 
-        $criterias = [];
-        foreach ($criteria as $method => $value) {
-            $criterias[] = function($segment) use ($method, $value) {
-                return $segment->$method() == $value;
-            };
-        }
-        return $criterias;
+        return $criteria($segmentObject);
     }
 }
