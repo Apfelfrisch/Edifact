@@ -126,6 +126,16 @@ class EdifactFileTest extends TestCase
         $this->assertEquals(0, $stream->tell());
     }
 
+    public function testReReadRessourceAfterClosingIt()
+    {
+        file_put_contents($this->tmpnam, "FOO");
+        $stream = new EdifactFile($this->tmpnam);
+        $stream->seek(0, SEEK_END);
+        $stream->close();
+
+        $this->assertEquals("FOO", $stream->getSegment());
+    }
+
     public function testUsingReadFilter()
     {
         file_put_contents($this->tmpnam, 'FOO BAR');

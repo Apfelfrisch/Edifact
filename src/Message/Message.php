@@ -90,6 +90,11 @@ class Message implements \Iterator
         return $this->description->get($key);
     }
 
+    public function closeStream()
+    {
+        $this->edifactFile->close();
+    }
+
     public function getFilepath()
     {
         return $this->edifactFile->getRealPath();

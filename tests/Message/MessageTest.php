@@ -165,6 +165,21 @@ class MessageTest extends TestCase
     }
 
     /** @test */
+    public function it_can_close_the_ressource()
+    {
+        $messageCore = Message::fromString("FOO BAR", $this->getConfiguration());
+        $messageCore->closeStream();
+        $this->assertEquals("", (string)$messageCore);
+    }
+
+    /** @test */
+    public function it_rereads_the_stream_after_accessing_closed_stream()
+    {
+        $this->messageCore->closeStream();
+        $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $this->messageCore->getCurrentSegment());
+    }
+
+    /** @test */
     public function it_uses_the_filters_from_configuration_class()
     {
         $configuration = $this->getConfiguration();
@@ -186,6 +201,7 @@ class MessageTest extends TestCase
         $file = m::mock(EdifactFile::class, function($file) {
             $file->shouldReceive('rewind');
             $file->shouldReceive('getDelimiter')->once();
+            $file->shouldReceive('close');
         });
         $validator = m::mock(MessageValidator::class, function($validator){
             $validator->shouldReceive('validate')->once();
