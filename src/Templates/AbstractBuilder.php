@@ -16,6 +16,7 @@ abstract class AbstractBuilder
     protected $to;
     protected $from;
     protected $edifactFile;
+    protected $description;
     protected $configuration;
     protected $buildCache = [];
 
@@ -100,12 +101,7 @@ abstract class AbstractBuilder
 
     public function get()
     {
-        if (!$this->messageIsEmpty()) {
-            $this->writeSeg('unz', [$this->messageCount, $this->unbReference()]);
-            $this->edifactFile->rewind();
-        }
-
-        $this->messageWasFetched = true;
+        $this->finalize();
 
         return new Message($this->edifactFile, $this->configuration, $this->description);
     }
@@ -115,6 +111,16 @@ abstract class AbstractBuilder
     abstract protected function writeUnb();
 
     abstract protected function writeMessage($array);
+
+    protected function finalize()
+    {
+        if (!$this->messageIsEmpty()) {
+            $this->writeSeg('unz', [$this->messageCount, $this->unbReference()]);
+            $this->edifactFile->rewind();
+        }
+
+        $this->messageWasFetched = true;
+    }
 
     protected function writeSeg($segmentName, $attributes = [], $method = 'fromAttributes')
     {
