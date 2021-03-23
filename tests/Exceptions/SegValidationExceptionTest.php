@@ -5,19 +5,19 @@ namespace Proengeno\Edifact\Test\Exceptions;
 use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\Exceptions\SegValidationException;
 
-class SegValidationExceptionTest extends TestCase 
+class SegValidationExceptionTest extends TestCase
 {
     private $key;
     private $value;
     private $code;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->key = 'key';
         $this->value = 'value';
         $this->code = 15;
     }
-    
+
     /** @test */
     public function it_can_instanciate_over_key_value_named_constructor()
     {
@@ -62,4 +62,3 @@ class SegValidationExceptionTest extends TestCase
         $this->assertEquals($this->code, $exception->getCode());
     }
 }
-    

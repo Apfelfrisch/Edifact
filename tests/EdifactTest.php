@@ -13,7 +13,7 @@ class EdifactTest extends TestCase
 {
     private $edifactBuilder;
 
-    public function setUp()
+    public function setUp(): void
     {
         $configuration = $this->getConfiguration();
         $configuration->addBuilder('Message', Builder::class, 'from');

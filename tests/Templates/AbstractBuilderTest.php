@@ -17,13 +17,13 @@ class AbstractBuilderTest extends TestCase
     private $builder;
     private $file;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->builder = new Builder('to', $this->getConfiguration());
         $this->file = $this->builder->getEdifactFile();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
         $filepath = $this->file->getRealPath();

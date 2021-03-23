@@ -14,13 +14,13 @@ class EdifactFileTest extends TestCase
      */
     protected $stream;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->tmpnam = tempnam(sys_get_temp_dir(), 'diac');
         $this->stream = new EdifactFile($this->tmpnam, 'w+');
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         if ($this->tmpnam && file_exists($this->tmpnam)) {
             unlink($this->tmpnam);

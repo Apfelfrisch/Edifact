@@ -13,7 +13,7 @@ class MessageTest extends TestCase
 {
     private $messageCore;
 
-    public function setUp()
+    public function setUp(): void
     {
         $file = new EdifactFile(__DIR__ . '/../data/edifact.txt');
         $this->messageCore = new Message($file, $this->getConfiguration(), $this->getDescriber());

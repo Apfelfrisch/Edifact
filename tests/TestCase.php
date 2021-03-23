@@ -8,7 +8,7 @@ use Proengeno\Edifact\Message\Describer;
 
 abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
-    protected function tearDown()
+    protected function tearDown(): void
     {
         m::close();
     }

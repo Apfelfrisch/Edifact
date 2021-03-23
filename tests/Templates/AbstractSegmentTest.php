@@ -12,7 +12,7 @@ use Proengeno\Edifact\Interfaces\SegValidatorInterface;
 
 class AbstractSegmentTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         Segment::setBuildDelimiter(null);
         Segment::setBuildValidator(null);

@@ -10,7 +10,7 @@ class DescriberTest extends TestCase
 {
     private $description;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->description = Describer::build(__DIR__ . '/../data/message_description.php');
         Describer::clean();
@@ -25,12 +25,10 @@ class DescriberTest extends TestCase
         $this->assertSame($description1, $description2);
     }
 
-    /**
-     * @test
-     * @expectedException InvalidArgumentException
-     **/
     public function it_throw_an_exception_if_the_given_file_does_not_exists()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $description = Describer::build('/invald/path.txt');
     }
 
