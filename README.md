@@ -17,5 +17,4 @@ Notes
 -------
 This Package only provides the basic Framework to work with Edifact Messages.
 You have to define your needed Segment and Message Classes at your own. 
-For a specific implementation see https://github.com/Apfelfrisch/EdiMessages. 
 A Dummy implementation can be found in the tests.
