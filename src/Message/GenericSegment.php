@@ -7,6 +7,9 @@ use Proengeno\Edifact\Exceptions\EdifactException;
 
 class GenericSegment extends AbstractSegment
 {
+    /**
+     * @return void
+     */
     public static function fromAttributes()
     {
         throw new EdifactException('Generic Segment can not be instanciate with "fromAttributes"');

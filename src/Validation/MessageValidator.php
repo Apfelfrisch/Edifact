@@ -13,39 +13,45 @@ use Proengeno\Edifact\Exceptions\SegValidationException;
  */
 class MessageValidator
 {
-    private $blueprint;
-    private $lineCount = 0;
-    private $blueprintValidator;
+    private int $lineCount = 0;
 
-    public function validate(Message $edifact)
+    /**
+     * @param Message $edifact
+     *
+     * @return self
+     */
+    public function validate($edifact)
     {
-        $edifact->pinPointer();
+        $validation = $edifact->getDescription('validation');
 
-        $this->blueprintValidator = new Blueprint($edifact->getDescription('validation'));
-
-        $edifact->rewind();
+        if (! is_array($validation)) {
+            throw new ValidationException("No validation configuration provided", 0, null);
+        }
 
         try {
-            $this->loop($edifact);
+            $edifact->pinPointer();
+            $edifact->rewind();
+
+            $this->loop($edifact, new Blueprint($validation));
+
+            $edifact->jumpToPinnedPointer();
+
+            return $this;
         } catch (EdifactException $e) {
             throw new ValidationException($e->getMessage(), $this->lineCount, null);
         }
-
-        $edifact->jumpToPinnedPointer();
-
-        return $this;
     }
 
-    public function loop($edifact)
+    private function loop(Message $edifact, Blueprint $validator): void
     {
         while ($line = $edifact->getNextSegment()) {
             $this->lineCount++;
-            $this->blueprintValidator->validate($line);
+            $validator->validate($line);
             $this->validateSegment($line);
         }
     }
 
-    private function validateSegment(SegInterface $segment)
+    private function validateSegment(SegInterface $segment): void
     {
         try {
             $segment->validate();

@@ -16,6 +16,7 @@ class EdifactTest extends TestCase
     public function setUp(): void
     {
         $configuration = $this->getConfiguration();
+        $configuration->setSegmentNamespace('FAKE_NAMESPACE');
         $configuration->addBuilder('Message', Builder::class, 'from');
 
         $this->edifact = new Edifact($configuration);

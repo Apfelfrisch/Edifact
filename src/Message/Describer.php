@@ -6,11 +6,16 @@ use Proengeno\Edifact\Exceptions\ValidationException;
 
 class Describer
 {
-    private static $distincInstances = [];
-    private $description = [];
-    private $throwException;
-    private $defaultDescription;
+    private static array $distincInstances = [];
+    private array $description = [];
+    private bool $throwException;
+    private ?string $defaultDescription;
 
+    /**
+     * @param string $file
+     * @param bool $throwException
+     * @param string|null $defaultDescription
+     */
     private function __construct($file = null, $throwException = true, $defaultDescription = null)
     {
         if ($file !== null) {
@@ -23,6 +28,11 @@ class Describer
         $this->defaultDescription = $defaultDescription;
     }
 
+    /**
+     * @param string $file
+     *
+     * @return self
+     */
     public static function build($file)
     {
         if (!isset(self::$distincInstances[md5($file)])) {
@@ -32,6 +42,12 @@ class Describer
         return self::$distincInstances[md5($file)];
     }
 
+    /**
+     * @param string $file
+     * @param ?string $description
+     *
+     * @return self
+     */
     public static function buildWithDefaultDescription($file, $description = null)
     {
         if (!isset(self::$distincInstances[md5($file)])) {
@@ -41,11 +57,19 @@ class Describer
         return self::$distincInstances[md5($file)];
     }
 
+    /**
+     * @return void
+     */
     public static function clean()
     {
         self::$distincInstances = [];
     }
 
+    /**
+     * @param ?string $key
+     *
+     * @return bool
+     */
     public function has($key)
     {
         if (is_null($key)) {
@@ -59,9 +83,15 @@ class Describer
         return !! $this->findDescription($key);
     }
 
+    /**
+     * @param ?string $key
+     * @param ?string $default
+     *
+     * @return string|null
+     */
     public function get($key, $default = null)
     {
-        if ($this->description === null) {
+        if (empty($this->description)) {
             throw new ValidationException('No Description set.');
         }
 
@@ -86,7 +116,7 @@ class Describer
         return $description;
     }
 
-    private function findDescription($key)
+    private function findDescription(string $key): ?string
     {
         $matchedDescription = $this->description;
         foreach (explode('.', $key) as $segment) {

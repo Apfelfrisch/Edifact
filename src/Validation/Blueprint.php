@@ -2,22 +2,37 @@
 
 namespace Proengeno\Edifact\Validation;
 
+use Proengeno\Edifact\Interfaces\SegInterface;
+use Throwable;
 use Proengeno\Edifact\Exceptions\ValidationException;
 
 class Blueprint
 {
-    private $loopDeep = 0;
-    private $blueprint = [];
-    private $loopLevelCount = [];
-    private $blueprintCount = [];
-    private $loopIsNecessary = true;
-    private $optinalSegmentException;
+    private int $loopDeep = 0;
 
+    private array $blueprint = [];
+
+    private array $loopLevelCount = [];
+
+    private array $blueprintCount = [];
+
+    private bool $loopIsNecessary = true;
+
+    private ?Throwable $optinalSegmentException = null;
+
+    /**
+     * @param array $blueprint
+     */
     public function __construct($blueprint)
     {
         $this->flattenBlueprint($blueprint);
     }
 
+    /**
+     * @param SegInterface $segment
+     *
+     * @return void
+     */
     public function validate($segment)
     {
         validationStart:
@@ -38,7 +53,7 @@ class Blueprint
             return;
         }
 
-        if ($segment->name() == $this->getBlueprintAttribute('name')) {
+        if ($segment->name() == $this->getExpectedSegmentName()) {
             try {
                 $this->validateBlueprintTemplates($segment);
             } catch (ValidationException $e) {
@@ -57,23 +72,32 @@ class Blueprint
         if ($this->optinalSegmentException) {
             throw $this->optinalSegmentException;
         }
-        throw ValidationException::unexpectedSegment('', @$segment->name(), $this->getBlueprintAttribute('name'));
+
+        throw ValidationException::unexpectedSegment(null, $segment->name(), $this->getExpectedSegmentName());
     }
 
-    private function validateBlueprintTemplates($segment)
+    private function getExpectedSegmentName(): string
     {
-        if ($this->getBlueprintAttribute('templates')) {
-            foreach ($this->getBlueprintAttribute('templates') as $segmendMethod => $suggestions) {
-                if (in_array($segment->$segmendMethod(), $suggestions)) {
-                    continue;
-                }
+        /** @psalm-suppress PossiblyInvalidCast */
+        return (string)$this->getBlueprintAttribute('name');
+    }
 
-                throw ValidationException::illegalContent('', $segment->name(), $segment->$segmendMethod(), implode('" | "', $suggestions));
+    private function validateBlueprintTemplates(SegInterface $segment): void
+    {
+        if (! is_array($templates = $this->getBlueprintAttribute('templates'))) {
+            return;
+        }
+
+        foreach ($templates as $segmendMethod => $suggestions) {
+            if (in_array($segment->$segmendMethod(), $suggestions)) {
+                continue;
             }
+
+            throw ValidationException::illegalContent(null, $segment->name(), $segment->$segmendMethod(), implode('" | "', $suggestions));
         }
     }
 
-    private function flattenBlueprint($blueprint, $nestedDeep = 0, $levelCount = 0)
+    private function flattenBlueprint(array $blueprint, int $nestedDeep = 0, int $levelCount = 0): void
     {
         $levelCounter = 0;
         foreach ($blueprint as $blueprintRow) {
@@ -85,46 +109,48 @@ class Blueprint
         }
     }
 
-    private function unnecessarySegmentIsMissing($segment)
+    private function unnecessarySegmentIsMissing(SegInterface $segment): bool
     {
         return $this->getBlueprintAttribute('name') != 'LOOP'
             && $this->getBlueprintAttribute('necessity') == 'O'
             && $segment->name() != $this->getBlueprintAttribute('name');
     }
 
-    private function unnecessaryLoopIsMissing($segment)
+    private function unnecessaryLoopIsMissing(SegInterface $segment): bool
     {
         return $this->getBlueprintAttribute('name') == 'LOOP'
             && $segment->name() == $this->getBlueprintAttribute('name', $this->getBlueprintCount() + 1)
             && $this->getBlueprintAttribute('necessity') == 'O';
     }
 
-    private function startOfLoop()
+    private function startOfLoop(): bool
     {
-        return $this->getBlueprintAttribute('name') == 'LOOP';
+        return $this->getBlueprintAttribute('name') === 'LOOP';
     }
 
-    private function reLoop()
+    private function reLoop(): void
     {
         $this->blueprintCount[$this->loopDeep] = 0;
+
         unset($this->loopLevelCount[$this->loopDeep + 1]);
     }
 
-    private function endOfLoop()
+    private function endOfLoop(): bool
     {
         $segmentCount = isset($this->blueprint[$this->loopDeep][$this->getLevelLoopCount()])
             ? count($this->blueprint[$this->loopDeep][$this->getLevelLoopCount()])
             : 0;
+
         return $this->getBlueprintCount() >= $segmentCount;
     }
 
-    private function previosLoop()
+    private function previosLoop(): void
     {
         $this->loopDeep--;
         $this->countUpBlueprint();
     }
 
-    private function startOfReLoop($segment)
+    private function startOfReLoop(SegInterface $segment): bool
     {
         if ($this->endOfLoop() && $segment->name() == $this->getBlueprintAttribute('name', 0)) {
             return true;
@@ -132,7 +158,7 @@ class Blueprint
         return false;
     }
 
-    private function nextLoop()
+    private function nextLoop(): void
     {
         $this->loopDeep++;
         $this->countUpLevelLoop();
@@ -140,7 +166,7 @@ class Blueprint
         unset($this->loopLevelCount[$this->loopDeep + 1]);
     }
 
-    private function countUpLevelLoop()
+    private function countUpLevelLoop(): void
     {
         if (!isset($this->loopLevelCount[$this->loopDeep])) {
             $this->loopLevelCount[$this->loopDeep] = -1;
@@ -148,7 +174,7 @@ class Blueprint
         $this->loopLevelCount[$this->loopDeep]++;
     }
 
-    private function getLevelLoopCount()
+    private function getLevelLoopCount(): int
     {
         if (!isset($this->loopLevelCount[$this->loopDeep])) {
             $this->loopLevelCount[$this->loopDeep] = 0;
@@ -157,7 +183,7 @@ class Blueprint
         return $this->loopLevelCount[$this->loopDeep];
     }
 
-    private function getBlueprintAttribute($attribute, $blueprintCount = null)
+    private function getBlueprintAttribute(string $attribute, ?int $blueprintCount = null): array|string|null
     {
         if ($blueprintCount === null) {
             $blueprintCount = $this->getBlueprintCount();
@@ -168,7 +194,7 @@ class Blueprint
         return null;
     }
 
-    private function getBlueprintCount()
+    private function getBlueprintCount(): int
     {
         if (!isset($this->blueprintCount[$this->loopDeep])) {
             $this->blueprintCount[$this->loopDeep] = 0;
@@ -176,7 +202,7 @@ class Blueprint
         return $this->blueprintCount[$this->loopDeep];
     }
 
-    private function countUpBlueprint()
+    private function countUpBlueprint(): void
     {
         if (!isset($this->blueprintCount[$this->loopDeep])) {
             $this->blueprintCount[$this->loopDeep] = 1;

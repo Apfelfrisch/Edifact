@@ -1,16 +1,22 @@
-<?php 
+<?php
 
 namespace Proengeno\Edifact\Validation;
 
 use Proengeno\Edifact\Interfaces\SegValidatorInterface;
 use Proengeno\Edifact\Exceptions\SegValidationException;
 
-class SegmentValidator implements SegValidatorInterface 
+class SegmentValidator implements SegValidatorInterface
 {
     const ALPHA = 'a';
     const NUMERIC = 'n';
     const ALPHA_NUMERIC = 'an';
 
+    /**
+     * @param array $blueprint
+     * @param array $data
+     *
+     * @return SegValidatorInterface
+     */
     public function validate($blueprint, $data)
     {
         foreach ($blueprint as $dataGroupKey => $dataGroup) {
@@ -36,8 +42,11 @@ class SegmentValidator implements SegValidatorInterface
 
         return $this;
     }
-    
-    private function checkUnknowDataGroup($data)
+
+    /**
+     * @param array $data
+     */
+    private function checkUnknowDataGroup($data): void
     {
         if (empty($data)) {
             return;
@@ -47,7 +56,10 @@ class SegmentValidator implements SegValidatorInterface
         throw SegValidationException::forKey(array_shift($keys), 'Data-Group not allowed.', 7);
     }
 
-    private function checkUnknowDatafields($data)
+    /**
+     * @param array $data
+     */
+    private function checkUnknowDatafields($data): void
     {
         if (empty($data)) {
             return;
@@ -58,7 +70,12 @@ class SegmentValidator implements SegValidatorInterface
         throw SegValidationException::forKeyValue($key, $value, 'Data-Element not allowed.', 6);
     }
 
-    private function cleanUp(&$data, $dataGroupKey, $dataKey = null)
+    /**
+     * @param array $data
+     * @param string $dataGroupKey
+     * @param string|null $dataKey
+     */
+    private function cleanUp(&$data, $dataGroupKey, $dataKey = null): void
     {
         if ($dataKey) {
             unset($data[$dataGroupKey][$dataKey]);
@@ -67,19 +84,34 @@ class SegmentValidator implements SegValidatorInterface
         }
     }
 
-    private function isDataIsAvailable($data, $dataGroupKey, $dataKey)
+    /**
+     * @param array $data
+     * @param string $dataGroupKey
+     * @param string $dataKey
+     */
+    private function isDataIsAvailable($data, $dataGroupKey, $dataKey): bool
     {
         return $this->isDatafieldIsAvailable($data, $dataGroupKey, $dataKey)
             && $data[$dataGroupKey][$dataKey] !== null
             && $data[$dataGroupKey][$dataKey] !== '';
     }
 
-    private function isDatafieldIsAvailable($data, $dataGroupKey, $dataKey)
+    /**
+     * @param array $data
+     * @param string $dataGroupKey
+     * @param string $dataKey
+     */
+    private function isDatafieldIsAvailable($data, $dataGroupKey, $dataKey): bool
     {
         return isset($data[$dataGroupKey][$dataKey]);
     }
 
-    private function checkAvailability($data, $dataGroupKey, $dataKey)
+    /**
+     * @param array $data
+     * @param string $dataGroupKey
+     * @param string $dataKey
+     */
+    private function checkAvailability($data, $dataGroupKey, $dataKey): void
     {
         if ($this->isDatafieldIsAvailable($data, $dataGroupKey, $dataKey)) {
             return;
@@ -88,12 +120,21 @@ class SegmentValidator implements SegValidatorInterface
         throw SegValidationException::forKey($dataKey, 'Data-Element not available, but needed.', 1);
     }
 
-    private function isDatafieldOptional($necessaryStatus)
+    /**
+     * @param string|null $necessaryStatus
+     */
+    private function isDatafieldOptional($necessaryStatus): bool
     {
         return !($necessaryStatus == 'M' || $necessaryStatus == 'R');
     }
 
-    private function checkStringType($type, $data, $dataGroupKey, $dataKey)
+    /**
+     * @param string|null $type
+     * @param array $data
+     * @param string $dataGroupKey
+     * @param string $dataKey
+     */
+    private function checkStringType($type, $data, $dataGroupKey, $dataKey): void
     {
         $string = $data[$dataGroupKey][$dataKey];
 
@@ -107,8 +148,8 @@ class SegmentValidator implements SegValidatorInterface
             throw SegValidationException::forKeyValue($dataKey, $string, 'Data-Element contains non-alpha characters.', 3);
         }
     }
-    
-    private function checkStringLenght($lenght, $data, $dataGroupKey, $dataKey)
+
+    private function checkStringLenght(string $lenght, array $data, string $dataGroupKey, string $dataKey): void
     {
         $string = $data[$dataGroupKey][$dataKey];
 

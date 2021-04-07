@@ -7,23 +7,18 @@ class Delimiter
     const UNA_SEGMENT = 'UNA';
     const PLACE_HOLDER = '«>~<«';
 
-    private $data;
-    private $dataGroup;
-    private $decimal;
-    private $terminator;
-    private $empty;
-    private $segment;
+    public function __construct(
+        private string $data = ':',
+        private string $dataGroup = '+',
+        private string $decimal = '.',
+        private string $terminator = '?',
+        private string $empty = ' ',
+        private string $segment = '\''
+    ) { }
 
-    public function __construct($data = ':', $dataGroup = '+', $decimal = '.', $terminator = '?', $empty = ' ', $segment = '\'')
-    {
-        $this->data = $data;
-        $this->dataGroup = $dataGroup;
-        $this->decimal = $decimal;
-        $this->terminator = $terminator;
-        $this->empty = $empty;
-        $this->segment = $segment;
-    }
-
+    /**
+     * @return self
+     */
     public static function setFromFile(EdifactFile $file)
     {
         $position = $file->tell();
@@ -41,6 +36,11 @@ class Delimiter
         return $instance;
     }
 
+    /**
+     * @param string|array $string
+     *
+     * @return string|array
+     */
     public function terminate($string)
     {
         return str_replace(
@@ -50,47 +50,78 @@ class Delimiter
         );
     }
 
+    /**
+     * @param string $string
+     *
+     * @return list
+     */
     public function explodeSegments($string)
     {
         return $this->explodeString($string, $this->dataGroup);
     }
 
+    /**
+     * @param string $string
+     *
+     * @return list
+     */
     public function explodeElements($string)
     {
         return $this->explodeString($string, $this->data);
     }
 
+    /**
+     * @return string
+     */
     public function getData()
     {
         return $this->data;
     }
 
+    /**
+     * @return string
+     */
     public function getDataGroup()
     {
         return $this->dataGroup;
     }
 
+    /**
+     * @return string
+     */
     public function getDecimal()
     {
         return $this->decimal;
     }
 
+    /**
+     * @return string
+     */
     public function getTerminator()
     {
         return $this->terminator;
     }
 
+    /**
+     * @return string
+     */
     public function getEmpty()
     {
         return $this->empty;
     }
 
+    /**
+     * @return string
+     */
     public function getSegment()
     {
         return $this->segment;
     }
 
-    private function explodeString($string, $pattern)
+    /**
+     * @return list
+     */
+    private function explodeString(string $string, string $pattern): array
     {
         $string = $this->removeLineBreaks($string);
 
@@ -109,7 +140,12 @@ class Delimiter
         return $this->trimLastItem($explodedString);
     }
 
-    private function trimLastItem(array $array)
+    /**
+     * @param list $array
+     *
+     * @return list
+     */
+    private function trimLastItem(array $array): array
     {
         if (end($array) == '') {
             array_pop($array);
@@ -118,7 +154,7 @@ class Delimiter
         return $array;
     }
 
-    private function removeLineBreaks($string)
+    private function removeLineBreaks(string $string): string
     {
         return str_replace(["\r", "\n"], '', $string);
     }

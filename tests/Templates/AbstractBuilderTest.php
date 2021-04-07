@@ -68,6 +68,7 @@ class AbstractBuilderTest extends TestCase
     {
         $ownRef = 'OWN_REF';
         $configuration = new Configuration;
+        $configuration->setExportSender('to-sender');
         $configuration->setUnbRefGenerator(function() use ($ownRef) {
             return $ownRef;
         });

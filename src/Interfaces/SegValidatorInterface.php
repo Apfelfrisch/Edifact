@@ -1,7 +1,16 @@
-<?php 
+<?php
 
 namespace Proengeno\Edifact\Interfaces;
 
-interface SegValidatorInterface {
+use Proengeno\Edifact\Validation\SegmentValidator;
+
+interface SegValidatorInterface
+{
+    /**
+     * @param array $blueprint
+     * @param array $data
+     *
+     * @return SegValidatorInterface
+     */
     public function validate($blueprint, $data);
-} 
+}
