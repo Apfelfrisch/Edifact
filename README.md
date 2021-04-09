@@ -1,8 +1,7 @@
 # PHP - Edifact
 
-![Build Status](https://travis-ci.org/Apfelfrisch/EDI-Energy.svg?branch=master)
-[![Quality Score](https://scrutinizer-ci.com/g/Apfelfrisch/Edifact/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Apfelfrisch/Edifact/?branch=master)
-[![Code Coverage](https://scrutinizer-ci.com/g/Apfelfrisch/Edifact/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/Apfelfrisch/Edifact/?branch=master)
+![Unit Test](https://github.com/Apfelfrisch/Edifact/actions/workflows/phpunit.yml/badge.svg)
+![Static Analysis](https://github.com/Apfelfrisch/Edifact/actions/workflows/psalm.yml/badge.svg)
 
 A PHP library, wich provides a Framework to parse, build, serialize and validate UN/EDIFACT messages.
 

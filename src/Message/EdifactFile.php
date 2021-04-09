@@ -31,6 +31,7 @@ class EdifactFile extends SplFileInfo
     ) {
         parent::__construct($filename);
 
+        $ressource = null;
         try {
             $ressource = fopen($this->filename, $this->openMode, $this->userIncludePath);
         } catch (Throwable) { }
