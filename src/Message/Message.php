@@ -53,11 +53,6 @@ class Message implements \Iterator
         }
     }
 
-    public function __destruct()
-    {
-        unset($this->edifactFile);
-    }
-
     /**
      * @param string $string
      *
@@ -115,14 +110,6 @@ class Message implements \Iterator
             $this->description = Describer::build(self::findDescrtiptionFile($this->edifactFile, $this->configuration));
         }
         return $this->description->get($key);
-    }
-
-    /**
-     * @return void
-     */
-    public function closeStream()
-    {
-        $this->edifactFile->close();
     }
 
     /**
