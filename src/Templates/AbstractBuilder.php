@@ -69,6 +69,8 @@ abstract class AbstractBuilder implements BuilderInterface
     }
 
     /**
+     * @no-named-arguments
+     *
      * @param iterable $message
      *
      * @return void
@@ -161,6 +163,8 @@ abstract class AbstractBuilder implements BuilderInterface
     abstract protected function writeUnb();
 
     /**
+     * @no-named-arguments
+     *
      * @param iterable $message
      *
      * @return void

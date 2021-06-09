@@ -54,9 +54,9 @@ abstract class AbstractSegment implements SegInterface
     /**
      * @return void
      */
-    public static function setBuildDelimiter(Delimiter $buildDelimiter = null)
+    public static function setBuildDelimiter(Delimiter $delimiter = null)
     {
-        self::$buildDelimiter = $buildDelimiter;
+        self::$buildDelimiter = $delimiter;
     }
 
     /**

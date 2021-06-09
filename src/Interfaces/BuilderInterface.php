@@ -16,6 +16,8 @@ interface BuilderInterface
     public function __construct($to, Configuration $configuration, $filename);
 
     /**
+     * @no-named-arguments
+     *
      * @param iterable $message
      *
      * @return void
