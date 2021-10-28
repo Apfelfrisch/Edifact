@@ -32,10 +32,10 @@ class Configuration
     /** @var string|null */
     protected $segmentNamespace = null;
 
-    /** @var list<Callable> */
+    /** @var list<string> */
     protected $readFilter = [];
 
-    /** @var list<Callable> */
+    /** @var list<string> */
     protected $writeFilter = [];
 
     /** @var array */
@@ -107,21 +107,21 @@ class Configuration
     /**
      * @return void
      */
-    public function setReadFilter(Callable $callable)
+    public function setReadFilter(string $filter)
     {
-        $this->readFilter[] = $callable;
+        $this->readFilter[] = $filter;
     }
 
     /**
      * @return void
      */
-    public function setWriteFilter(Callable $callable)
+    public function setWriteFilter(string $filter)
     {
-        $this->writeFilter[] = $callable;
+        $this->writeFilter[] = $filter;
     }
 
     /**
-     * @return list<Callable>
+     * @return list<string>
      */
     public function getReadFilter()
     {
@@ -129,7 +129,7 @@ class Configuration
     }
 
     /**
-     * @return list<Callable>
+     * @return list<string>
      */
     public function getWriteFilter()
     {

@@ -2,25 +2,22 @@
 
 namespace Proengeno\Edifact\Message;
 
-use Iterator;
-use Exception;
 use SplFileInfo;
-use LogicException;
-use DomainException;
 use RuntimeException;
 use Proengeno\Edifact\Message\Delimiter;
 use Throwable;
 
-class EdifactFile extends SplFileInfo
+final class EdifactFile extends SplFileInfo
 {
-    /** @var array<string, Callable> */
-    private array $readFilter = [];
+    /*
+     * Attached filters.
+     *
+     * @var array<string, array<resource>>
+     */
+    private array $filters = [];
 
-    /** @var array<string, Callable> */
-    private array $writeFilter = [];
-
-    /** @var mixed */
-    private $ressource;
+    /** @var resource */
+    private $resource;
 
     private ?Delimiter $delimiter = null;
 
@@ -31,22 +28,22 @@ class EdifactFile extends SplFileInfo
     ) {
         parent::__construct($filename);
 
-        $ressource = null;
+        $resource = null;
         try {
-            $ressource = fopen($this->filename, $this->openMode, $this->userIncludePath);
+            $resource = fopen($this->filename, $this->openMode, $this->userIncludePath);
         } catch (Throwable) { }
 
-        if (! is_resource($ressource)) {
+        if (! is_resource($resource)) {
             throw new RuntimeException(__METHOD__ . "({$this->filename}): failed to open stream: No such file or directory");
         }
 
-        $this->ressource = $ressource;
+        $this->resource = $resource;
     }
 
     /**
      * @param string $string
      * @param string $filename
-     * @param list<Callable> $writeFilter
+     * @param list<string> $writeFilter
      *
      * @return self
      */
@@ -63,6 +60,17 @@ class EdifactFile extends SplFileInfo
         return $instance;
     }
 
+    public function __destruct()
+    {
+        array_walk_recursive($this->filters, static function (mixed $filter): bool {
+            return @stream_filter_remove($filter);
+        });
+
+        fclose($this->resource);
+
+        unset($this->resource);
+    }
+
     /**
      * @return string
      */
@@ -72,31 +80,23 @@ class EdifactFile extends SplFileInfo
             $this->rewind();
 
             return $this->getContents();
-        } catch (RuntimeException $e) {
+        } catch (RuntimeException) {
             return '';
         }
     }
 
-    /**
-     * @return void
-     */
-    public function addReadFilter(Callable $filter)
+    public function addReadFilter(string $filter, mixed $params = null): self
     {
-        $id = spl_object_hash((object)$filter);
-        if (!isset($this->readFilter[$id])) {
-            $this->readFilter[$id] = $filter;
-        }
+        $this->addFilter($filter, STREAM_FILTER_READ, $params);
+
+        return $this;
     }
 
-    /**
-     * @return void
-     */
-    public function addWriteFilter(Callable $filter)
+    public function addWriteFilter(string $filter, mixed $params = null): self
     {
-        $id = spl_object_hash((object)$filter);
-        if (!isset($this->writeFilter[$id])) {
-            $this->writeFilter[$id] = $filter;
-        }
+        $this->addFilter($filter, STREAM_FILTER_WRITE, $params);
+
+        return $this;
     }
 
     /**
@@ -104,7 +104,7 @@ class EdifactFile extends SplFileInfo
      */
     public function getContents()
     {
-        return $this->applyReadFilter(trim(stream_get_contents($this->ressource)));
+        return trim(stream_get_contents($this->resource));
     }
 
     /**
@@ -112,7 +112,7 @@ class EdifactFile extends SplFileInfo
      */
     public function eof()
     {
-        return feof($this->ressource);
+        return feof($this->resource);
     }
 
     /**
@@ -120,7 +120,7 @@ class EdifactFile extends SplFileInfo
      */
     public function flush()
     {
-        return fflush($this->ressource);
+        return fflush($this->resource);
     }
 
     /**
@@ -128,7 +128,7 @@ class EdifactFile extends SplFileInfo
      */
     public function getChar()
     {
-        return $this->applyReadFilter(fgetc($this->ressource));
+        return fgetc($this->resource);
     }
 
     /**
@@ -136,7 +136,7 @@ class EdifactFile extends SplFileInfo
      */
     public function getSegment()
     {
-        return $this->applyReadFilter($this->fetchSegment());
+        return $this->fetchSegment();
     }
 
     /**
@@ -146,7 +146,7 @@ class EdifactFile extends SplFileInfo
      */
     public function lock($operation)
     {
-        return flock($this->ressource, $operation);
+        return flock($this->resource, $operation);
     }
 
     /**
@@ -154,7 +154,7 @@ class EdifactFile extends SplFileInfo
      */
     public function passthru()
     {
-        return fpassthru($this->ressource);
+        return fpassthru($this->resource);
     }
 
     /**
@@ -164,7 +164,7 @@ class EdifactFile extends SplFileInfo
      */
     public function read($length)
     {
-        return $this->applyReadFilter(fread($this->ressource, $length));
+        return fread($this->resource, $length);
     }
 
     /**
@@ -175,10 +175,7 @@ class EdifactFile extends SplFileInfo
      */
     public function seek($offset, $whence = SEEK_SET)
     {
-        if (0 == $result = fseek($this->ressource, $offset, $whence)) {
-            return true;
-        }
-        return false;
+        return 0 == fseek($this->resource, $offset, $whence);
     }
 
     /**
@@ -186,7 +183,7 @@ class EdifactFile extends SplFileInfo
      */
     public function stat()
     {
-        return fstat($this->ressource);
+        return fstat($this->resource);
     }
 
     /**
@@ -194,7 +191,7 @@ class EdifactFile extends SplFileInfo
      */
     public function tell()
     {
-        return (int)ftell($this->ressource);
+        return (int)ftell($this->resource);
     }
 
     /**
@@ -204,7 +201,7 @@ class EdifactFile extends SplFileInfo
      */
     public function write($str)
     {
-        return fwrite($this->ressource, $this->applyWriteFilter($str));
+        return fwrite($this->resource, $str);
     }
 
     /**
@@ -234,25 +231,19 @@ class EdifactFile extends SplFileInfo
      */
     public function rewind()
     {
-        rewind($this->ressource);
+        rewind($this->resource);
     }
 
-    private function applyReadFilter(string $content): string
+    private function addFilter(string $filtername, int $direction, mixed $params = null): void
     {
-        foreach ($this->readFilter as $filter) {
-            $content = $filter($content);
-        }
-        return $content;
-    }
+        $res = @stream_filter_append($this->resource, $filtername, $direction, $params);
 
-    private function applyWriteFilter(string $content): string
-    {
-        foreach ($this->writeFilter as $filter) {
-            $content = $filter($content);
+        if (! is_resource($res)) {
+            throw new RuntimeException('unable to locate filter `'.$filtername.'`');
         }
-        return $content;
-    }
 
+        $this->filters[$filtername][] = $res;
+    }
 
     private function fetchSegment(): string
     {
@@ -272,22 +263,7 @@ class EdifactFile extends SplFileInfo
 
     private function streamGetLine(): string|false
     {
-        // stream_get_line doesnt Return the rest of the string when the last char is not the
-        // Delimiter and a read filter is appended. To avoid this Problem we have to check if
-        // the stream is on its and, if not simply return the rest of the string with fread
-
-        if ($this->eof()) {
-            return false;
-        }
-
-        $position = $this->tell();
-
-        if (false === $line = stream_get_line($this->ressource, 0, $this->getDelimiter()->getSegment())) {
-            $this->seek($position);
-            $line = $this->read(1024);
-        }
-
-        return $line;
+        return stream_get_line($this->resource, 0, $this->getDelimiter()->getSegment());
     }
 
     private function delimiterWasTerminated(string $line): bool
