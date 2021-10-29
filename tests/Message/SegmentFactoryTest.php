@@ -25,6 +25,14 @@ class SegmentFactoryTest extends TestCase
     }
 
     /** @test */
+    public function it_handles_string_terminations()
+    {
+        $segment = $this->segFactory->fromSegline("BGM+?+?:");
+
+        $this->assertEquals("+:", $segment->docCode());
+    }
+
+    /** @test */
     public function it_instanciates_the_segment_from_attributes()
     {
         $this->assertInstanceOf($this->segmentNamespace . '\Bgm', $this->segFactory->fromAttributes('BGM', ['380', '12345']));
@@ -33,7 +41,7 @@ class SegmentFactoryTest extends TestCase
     /** @test **/
     public function it_instanciates_the_dafault_seg_if_its_allowed_and_no_secific_segement_was_found()
     {
-        $this->segFactory = new SegmentFactory($this->segmentNamespace, null, GenericSegment::class);
+        $this->segFactory = new SegmentFactory($this->segmentNamespace, GenericSegment::class);
         $this->assertInstanceOf(GenericSegment::class, $this->segFactory->fromSegline('UKW'));
     }
 

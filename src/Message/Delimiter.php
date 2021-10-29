@@ -21,16 +21,26 @@ final class Delimiter
         $position = $file->tell();
         $file->rewind();
 
-        if ($file->read(3) != self::UNA_SEGMENT) {
-            $instance = new self();
-        } else {
-            $instance = new self(
-                $file->getChar(), $file->getChar(), $file->getChar(), $file->getChar(), $file->getChar(), $file->getChar()
-            );
-        }
+        $instance = self::setFromString($file->read(9));
+
         $file->seek($position);
 
         return $instance;
+    }
+
+    public static function setFromString(string $string): self
+    {
+        if (substr($string, 0, 3) !== self::UNA_SEGMENT && isset($string[8])) {
+            return new self();
+        }
+
+        if (! isset($string[8])) {
+            return new self();
+        }
+
+        return new self(
+            $string[3], $string[4], $string[5], $string[6], $string[7], $string[8]
+        );
     }
 
     public function terminate(string $string): string
@@ -89,7 +99,7 @@ final class Delimiter
      */
     private function explodeString(string $string, string $pattern): array
     {
-        $string = $this->removeLineBreaks($string);
+        $string = str_replace(["\r", "\n"], '', $string);
 
         if ($foundTermination = (boolean)strpos($string, $this->terminator . $pattern)) {
             $string = str_replace($this->terminator . $pattern, self::PLACE_HOLDER, $string);
@@ -118,10 +128,5 @@ final class Delimiter
         }
 
         return $array;
-    }
-
-    private function removeLineBreaks(string $string): string
-    {
-        return str_replace(["\r", "\n"], '', $string);
     }
 }

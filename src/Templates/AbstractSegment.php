@@ -13,99 +13,69 @@ abstract class AbstractSegment implements SegInterface
     /** @var array<string, array<string, string>> */
     protected static $validationBlueprint = [];
 
-    protected static SegValidatorInterface|null $buildValidator = null;
-
-    protected static Delimiter|null $buildDelimiter = null;
-
     /** @var array<string, array<string, null|string>> */
     protected array $elements = [];
 
     protected array $cache = [];
 
-    protected Delimiter $delimiter;
-
-    protected SegValidatorInterface $validator;
-
     /** @param array<string, array<string, null|string>> $elements */
     protected function __construct(array $elements)
     {
         $this->elements = $elements;
-        $this->delimiter = static::getBuildDelimiter();
-        $this->validator = static::$buildValidator ?? new SegmentValidator;
     }
 
-    /**
-     * @param string $segLine
-     *
-     * @return static
-     *
-     * @psalm-suppress UnsafeInstantiation
-     */
-    public static function fromSegLine($segLine)
+    public static function fromSegline(string $segLine, ?Delimiter $delimiter = null): SegInterface
     {
-        return new static(static::mapToBlueprint($segLine));
+        $delimiter ??= new Delimiter;
+
+        $elementKeys = array_keys(static::$validationBlueprint);
+        $segmentKeys = array_map(function($blueprintRow) {
+            return array_keys($blueprintRow);
+        }, array_values(static::$validationBlueprint));
+
+        $i = 0;
+        $segements = [];
+        foreach ($delimiter->explodeSegments($segLine) as $dataGroup) {
+            $elements = $delimiter->explodeElements($dataGroup);
+
+            $j = 0;
+            foreach ($elements as $element) {
+                if (! isset($elementKeys[$i])) {
+                    continue;
+                }
+                if (! isset($segmentKeys[$i][$j])) {
+                    continue;
+                }
+                $segements[$elementKeys[$i]][$segmentKeys[$i][$j]] = $element;
+                $j++;
+            }
+
+            $i++;
+        }
+
+        /** @psalm-suppress UnsafeInstantiation */
+        return new static($segements);
     }
 
-    /**
-     * @return void
-     */
-    public static function setBuildDelimiter(?Delimiter $delimiter)
+    public function getValue(string $dataGroupKey, string $dataKey): string|null
     {
-        self::$buildDelimiter = $delimiter;
-    }
-
-    /**
-     * @return Delimiter
-     */
-    public static function getBuildDelimiter()
-    {
-        return self::$buildDelimiter ?? new Delimiter;
-    }
-
-    /**
-     * @return void
-     */
-    public static function setBuildValidator(SegValidatorInterface $buildValidator = null)
-    {
-        self::$buildValidator = $buildValidator;
-    }
-
-    /**
-     * @param int $dataGroup
-     * @param int $element
-     *
-     * @return string|null
-     */
-    public function getValue($dataGroup, $element)
-    {
-        return array_values(array_values($this->elements)[$dataGroup])[$element] ?? null;
-    }
-
-    /**
-     * @return SegValidatorInterface
-     */
-    public function getValidator()
-    {
-        return $this->validator;
-    }
-
-    public function getDelimiter(): Delimiter
-    {
-        return $this->delimiter;
+        return $this->elements[$dataGroupKey][$dataKey] ?? null;
     }
 
     public function name(): string
     {
-        if (null === $name = $this->getValue(0,0)) {
+        if (null === $name = array_values(array_values($this->elements)[0])[0] ?? null) {
             throw SegValidationException::forKey('name', "Segment is empty");
         }
 
         return $name;
     }
 
-    public function validate(): self
+    public function validate(?SegValidatorInterface $validator = null): self
     {
-        $this->validator->validate(static::$validationBlueprint, $this->elements);
+        $validator ??= new SegmentValidator;
+
+        $validator->validate(static::$validationBlueprint, $this->elements);
 
         return $this;
     }
@@ -121,17 +91,31 @@ abstract class AbstractSegment implements SegInterface
         return $result;
     }
 
-    public function __toString(): string
+    public function toString(?Delimiter $delimiter = null): string
     {
-        if (!isset($this->cache['segLine'])) {
-            $dataFields = array_map(function($dataGroups) {
-                return implode($this->delimiter->getData(), $this->terminateDataGroups($dataGroups));
-            }, $this->elements);
+        $delimiter ??= new Delimiter;
 
-            $this->cache['segLine'] = implode($this->delimiter->getDataGroup(), $this->deleteEmptyArrayEnds($dataFields));
-        }
+        $trimDataGroups = static function (array $dataGroups): array {
+            $reversed = array_reverse($dataGroups);
 
-        return $this->cache['segLine'] . $this->delimiter->getSegment();
+            foreach ($reversed as $key => $value) {
+                if (!empty($value)) {
+                    break;
+                }
+                unset($reversed[$key]);
+            }
+
+            return array_reverse($reversed);
+        };
+
+        $implodeElements = static fn(array $dataGroups): string
+            => implode($delimiter->getData(),
+                array_map(fn(?string $value): string
+                    => $delimiter->terminate((string)$value), $trimDataGroups($dataGroups)
+                )
+            );
+
+        return implode($delimiter->getDataGroup(), array_map($implodeElements, $this->elements)) . $delimiter->getSegment();
     }
 
     /**
@@ -190,57 +174,5 @@ abstract class AbstractSegment implements SegInterface
         }
 
         return $this->cache['getterMethods'];
-    }
-
-    /**
-     * @param string $segLine
-     *
-     * @return array<string, array<string, null|string>>
-     */
-    protected static function mapToBlueprint(string $segLine)
-    {
-        $i = 0;
-        $elements = [];
-        $inputDataGroups = static::getBuildDelimiter()->explodeSegments($segLine);
-        foreach (static::$validationBlueprint as $BpDataKey => $BPdataGroups) {
-            $inputElement = [];
-            if (isset($inputDataGroups[$i])) {
-                $inputElement = static::getBuildDelimiter()->explodeElements($inputDataGroups[$i]);
-            }
-
-            $j = 0;
-            foreach (array_keys($BPdataGroups) as $key) {
-                $elements[$BpDataKey][$key] = isset($inputElement[$j]) ? $inputElement[$j] : null;
-                $j++;
-            }
-            $i++;
-        }
-
-        return $elements;
-    }
-
-    /**
-     * @param array<string|null> $dataGroups
-     *
-     * @return array<string>
-     */
-    private function terminateDataGroups(array $dataGroups): array
-    {
-        return array_map(
-            fn(?string $value): string => $this->delimiter->terminate((string)$value),
-            $this->deleteEmptyArrayEnds($dataGroups)
-        );
-    }
-
-    private function deleteEmptyArrayEnds(array $array): array
-    {
-        $reversed = array_reverse($array);
-        foreach ($reversed as $key => $value) {
-            if (!empty($value)) {
-                break;
-            }
-            unset($reversed[$key]);
-        }
-        return array_reverse($reversed);
     }
 }

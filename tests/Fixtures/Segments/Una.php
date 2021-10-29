@@ -2,6 +2,8 @@
 
 namespace Proengeno\Edifact\Test\Fixtures\Segments;
 
+use Proengeno\Edifact\Interfaces\SegInterface;
+use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Templates\AbstractSegment;
 
 class Una extends AbstractSegment
@@ -10,11 +12,26 @@ class Una extends AbstractSegment
         'UNA' => ['Una' => 'M|a|3', 'data' => 'M|an|1', 'dataGroup' => 'M|an|1', 'decimal' => 'M|an|1', 'terminator' => 'M|an|1', 'empty' => 'M|an|1'],
     ];
 
+    public static function fromSegline(string $segLine, ?Delimiter $delimiter = null): SegInterface
+    {
+        $elements = [];
+        $inputElement = ['UNA'] + str_split(substr($segLine, 2));
+        $i = 0;
+        foreach (self::$validationBlueprint as $BpDataKey => $BPdataGroups) {
+            if (isset($inputElement)) {
+                $elements[$BpDataKey] = array_combine(array_keys($BPdataGroups), $inputElement);
+            }
+            $i++;
+        }
+
+        return new self($elements);
+    }
+
     public static function fromAttributes($data = ':', $dataGroup = '+', $decimal = '.', $terminator = '?', $empty = ' ')
     {
-        return new static([
+        return new self([
             'UNA' => ['UNA' => 'UNA', 'data' => $data, 'dataGroup' => $dataGroup, 'decimal' => $decimal, 'terminator' => $terminator, 'empty' => $empty],
-        ], static::$buildDelimiter);
+        ]);
     }
 
     public function data()
@@ -42,27 +59,16 @@ class Una extends AbstractSegment
         return @$this->elements['UNA']['empty'] ?: null;
     }
 
-    public function __toString()
+    public function toString(?Delimiter $delimiter = null): string
     {
-        return $this->segLine = implode('', $this->elements['UNA']) . "'";
-    }
+        $delimiter ??= new Delimiter;
 
-    /**
-     * @param string $segLine
-     *
-     * @return array<string, array<string, null|string>>
-     */
-    protected static function mapToBlueprint(string $segLine)
-    {
-        $inputElement = ['UNA'] + str_split(substr($segLine, 2));
-        $i = 0;
-        foreach (static::$validationBlueprint as $BpDataKey => $BPdataGroups) {
-            if (isset($inputElement)) {
-                $elements[$BpDataKey] = array_combine(array_keys($BPdataGroups), $inputElement);
-            }
-            $i++;
-        }
-
-        return @$elements ?: [];
+        return $this->name()
+            . $this->data()
+            . $this->dataGroup()
+            . $this->decimal()
+            . $this->terminator()
+            . $this->emptyChar()
+            . $delimiter->getSegment();
     }
 }

@@ -35,7 +35,7 @@ class SegmentValidator implements SegValidatorInterface
                 }
                 $this->cleanUp($data, $dataGroupKey, $dataKey);
             }
-            $this->checkUnknowDatafields(@$data[$dataGroupKey]);
+            $this->checkUnknowDatafields($data[$dataGroupKey] ?? []);
             $this->cleanUp($data, $dataGroupKey);
         }
         $this->checkUnknowDataGroup($data);
@@ -70,6 +70,10 @@ class SegmentValidator implements SegValidatorInterface
 
     private function cleanUp(array &$data, string $dataGroupKey, string $dataKey = null): void
     {
+        if ($data === []) {
+            return;
+        }
+
         if ($dataKey === null) {
             if (array_key_exists($dataGroupKey, $data)) {
                 unset($data[$dataGroupKey]);

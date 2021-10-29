@@ -37,7 +37,6 @@ class Message implements \Iterator
         $this->configuration = $configuration ?: new Configuration;
         $this->segmentFactory = new SegmentFactory(
             $this->configuration->getSegmentNamespace(),
-            $this->getDelimiter(),
             $this->configuration->getGenericSegment()
         );
 
@@ -221,7 +220,7 @@ class Message implements \Iterator
 
     protected function getSegmentObject(string $segLine): SegInterface
     {
-        return $this->segmentFactory->fromSegline($segLine);
+        return $this->segmentFactory->fromSegline($segLine, $this->edifactFile->getDelimiter());
     }
 
     private function getNextSegLine(): string

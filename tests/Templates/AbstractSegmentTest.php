@@ -4,61 +4,15 @@ namespace Proengeno\Edifact\Test\Templates;
 
 use Mockery as m;
 use Proengeno\Edifact\Test\TestCase;
-use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Test\Fixtures\Segment;
-use Proengeno\Edifact\Exceptions\EdifactException;
-use Proengeno\Edifact\Validation\SegmentValidator;
 use Proengeno\Edifact\Interfaces\SegValidatorInterface;
 
 class AbstractSegmentTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        Segment::setBuildDelimiter(null);
-        Segment::setBuildValidator(null);
-    }
-
-    /** @test */
-    public function it_can_set_a_costum_delimter()
-    {
-        $customDelimiter = new Delimiter;
-        Segment::setBuildDelimiter($customDelimiter);
-        $segment = Segment::fromAttributes('A');
-
-        $this->assertEquals($customDelimiter, $segment->getDelimiter());
-    }
-
-    /** @test */
-    public function it_gives_a_standard_delimiter_if_none_was_set()
-    {
-        $segment = Segment::fromAttributes('A');
-
-        $this->assertInstanceOf(Delimiter::class, $segment->getDelimiter());
-    }
-
-    /** @test */
-    public function it_can_set_a_costum_validator()
-    {
-        $customValidator = new SegmentValidator;
-        $segment = Segment::fromAttributes('A');
-
-        Segment::setBuildValidator($customValidator);
-
-        $this->assertEquals($customValidator, $segment->getValidator());
-    }
-
-    /** @test */
-    public function it_gives_a_standard_validator_if_none_was_set()
-    {
-        $segment = Segment::fromAttributes('A');
-
-        $this->assertInstanceOf(SegmentValidator::class, $segment->getValidator());
-    }
-
     /** @test */
     public function it_gives_its_segment_name()
     {
-        $segment = Segment::fromSegLine('A');
+        $segment = Segment::fromAttributes('A');
 
         $this->assertEquals('A', $segment->name());
     }
@@ -69,10 +23,10 @@ class AbstractSegmentTest extends TestCase
         $customValidator = m::mock(SegValidatorInterface::class, function($customValidator) {
             $customValidator->shouldReceive('validate')->once();
         });
-        Segment::setBuildValidator($customValidator);
-        $segment = Segment::fromSegLine('A');
 
-        $this->assertInstanceOf(get_class($segment), $segment->validate());
+        $segment = Segment::fromAttributes('A');
+
+        $this->assertInstanceOf(get_class($segment), $segment->validate($customValidator));
     }
 
     /** @test */
@@ -81,9 +35,9 @@ class AbstractSegmentTest extends TestCase
         $givenString = 'A+B+1:2:3:4:5+D+E';
         $expectedString = $givenString . "'";
 
-        $segment = Segment::fromSegLine($givenString);
+        $segment = Segment::fromSegline($givenString);
 
-        $this->assertEquals($expectedString, (string)$segment);
+        $this->assertEquals($expectedString, $segment->toString());
     }
 
     /** @test */
@@ -92,27 +46,16 @@ class AbstractSegmentTest extends TestCase
         $givenString = 'A+B+1:2:::+D++';
         $expectedString = "A+B+1:2+D'";
 
-        $segment = Segment::fromSegLine($givenString);
+        $segment = Segment::fromSegline($givenString);
 
-        $this->assertEquals($expectedString, (string)$segment);
-    }
-
-    /** @test */
-    public function it_handles_string_terminations()
-    {
-        $givenString = "A+B?+";
-        $expectedString = "A+B+1:2+D'";
-
-        $segment = Segment::fromSegLine($givenString);
-        $this->assertEquals('B+', $segment->dummyMethod());
+        $this->assertEquals($expectedString, $segment->toString());
     }
 
     /** @test */
     public function it_can_grap_a_value_over_an_element_key()
     {
-        $givenString = "Aa+Bb";
+        $segment = Segment::fromSegline("Aa+Bb");
 
-        $segment = Segment::fromSegLine($givenString);
         $this->assertEquals('Aa', $segment->getA());
         $this->assertEquals('Bb', $segment->getB());
     }

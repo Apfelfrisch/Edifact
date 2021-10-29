@@ -12,11 +12,11 @@ class Blueprint
 
     private array $blueprint = [];
 
+    /** @var array<int, int> */
     private array $loopLevelCount = [];
 
+    /** @var array<int, int> */
     private array $blueprintCount = [];
-
-    private bool $loopIsNecessary = true;
 
     private ?Throwable $optinalSegmentException = null;
 
@@ -64,7 +64,6 @@ class Blueprint
                 $this->optinalSegmentException = $e;
                 goto validationStart;
             }
-            $this->loopIsNecessary = true;
             $this->countUpBlueprint();
             return;
         }

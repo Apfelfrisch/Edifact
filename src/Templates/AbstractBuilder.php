@@ -2,16 +2,13 @@
 
 namespace Proengeno\Edifact\Templates;
 
-use Closure;
 use Proengeno\Edifact\Configuration;
 use Proengeno\Edifact\Interfaces\BuilderInterface;
 use Proengeno\Edifact\Interfaces\SegInterface;
 use Proengeno\Edifact\Message\Message;
-use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Message\Describer;
 use Proengeno\Edifact\Message\EdifactFile;
 use Proengeno\Edifact\Message\SegmentFactory;
-use Proengeno\Edifact\Exceptions\EdifactException;
 
 abstract class AbstractBuilder implements BuilderInterface
 {
@@ -53,7 +50,7 @@ abstract class AbstractBuilder implements BuilderInterface
         $this->to = $to;
         $this->from = $this->configuration->getExportSender();
         $this->description = Describer::build($this->getDescriptionPath());
-        $this->edifactFile = new EdifactFile($this->getFullpath($filename), 'w+');
+        $this->edifactFile = new EdifactFile($this->getFullpath($filename), 'w+', $this->configuration->getDelimiter());
         foreach ($this->configuration->getWriteFilter() as $callable) {
             $this->edifactFile->addWriteFilter($callable);
         }
@@ -78,7 +75,15 @@ abstract class AbstractBuilder implements BuilderInterface
     public function addMessage($message)
     {
         if ($this->messageIsEmpty()) {
-            $this->writeSeg('una');
+            $delimiter = $this->edifactFile->getDelimiter();
+
+            $this->writeSeg('una', [
+                'data' => $delimiter->getData(),
+                'dataGroup' => $delimiter->getDataGroup(),
+                'decimal' => $delimiter->getDecimal(),
+                'terminator' => $delimiter->getTerminator(),
+                'empty' => $delimiter->getEmpty(),
+            ]);
             $this->writeUnb();
         }
         $this->writeMessage($message);
@@ -106,7 +111,6 @@ abstract class AbstractBuilder implements BuilderInterface
         if (!isset($this->buildCache['segmentFactory'])) {
             $this->buildCache['segmentFactory'] = new SegmentFactory(
                 $this->configuration->getSegmentNamespace(),
-                $this->configuration->getDelimiter()
             );
         }
 
@@ -194,7 +198,7 @@ abstract class AbstractBuilder implements BuilderInterface
     protected function writeSeg($segmentName, $attributes = [], $method = 'fromAttributes')
     {
         $segment = $this->getSegmentFactory()->fromAttributes($segmentName, $attributes, $method);
-        $this->edifactFile->write((string)$segment);
+        $this->edifactFile->write($segment->toString($this->edifactFile->getDelimiter()));
         $this->countSegments($segment);
     }
 
