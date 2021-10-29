@@ -14,26 +14,19 @@ use Proengeno\Edifact\Exceptions\SegValidationException;
 
 class Message implements \Iterator
 {
-    /** @var Configuration */
-    protected $configuration;
+    protected Configuration $configuration;
 
-    /** @var Describer|null */
-    protected $description;
+    protected Describer|null $description;
 
-    /** @var EdifactFile */
-    private $edifactFile;
+    private EdifactFile $edifactFile;
 
-    /** @var SegmentFactory */
-    private $segmentFactory;
+    private SegmentFactory $segmentFactory;
 
-    /** @var int|null */
-    private $pinnedPointer = null;
+    private int|null $pinnedPointer = null;
 
-    /** @var SegInterface|false */
-    private $currentSegment = false;
+    private SegInterface|false $currentSegment = false;
 
-    /** @var int */
-    private $currentSegmentNumber = -1;
+    private int $currentSegmentNumber = -1;
 
     public function __construct(EdifactFile $edifactFile, ?Configuration $configuration = null, ?Describer $description = null)
     {
@@ -53,43 +46,25 @@ class Message implements \Iterator
         }
     }
 
-    /**
-     * @param string $string
-     *
-     * @return static
-     *
-     * @psalm-suppress UnsafeInstantiation
-     */
-    public static function fromFilepath($string, Configuration $configuration = null, Describer $description = null)
+    public static function fromFilepath(string $string, Configuration $configuration = null, Describer $description = null): self
     {
         $edifactFile = new EdifactFile($string);
         $configuration = $configuration ?: new Configuration;
 
-        return new static($edifactFile, $configuration, $description);
+        return new self($edifactFile, $configuration, $description);
     }
 
-    /**
-     * @param string $string
-     * @param string $filename
-     *
-     * @return static
-     *
-     * @psalm-suppress UnsafeInstantiation
-     */
-    public static function fromString($string, Configuration $configuration = null, $filename = 'php://temp', Describer $description = null)
+    public static function fromString(
+        string $string, Configuration $configuration = null, string $filename = 'php://temp', Describer $description = null
+    ): self
     {
         $configuration = $configuration ?: new Configuration;
         $edifactFile = EdifactFile::fromString($string, $filename, $configuration->getWriteFilter());
 
-        return new static($edifactFile, $configuration, $description);
+        return new self($edifactFile, $configuration, $description);
     }
 
-    /**
-     * @param string $key
-     *
-     * @return mixed
-     */
-    public function getConfiguration($key)
+    public function getConfiguration(string $key): mixed
     {
         $method = 'get' . ucfirst($key);
         if (method_exists($this->configuration, $method)) {
@@ -99,12 +74,7 @@ class Message implements \Iterator
         throw new EdifactException("Unknown Configuration '$key'.");
     }
 
-    /**
-     * @param string $key
-     *
-     * @return string|array|null
-     */
-    public function getDescription($key)
+    public function getDescription(string $key): string|array|null
     {
         if ($this->description === null) {
             $this->description = Describer::build(self::findDescrtiptionFile($this->edifactFile, $this->configuration));
@@ -112,18 +82,12 @@ class Message implements \Iterator
         return $this->description->get($key);
     }
 
-    /**
-     * @return string
-     */
-    public function getFilepath()
+    public function getFilepath(): string
     {
         return $this->edifactFile->getRealPath();
     }
 
-    /**
-     * @return SegInterface|false
-     */
-    public function getCurrentSegment()
+    public function getCurrentSegment(): SegInterface|false
     {
         if ($this->currentSegment === false) {
             $this->currentSegment = $this->getNextSegment();
@@ -131,10 +95,7 @@ class Message implements \Iterator
         return $this->currentSegment;
     }
 
-    /**
-     * @return SegInterface|false
-     */
-    public function getNextSegment()
+    public function getNextSegment(): SegInterface|false
     {
         $segLine = $this->getNextSegLine();
 
@@ -145,26 +106,14 @@ class Message implements \Iterator
         return $this->currentSegment = $this->getSegmentObject($segLine);
     }
 
-    /**
-     * @param string $searchSegment
-     * @param callable|array|null $criteria
-     *
-     * @return SegInterface|false
-     */
-    public function findSegmentFromBeginn($searchSegment, $criteria = null)
+    public function findSegmentFromBeginn(string $searchSegment, callable|array|null $criteria = null): SegInterface|false
     {
         $this->rewind();
 
         return $this->findNextSegment($searchSegment, $criteria);
     }
 
-    /**
-     * @param string $searchSegment
-     * @param callable|array|null $criteria
-     *
-     * @return SegInterface|false
-     */
-    public function findNextSegment($searchSegment, $criteria = null)
+    public function findNextSegment(string $searchSegment, callable|array|null $criteria = null): SegInterface|false
     {
         while ($segmentObject = $this->getNextSegment()) {
             if ($segmentObject->name() == $searchSegment) {
@@ -178,18 +127,12 @@ class Message implements \Iterator
         return false;
     }
 
-    /**
-     * @return void
-     */
-    public function pinPointer()
+    public function pinPointer(): void
     {
         $this->pinnedPointer = $this->edifactFile->tell();
     }
 
-    /**
-     * @return int
-     */
-    public function jumpToPinnedPointer()
+    public function jumpToPinnedPointer(): int
     {
         if ($this->pinnedPointer === null) {
             return $this->edifactFile->tell();
@@ -203,10 +146,7 @@ class Message implements \Iterator
         return $pinnedPointer;
     }
 
-    /**
-     * @return static
-     */
-    public function validate(MessageValidator $validator = null)
+    public function validate(MessageValidator $validator = null): self
     {
         $validator = $validator ?: new MessageValidator;
         $validator->validate($this);
@@ -214,10 +154,7 @@ class Message implements \Iterator
         return $this;
     }
 
-    /**
-     * @return void
-     */
-    public function validateSegments()
+    public function validateSegments(): void
     {
         $this->rewind();
 
@@ -235,70 +172,49 @@ class Message implements \Iterator
         $this->rewind();
     }
 
-    /**
-     * @return Delimiter
-     */
-    public function getDelimiter()
+    public function getDelimiter(): Delimiter
     {
         return $this->edifactFile->getDelimiter();
     }
 
-    /**
-     * @return SegInterface|mixed
-     */
-    public function current()
+    public function current(): SegInterface|false
     {
         return $this->getCurrentSegment();
     }
 
-    /**
-     * @return int
-     */
-    public function key()
+    public function key(): int
     {
         return $this->currentSegmentNumber;
     }
 
-    /**
-     * @return void
-     */
-    public function next()
+    public function next(): void
     {
         $this->currentSegment = false;
     }
 
-    /**
-     * @return void
-     */
-    public function rewind()
+    public function rewind(): void
     {
         $this->edifactFile->rewind();
         $this->currentSegmentNumber = -1;
         $this->currentSegment = false;
     }
 
-    /**
-     * @return bool
-     */
-    public function valid()
+    public function valid(): bool
     {
         return $this->current() !== false;
     }
 
-    /**
-     * @return array
-     */
-    public function toArray()
+    public function toArray(): array
     {
         return array_map(function($segment) {
+            if (! $segment) {
+                return [];
+            }
             return [$segment->name() => $segment->toArray()];
         }, iterator_to_array($this) ?: []);
     }
 
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->edifactFile->__toString();
     }

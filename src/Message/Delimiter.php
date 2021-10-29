@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact\Message;
 
-class Delimiter
+final class Delimiter
 {
     const UNA_SEGMENT = 'UNA';
     const PLACE_HOLDER = '«>~<«';
@@ -16,10 +16,7 @@ class Delimiter
         private string $segment = '\''
     ) { }
 
-    /**
-     * @return self
-     */
-    public static function setFromFile(EdifactFile $file)
+    public static function setFromFile(EdifactFile $file): self
     {
         $position = $file->tell();
         $file->rewind();
@@ -36,12 +33,7 @@ class Delimiter
         return $instance;
     }
 
-    /**
-     * @param string|array $string
-     *
-     * @return string|array
-     */
-    public function terminate($string)
+    public function terminate(string $string): string
     {
         return str_replace(
             [$this->data, $this->dataGroup, '\\n'],
@@ -50,76 +42,50 @@ class Delimiter
         );
     }
 
-    /**
-     * @param string $string
-     *
-     * @return list
-     */
-    public function explodeSegments($string)
+    /** @return list<string> */
+    public function explodeSegments(string $string): array
     {
         return $this->explodeString($string, $this->dataGroup);
     }
 
-    /**
-     * @param string $string
-     *
-     * @return list
-     */
-    public function explodeElements($string)
+    /** @return list<string> */
+    public function explodeElements(string $string): array
     {
         return $this->explodeString($string, $this->data);
     }
 
-    /**
-     * @return string
-     */
-    public function getData()
+    public function getData(): string
     {
         return $this->data;
     }
 
-    /**
-     * @return string
-     */
-    public function getDataGroup()
+    public function getDataGroup(): string
     {
         return $this->dataGroup;
     }
 
-    /**
-     * @return string
-     */
-    public function getDecimal()
+    public function getDecimal(): string
     {
         return $this->decimal;
     }
 
-    /**
-     * @return string
-     */
-    public function getTerminator()
+    public function getTerminator(): string
     {
         return $this->terminator;
     }
 
-    /**
-     * @return string
-     */
-    public function getEmpty()
+    public function getEmpty(): string
     {
         return $this->empty;
     }
 
-    /**
-     * @return string
-     */
-    public function getSegment()
+    public function getSegment(): string
     {
         return $this->segment;
     }
 
     /**
-     * @return list
+     * @return list<string>
      */
     private function explodeString(string $string, string $pattern): array
     {
@@ -141,9 +107,9 @@ class Delimiter
     }
 
     /**
-     * @param list $array
+     * @param list<string> $array
      *
-     * @return list
+     * @return list<string>
      */
     private function trimLastItem(array $array): array
     {

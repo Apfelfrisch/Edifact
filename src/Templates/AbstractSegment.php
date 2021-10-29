@@ -5,33 +5,28 @@ namespace Proengeno\Edifact\Templates;
 use Proengeno\Edifact\Exceptions\SegValidationException;
 use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Interfaces\SegInterface;
-use Proengeno\Edifact\Exceptions\EdifactException;
 use Proengeno\Edifact\Validation\SegmentValidator;
 use Proengeno\Edifact\Interfaces\SegValidatorInterface;
 
 abstract class AbstractSegment implements SegInterface
 {
-    /** @var array */
+    /** @var array<string, array<string, string>> */
     protected static $validationBlueprint = [];
 
-    /** @var SegValidatorInterface|null */
-    protected static $buildValidator = null;
+    protected static SegValidatorInterface|null $buildValidator = null;
 
-    /** @var Delimiter|null */
-    protected static $buildDelimiter = null;
+    protected static Delimiter|null $buildDelimiter = null;
 
-    /** @var array */
-    protected $elements = [];
+    /** @var array<string, array<string, null|string>> */
+    protected array $elements = [];
 
-    /** @var array */
-    protected $cache = [];
+    protected array $cache = [];
 
-    /** @var Delimiter */
-    protected $delimiter;
+    protected Delimiter $delimiter;
 
-    /** @var SegValidatorInterface */
-    protected $validator;
+    protected SegValidatorInterface $validator;
 
+    /** @param array<string, array<string, null|string>> $elements */
     protected function __construct(array $elements)
     {
         $this->elements = $elements;
@@ -54,9 +49,9 @@ abstract class AbstractSegment implements SegInterface
     /**
      * @return void
      */
-    public static function setBuildDelimiter(Delimiter $buildDelimiter = null)
+    public static function setBuildDelimiter(?Delimiter $delimiter)
     {
-        self::$buildDelimiter = $buildDelimiter;
+        self::$buildDelimiter = $delimiter;
     }
 
     /**
@@ -94,18 +89,12 @@ abstract class AbstractSegment implements SegInterface
         return $this->validator;
     }
 
-    /**
-     * @return Delimiter
-     */
-    public function getDelimiter()
+    public function getDelimiter(): Delimiter
     {
         return $this->delimiter;
     }
 
-    /**
-     * @return string
-     */
-    public function name()
+    public function name(): string
     {
         if (null === $name = $this->getValue(0,0)) {
             throw SegValidationException::forKey('name', "Segment is empty");
@@ -114,20 +103,14 @@ abstract class AbstractSegment implements SegInterface
         return $name;
     }
 
-    /**
-     * @return static
-     */
-    public function validate()
+    public function validate(): self
     {
         $this->validator->validate(static::$validationBlueprint, $this->elements);
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function toArray()
+    public function toArray(): array
     {
         $result = [];
         foreach ($this->getGetterMethods() as $method) {
@@ -138,15 +121,11 @@ abstract class AbstractSegment implements SegInterface
         return $result;
     }
 
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
         if (!isset($this->cache['segLine'])) {
             $dataFields = array_map(function($dataGroups) {
-                /** @psalm-suppress PossiblyInvalidArgument */
-                return implode($this->delimiter->getData(), $this->delimiter->terminate($this->deleteEmptyArrayEnds($dataGroups)));
+                return implode($this->delimiter->getData(), $this->terminateDataGroups($dataGroups));
             }, $this->elements);
 
             $this->cache['segLine'] = implode($this->delimiter->getDataGroup(), $this->deleteEmptyArrayEnds($dataFields));
@@ -166,7 +145,7 @@ abstract class AbstractSegment implements SegInterface
             if (in_array($attribute, $this->getGetterMethods())) {
                 return $this->$attribute();
             }
-        } catch (\Throwable $e) { }
+        } catch (\Throwable) { }
 
         return null;
     }
@@ -175,7 +154,7 @@ abstract class AbstractSegment implements SegInterface
      * @param string $name
      * @param array $arguments
      *
-     * @return string
+     * @return string|null
      */
     public function __call($name, $arguments)
     {
@@ -195,7 +174,7 @@ abstract class AbstractSegment implements SegInterface
     }
 
     /**
-     * @return list
+     * @return list<string>
      */
     protected function getGetterMethods()
     {
@@ -216,9 +195,9 @@ abstract class AbstractSegment implements SegInterface
     /**
      * @param string $segLine
      *
-     * @return array
+     * @return array<string, array<string, null|string>>
      */
-    protected static function mapToBlueprint($segLine)
+    protected static function mapToBlueprint(string $segLine)
     {
         $i = 0;
         $elements = [];
@@ -230,7 +209,7 @@ abstract class AbstractSegment implements SegInterface
             }
 
             $j = 0;
-            foreach ($BPdataGroups as $key => $value) {
+            foreach (array_keys($BPdataGroups) as $key) {
                 $elements[$BpDataKey][$key] = isset($inputElement[$j]) ? $inputElement[$j] : null;
                 $j++;
             }
@@ -241,11 +220,19 @@ abstract class AbstractSegment implements SegInterface
     }
 
     /**
-     * @param array $array
+     * @param array<string|null> $dataGroups
      *
-     * @return array
+     * @return array<string>
      */
-    private function deleteEmptyArrayEnds(array $array)
+    private function terminateDataGroups(array $dataGroups): array
+    {
+        return array_map(
+            fn(?string $value): string => $this->delimiter->terminate((string)$value),
+            $this->deleteEmptyArrayEnds($dataGroups)
+        );
+    }
+
+    private function deleteEmptyArrayEnds(array $array): array
     {
         $reversed = array_reverse($array);
         foreach ($reversed as $key => $value) {

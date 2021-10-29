@@ -15,7 +15,7 @@ interface SegInterface {
     /**
      * @return void
      */
-    public static function setBuildDelimiter(Delimiter $delimiter);
+    public static function setBuildDelimiter(?Delimiter $delimiter);
 
     /**
      * @return Delimiter

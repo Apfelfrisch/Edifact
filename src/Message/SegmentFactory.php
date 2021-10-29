@@ -5,16 +5,14 @@ namespace Proengeno\Edifact\Message;
 use Proengeno\Edifact\Exceptions\ValidationException;
 use Proengeno\Edifact\Interfaces\SegInterface;
 
-class SegmentFactory
+final class SegmentFactory
 {
-    /** @var string|null */
-    protected $segmentNamespace;
+    protected ?string $segmentNamespace;
 
-    /** @var Delimiter */
-    protected $delimiter;
+    protected Delimiter $delimiter;
 
     /** @var class-string<SegInterface>|null */
-    private $genericSegment;
+    private ?string $genericSegment;
 
     /**
      * @param class-string<SegInterface>|null $genericSegment

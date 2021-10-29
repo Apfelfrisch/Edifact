@@ -15,24 +15,27 @@ class GenericSegment extends AbstractSegment
         throw new EdifactException('Generic Segment can not be instanciate with "fromAttributes"');
     }
 
-    public function validate()
+    public function validate(): self
     {
         return $this;
     }
 
-    protected static function mapToBlueprint($segLine)
+    /**
+     * @return array<string, array<string, null|string>>
+     */
+    protected static function mapToBlueprint(string $segLine): array
     {
-        $i = 0;
-        $elements = [];
         $inputDataGroups = static::getBuildDelimiter()->explodeSegments($segLine);
-        foreach ($inputDataGroups as $inputDataGroup) {
+
+        $elements = [];
+
+        for ($i = 0; $i < $_ = count($inputDataGroups); $i++) {
             $inputElements = static::getBuildDelimiter()->explodeElements($inputDataGroups[$i]);
-            $j = 0;
-            foreach ($inputElements as $inputElement) {
-                $elements[$i][$j] = $inputElement;
-                $j++;
+
+            for($j = 0; $j < $__ = count($inputElements); $j++) {
+                // Force Php to string-cast the array keys
+                $elements["_$i"]["_$j"] = $inputElements[$j];
             }
-            $i++;
         }
 
         return $elements;

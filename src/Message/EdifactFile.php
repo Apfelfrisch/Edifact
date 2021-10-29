@@ -9,11 +9,7 @@ use Throwable;
 
 final class EdifactFile extends SplFileInfo
 {
-    /*
-     * Attached filters.
-     *
-     * @var array<string, array<resource>>
-     */
+    /* @var array<string, array<resource>> */
     private array $filters = [];
 
     /** @var resource */
