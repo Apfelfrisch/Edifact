@@ -11,12 +11,7 @@ class Describer
     private bool $throwException;
     private ?string $defaultDescription;
 
-    /**
-     * @param string $file
-     * @param bool $throwException
-     * @param string|null $defaultDescription
-     */
-    private function __construct($file = null, $throwException = true, $defaultDescription = null)
+    private function __construct(string $file = null, bool $throwException = true, ?string $defaultDescription = null)
     {
         if ($file !== null) {
             if (!is_file($file)) {
@@ -28,12 +23,7 @@ class Describer
         $this->defaultDescription = $defaultDescription;
     }
 
-    /**
-     * @param string $file
-     *
-     * @return self
-     */
-    public static function build($file)
+    public static function build(string $file): self
     {
         if (!isset(self::$distincInstances[md5($file)])) {
             self::$distincInstances[md5($file)] = new self($file);
@@ -42,13 +32,7 @@ class Describer
         return self::$distincInstances[md5($file)];
     }
 
-    /**
-     * @param string $file
-     * @param ?string $description
-     *
-     * @return self
-     */
-    public static function buildWithDefaultDescription($file, $description = null)
+    public static function buildWithDefaultDescription(string $file, ?string $description = null): self
     {
         if (!isset(self::$distincInstances[md5($file)])) {
             self::$distincInstances[md5($file)] = new self($file, false, $description);
@@ -57,22 +41,14 @@ class Describer
         return self::$distincInstances[md5($file)];
     }
 
-    /**
-     * @return void
-     */
-    public static function clean()
+    public static function clean(): void
     {
         self::$distincInstances = [];
     }
 
-    /**
-     * @param ?string $key
-     *
-     * @return bool
-     */
-    public function has($key)
+    public function has(?string $key): bool
     {
-        if (is_null($key)) {
+        if ($key === null) {
             return false;
         }
 
@@ -83,19 +59,13 @@ class Describer
         return !! $this->findDescription($key);
     }
 
-    /**
-     * @param ?string $key
-     * @param ?string $default
-     *
-     * @return string|null
-     */
-    public function get($key, $default = null)
+    public function get(?string $key, ?string $default = null): string|array|null
     {
         if (empty($this->description)) {
             throw new ValidationException('No Description set.');
         }
 
-        if (is_null($key)) {
+        if ($key === null) {
             return null;
         }
 

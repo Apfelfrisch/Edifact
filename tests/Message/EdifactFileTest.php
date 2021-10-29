@@ -34,7 +34,7 @@ class EdifactFileTest extends TestCase
 
     public function testCanGetEdifactSegments()
     {
-        $stream = new EdifactFile($filePath = __DIR__ . '/../data/edifact.txt');
+        $stream = new EdifactFile(__DIR__ . '/../data/edifact.txt');
 
         while (! $stream->eof()) {
             $string[] = $stream->getSegment();
@@ -126,45 +126,37 @@ class EdifactFileTest extends TestCase
         $this->assertEquals(0, $stream->tell());
     }
 
-    public function testUsingReadFilter()
+    public function testReadFilter()
     {
-        file_put_contents($this->tmpnam, 'FOO BAR');
+        file_put_contents($this->tmpnam, 'foo bar');
         $stream = new EdifactFile($this->tmpnam, 'r+');
 
-        $stream->addReadFilter(function($content) {
-            return str_replace("F", "G", $content);
-        });
+        $stream->addReadFilter('string.toupper');
 
-        $this->assertEquals('GOO BAR', (string)$stream);
+        $this->assertEquals('FOO BAR', (string)$stream);
         $stream->rewind();
-        $this->assertEquals('GOO BAR', $stream->getContents());
+        $this->assertEquals('FOO BAR', $stream->getContents());
         $stream->rewind();
-        $this->assertEquals('GOO BAR', $stream->getSegment());
+        $this->assertEquals('FOO BAR', $stream->getSegment());
         $stream->rewind();
-        $this->assertEquals('GOO BAR', $stream->read(1024));
+        $this->assertEquals('FOO BAR', $stream->read(1024));
         $stream->rewind();
-        $this->assertEquals('G', $stream->getChar());
+        $this->assertEquals('F', $stream->getChar());
     }
 
-    public function testUsingWriteFilter()
+    public function testWriteFilter()
     {
         $stream = new EdifactFile('php://temp', 'w+');
-        $stream->addWriteFilter(function($content) {
-            return str_replace("F", "G", $content);
-        });
-        $stream->write('FOO BAR');
+        $stream->addWriteFilter('string.toupper', STREAM_FILTER_WRITE);
+        $stream->write('foo bar');
         $stream->rewind();
-        $this->assertEquals('GOO BAR', $stream->getContents());
+        $this->assertEquals('FOO BAR', $stream->getContents());
     }
 
     public function testUsingWriteFilterOverStaticConstructor()
     {
-        $stream = EdifactFile::fromString('FOO BAR', 'php://temp', [
-            function($content) {
-                return str_replace("F", "G", $content);
-            }
-        ]);
-        $this->assertEquals('GOO BAR', $stream->getContents());
+        $stream = EdifactFile::fromString('foo bar', 'php://temp', ['string.toupper']);
+        $this->assertEquals('FOO BAR', $stream->getContents());
     }
 }
 

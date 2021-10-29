@@ -56,62 +56,44 @@ class SegmentValidator implements SegValidatorInterface
         throw SegValidationException::forKey(array_shift($keys), 'Data-Group not allowed.', 7);
     }
 
-    /**
-     * @param array $data
-     */
-    private function checkUnknowDatafields($data): void
+    private function checkUnknowDatafields(array $data): void
     {
         if (empty($data)) {
             return;
         }
+
         $key = current(array_keys($data));
         $value = current($data);
 
         throw SegValidationException::forKeyValue($key, $value, 'Data-Element not allowed.', 6);
     }
 
-    /**
-     * @param array $data
-     * @param string $dataGroupKey
-     * @param string|null $dataKey
-     */
-    private function cleanUp(&$data, $dataGroupKey, $dataKey = null): void
+    private function cleanUp(array &$data, string $dataGroupKey, string $dataKey = null): void
     {
-        if ($dataKey) {
+        if ($dataKey === null) {
+            if (array_key_exists($dataGroupKey, $data)) {
+                unset($data[$dataGroupKey]);
+            }
+
+            return;
+        }
+
+        if (array_key_exists($dataKey, $data[$dataGroupKey])) {
             unset($data[$dataGroupKey][$dataKey]);
-        } else {
-            unset($data[$dataGroupKey]);
         }
     }
 
-    /**
-     * @param array $data
-     * @param string $dataGroupKey
-     * @param string $dataKey
-     */
-    private function isDataIsAvailable($data, $dataGroupKey, $dataKey): bool
+    private function isDataIsAvailable(array $data, string $dataGroupKey, string $dataKey): bool
     {
-        return $this->isDatafieldIsAvailable($data, $dataGroupKey, $dataKey)
-            && $data[$dataGroupKey][$dataKey] !== null
-            && $data[$dataGroupKey][$dataKey] !== '';
+        return ($data[$dataGroupKey][$dataKey] ?? '') !== '';
     }
 
-    /**
-     * @param array $data
-     * @param string $dataGroupKey
-     * @param string $dataKey
-     */
-    private function isDatafieldIsAvailable($data, $dataGroupKey, $dataKey): bool
+    private function isDatafieldIsAvailable(array $data, string $dataGroupKey, string $dataKey): bool
     {
         return isset($data[$dataGroupKey][$dataKey]);
     }
 
-    /**
-     * @param array $data
-     * @param string $dataGroupKey
-     * @param string $dataKey
-     */
-    private function checkAvailability($data, $dataGroupKey, $dataKey): void
+    private function checkAvailability(array $data, string $dataGroupKey, string $dataKey): void
     {
         if ($this->isDatafieldIsAvailable($data, $dataGroupKey, $dataKey)) {
             return;
@@ -120,23 +102,18 @@ class SegmentValidator implements SegValidatorInterface
         throw SegValidationException::forKey($dataKey, 'Data-Element not available, but needed.', 1);
     }
 
-    /**
-     * @param string|null $necessaryStatus
-     */
-    private function isDatafieldOptional($necessaryStatus): bool
+    private function isDatafieldOptional(?string $necessaryStatus): bool
     {
-        return !($necessaryStatus == 'M' || $necessaryStatus == 'R');
+        return !($necessaryStatus === 'M' || $necessaryStatus === 'R');
     }
 
-    /**
-     * @param string|null $type
-     * @param array $data
-     * @param string $dataGroupKey
-     * @param string $dataKey
-     */
-    private function checkStringType($type, $data, $dataGroupKey, $dataKey): void
+    private function checkStringType(?string $type, array $data, string $dataGroupKey, string $dataKey): void
     {
-        $string = $data[$dataGroupKey][$dataKey];
+        $string = $data[$dataGroupKey][$dataKey] ?? '';
+
+        if (! is_string($string)) {
+            throw SegValidationException::forKey($dataKey, 'Data-Element is not a string.', 6);
+        }
 
         if ($type == static::ALPHA_NUMERIC || $type == null) {
             return;
@@ -151,7 +128,11 @@ class SegmentValidator implements SegValidatorInterface
 
     private function checkStringLenght(string $lenght, array $data, string $dataGroupKey, string $dataKey): void
     {
-        $string = $data[$dataGroupKey][$dataKey];
+        $string = $data[$dataGroupKey][$dataKey] ?? '';
+
+        if (! is_string($string)) {
+            throw SegValidationException::forKey($dataKey, 'Data-Element is not a string.', 6);
+        }
 
         $strLen = strlen($string);
         if ($strLen == 0) {

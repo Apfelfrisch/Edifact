@@ -4,11 +4,9 @@ namespace Proengeno\Edifact\Exceptions;
 
 class SegValidationException extends EdifactException
 {
-    /** @var string|null $key */
-    protected $key;
+    protected string|null $key;
 
-    /** @var string|null $key */
-    protected $value;
+    protected string|null $value;
 
     /**
      * @param string|null $key
@@ -28,67 +26,33 @@ class SegValidationException extends EdifactException
         parent::__construct($message, $code);
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     * @param string $message
-     * @param int $code
-     *
-     * @return static
-     *
-     * @psalm-suppress UnsafeInstantiation
-     */
-    public static function forKeyValue($key, $value, $message, $code = 0)
+    public static function forKeyValue(string $key, string $value, string $message, int $code = 0): self
     {
         $message = $key . ' (' . $value . ') : ' . $message;
 
-        return new static($key, $value, $message, $code);
+        return new self($key, $value, $message, $code);
     }
 
-    /**
-     * @param string $key
-     * @param string $message
-     * @param int $code
-     *
-     * @return static
-     *
-     * @psalm-suppress UnsafeInstantiation
-     */
-    public static function forKey($key, $message, $code = 0)
+    public static function forKey(string $key, string $message, int $code = 0): self
     {
         $message = $key . ': ' . $message;
 
-        return new static($key, null, $message, $code);
+        return new self($key, null, $message, $code);
     }
 
-    /**
-     * @param string $value
-     * @param string $message
-     * @param int $code
-     *
-     * @return static
-     *
-     * @psalm-suppress UnsafeInstantiation
-     */
-    public static function forValue($value, $message, $code = 0)
+    public static function forValue(string $value, string $message, int $code = 0): self
     {
         $message = $value . ': ' . $message;
 
-        return new static(null, $value, $message, $code);
+        return new self(null, $value, $message, $code);
     }
 
-    /**
-     * @return string|null
-     */
-    public function getKey()
+    public function getKey(): string|null
     {
         return $this->key;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getValue()
+    public function getValue(): string|null
     {
         return $this->value;
     }

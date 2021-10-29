@@ -1,11 +1,10 @@
-<?php 
+<?php
 
 namespace Proengeno\Edifact\Test\Fixtures\Segments;
 
-use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Templates\AbstractSegment;
 
-class Una extends AbstractSegment 
+class Una extends AbstractSegment
 {
     protected static $validationBlueprint = [
         'UNA' => ['Una' => 'M|a|3', 'data' => 'M|an|1', 'dataGroup' => 'M|an|1', 'decimal' => 'M|an|1', 'terminator' => 'M|an|1', 'empty' => 'M|an|1'],
@@ -48,7 +47,12 @@ class Una extends AbstractSegment
         return $this->segLine = implode('', $this->elements['UNA']) . "'";
     }
 
-    protected static function mapToBlueprint($segLine)
+    /**
+     * @param string $segLine
+     *
+     * @return array<string, array<string, null|string>>
+     */
+    protected static function mapToBlueprint(string $segLine)
     {
         $inputElement = ['UNA'] + str_split(substr($segLine, 2));
         $i = 0;
