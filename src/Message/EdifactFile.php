@@ -245,13 +245,11 @@ final class EdifactFile extends SplFileInfo
     {
         $mergedLines = '';
         while (($line = $this->streamGetLine()) && !ctype_cntrl($line)) {
-            if ($this->delimiterWasTerminated($line)) {
-                $line[(strlen($line) - 1)] = $this->getDelimiter()->getSegment();
-                $mergedLines .= $line;
-                continue;
+            if (! $this->delimiterWasTerminated($line)) {
+                return $mergedLines . $line;
             }
 
-            return $mergedLines . $line;
+            $mergedLines .= substr_replace($line, $this->getDelimiter()->getSegment(), -1);
         }
 
         return $mergedLines;
