@@ -2,15 +2,13 @@
 
 namespace Proengeno\Edifact\Interfaces;
 
-use Proengeno\Edifact\Validation\SegmentValidator;
-
 interface SegValidatorInterface
 {
     /**
-     * @param array $blueprint
-     * @param array $data
+     * @param array<string, array<string, string>> $blueprint
+     * @param array<string, array<string, null|string>> $elements
      *
      * @return SegValidatorInterface
      */
-    public function validate($blueprint, $data);
+    public function validate(array $blueprint, array $elements): self;
 }
