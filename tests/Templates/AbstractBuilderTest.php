@@ -2,6 +2,7 @@
 
 namespace Proengeno\Edifact\Test\Templates;
 
+use Proengeno\Edifact\Interfaces\SegInterface;
 use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\Configuration;
 use Proengeno\Edifact\Message\Message;
@@ -86,8 +87,6 @@ class AbstractBuilderTest extends TestCase
     /** @test */
     public function it_sets_the_header_an_footer_from_the_edifact_message()
     {
-        $expectedMessage = "UNA:+.? 'UNB+UNOC:3+from:500+to:500+160510:0143+unique_id+VL'UNZ+1+unique_id'";
-
         $this->builder->addMessage([]);
         $message = $this->builder->get();
 
@@ -128,5 +127,21 @@ class AbstractBuilderTest extends TestCase
         $message = $builder->get();
         $this->assertStringStartsWith("UNA:+.? 'UNB+UNOC:3+from:500+to:500", (string)$message);
         $this->assertStringEndsWith("UNZ+" . $messageCount . "+" . $builder->unbReference() . "'", (string)$message);
+    }
+
+    /** @test */
+    public function it_uses_the_provided_delimter()
+    {
+        $configuration = $this->getConfiguration();
+        $configuration->setDelimiter(new Delimiter('|', '#', ',', '!', '_', '"'));
+
+        $builder = new Builder('to', $configuration);
+        $builder->addMessage(['']);
+
+        foreach ($builder->get() as $segment) {
+            $this->assertInstanceOf(SegInterface::class, $segment);
+        }
+
+        $this->assertStringStartsWith('UNA|#,!_"UNB#UNOC|3#from|500#to|500', (string)$builder->get());
     }
 }

@@ -15,37 +15,39 @@ final class EdifactFile extends SplFileInfo
     /** @var resource */
     private $resource;
 
-    private ?Delimiter $delimiter = null;
+    private Delimiter $delimiter;
 
     public function __construct(
-        private string $filename,
-        private string $openMode = 'r',
-        private bool $userIncludePath = false
+        string $filename,
+        string $openMode = 'r',
+        ?Delimiter $delimiter = null
     ) {
         parent::__construct($filename);
 
         $resource = null;
         try {
-            $resource = fopen($this->filename, $this->openMode, $this->userIncludePath);
+            $resource = fopen($filename, $openMode);
         } catch (Throwable) { }
 
         if (! is_resource($resource)) {
-            throw new RuntimeException(__METHOD__ . "({$this->filename}): failed to open stream: No such file or directory");
+            throw new RuntimeException(__METHOD__ . "({$filename}): failed to open stream: No such file or directory");
         }
 
         $this->resource = $resource;
+
+        if ($openMode === 'r' || substr($openMode, 1, 1) === '+') { // Stream is readable
+            $this->delimiter = $delimiter ?? Delimiter::setFromFile($this);
+        } else {
+            $this->delimiter = $delimiter ?? new Delimiter;
+        }
     }
 
     /**
-     * @param string $string
-     * @param string $filename
      * @param list<string> $writeFilter
-     *
-     * @return self
      */
-    public static function fromString($string, $filename = 'php://temp', $writeFilter = [])
+    public static function fromString(string $string, string $filename = 'php://temp', array $writeFilter = []): self
     {
-        $instance = new self($filename, 'w+');
+        $instance = new self($filename, 'w+', Delimiter::setFromString($string));
 
         foreach ($writeFilter as $callable) {
             $instance->addWriteFilter($callable);
@@ -95,137 +97,78 @@ final class EdifactFile extends SplFileInfo
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getContents()
+    public function getContents(): string
     {
         return trim(stream_get_contents($this->resource));
     }
 
-    /**
-     * @return bool
-     */
-    public function eof()
+    public function eof(): bool
     {
         return feof($this->resource);
     }
 
-    /**
-     * @return bool
-     */
-    public function flush()
+    public function flush(): bool
     {
         return fflush($this->resource);
     }
 
-    /**
-     * @return string
-     */
-    public function getChar()
+    public function getChar(): string
     {
         return fgetc($this->resource);
     }
 
-    /**
-     * @return string
-     */
-    public function getSegment()
+    public function getSegment(): string
     {
         return $this->fetchSegment();
     }
 
-    /**
-     * @param int $operation
-     *
-     * @return bool
-     */
-    public function lock($operation)
+    public function lock(int $operation): bool
     {
         return flock($this->resource, $operation);
     }
 
-    /**
-     * @return bool|int
-     */
-    public function passthru()
+    public function passthru(): int|bool
     {
         return fpassthru($this->resource);
     }
 
-    /**
-     * @param int $length
-     *
-     * @return string
-     */
-    public function read($length)
+    public function read(int $length): string
     {
         return fread($this->resource, $length);
     }
 
-    /**
-     * @param int $offset
-     * @param int $whence
-     *
-     * @return bool
-     */
-    public function seek($offset, $whence = SEEK_SET)
+    public function seek(int $offset, int $whence = SEEK_SET): bool
     {
         return 0 == fseek($this->resource, $offset, $whence);
     }
 
-    /**
-     * @return array
-     */
-    public function stat()
+    public function stat(): array
     {
         return fstat($this->resource);
     }
 
-    /**
-     * @return int
-     */
-    public function tell()
+    public function tell(): int
     {
         return (int)ftell($this->resource);
     }
 
-    /**
-     * @param string $str
-     *
-     * @return int|false
-     */
-    public function write($str)
+    public function write(string $str): int|false
     {
         return fwrite($this->resource, $str);
     }
 
-    /**
-     * @param string $str
-     *
-     * @return void
-     */
-    public function writeAndRewind($str)
+    public function writeAndRewind(string $str): void
     {
         $this->write($str);
         $this->rewind();
     }
 
-    /**
-     * @return Delimiter
-     */
-    public function getDelimiter()
+    public function getDelimiter(): Delimiter
     {
-        if ($this->delimiter === null) {
-            $this->delimiter = Delimiter::setFromFile($this);
-        }
         return $this->delimiter;
     }
 
-    /**
-     * @return void
-     */
-    public function rewind()
+    public function rewind(): void
     {
         rewind($this->resource);
     }
@@ -265,3 +208,4 @@ final class EdifactFile extends SplFileInfo
         return str_ends_with($line, $this->getDelimiter()->getTerminator());
     }
 }
+
