@@ -208,3 +208,4 @@ final class EdifactFile extends SplFileInfo
         return str_ends_with($line, $this->getDelimiter()->getTerminator());
     }
 }
+

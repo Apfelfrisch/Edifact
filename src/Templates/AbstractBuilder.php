@@ -84,6 +84,7 @@ abstract class AbstractBuilder implements BuilderInterface
                 'terminator' => $delimiter->getTerminator(),
                 'empty' => $delimiter->getEmpty(),
             ]);
+
             $this->writeUnb();
         }
         $this->writeMessage($message);

@@ -165,21 +165,23 @@ class Blueprint
         unset($this->loopLevelCount[$this->loopDeep + 1]);
     }
 
-    private function countUpLevelLoop(): void
-    {
-        if (!isset($this->loopLevelCount[$this->loopDeep])) {
-            $this->loopLevelCount[$this->loopDeep] = -1;
-        }
-        $this->loopLevelCount[$this->loopDeep]++;
-    }
-
     private function getLevelLoopCount(): int
     {
         if (!isset($this->loopLevelCount[$this->loopDeep])) {
             $this->loopLevelCount[$this->loopDeep] = 0;
         }
 
+        /** @var int */
         return $this->loopLevelCount[$this->loopDeep];
+    }
+
+    private function countUpLevelLoop(): void
+    {
+        if (!isset($this->loopLevelCount[$this->loopDeep])) {
+            $this->loopLevelCount[$this->loopDeep] = -1;
+        }
+        /** @psalm-suppress MixedOperand */
+        $this->loopLevelCount[$this->loopDeep]++;
     }
 
     private function getBlueprintAttribute(string $attribute, ?int $blueprintCount = null): array|string|null
@@ -198,6 +200,7 @@ class Blueprint
         if (!isset($this->blueprintCount[$this->loopDeep])) {
             $this->blueprintCount[$this->loopDeep] = 0;
         }
+        /** @var int */
         return $this->blueprintCount[$this->loopDeep];
     }
 
@@ -206,6 +209,7 @@ class Blueprint
         if (!isset($this->blueprintCount[$this->loopDeep])) {
             $this->blueprintCount[$this->loopDeep] = 1;
         }
+        /** @psalm-suppress MixedOperand */
         $this->blueprintCount[$this->loopDeep] ++;
     }
 }
