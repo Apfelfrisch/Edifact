@@ -16,26 +16,26 @@ final class Delimiter
         private string $segment = '\''
     ) { }
 
-    public static function setFromFile(EdifactFile $file): self
+    public static function setFromFile(EdifactFile $file, ?self $fallback = null): self
     {
         $position = $file->tell();
         $file->rewind();
 
-        $instance = self::setFromString($file->read(9));
+        $instance = self::setFromString($file->read(9), $fallback);
 
         $file->seek($position);
 
         return $instance;
     }
 
-    public static function setFromString(string $string): self
+    public static function setFromString(string $string, ?self $fallback = null): self
     {
         if (substr($string, 0, 3) !== self::UNA_SEGMENT) {
-            return new self();
+            return $fallback ?? new self();
         }
 
         if (! isset($string[8])) {
-            return new self();
+            return $fallback ?? new self();
         }
 
         return new self(

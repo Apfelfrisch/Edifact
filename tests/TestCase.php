@@ -16,7 +16,6 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     public function getConfiguration()
     {
         $configuration = new Configuration;
-        $configuration->setSegmentNamespace('\Proengeno\Edifact\Test\Fixtures\Segments');
         $configuration->setExportSender('from');
         $configuration->addMessageDescription(__DIR__ . '/data/message_description.php', ['UNH' => '/./']);
 

@@ -20,10 +20,7 @@ class Blueprint
 
     private ?Throwable $optinalSegmentException = null;
 
-    /**
-     * @param array $blueprint
-     */
-    public function __construct($blueprint)
+    public function __construct(array $blueprint)
     {
         $this->flattenBlueprint($blueprint);
     }
