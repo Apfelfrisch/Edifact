@@ -4,53 +4,17 @@ namespace Proengeno\Edifact\Interfaces;
 
 use Proengeno\Edifact\Message\Delimiter;
 
-interface SegInterface {
-    /**
-     * @param string $segLine
-     *
-     * @return static
-     */
-    public static function fromSegLine($segLine);
+interface SegInterface
+{
+    public static function fromSegLine(Delimiter $delimiter, string $segLine): SegInterface;
 
-    /**
-     * @return void
-     */
-    public static function setBuildDelimiter(?Delimiter $delimiter);
+    public function getDelimiter(): Delimiter;
 
-    /**
-     * @return Delimiter
-     */
-    public static function getBuildDelimiter();
+    public function name(): string;
 
-    /**
-     * @return Delimiter
-     */
-    public function getDelimiter();
+    public function validate(): void;
 
-    /**
-     * @return string
-     */
-    public function name();
+    public function toArray(): array;
 
-    /**
-     * @return static
-     */
-    public function validate();
-
-    /**
-     * @return array
-     */
-    public function toArray();
-
-    /**
-     * @param string $attribute
-     *
-     * @return string|null
-     */
-    public function __get($attribute);
-
-    /**
-     * @return string
-     */
-    public function __toString();
+    public function toString(): string;
 }

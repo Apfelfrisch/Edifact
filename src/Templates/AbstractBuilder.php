@@ -2,16 +2,13 @@
 
 namespace Proengeno\Edifact\Templates;
 
-use Closure;
 use Proengeno\Edifact\Configuration;
 use Proengeno\Edifact\Interfaces\BuilderInterface;
 use Proengeno\Edifact\Interfaces\SegInterface;
 use Proengeno\Edifact\Message\Message;
-use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Message\Describer;
 use Proengeno\Edifact\Message\EdifactFile;
 use Proengeno\Edifact\Message\SegmentFactory;
-use Proengeno\Edifact\Exceptions\EdifactException;
 
 abstract class AbstractBuilder implements BuilderInterface
 {
@@ -33,14 +30,15 @@ abstract class AbstractBuilder implements BuilderInterface
     /** @var array */
     protected $buildCache = [];
 
-    /** @var int */
-    private $unhCounter = 0;
+    private SegmentFactory $segmentFactory;
 
-    /** @var int */
-    private $messageCount = 0;
+    private string $unbReference;
 
-    /** @var bool */
-    private $messageWasFetched = false;
+    private int $unhCounter = 0;
+
+    private int $messageCount = 0;
+
+    private bool $messageWasFetched = false;
 
     /**
      * @param string $to
@@ -49,11 +47,20 @@ abstract class AbstractBuilder implements BuilderInterface
      */
     public function __construct($to, Configuration $configuration, $filename = 'php://temp')
     {
-        $this->configuration = $configuration;
         $this->to = $to;
+
+        $this->configuration = $configuration;
+
         $this->from = $this->configuration->getExportSender();
+
         $this->description = Describer::build($this->getDescriptionPath());
+
+        $this->unbReference = (string)$this->configuration->getUnbRefGenerator()();
+
         $this->edifactFile = new EdifactFile($this->getFullpath($filename), 'w+', $this->configuration->getDelimiter());
+
+        $this->segmentFactory = new SegmentFactory($this->configuration->getSegmentNamespace(), $this->edifactFile->getDelimiter());
+
         foreach ($this->configuration->getWriteFilter() as $callable) {
             $this->edifactFile->addWriteFilter($callable);
         }
@@ -99,12 +106,7 @@ abstract class AbstractBuilder implements BuilderInterface
      */
     public function unbReference()
     {
-        if (!isset($this->buildCache['unbReference'])) {
-            $generateUnbRef = $this->configuration->getUnbRefGenerator();
-            $this->buildCache['unbReference'] = (string)$generateUnbRef();
-        }
-
-        return $this->buildCache['unbReference'];
+        return $this->unbReference;
     }
 
     /**
@@ -112,14 +114,7 @@ abstract class AbstractBuilder implements BuilderInterface
      */
     public function getSegmentFactory()
     {
-        if (!isset($this->buildCache['segmentFactory'])) {
-            $this->buildCache['segmentFactory'] = new SegmentFactory(
-                $this->configuration->getSegmentNamespace(),
-                $this->edifactFile->getDelimiter(),
-            );
-        }
-
-        return $this->buildCache['segmentFactory'];
+        return $this->segmentFactory;
     }
 
     /**
@@ -185,7 +180,7 @@ abstract class AbstractBuilder implements BuilderInterface
      */
     protected function finalize()
     {
-        if (!$this->messageIsEmpty()) {
+        if (! $this->messageIsEmpty()) {
             $this->writeSeg('unz', [$this->messageCount, $this->unbReference()]);
             $this->edifactFile->rewind();
         }
@@ -203,41 +198,29 @@ abstract class AbstractBuilder implements BuilderInterface
     protected function writeSeg($segmentName, $attributes = [], $method = 'fromAttributes')
     {
         $segment = $this->getSegmentFactory()->fromAttributes($segmentName, $attributes, $method);
-        $this->edifactFile->write((string)$segment);
+
+        $this->edifactFile->write($segment->toString() . $this->edifactFile->getDelimiter()->getSegment());
         $this->countSegments($segment);
     }
 
-    /**
-     * @return bool
-     */
-    private function messageIsEmpty()
+    private function messageIsEmpty(): bool
     {
         return $this->edifactFile->tell() === 0;
     }
 
-    /**
-     * @param SegInterface $segment
-     *
-     * @return void
-     */
-    private function countSegments($segment)
+    private function countSegments(SegInterface $segment): void
     {
         if ($segment->name() == 'UNA' || $segment->name() == 'UNB') {
             return;
         }
-        if ($segment->name() == 'UNH') {
+        if ($segment->name() === 'UNH') {
             $this->unhCounter = 1;
             return;
         }
         $this->unhCounter++;
     }
 
-    /**
-     * @param string $filename
-     *
-     * @return string
-     */
-    private function getFullpath($filename)
+    private function getFullpath(string $filename): string
     {
         if (substr($filename, 0, 4) === 'php:') {
             return $filename;

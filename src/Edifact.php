@@ -3,15 +3,13 @@
 namespace Proengeno\Edifact;
 
 use Proengeno\Edifact\Configuration;
-use Proengeno\Edifact\EdifactBuilder;
 use Proengeno\Edifact\Interfaces\BuilderInterface;
 use Proengeno\Edifact\Message\Message;
 use Proengeno\Edifact\Exceptions\EdifactException;
 
 class Edifact
 {
-    /** @var Configuration */
-    protected $configuration;
+    protected Configuration $configuration;
 
     public function __construct(Configuration $configuration)
     {
