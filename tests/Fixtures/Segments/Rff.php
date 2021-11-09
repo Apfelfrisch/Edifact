@@ -1,10 +1,11 @@
-<?php 
+<?php
 
 namespace Proengeno\Edifact\Test\Fixtures\Segments;
 
+use Proengeno\Edifact\Message\DataGroupCollection;
 use Proengeno\Edifact\Templates\AbstractSegment;
 
-class Rff extends AbstractSegment 
+class Rff extends AbstractSegment
 {
     protected static $validationBlueprint = [
         'RFF' => ['RFF' => 'M|a|3'],
@@ -13,15 +14,17 @@ class Rff extends AbstractSegment
 
     public static function fromAttributes($code, $referenz)
     {
-        return new static([
-            'RFF' => ['RFF' => 'RFF'],
-            'C506' => ['1153' => $code, '1154' => $referenz],
-        ]);
+        return new static(
+            (new DataGroupCollection(static::getBuildDelimiter()))
+                ->addValue('RFF', 'RFF', 'RFF')
+                ->addValue('C506', '1153', $code)
+                ->addValue('C506', '1154', $referenz)
+        );
     }
 
     public function code()
     {
-        return @$this->elements['C506']['1153'] ?: null;
+        return $this->elements->getValue('C506', '1153');
     }
 
     public function referenz()

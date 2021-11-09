@@ -2,44 +2,44 @@
 
 namespace Proengeno\Edifact;
 
+use Closure;
 use Proengeno\Edifact\Exceptions\EdifactException;
 use Proengeno\Edifact\Interfaces\SegInterface;
 use Proengeno\Edifact\Message\Delimiter;
-use Proengeno\Edifact\Message\GenericSegment;
+use Proengeno\Edifact\Message\Segements\Generic;
 use Proengeno\Edifact\Interfaces\BuilderInterface;
-use Proengeno\Edifact\Validation\MessageValidator;
 
 class Configuration
 {
     /** @var class-string<SegInterface> */
-    protected $genericSegment = GenericSegment::class;
+    protected $genericSegment = Generic::class;
+
+    protected Delimiter $delimiter;
+
+    protected Closure $unbRefGenerator;
 
     /** @var ?array<string, class-string<BuilderInterface>> */
-    protected $builder = null;
+    protected ?array $builder = null;
 
-    /** @var string|null */
-    protected $filepath = null;
+    protected ?string $filepath = null;
 
-    /** @var Delimiter|null */
-    protected $delimiter = null;
+    protected ?string $exportSender = null;
 
-    /** @var string|null */
-    protected $exportSender = null;
-
-    /** @var callable|null */
-    protected $unbRefGenerator = null;
-
-    /** @var string|null */
-    protected $segmentNamespace = null;
+    protected ?string $segmentNamespace = null;
 
     /** @var list<string> */
-    protected $readFilter = [];
+    protected array $readFilter = [];
 
     /** @var list<string> */
-    protected $writeFilter = [];
+    protected array $writeFilter = [];
 
-    /** @var array */
-    protected $messageDescriptions = [];
+    protected array $messageDescriptions = [];
+
+    public function __construct()
+    {
+        $this->delimiter = new Delimiter;
+        $this->unbRefGenerator = static fn(): string => uniqid();
+    }
 
     /**
      * @param class-string<SegInterface> $genericSegment
@@ -60,12 +60,9 @@ class Configuration
     }
 
     /**
-     * @param string $key
      * @param class-string<BuilderInterface> $class
-     *
-     * @return void
      */
-    public function addBuilder($key, $class)
+    public function addBuilder(string $key, string $class): void
     {
         if (!isset($this->builder[$key])) {
             $this->builder[$key] = $class;
@@ -73,11 +70,9 @@ class Configuration
     }
 
     /**
-     * @param string $key
-     *
      * @return class-string<BuilderInterface>|null
      */
-    public function getBuilder($key)
+    public function getBuilder(string $key): ?string
     {
         if (isset($this->builder[$key])) {
             return $this->builder[$key];
@@ -86,36 +81,22 @@ class Configuration
         return null;
     }
 
-    /**
-     * @param string $filepath
-     *
-     * @return void
-     */
-    public function setFilepath($filepath)
+    public function setFilepath(string $filepath): void
     {
         $this->filepath = $filepath;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getFilepath()
+    public function getFilepath(): ?string
     {
         return $this->filepath;
     }
 
-    /**
-     * @return void
-     */
-    public function setReadFilter(string $filter)
+    public function setReadFilter(string $filter): void
     {
         $this->readFilter[] = $filter;
     }
 
-    /**
-     * @return void
-     */
-    public function setWriteFilter(string $filter)
+    public function setWriteFilter(string $filter): void
     {
         $this->writeFilter[] = $filter;
     }
@@ -123,7 +104,7 @@ class Configuration
     /**
      * @return list<string>
      */
-    public function getReadFilter()
+    public function getReadFilter(): array
     {
         return $this->readFilter;
     }
@@ -131,25 +112,17 @@ class Configuration
     /**
      * @return list<string>
      */
-    public function getWriteFilter()
+    public function getWriteFilter(): array
     {
         return $this->writeFilter;
     }
 
-    /**
-     * @param string $exportSender
-     *
-     * @return void
-     */
-    public function setExportSender($exportSender)
+    public function setExportSender(string $exportSender): void
     {
         $this->exportSender = $exportSender;
     }
 
-    /**
-     * @return string
-     */
-    public function getExportSender()
+    public function getExportSender(): string
     {
         if ($this->exportSender === null) {
             throw new EdifactException("No exportSender in Configuration available, please set via Configuration::setExportSender ");
@@ -157,80 +130,43 @@ class Configuration
         return $this->exportSender;
     }
 
-    /**
-     * @param string $descriptionFile
-     * @param array $allocationRules
-     *
-     * @return void
-     */
-    public function addMessageDescription($descriptionFile, $allocationRules)
+    public function addMessageDescription(string $descriptionFile, array $allocationRules): void
     {
         $this->messageDescriptions[$descriptionFile] = $allocationRules;
     }
 
-    /**
-     * @return array
-     */
-    public function getMessageDescriptions()
+    public function getMessageDescriptions(): array
     {
         return $this->messageDescriptions;
     }
 
-    /**
-     * @param string|null $segmentNamespace
-     *
-     * @return void
-     */
-    public function setSegmentNamespace($segmentNamespace)
+    public function setSegmentNamespace(?string $segmentNamespace): void
     {
         $this->segmentNamespace = $segmentNamespace;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getSegmentNamespace()
+    public function getSegmentNamespace(): ?string
     {
         return $this->segmentNamespace;
     }
 
-    /**
-     * @return void
-     */
-    public function setUnbRefGenerator(callable $unbRefGenerator)
+    public function setUnbRefGenerator(Closure $unbRefGenerator): void
     {
         $this->unbRefGenerator = $unbRefGenerator;
     }
 
-    /**
-     * @return Callable
-     */
-    public function getUnbRefGenerator()
+    public function getUnbRefGenerator(): Closure
     {
-        if (null === $this->unbRefGenerator) {
-            $this->unbRefGenerator = fn(): string => uniqid();
-        }
-
         return $this->unbRefGenerator;
     }
 
-    /**
-     * @return void
-     */
-    public function setDelimiter(Delimiter $delimiter)
+    public function setDelimiter(Delimiter $delimiter): void
     {
         $this->delimiter = $delimiter;
     }
 
-    /**
-     * @return Delimiter
-     */
-    public function getDelimiter()
+    public function getDelimiter(): Delimiter
     {
-        if (null === $this->delimiter) {
-            $this->delimiter = new Delimiter;
-        }
-
         return $this->delimiter;
     }
 }

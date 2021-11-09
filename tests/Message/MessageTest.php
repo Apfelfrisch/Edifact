@@ -3,6 +3,8 @@
 namespace Proengeno\Edifact\Test\Message;
 
 use Mockery as m;
+use Proengeno\Edifact\Message\DataGroupCollection;
+use Proengeno\Edifact\Message\Segements\Generic;
 use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\Message\Message;
 use Proengeno\Edifact\Message\EdifactFile;
@@ -58,7 +60,7 @@ class MessageTest extends TestCase
     {
         $messageCore = Message::fromString("UKN", $this->getConfiguration());
 
-        $this->assertInstanceOf('Proengeno\Edifact\Message\GenericSegment', $messageCore->getNextSegment());
+        $this->assertInstanceOf(Generic::class, $messageCore->getNextSegment());
     }
 
     /** @test */
@@ -114,7 +116,7 @@ class MessageTest extends TestCase
         $messageCore = Message::fromString("UNH'UNB'", $this->getConfiguration());
         $message = "";
         foreach ($messageCore as $segment) {
-            $message .= (string)$segment;
+            $message .= $segment->toString() . $messageCore->getDelimiter()->getSegment();
         }
         $this->assertEquals($message, (string)$messageCore);
     }
@@ -128,10 +130,7 @@ class MessageTest extends TestCase
             'Proengeno\Edifact\Test\Fixtures\Segments\Unb',
             $messageCore->findNextSegment('UNB')
         );
-        $this->assertInstanceOf(
-            'Proengeno\Edifact\Message\GenericSegment',
-            $messageCore->findNextSegment('UKN')
-        );
+        $this->assertInstanceOf(Generic::class, $messageCore->findNextSegment('UKN'));
         $this->assertFalse($messageCore->findNextSegment('UNH'));
 
     }

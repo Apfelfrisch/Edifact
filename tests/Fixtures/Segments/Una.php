@@ -2,6 +2,7 @@
 
 namespace Proengeno\Edifact\Test\Fixtures\Segments;
 
+use Proengeno\Edifact\Message\DataGroupCollection;
 use Proengeno\Edifact\Templates\AbstractSegment;
 
 class Una extends AbstractSegment
@@ -12,9 +13,15 @@ class Una extends AbstractSegment
 
     public static function fromAttributes($data = ':', $dataGroup = '+', $decimal = '.', $terminator = '?', $empty = ' ')
     {
-        return new static([
-            'UNA' => ['UNA' => 'UNA', 'data' => $data, 'dataGroup' => $dataGroup, 'decimal' => $decimal, 'terminator' => $terminator, 'empty' => $empty],
-        ], static::$buildDelimiter);
+        return new static(
+            (new DataGroupCollection(static::getBuildDelimiter()))
+                ->addValue('UNA', 'UNA', 'UNA')
+                ->addValue('UNA', 'data', $data)
+                ->addValue('UNA', 'dataGroup', $dataGroup)
+                ->addValue('UNA', 'decimal', $decimal)
+                ->addValue('UNA', 'terminator', $terminator)
+                ->addValue('UNA', 'empty', $empty)
+        );
     }
 
     public function data()
@@ -42,27 +49,27 @@ class Una extends AbstractSegment
         return @$this->elements['UNA']['empty'] ?: null;
     }
 
-    public function __toString()
+    public function toString(): string
     {
-        return $this->segLine = implode('', $this->elements['UNA']) . $this->getDelimiter()->getSegment();
+        return $this->elements->getValue('UNA', 'UNA')
+            . $this->elements->getValue('UNA', 'data')
+            . $this->elements->getValue('UNA', 'dataGroup')
+            . $this->elements->getValue('UNA', 'decimal')
+            . $this->elements->getValue('UNA', 'terminator')
+            . $this->elements->getValue('UNA', 'empty');
     }
 
-    /**
-     * @param string $segLine
-     *
-     * @return array<string, array<string, null|string>>
-     */
-    protected static function mapToBlueprint(string $segLine)
+    protected static function mapToBlueprint(string $segLine): DataGroupCollection
     {
         $inputElement = ['UNA'] + str_split(substr($segLine, 2));
+        $dataCollection = new DataGroupCollection(static::getBuildDelimiter());
+
         $i = 0;
-        foreach (static::$validationBlueprint as $BpDataKey => $BPdataGroups) {
-            if (isset($inputElement)) {
-                $elements[$BpDataKey] = array_combine(array_keys($BPdataGroups), $inputElement);
-            }
+        foreach (static::$validationBlueprint['UNA'] as $BpDataKey => $BPdataGroups) {
+            $dataCollection->addValue('UNA', $BpDataKey, $inputElement[$i] ?? null);
             $i++;
         }
 
-        return @$elements ?: [];
+        return $dataCollection;
     }
 }

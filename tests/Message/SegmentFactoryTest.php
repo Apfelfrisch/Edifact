@@ -4,7 +4,7 @@ namespace Proengeno\Edifact\Test\Message;
 
 use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\Message\SegmentFactory;
-use Proengeno\Edifact\Message\GenericSegment;
+use Proengeno\Edifact\Message\Segements\Generic;
 use Proengeno\Edifact\Exceptions\EdifactException;
 use Proengeno\Edifact\Exceptions\ValidationException;
 
@@ -33,8 +33,8 @@ class SegmentFactoryTest extends TestCase
     /** @test **/
     public function it_instanciates_the_dafault_seg_if_its_allowed_and_no_secific_segement_was_found()
     {
-        $this->segFactory = new SegmentFactory($this->segmentNamespace, null, GenericSegment::class);
-        $this->assertInstanceOf(GenericSegment::class, $this->segFactory->fromSegline('UKW'));
+        $this->segFactory = new SegmentFactory($this->segmentNamespace, null, Generic::class);
+        $this->assertInstanceOf(Generic::class, $this->segFactory->fromSegline('UKW'));
     }
 
     /** @test **/

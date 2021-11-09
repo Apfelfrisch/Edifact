@@ -3,6 +3,7 @@
 namespace Proengeno\Edifact\Templates;
 
 use Proengeno\Edifact\Exceptions\SegValidationException;
+use Proengeno\Edifact\Message\DataGroupCollection;
 use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Interfaces\SegInterface;
 use Proengeno\Edifact\Validation\SegmentValidator;
@@ -17,8 +18,7 @@ abstract class AbstractSegment implements SegInterface
 
     protected static Delimiter|null $buildDelimiter = null;
 
-    /** @var array<string, array<string, null|string>> */
-    protected array $elements = [];
+    protected DataGroupCollection $elements;
 
     protected array $cache = [];
 
@@ -26,8 +26,7 @@ abstract class AbstractSegment implements SegInterface
 
     protected SegValidatorInterface $validator;
 
-    /** @param array<string, array<string, null|string>> $elements */
-    protected function __construct(array $elements)
+    protected function __construct(DataGroupCollection $elements)
     {
         $this->elements = $elements;
         $this->delimiter = static::getBuildDelimiter();
@@ -78,7 +77,7 @@ abstract class AbstractSegment implements SegInterface
      */
     public function getValue($dataGroup, $element)
     {
-        return array_values(array_values($this->elements)[$dataGroup])[$element] ?? null;
+        return $this->elements->getValueFromPosition($dataGroup, $element);
     }
 
     /**
@@ -121,17 +120,17 @@ abstract class AbstractSegment implements SegInterface
         return $result;
     }
 
+    /**
+     * @deprecated
+     */
     public function __toString(): string
     {
-        if (!isset($this->cache['segLine'])) {
-            $dataFields = array_map(function($dataGroups) {
-                return implode($this->delimiter->getData(), $this->terminateDataGroups($dataGroups));
-            }, $this->elements);
+        return $this->toString();
+    }
 
-            $this->cache['segLine'] = implode($this->delimiter->getDataGroup(), $this->deleteEmptyArrayEnds($dataFields));
-        }
-
-        return $this->cache['segLine'] . $this->delimiter->getSegment();
+    public function toString(): string
+    {
+        return $this->elements->toString();
     }
 
     /**
@@ -148,29 +147,6 @@ abstract class AbstractSegment implements SegInterface
         } catch (\Throwable) { }
 
         return null;
-    }
-
-    /**
-     * @param string $name
-     * @param array $arguments
-     *
-     * @return string|null
-     */
-    public function __call($name, $arguments)
-    {
-        if (strpos($name, 'get') === false) {
-            throw new \BadMethodCallException;
-        }
-
-        $pattern = substr($name, 3);
-
-        foreach ($this->elements as $element) {
-            if (array_key_exists($pattern, $element)) {
-                return $element[$pattern];
-            }
-        }
-
-        throw new \BadMethodCallException;
     }
 
     /**
@@ -192,15 +168,10 @@ abstract class AbstractSegment implements SegInterface
         return $this->cache['getterMethods'];
     }
 
-    /**
-     * @param string $segLine
-     *
-     * @return array<string, array<string, null|string>>
-     */
-    protected static function mapToBlueprint(string $segLine)
+    protected static function mapToBlueprint(string $segLine): DataGroupCollection
     {
         $i = 0;
-        $elements = [];
+        $dataCollection = new DataGroupCollection(static::getBuildDelimiter());
         $inputDataGroups = static::getBuildDelimiter()->explodeSegments($segLine);
         foreach (static::$validationBlueprint as $BpDataKey => $BPdataGroups) {
             $inputElement = [];
@@ -210,37 +181,12 @@ abstract class AbstractSegment implements SegInterface
 
             $j = 0;
             foreach (array_keys($BPdataGroups) as $key) {
-                $elements[$BpDataKey][$key] = isset($inputElement[$j]) ? $inputElement[$j] : null;
+                $dataCollection->addValue($BpDataKey, $key, isset($inputElement[$j]) ? $inputElement[$j] : null);
                 $j++;
             }
             $i++;
         }
 
-        return $elements;
-    }
-
-    /**
-     * @param array<string|null> $dataGroups
-     *
-     * @return array<string>
-     */
-    private function terminateDataGroups(array $dataGroups): array
-    {
-        return array_map(
-            fn(?string $value): string => $this->delimiter->terminate((string)$value),
-            $this->deleteEmptyArrayEnds($dataGroups)
-        );
-    }
-
-    private function deleteEmptyArrayEnds(array $array): array
-    {
-        $reversed = array_reverse($array);
-        foreach ($reversed as $key => $value) {
-            if (!empty($value)) {
-                break;
-            }
-            unset($reversed[$key]);
-        }
-        return array_reverse($reversed);
+        return $dataCollection;
     }
 }

@@ -1,11 +1,12 @@
-<?php 
+<?php
 
 namespace Proengeno\Edifact\Test\Fixtures\Segments;
 
 use DateTime;
+use Proengeno\Edifact\Message\DataGroupCollection;
 use Proengeno\Edifact\Templates\AbstractSegment;
 
-class Unb extends AbstractSegment 
+class Unb extends AbstractSegment
 {
     protected static $validationBlueprint = [
         'UNB' => ['UNB' => 'M|an|3'],
@@ -20,17 +21,20 @@ class Unb extends AbstractSegment
 
     public static function fromAttributes($syntaxId, $syntaxVersion, $sender, $senderQualifier, $receiver, $receiverQualifier, DateTime $creationDatetime, $referenzNumber, $usageType = null, $testMarker = null)
     {
-
-        return new static([
-            'UNB' => ['UNB' => 'UNB'],
-            'S001' => ['0001' => $syntaxId, '0002' => $syntaxVersion],
-            'S002' => ['0004' => $sender, '0007' => $senderQualifier],
-            'S003' => ['0010' => $receiver, '0007' => $receiverQualifier],
-            'S004' => ['0017' => $creationDatetime->format('ymd'), '0019' => $creationDatetime->format('hi')],
-            '0020' => ['0020' => $referenzNumber],
-            '0026' => ['0026' => $usageType],
-            '0035' => ['0035' => $testMarker],
-        ]);
+        return new static(
+            (new DataGroupCollection(static::getBuildDelimiter()))
+                ->addValue('UNB', 'UNB', 'UNB')
+                ->addValue('S001', '0001', $syntaxId)
+                ->addValue('S001', '0002', $syntaxVersion)
+                ->addValue('S002', '0004', $sender)
+                ->addValue('S002', '0007', $senderQualifier)
+                ->addValue('S003', '0010', $receiver)
+                ->addValue('S003', '0007', $receiverQualifier)
+                ->addValue('S004', '0017', $creationDatetime->format('ymd'))
+                ->addValue('0020', '0020', $referenzNumber)
+                ->addValue('0026', '0026', $usageType)
+                ->addValue('0035', '0035', $usageType)
+        );
     }
 
     public function syntaxId()

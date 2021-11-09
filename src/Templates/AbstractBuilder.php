@@ -203,7 +203,8 @@ abstract class AbstractBuilder implements BuilderInterface
     protected function writeSeg($segmentName, $attributes = [], $method = 'fromAttributes')
     {
         $segment = $this->getSegmentFactory()->fromAttributes($segmentName, $attributes, $method);
-        $this->edifactFile->write((string)$segment);
+
+        $this->edifactFile->write($segment->toString() . $this->edifactFile->getDelimiter()->getSegment());
         $this->countSegments($segment);
     }
 

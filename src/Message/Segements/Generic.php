@@ -1,11 +1,12 @@
 <?php
 
-namespace Proengeno\Edifact\Message;
+namespace Proengeno\Edifact\Message\Segements;
 
+use Proengeno\Edifact\Message\DataGroupCollection;
 use Proengeno\Edifact\Templates\AbstractSegment;
 use Proengeno\Edifact\Exceptions\EdifactException;
 
-class GenericSegment extends AbstractSegment
+class Generic extends AbstractSegment
 {
     /**
      * @return void
@@ -20,24 +21,20 @@ class GenericSegment extends AbstractSegment
         return $this;
     }
 
-    /**
-     * @return array<string, array<string, null|string>>
-     */
-    protected static function mapToBlueprint(string $segLine): array
+    protected static function mapToBlueprint(string $segLine): DataGroupCollection
     {
         $inputDataGroups = static::getBuildDelimiter()->explodeSegments($segLine);
 
-        $elements = [];
+        $dataCollection = new DataGroupCollection;
 
         for ($i = 0; $i < $_ = count($inputDataGroups); $i++) {
             $inputElements = static::getBuildDelimiter()->explodeElements($inputDataGroups[$i]);
 
             for($j = 0; $j < $__ = count($inputElements); $j++) {
-                // Force Php to string-cast the array keys
-                $elements["_$i"]["_$j"] = $inputElements[$j];
+                $dataCollection->addValue((string)$i, (string)$j, $inputElements[$j]);
             }
         }
 
-        return $elements;
+        return $dataCollection ;
     }
 }

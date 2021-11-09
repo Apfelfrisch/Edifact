@@ -1,10 +1,11 @@
-<?php 
+<?php
 
 namespace Proengeno\Edifact\Test\Fixtures\Segments;
 
+use Proengeno\Edifact\Message\DataGroupCollection;
 use Proengeno\Edifact\Templates\AbstractSegment;
 
-class Unh extends AbstractSegment 
+class Unh extends AbstractSegment
 {
     protected static $validationBlueprint = [
         'UNH' => ['UNH' => 'M|an|3'],
@@ -14,16 +15,21 @@ class Unh extends AbstractSegment
 
     public static function fromAttributes($referenz, $type, $versionNumber, $releaseNumber, $organisation, $organisationCode)
     {
-        return new static([
-            'UNH' => ['UNH' => 'UNH'],
-            '0062' => ['0062' => $referenz],
-            'S009' => ['0065' => $type, '0052' => $versionNumber, '0054' => $releaseNumber, '0051' => $organisation, '0057' => $organisationCode],
-        ]);
+        return new static(
+            (new DataGroupCollection(static::getBuildDelimiter()))
+                ->addValue('UNH', 'UNH', 'UNH')
+                ->addValue('0062', '0062', $referenz)
+                ->addValue('S009', '0065', $type)
+                ->addValue('S009', '0052', $versionNumber)
+                ->addValue('S009', '0054', $releaseNumber)
+                ->addValue('S009', '0051', $organisation)
+                ->addValue('S009', '0057', $organisationCode)
+        );
     }
 
     public function referenz()
     {
-        return @$this->elements['0062']['0062'] ?: null;
+        return $this->elements->getValue('0062', '0062');
     }
 
     public function type()

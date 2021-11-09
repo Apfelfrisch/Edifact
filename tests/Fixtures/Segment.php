@@ -2,6 +2,7 @@
 
 namespace Proengeno\Edifact\Test\Fixtures;
 
+use Proengeno\Edifact\Message\DataGroupCollection;
 use Proengeno\Edifact\Templates\AbstractSegment;
 
 class Segment extends AbstractSegment
@@ -17,13 +18,14 @@ class Segment extends AbstractSegment
 
     public static function fromAttributes($attribute)
     {
-        return new static([
-            'A' => ['A' => $attribute],
-        ]);
+        return new static(
+            (new DataGroupCollection)
+                ->addValue('A', 'A', $attribute)
+        );
     }
 
     public function dummyMethod()
     {
-        return @$this->elements['B']['B'] ?: null;
+        return $this->elements->getValue('B', 'B');
     }
 }

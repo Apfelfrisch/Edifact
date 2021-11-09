@@ -1,12 +1,13 @@
-<?php 
+<?php
 
 namespace Proengeno\Edifact\Test\Fixtures\Segments;
 
 use DateTime;
+use Proengeno\Edifact\Message\DataGroupCollection;
 use Proengeno\Edifact\Templates\AbstractSegment;
 use Proengeno\Edifact\Exceptions\SegValidationException;
 
-class Dtm extends AbstractSegment 
+class Dtm extends AbstractSegment
 {
     private static $timecodes = [
         102 => 'YmdH',
@@ -21,10 +22,13 @@ class Dtm extends AbstractSegment
 
     public static function fromAttributes($qualifier, DateTime $date, $code)
     {
-        return new static([
-            'DTM' => ['DTM' => 'DTM'],
-            'C507' => ['2005' => $qualifier, '2380' => $date->format(static::getTimecodeFormat($code)), '2379' => $code],
-        ]);
+        return new static(
+            (new DataGroupCollection(static::getBuildDelimiter()))
+                ->addValue('DTM', 'DTM', 'DTM')
+                ->addValue('C507', '2005', $qualifier)
+                ->addValue('C507', '2380', $date->format(static::getTimecodeFormat($code)))
+                ->addValue('C507', '2379', $code)
+        );
     }
 
     public static function getTimecodeFormat($code)

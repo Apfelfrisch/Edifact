@@ -1,10 +1,11 @@
-<?php 
+<?php
 
 namespace Proengeno\Edifact\Test\Fixtures\Segments;
 
+use Proengeno\Edifact\Message\DataGroupCollection;
 use Proengeno\Edifact\Templates\AbstractSegment;
 
-class Unz extends AbstractSegment 
+class Unz extends AbstractSegment
 {
     protected static $validationBlueprint = [
         'UNZ' => ['UNZ' => 'M|an|3'],
@@ -14,13 +15,12 @@ class Unz extends AbstractSegment
 
     public static function fromAttributes($counter, $referenz)
     {
-        $instance = new static([
-            'UNZ' => ['UNZ' => 'UNZ'],
-            '0062' => ['0062' => $counter],
-            'S009' => ['0065' => $referenz],
-        ]);
-
-        return $instance;
+        return new static(
+            (new DataGroupCollection(static::getBuildDelimiter()))
+                ->addValue('UNZ', 'UNZ', 'UNZ')
+                ->addValue('0062', '0062', $counter)
+                ->addValue('S009', '0065', $referenz)
+        );
     }
 
     public function counter()

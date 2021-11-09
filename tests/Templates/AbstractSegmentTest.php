@@ -76,44 +76,34 @@ class AbstractSegmentTest extends TestCase
     }
 
     /** @test */
-    public function it_can_cast_to_a_string()
+    public function it_can_provide_the_segling()
     {
         $givenString = 'A+B+1:2:3:4:5+D+E';
-        $expectedString = $givenString . "'";
 
         $segment = Segment::fromSegLine($givenString);
 
-        $this->assertEquals($expectedString, (string)$segment);
+        $this->assertEquals($givenString, $segment->toString());
     }
 
     /** @test */
     public function it_removes_his_loose_ends_when_it_is_castet_to_a_string()
     {
-        $givenString = 'A+B+1:2:::+D++';
-        $expectedString = "A+B+1:2+D'";
+        $givenString = "A+B+1:2:::+D++";
+        $expectedString = "A+B+1:2+D";
 
         $segment = Segment::fromSegLine($givenString);
 
-        $this->assertEquals($expectedString, (string)$segment);
+        $this->assertEquals($expectedString, $segment->toString());
     }
 
     /** @test */
     public function it_handles_string_terminations()
     {
         $givenString = "A+B?+";
-        $expectedString = "A+B+1:2+D'";
 
         $segment = Segment::fromSegLine($givenString);
+
         $this->assertEquals('B+', $segment->dummyMethod());
-    }
-
-    /** @test */
-    public function it_can_grap_a_value_over_an_element_key()
-    {
-        $givenString = "Aa+Bb";
-
-        $segment = Segment::fromSegLine($givenString);
-        $this->assertEquals('Aa', $segment->getA());
-        $this->assertEquals('Bb', $segment->getB());
+        $this->assertEquals($givenString, $segment->toString());
     }
 }

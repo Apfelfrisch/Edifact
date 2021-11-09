@@ -1,10 +1,11 @@
-<?php 
+<?php
 
 namespace Proengeno\Edifact\Test\Fixtures\Segments;
 
+use Proengeno\Edifact\Message\DataGroupCollection;
 use Proengeno\Edifact\Templates\AbstractSegment;
 
-class Bgm extends AbstractSegment 
+class Bgm extends AbstractSegment
 {
     protected static $validationBlueprint = [
         'BGM' => ['BGM' => 'M|a|3'],
@@ -15,26 +16,17 @@ class Bgm extends AbstractSegment
 
     public static function fromAttributes($docCode, $docNumber, $messageCode = null)
     {
-        return new static([
-            'BGM' => ['BGM' => 'BGM'],
-            'C002' => ['1001' => $docCode],
-            'C106' => ['1004' => $docNumber],
-            '1225' => ['1225' => $messageCode],
-        ]);
+        return new static(
+            (new DataGroupCollection(static::getBuildDelimiter()))
+                ->addValue('BGM', 'BGM', 'BGM')
+                ->addValue('C002', '1001', $docCode)
+                ->addValue('C106', '1004', $docNumber)
+                ->addValue('1225', '1225', $messageCode)
+        );
     }
 
     public function docCode()
     {
-        return @$this->elements['C002']['1001'] ?: null;
-    }
-
-    public function docNumber()
-    {
-        return @$this->elements['C106']['1004'] ?: null;
-    }
-
-    public function messageCode()
-    {
-        return @$this->elements['1225']['1225'] ?: null;
+        return $this->elements->getValue('C002', '1001');
     }
 }
