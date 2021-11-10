@@ -4,7 +4,8 @@ namespace Proengeno\Edifact\Validation;
 
 use Proengeno\Edifact\Interfaces\SegValidatorInterface;
 use Proengeno\Edifact\Exceptions\SegValidationException;
-use Proengeno\Edifact\Message\DataGroupCollection;
+use Proengeno\Edifact\Message\DataGroups;
+use Proengeno\Edifact\Message\SegmentData;
 
 class SegmentValidator implements SegValidatorInterface
 {
@@ -12,12 +13,9 @@ class SegmentValidator implements SegValidatorInterface
     const NUMERIC = 'n';
     const ALPHA_NUMERIC = 'an';
 
-    /**
-     * @param array<string, array<string, string>> $blueprint
-     */
-    public function validate(array $blueprint, DataGroupCollection $elements): SegValidatorInterface
+    public function validate(DataGroups $blueprint, SegmentData $elements): SegValidatorInterface
     {
-        foreach ($blueprint as $dataGroupKey => $dataGroup) {
+        foreach ($blueprint->toArray() as $dataGroupKey => $dataGroup) {
             foreach ($dataGroup as $dataKey => $validation) {
                 if ($validation !== null) {
                     list($necessaryStatus, $type, $lenght) = explode('|', $validation);
@@ -38,17 +36,17 @@ class SegmentValidator implements SegValidatorInterface
         return $this;
     }
 
-    private function isDataIsAvailable(DataGroupCollection $elements, string $dataGroupKey, string $dataKey): bool
+    private function isDataIsAvailable(SegmentData $elements, string $dataGroupKey, string $dataKey): bool
     {
         return ($elements->getValue($dataGroupKey, $dataKey) ?? '') !== '';
     }
 
-    private function isDatafieldIsAvailable(DataGroupCollection $elements, string $dataGroupKey, string $dataKey): bool
+    private function isDatafieldIsAvailable(SegmentData $elements, string $dataGroupKey, string $dataKey): bool
     {
         return $elements->getValue($dataGroupKey, $dataKey) !== null;
     }
 
-    private function checkAvailability(DataGroupCollection $elements, string $dataGroupKey, string $dataKey): void
+    private function checkAvailability(SegmentData $elements, string $dataGroupKey, string $dataKey): void
     {
         if ($this->isDatafieldIsAvailable($elements, $dataGroupKey, $dataKey)) {
             return;
@@ -62,7 +60,7 @@ class SegmentValidator implements SegValidatorInterface
         return !($necessaryStatus === 'M' || $necessaryStatus === 'R');
     }
 
-    private function checkStringType(?string $type, DataGroupCollection $elements, string $dataGroupKey, string $dataKey): void
+    private function checkStringType(?string $type, SegmentData $elements, string $dataGroupKey, string $dataKey): void
     {
         $string = $elements->getValue($dataGroupKey, $dataKey) ?? '';
 
@@ -77,7 +75,7 @@ class SegmentValidator implements SegValidatorInterface
         }
     }
 
-    private function checkStringLenght(string $lenght, DataGroupCollection $elements, string $dataGroupKey, string $dataKey): void
+    private function checkStringLenght(string $lenght, SegmentData $elements, string $dataGroupKey, string $dataKey): void
     {
         $string = $elements->getValue($dataGroupKey, $dataKey) ?? '';
 

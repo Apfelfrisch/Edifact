@@ -36,7 +36,7 @@ final class EdifactFile extends SplFileInfo
         $this->resource = $resource;
 
         if ($openMode === 'r' || substr($openMode, 1, 1) === '+') { // Stream is readable
-            $this->delimiter = $delimiter ?? Delimiter::setFromFile($this);
+            $this->delimiter = Delimiter::setFromFile($this, fallback: $delimiter);
         } else {
             $this->delimiter = $delimiter ?? new Delimiter;
         }

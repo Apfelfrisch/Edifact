@@ -2,14 +2,10 @@
 
 namespace Proengeno\Edifact\Interfaces;
 
-use Proengeno\Edifact\Message\DataGroupCollection;
+use Proengeno\Edifact\Message\DataGroups;
+use Proengeno\Edifact\Message\SegmentData;
 
 interface SegValidatorInterface
 {
-    /**
-     * @param array<string, array<string, string>> $blueprint
-     *
-     * @return SegValidatorInterface
-     */
-    public function validate(array $blueprint, DataGroupCollection $elements): self;
+    public function validate(DataGroups $blueprint, SegmentData $elements): self;
 }

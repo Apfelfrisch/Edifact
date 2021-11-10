@@ -3,7 +3,8 @@
 namespace Proengeno\Edifact\Templates;
 
 use Proengeno\Edifact\Exceptions\SegValidationException;
-use Proengeno\Edifact\Message\DataGroupCollection;
+use Proengeno\Edifact\Message\DataGroups;
+use Proengeno\Edifact\Message\SegmentData;
 use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Interfaces\SegInterface;
 use Proengeno\Edifact\Validation\SegmentValidator;
@@ -11,62 +12,26 @@ use Proengeno\Edifact\Interfaces\SegValidatorInterface;
 
 abstract class AbstractSegment implements SegInterface
 {
-    /** @var array<string, array<string, string>> */
-    protected static $validationBlueprint = [];
-
-    protected static SegValidatorInterface|null $buildValidator = null;
-
-    protected static Delimiter|null $buildDelimiter = null;
-
-    protected DataGroupCollection $elements;
+    protected SegmentData $elements;
 
     protected array $cache = [];
 
-    protected Delimiter $delimiter;
-
     protected SegValidatorInterface $validator;
 
-    protected function __construct(DataGroupCollection $elements)
+    protected function __construct(SegmentData $elements)
     {
         $this->elements = $elements;
-        $this->delimiter = static::getBuildDelimiter();
-        $this->validator = static::$buildValidator ?? new SegmentValidator;
+        $this->validator = new SegmentValidator;
     }
 
+    abstract public static function blueprint(): DataGroups;
+
     /**
-     * @param string $segLine
-     *
-     * @return static
-     *
      * @psalm-suppress UnsafeInstantiation
      */
-    public static function fromSegLine($segLine)
+    public static function fromSegLine(Delimiter $delimiter, string $segLine): SegInterface
     {
-        return new static(static::mapToBlueprint($segLine));
-    }
-
-    /**
-     * @return void
-     */
-    public static function setBuildDelimiter(?Delimiter $delimiter)
-    {
-        self::$buildDelimiter = $delimiter;
-    }
-
-    /**
-     * @return Delimiter
-     */
-    public static function getBuildDelimiter()
-    {
-        return self::$buildDelimiter ?? new Delimiter;
-    }
-
-    /**
-     * @return void
-     */
-    public static function setBuildValidator(SegValidatorInterface $buildValidator = null)
-    {
-        self::$buildValidator = $buildValidator;
+        return new static(static::mapToBlueprint($delimiter, $segLine));
     }
 
     /**
@@ -90,7 +55,7 @@ abstract class AbstractSegment implements SegInterface
 
     public function getDelimiter(): Delimiter
     {
-        return $this->delimiter;
+        return $this->elements->getDelimiter();
     }
 
     public function name(): string
@@ -102,11 +67,9 @@ abstract class AbstractSegment implements SegInterface
         return $name;
     }
 
-    public function validate(): self
+    public function validate(): void
     {
-        $this->validator->validate(static::$validationBlueprint, $this->elements);
-
-        return $this;
+        $this->validator->validate(static::blueprint(), $this->elements);
     }
 
     public function toArray(): array
@@ -134,25 +97,9 @@ abstract class AbstractSegment implements SegInterface
     }
 
     /**
-     * @param string $attribute
-     *
-     * @return string|null
-     */
-    public function __get($attribute)
-    {
-        try {
-            if (in_array($attribute, $this->getGetterMethods())) {
-                return $this->$attribute();
-            }
-        } catch (\Throwable) { }
-
-        return null;
-    }
-
-    /**
      * @return list<string>
      */
-    protected function getGetterMethods()
+    protected function getGetterMethods(): array
     {
         if (isset($this->cache['getterMethods'])) {
             return $this->cache['getterMethods'];
@@ -168,15 +115,15 @@ abstract class AbstractSegment implements SegInterface
         return $this->cache['getterMethods'];
     }
 
-    protected static function mapToBlueprint(string $segLine): DataGroupCollection
+    protected static function mapToBlueprint(Delimiter $delimiter, string $segLine): SegmentData
     {
         $i = 0;
-        $dataCollection = new DataGroupCollection(static::getBuildDelimiter());
-        $inputDataGroups = static::getBuildDelimiter()->explodeSegments($segLine);
-        foreach (static::$validationBlueprint as $BpDataKey => $BPdataGroups) {
+        $dataCollection = new DataGroups;
+        $inputDataGroups = $delimiter->explodeSegments($segLine);
+        foreach (static::blueprint()->toArray() as $BpDataKey => $BPdataGroups) {
             $inputElement = [];
             if (isset($inputDataGroups[$i])) {
-                $inputElement = static::getBuildDelimiter()->explodeElements($inputDataGroups[$i]);
+                $inputElement = $delimiter->explodeElements($inputDataGroups[$i]);
             }
 
             $j = 0;
@@ -187,6 +134,6 @@ abstract class AbstractSegment implements SegInterface
             $i++;
         }
 
-        return $dataCollection;
+        return new SegmentData($dataCollection, $delimiter);
     }
 }

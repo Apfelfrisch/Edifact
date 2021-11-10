@@ -2,40 +2,46 @@
 
 namespace Proengeno\Edifact\Message;
 
-final class DataGroupCollection
+final class SegmentData
 {
     private Delimiter $delimiter;
+    private DataGroups $dataGroups;
 
-    /** @var array<string, array<string, string|null>> */
-    private array $dataGroups = [];
-
-    public function __construct(Delimiter $delimiter = null)
+    public function __construct(DataGroups $dataGroups, Delimiter $delimiter = null)
     {
+        $this->dataGroups = $dataGroups;
         $this->delimiter = $delimiter ?? new Delimiter;
     }
 
-    public function addValue(string $dataGroupKey, string $valueKey, ?string $value): self
+    public function getDelimiter(): Delimiter
     {
-        $this->dataGroups[$dataGroupKey][$valueKey] = $value;
-
-        return $this;
+        return $this->delimiter;
     }
 
     public function getValueFromPosition(int $dataGroupPosition, int $valuePosition): ?string
     {
-        return array_values(array_values($this->dataGroups)[$dataGroupPosition])[$valuePosition] ?? null;
+        return $this->dataGroups->getValueFromPosition($dataGroupPosition, $valuePosition);
     }
 
     public function getValue(string $dataGroupKey, string $valueKey): ?string
     {
-        return $this->dataGroups[$dataGroupKey][$valueKey] ?? null;
+        return $this->dataGroups->getValue($dataGroupKey, $valueKey);
+    }
+
+    public function getNumericValue(string $dataGroupKey, string $valueKey): ?string
+    {
+        if (null === $value = $this->getValue($dataGroupKey, $valueKey)) {
+            return $value;
+        }
+
+        return str_replace($this->delimiter->getDecimal(), '.', $value);
     }
 
     public function toString(): string
     {
         $string = '';
 
-        foreach($this->dataGroups as $dataGroup) {
+        foreach($this->dataGroups->toArray() as $dataGroup) {
             foreach ($dataGroup as $value) {
                 $string .= $value === null
                     ? $this->delimiter->getData()

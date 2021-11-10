@@ -26,43 +26,36 @@ final class SegmentFactory
 
     public function fromSegline(string $segline): SegInterface
     {
-        return $this->instanciateSegment($this->getSegname($segline), 'fromSegLine', $segline);
+        $segment = $this->getSegmentClass($this->getSegname($segline));
+
+        return $segment::fromSegLine($this->delimiter, $segline);
     }
 
     public function fromAttributes(string $segmentName, array $attributes = [], string $method = 'fromAttributes'): SegInterface
     {
-        return $this->instanciateSegment($segmentName, $method, $attributes);
-    }
-
-    private function instanciateSegment(string $segmentName, string $method, string|array $attributes): SegInterface
-    {
-        if (!is_array($attributes)) {
-            $attributes = [$attributes];
-        }
-
         $segment = $this->getSegmentClass($segmentName);
 
-        if ($segment !== null && is_callable([$segment, 'setBuildDelimiter'])) {
-            call_user_func_array([$segment, 'setBuildDelimiter'], [$this->delimiter]);
-
-            return call_user_func_array([$segment, $method], $attributes);
-        }
-
-        if ($this->genericSegment !== null) {
-            call_user_func_array([$this->genericSegment, 'setBuildDelimiter'], [$this->delimiter]);
-
-            return call_user_func_array([$this->genericSegment, $method], $attributes);
-        }
-
-        throw new ValidationException("Unknown Segment '" . $segmentName . "'");
+        return $segment::$method($this->delimiter, ...$attributes);
     }
 
-    private function getSegmentClass(string $segmentName): ?string
+    /**
+     * @psalm-return class-string<SegInterface>
+     */
+    private function getSegmentClass(string $segmentName): string
     {
-        if ($this->segmentNamespace === null) {
-            return null;
+        $segmentClass = ucfirst(strtolower($segmentName));
+
+        if ($this->segmentNamespace !== null) {
+            $segmentClass = $this->segmentNamespace . '\\' . $segmentClass;
         }
-        return $this->segmentNamespace . '\\' . ucfirst(strtolower($segmentName));
+
+        if (! is_subclass_of($segmentClass, SegInterface::class)) {
+            if (null === $segmentClass = $this->genericSegment) {
+                throw new ValidationException("Unknown Segment '" . $this->getSegname($segmentName) . "'");
+            }
+        }
+
+        return $segmentClass;
     }
 
     private function getSegname(string $segLine): string

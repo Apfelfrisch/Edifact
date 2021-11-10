@@ -2,26 +2,40 @@
 
 namespace Proengeno\Edifact\Test\Fixtures;
 
-use Proengeno\Edifact\Message\DataGroupCollection;
+use Proengeno\Edifact\Message\DataGroups;
+use Proengeno\Edifact\Message\SegmentData;
+use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Templates\AbstractSegment;
 
 class Segment extends AbstractSegment
 {
-    protected static $validationBlueprint = [
-        'A' => ['A' => 'M|an|3'],
-        'B' => ['B' => 'O'],
-        'C' => ['1' => 'M|an|3', '2' => 'M|an|3', '3' => 'O', '4' => 'M|an|3', '5' => 'M|an|3'],
-        'D' => ['D' => 'O'],
-        'E' => ['E' => 'O'],
-        'F' => ['F' => 'O'],
-    ];
+    private static ?DataGroups $validationBlueprint = null;
 
-    public static function fromAttributes($attribute)
+    public static function blueprint(): DataGroups
     {
-        return new static(
-            (new DataGroupCollection)
-                ->addValue('A', 'A', $attribute)
-        );
+        if (self::$validationBlueprint === null) {
+            self::$validationBlueprint = (new DataGroups)
+                ->addValue('A', 'A', 'M|an|3')
+                ->addValue('B', 'B', 'O|an|3')
+                ->addValue('C', '1', 'M|an|3')
+                ->addValue('C', '2', 'M|an|3')
+                ->addValue('C', '3', 'O|an|3')
+                ->addValue('C', '4', 'M|an|3')
+                ->addValue('C', '5', 'M|an|3')
+                ->addValue('D', 'D', 'O|an|3')
+                ->addValue('E', 'E', 'O|an|3')
+                ->addValue('F', 'F', 'O|an|3');
+        }
+
+        return self::$validationBlueprint;
+    }
+
+    public static function fromAttributes(Delimiter $delimiter, $attribute): self
+    {
+        return new self(new SegmentData(
+            (new DataGroups)->addValue('A', 'A', $attribute),
+            $delimiter
+        ));
     }
 
     public function dummyMethod()

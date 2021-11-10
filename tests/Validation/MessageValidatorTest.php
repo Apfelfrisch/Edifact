@@ -12,8 +12,6 @@ class MessageValidatorTest extends TestCase
     /** @test */
     public function it_can_vaildate_a_message_without_reloops()
     {
-        $validator = new MessageValidator;
-
         $edifactMessage = Message::fromString(
             "UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'RFF+Z13:123'LIN+1'DTM+137:201604221414:203'UNS+D'UNT+18+2'UNZ+4+6910995E'",
             $this->getConfiguration()
@@ -24,8 +22,6 @@ class MessageValidatorTest extends TestCase
     /** @test */
     public function it_can_vaildate_a_message_with_1_nested_reloop()
     {
-        $validator = new MessageValidator;
-
         $edifactMessage = Message::fromString(
             "UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'RFF+Z13:123'LIN+1'DTM+137:201604221414:203'LIN+1'DTM+137:201604221414:203'UNS+D'UNT+18+2'UNZ+4+6910995E'",
             $this->getConfiguration()
@@ -36,8 +32,6 @@ class MessageValidatorTest extends TestCase
     /** @test */
     public function it_can_vaildate_a_message_with_multiple_nested_reloops()
     {
-        $validator = new MessageValidator;
-
         $edifactMessage = Message::fromString(
             "UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'RFF+Z13:123'LIN+1'DTM+137:201604221414:203'LIN+1'DTM+137:201604221414:203'UNS+D'UNT+18+2'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'RFF+Z13:123'LIN+1'DTM+137:201604221414:203'LIN+1'DTM+137:201604221414:203'UNS+D'UNT+18+2'UNZ+4+6910995E'",
             $this->getConfiguration()
@@ -48,8 +42,6 @@ class MessageValidatorTest extends TestCase
     /** @test */
     public function it_can_vaildate_a_message_with_single_segment_reloops()
     {
-        $validator = new MessageValidator;
-
         $edifactMessage = Message::fromString(
             "UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'RFF+Z13:123'LIN+1'DTM+137:201504221414:203'UNS+D'UNS+D'UNT+18+2'UNZ+4+6910995E'",
             $this->getConfiguration()
@@ -60,8 +52,6 @@ class MessageValidatorTest extends TestCase
     /** @test */
     public function it_ignores_unrequiered_fiedls_if_they_are_not_set()
     {
-        $validator = new MessageValidator;
-
         $edifactMessage = Message::fromString(
             "UNA:+.? 'UNH+1+MSG:D:11A:UN:5.1e'BGM+380+9'LIN+1'DTM+137:201504221414:203'UNS+D'UNS+D'UNT+18+2'UNZ+4+6910995E'",
             $this->getConfiguration()

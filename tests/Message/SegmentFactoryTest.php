@@ -4,14 +4,14 @@ namespace Proengeno\Edifact\Test\Message;
 
 use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\Message\SegmentFactory;
-use Proengeno\Edifact\Message\Segements\Generic;
+use Proengeno\Edifact\Message\Segments\Generic;
 use Proengeno\Edifact\Exceptions\EdifactException;
 use Proengeno\Edifact\Exceptions\ValidationException;
 
 class SegmentFactoryTest extends TestCase
 {
     private $segFactory;
-    private $segmentNamespace = '\Proengeno\Edifact\Test\Fixtures\Segments';
+    private $segmentNamespace = '\Proengeno\Edifact\Message\Segments';
 
     public function setUp(): void
     {

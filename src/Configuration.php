@@ -6,13 +6,15 @@ use Closure;
 use Proengeno\Edifact\Exceptions\EdifactException;
 use Proengeno\Edifact\Interfaces\SegInterface;
 use Proengeno\Edifact\Message\Delimiter;
-use Proengeno\Edifact\Message\Segements\Generic;
+use Proengeno\Edifact\Message\Segments\Generic;
 use Proengeno\Edifact\Interfaces\BuilderInterface;
 
 class Configuration
 {
     /** @var class-string<SegInterface> */
     protected $genericSegment = Generic::class;
+
+    protected ?string $segmentNamespace = 'Proengeno\Edifact\Message\Segments';
 
     protected Delimiter $delimiter;
 
@@ -25,7 +27,6 @@ class Configuration
 
     protected ?string $exportSender = null;
 
-    protected ?string $segmentNamespace = null;
 
     /** @var list<string> */
     protected array $readFilter = [];
