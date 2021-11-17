@@ -12,6 +12,23 @@ Highlights
 * Parse each Message to its specfic Object, see above.
 * Validate the Message, with predefined rules. 
 
+Usage
+-------
+```php
+use Proengeno\Edifact\Edifact;
+use \Proengeno\Edifact\Message\Segments\Nad;
+
+$edifact = new Edifact;
+
+$message = $edifact->resolveFromString("UNA:+.? 'NAD+DP++++Musterstr.::10+City++12345+DE");
+
+foreach ($message as $segment) {
+    if ($segment instanceof Nad) {
+        echo $segment->street(); // Musterstr.
+    }
+}
+```
+
 Notes
 -------
 This Package only provides the basic Framework to work with Edifact Messages.

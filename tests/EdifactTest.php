@@ -4,15 +4,11 @@ namespace Proengeno\Edifact\Test\Message;
 
 use Proengeno\Edifact\Edifact;
 use Proengeno\Edifact\Test\TestCase;
-use Proengeno\Edifact\EdifactBuilder;
 use Proengeno\Edifact\Message\Message;
-use Proengeno\Edifact\EdifactResolver;
 use Proengeno\Edifact\Test\Fixtures\Builder;
 
 class EdifactTest extends TestCase
 {
-    private $edifactBuilder;
-
     public function setUp(): void
     {
         $configuration = $this->getConfiguration();

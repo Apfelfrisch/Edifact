@@ -9,11 +9,9 @@ use Proengeno\Edifact\Exceptions\EdifactException;
 
 class Edifact
 {
-    protected Configuration $configuration;
-
-    public function __construct(Configuration $configuration)
+    public function __construct(protected ?Configuration $configuration = null)
     {
-        $this->configuration = $configuration;
+        $this->configuration = $configuration ?? new Configuration;
     }
 
     public function build(string $key, string $to, string $filename = 'php://temp'): BuilderInterface
