@@ -19,8 +19,8 @@ class Cci extends AbstractSegment
                 ->addValue('7059', '7059', 'O|an|3')
                 ->addValue('C502', '6313', null)
                 ->addValue('C240', '7037', 'O|an|17')
-                ->addValue('C240', '1131', null)
-                ->addValue('C240', '3055', null)
+                ->addValue('C240', '1131', 'O|an|17')
+                ->addValue('C240', '3055', 'O|an|3')
                 ->addValue('C240', '7036', 'O|an|35');
         }
 

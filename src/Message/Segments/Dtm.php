@@ -68,6 +68,7 @@ class Dtm extends AbstractSegment
             '102' => $date->format('Ymd'),
             '106' => $date->format('md'),
             '203' => $date->format('YmdHi'),
+            '303' => $date->format('YmdHi') . substr($date->format('O'), 0, 3),
             '602' => $date->format('Y'),
             '610' => $date->format('Ym'),
             default => throw SegValidationException::forKeyValue('DTM', $code, "Timecode doesnt Support DateTime or is unknown.")
