@@ -42,19 +42,17 @@ class Configuration
     }
 
     /**
-     * @param class-string<SegInterface> $genericSegment
-     *
-     * @return void
+     * @param class-string<SegInterface>|null $genericSegment
      */
-    public function setGenericSegment($genericSegment)
+    public function setGenericSegment(?string $genericSegment): void
     {
         $this->genericSegment = $genericSegment;
     }
 
     /**
-     * @return class-string<SegInterface>
+     * @return class-string<SegInterface>|null
      */
-    public function getGenericSegment()
+    public function getGenericSegment(): ?string
     {
         return $this->genericSegment;
     }

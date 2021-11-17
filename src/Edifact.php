@@ -16,16 +16,7 @@ class Edifact
         $this->configuration = $configuration;
     }
 
-    /**
-     * @param string $key
-     * @param string $to
-     * @param string $filename
-     *
-     * @return BuilderInterface
-     *
-     * @psalm-suppress UnsafeInstantiation
-     */
-    public function build($key, $to, $filename = 'php://temp')
+    public function build(string $key, string $to, string $filename = 'php://temp'): BuilderInterface
     {
         $builder = $this->configuration->getBuilder($key);
 
@@ -36,33 +27,17 @@ class Edifact
         return new $builder($to, $this->configuration, $filename);
     }
 
-    /**
-     * @param string $string
-     * @param string $filename
-     *
-     * @return Message
-     */
-    public function buildFromString($string, $filename = 'php://temp')
+    public function buildFromString(string $string, string $filename = 'php://temp'): Message
     {
         return Message::fromString($string, $this->configuration, $filename);
     }
 
-    /**
-     * @param string $filepath
-     *
-     * @return Message
-     */
-    public function resolveFromFile($filepath)
+    public function resolveFromFile(string $filepath): Message
     {
         return Message::fromFilepath($filepath, $this->configuration);
     }
 
-    /**
-     * @param string $string
-     *
-     * @return Message
-     */
-    public function resolveFromString($string)
+    public function resolveFromString(string $string): Message
     {
         return $this->buildFromString($string);
     }

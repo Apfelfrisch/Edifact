@@ -251,7 +251,7 @@ class Message implements \Iterator
 
     private function checkCriteria(callable|array|null $criteria, SegInterface $segmentObject): bool
     {
-        if ($criteria == null) {
+        if ($criteria === null) {
             return true;
         }
 
