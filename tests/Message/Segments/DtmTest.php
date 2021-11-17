@@ -6,6 +6,7 @@ namespace Proengeno\Edifact\Test\Message\Segments;
 
 use DateTime;
 use Iterator;
+use Proengeno\Edifact\Exceptions\SegValidationException;
 use Proengeno\Edifact\Message\Delimiter;
 use Proengeno\Edifact\Message\Segments\Dtm;
 use Proengeno\Edifact\Test\TestCase;
@@ -46,6 +47,16 @@ final class DtmTest extends TestCase
             $this->assertEquals($rawDate, $seg->date());
             $this->assertSame($rawDate, $seg->rawDate());
         }
+    }
+
+    /** @test */
+    public function it_throw_an_exception_if_the_date_code_is_unknown()
+    {
+        $code = '999';
+        $date = new DateTime;
+
+        $this->expectException(SegValidationException::class);
+        Dtm::fromAttributes(new Delimiter(), '137', $date, $code);
     }
 
     public function dateCodesProvider(): Iterator
