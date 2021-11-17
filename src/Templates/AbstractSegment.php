@@ -18,7 +18,7 @@ abstract class AbstractSegment implements SegInterface
 
     protected SegValidatorInterface $validator;
 
-    protected function __construct(SegmentData $elements)
+    final protected function __construct(SegmentData $elements)
     {
         $this->elements = $elements;
         $this->validator = new SegmentValidator;
@@ -26,29 +26,17 @@ abstract class AbstractSegment implements SegInterface
 
     abstract public static function blueprint(): DataGroups;
 
-    /**
-     * @psalm-suppress UnsafeInstantiation
-     */
     public static function fromSegLine(Delimiter $delimiter, string $segLine): SegInterface
     {
         return new static(static::mapToBlueprint($delimiter, $segLine));
     }
 
-    /**
-     * @param int $dataGroup
-     * @param int $element
-     *
-     * @return string|null
-     */
-    public function getValue($dataGroup, $element)
+    public function getValue(int $dataGroupKey, int $valueKey): ?string
     {
-        return $this->elements->getValueFromPosition($dataGroup, $element);
+        return $this->elements->getValueFromPosition($dataGroupKey, $valueKey);
     }
 
-    /**
-     * @return SegValidatorInterface
-     */
-    public function getValidator()
+    public function getValidator(): SegValidatorInterface
     {
         return $this->validator;
     }
