@@ -9,7 +9,9 @@ use Proengeno\Edifact\Exceptions\EdifactException;
 
 class Edifact
 {
-    public function __construct(protected ?Configuration $configuration = null)
+    protected Configuration $configuration;
+
+    public function __construct(?Configuration $configuration = null)
     {
         $this->configuration = $configuration ?? new Configuration;
     }

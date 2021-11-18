@@ -27,7 +27,7 @@ class Ucs extends AbstractSegment
     {
         return new self(new SegmentData(
             (new DataGroups)
-                ->addValue('UCS', 'UCS', 'M|an|3')
+                ->addValue('UCS', 'UCS', 'UCS')
                 ->addValue('0096', '0096', $position)
                 ->addValue('0085', '0085', $error),
             $delimiter

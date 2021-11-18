@@ -130,6 +130,9 @@ class Nad extends AbstractSegment
         );
     }
 
+    /**
+     * @todo Check if $title Attribute is nessecary
+     */
     public static function fromCompanyAdress(
         Delimiter $delimiter,
         string $qualifier,

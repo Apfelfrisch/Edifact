@@ -16,6 +16,7 @@ class Pri extends AbstractSegment
         if (self::$validationBlueprint === null) {
             self::$validationBlueprint = (new DataGroups)
                 ->addValue('PRI', 'PRI', 'M|a|3')
+                ->addValue('C509', '5125', 'M|n|3')
                 ->addValue('C509', '5118', 'M|n|15')
                 ->addValue('C509', '5375', null)
                 ->addValue('C509', '5387', null)

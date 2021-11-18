@@ -15,7 +15,7 @@ class Una extends AbstractSegment
     {
         if (self::$validationBlueprint === null) {
             self::$validationBlueprint = (new DataGroups)
-                ->addValue('UNA', 'Una', 'M|a|3')
+                ->addValue('UNA', 'UNA', 'M|a|3')
                 ->addValue('UNA', 'data', 'M|an|1')
                 ->addValue('UNA', 'dataGroup', 'M|an|1')
                 ->addValue('UNA', 'decimal', 'M|an|1')
