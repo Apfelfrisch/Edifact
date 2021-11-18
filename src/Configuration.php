@@ -5,8 +5,8 @@ namespace Proengeno\Edifact;
 use Closure;
 use Proengeno\Edifact\Exceptions\EdifactException;
 use Proengeno\Edifact\Interfaces\SegInterface;
-use Proengeno\Edifact\Message\Delimiter;
-use Proengeno\Edifact\Message\Segments\Generic;
+use Proengeno\Edifact\Delimiter;
+use Proengeno\Edifact\Segments\Generic;
 use Proengeno\Edifact\Interfaces\BuilderInterface;
 
 class Configuration
@@ -14,7 +14,7 @@ class Configuration
     /** @var class-string<SegInterface> */
     protected ?string $genericSegment = Generic::class;
 
-    protected ?string $segmentNamespace = 'Proengeno\Edifact\Message\Segments';
+    protected ?string $segmentNamespace = 'Proengeno\Edifact\Segments';
 
     protected Delimiter $delimiter;
 

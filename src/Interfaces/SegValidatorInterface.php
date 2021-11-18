@@ -2,8 +2,8 @@
 
 namespace Proengeno\Edifact\Interfaces;
 
-use Proengeno\Edifact\Message\DataGroups;
-use Proengeno\Edifact\Message\SegmentData;
+use Proengeno\Edifact\DataGroups;
+use Proengeno\Edifact\SegmentData;
 
 interface SegValidatorInterface
 {

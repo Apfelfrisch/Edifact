@@ -19,8 +19,7 @@
         },
         "classmap": [
             "tests/TestCase.php",
-            "tests/Fixtures/Segment.php",
-            "tests/Fixtures/Builder.php"
+            "tests/Fixtures/Segment.php"
         ]   
     }
 }

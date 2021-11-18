@@ -2,13 +2,11 @@
 
 namespace Proengeno\Edifact\Interfaces;
 
-use Proengeno\Edifact\Message\Delimiter;
+use Proengeno\Edifact\Delimiter;
 
 interface SegInterface
 {
-    public static function fromSegLine(Delimiter $delimiter, string $segLine): SegInterface;
-
-    public function getDelimiter(): Delimiter;
+    public static function fromSegLine(Delimiter $delimiter, string $segLine): self|static;
 
     public function name(): string;
 
@@ -16,5 +14,5 @@ interface SegInterface
 
     public function toArray(): array;
 
-    public function toString(): string;
+    public function toString(Delimiter $delimiter): string;
 }

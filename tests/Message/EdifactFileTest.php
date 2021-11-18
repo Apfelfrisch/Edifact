@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact\Test\Message;
 
-use Proengeno\Edifact\Message\EdifactFile;
+use Proengeno\Edifact\EdifactFile;
 use Proengeno\Edifact\Test\TestCase;
 
 class EdifactFileTest extends TestCase
@@ -29,7 +29,7 @@ class EdifactFileTest extends TestCase
 
     public function testCanInstantiateWithStreamIdentifier()
     {
-        $this->assertInstanceOf('Proengeno\Edifact\Message\EdifactFile', $this->stream);
+        $this->assertInstanceOf('Proengeno\Edifact\EdifactFile', $this->stream);
     }
 
     public function testCanGetEdifactSegments()

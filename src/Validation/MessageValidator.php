@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact\Validation;
 
-use Proengeno\Edifact\Message\Message;
+use Proengeno\Edifact\Message;
 use Proengeno\Edifact\Interfaces\SegInterface;
 use Proengeno\Edifact\Exceptions\EdifactException;
 use Proengeno\Edifact\Exceptions\ValidationException;

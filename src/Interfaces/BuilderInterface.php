@@ -3,8 +3,8 @@
 namespace Proengeno\Edifact\Interfaces;
 
 use Proengeno\Edifact\Configuration;
-use Proengeno\Edifact\Message\Message;
-use Proengeno\Edifact\Message\SegmentFactory;
+use Proengeno\Edifact\Message;
+use Proengeno\Edifact\SegmentFactory;
 
 interface BuilderInterface
 {

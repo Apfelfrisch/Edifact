@@ -3,7 +3,7 @@
 namespace Proengeno\Edifact\Test\Validation;
 
 use Proengeno\Edifact\Test\TestCase;
-use Proengeno\Edifact\Message\Message;
+use Proengeno\Edifact\Message;
 use Proengeno\Edifact\Validation\MessageValidator;
 use Proengeno\Edifact\Exceptions\ValidationException;
 

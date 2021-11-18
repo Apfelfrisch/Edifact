@@ -4,8 +4,8 @@ declare(strict_types = 1);
 
 namespace Proengeno\Edifact\Test\Message\Segments;
 
-use Proengeno\Edifact\Message\Delimiter;
-use Proengeno\Edifact\Message\Segments\Una;
+use Proengeno\Edifact\Delimiter;
+use Proengeno\Edifact\Segments\Una;
 use Proengeno\Edifact\Test\TestCase;
 
 final class UnaTest extends TestCase
@@ -13,7 +13,8 @@ final class UnaTest extends TestCase
     /** @test */
     public function test_segment(): void
     {
-        $seg = Una::fromAttributes(new Delimiter(), ':', '+', '.', '?', ' ');
+        $delimiter = new Delimiter();
+        $seg = Una::fromAttributes(':', '+', '.', '?', ' ');
 
         $this->assertEquals('UNA', $seg->name());
         $this->assertEquals(':', $seg->data());
@@ -22,6 +23,6 @@ final class UnaTest extends TestCase
         $this->assertEquals('?', $seg->terminator());
         $this->assertEquals(' ', $seg->emptyChar());
 
-        $this->assertEquals($seg->toString(), Una::fromSegLine(new Delimiter(), $seg->toString()));
+        $this->assertEquals($seg->toString($delimiter), Una::fromSegLine($delimiter, $seg->toString($delimiter))->toString($delimiter));
     }
 }

@@ -4,8 +4,8 @@ declare(strict_types = 1);
 
 namespace Proengeno\Edifact\Test\Message\Segments;
 
-use Proengeno\Edifact\Message\Delimiter;
-use Proengeno\Edifact\Message\Segments\Cav;
+use Proengeno\Edifact\Delimiter;
+use Proengeno\Edifact\Segments\Cav;
 use Proengeno\Edifact\Test\TestCase;
 
 final class CavTest extends TestCase
@@ -13,7 +13,8 @@ final class CavTest extends TestCase
     /** @test */
     public function test_ajt_segment()
     {
-        $seg = Cav::fromAttributes(new Delimiter(), 'COD', 'RCD', 'VON', 'VTW', 'CLS');
+        $delimiter = new Delimiter();
+        $seg = Cav::fromAttributes('COD', 'RCD', 'VON', 'VTW', 'CLS');
 
         $this->assertEquals('CAV', $seg->name());
         $this->assertEquals('COD', $seg->code());
@@ -21,6 +22,6 @@ final class CavTest extends TestCase
         $this->assertEquals('VON', $seg->valueOne());
         $this->assertEquals('VTW', $seg->valueTwo());
         $this->assertEquals('CLS', $seg->codeList());
-        $this->assertEquals($seg->toString(), Cav::fromSegLine(new Delimiter(), $seg->toString()));
+        $this->assertEquals($seg->toString($delimiter), Cav::fromSegLine($delimiter, $seg->toString($delimiter))->toString($delimiter));
     }
 }

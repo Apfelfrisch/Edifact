@@ -7,8 +7,8 @@ namespace Proengeno\Edifact\Test\Message\Segments;
 use DateTime;
 use Iterator;
 use Proengeno\Edifact\Exceptions\SegValidationException;
-use Proengeno\Edifact\Message\Delimiter;
-use Proengeno\Edifact\Message\Segments\Dtm;
+use Proengeno\Edifact\Delimiter;
+use Proengeno\Edifact\Segments\Dtm;
 use Proengeno\Edifact\Test\TestCase;
 
 final class DtmTest extends TestCase
@@ -16,13 +16,14 @@ final class DtmTest extends TestCase
     /** @test */
     public function test_ajt_segment(): void
     {
-        $seg = Dtm::fromAttributes(new Delimiter(), '102', '20200101', '102');
+        $delimiter = new Delimiter();
+        $seg = Dtm::fromAttributes('102', '20200101', '102');
 
         $this->assertEquals('DTM', $seg->name());
         $this->assertEquals('102', $seg->code());
         $this->assertEquals('2020-01-01', $seg->date()->format('Y-m-d'));
         $this->assertEquals('20200101', $seg->rawDate());
-        $this->assertEquals($seg->toString(), Dtm::fromSegLine(new Delimiter(), $seg->toString()));
+        $this->assertEquals($seg->toString($delimiter), Dtm::fromSegLine($delimiter, $seg->toString($delimiter))->toString($delimiter));
     }
 
     /**
@@ -32,7 +33,7 @@ final class DtmTest extends TestCase
     {
         $date = DateTime::createFromFormat("!$createFormat", date($createFormat));
 
-        $seg = Dtm::fromAttributes(new Delimiter(), '137', $date, $code);
+        $seg = Dtm::fromAttributes('137', $date, $code);
 
         $this->assertEquals($date, $seg->date());
         $this->assertSame($date->format($dateFormat), $seg->rawDate());
@@ -42,7 +43,7 @@ final class DtmTest extends TestCase
     {
         foreach (['802', 'Z01'] as $rawDateCode) {
             $rawDate = 'raw-date';
-            $seg = Dtm::fromAttributes(new Delimiter(), '137', $rawDate, $rawDateCode);
+            $seg = Dtm::fromAttributes('137', $rawDate, $rawDateCode);
 
             $this->assertEquals($rawDate, $seg->date());
             $this->assertSame($rawDate, $seg->rawDate());
@@ -56,7 +57,7 @@ final class DtmTest extends TestCase
         $date = new DateTime;
 
         $this->expectException(SegValidationException::class);
-        Dtm::fromAttributes(new Delimiter(), '137', $date, $code);
+        Dtm::fromAttributes('137', $date, $code);
     }
 
     public function dateCodesProvider(): Iterator

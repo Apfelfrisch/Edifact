@@ -3,10 +3,10 @@
 namespace Proengeno\Edifact\Test\Message;
 
 use Mockery as m;
-use Proengeno\Edifact\Message\Segments\Generic;
+use Proengeno\Edifact\Segments\Generic;
 use Proengeno\Edifact\Test\TestCase;
-use Proengeno\Edifact\Message\Message;
-use Proengeno\Edifact\Message\EdifactFile;
+use Proengeno\Edifact\Message;
+use Proengeno\Edifact\EdifactFile;
 use Proengeno\Edifact\Validation\MessageValidator;
 
 class MessageTest extends TestCase
@@ -50,8 +50,8 @@ class MessageTest extends TestCase
     {
         $messageCore = Message::fromString("UNH'UNB", $this->getConfiguration());
 
-        $this->assertInstanceOf(\Proengeno\Edifact\Message\Segments\Unh::class, $messageCore->getNextSegment());
-        $this->assertInstanceOf(\Proengeno\Edifact\Message\Segments\Unh::class, $messageCore->getCurrentSegment());
+        $this->assertInstanceOf(\Proengeno\Edifact\Segments\Unh::class, $messageCore->getNextSegment());
+        $this->assertInstanceOf(\Proengeno\Edifact\Segments\Unh::class, $messageCore->getCurrentSegment());
     }
 
     /** @test */
@@ -77,8 +77,8 @@ class MessageTest extends TestCase
     public function it_fetch_the_next_segement_from_stream()
     {
         $messageCore = Message::fromString("UNH'UNB", $this->getConfiguration());
-        $this->assertInstanceOf(\Proengeno\Edifact\Message\Segments\Unh::class, $messageCore->getNextSegment());
-        $this->assertInstanceOf(\Proengeno\Edifact\Message\Segments\Unb::class, $messageCore->getNextSegment());
+        $this->assertInstanceOf(\Proengeno\Edifact\Segments\Unh::class, $messageCore->getNextSegment());
+        $this->assertInstanceOf(\Proengeno\Edifact\Segments\Unb::class, $messageCore->getNextSegment());
     }
 
     /** @test */
@@ -86,18 +86,18 @@ class MessageTest extends TestCase
     {
         $messageCore = Message::fromString("UNH'UNB", $this->getConfiguration());
         $messageCore->pinPointer();
-        $this->assertInstanceOf(\Proengeno\Edifact\Message\Segments\Unh::class, $messageCore->getNextSegment());
+        $this->assertInstanceOf(\Proengeno\Edifact\Segments\Unh::class, $messageCore->getNextSegment());
         $messageCore->jumpToPinnedPointer();
-        $this->assertInstanceOf(\Proengeno\Edifact\Message\Segments\Unh::class, $messageCore->getNextSegment());
+        $this->assertInstanceOf(\Proengeno\Edifact\Segments\Unh::class, $messageCore->getNextSegment());
     }
 
     /** @test */
     public function it_jumps_to_the_actual_position_if_no_pointer_was_pinned()
     {
         $messageCore = Message::fromString("UNH'UNB", $this->getConfiguration());
-        $this->assertInstanceOf(\Proengeno\Edifact\Message\Segments\Unh::class, $messageCore->getNextSegment());
+        $this->assertInstanceOf(\Proengeno\Edifact\Segments\Unh::class, $messageCore->getNextSegment());
         $messageCore->jumpToPinnedPointer();
-        $this->assertInstanceOf(\Proengeno\Edifact\Message\Segments\Unb::class, $messageCore->getNextSegment());
+        $this->assertInstanceOf(\Proengeno\Edifact\Segments\Unb::class, $messageCore->getNextSegment());
     }
 
     /** @test */
@@ -106,7 +106,7 @@ class MessageTest extends TestCase
         $messageCore = Message::fromString("UNH'UNB'", $this->getConfiguration());
         $message = "";
         foreach ($messageCore as $segment) {
-            $message .= $segment->toString() . $messageCore->getDelimiter()->getSegment();
+            $message .= $segment->toString($messageCore->getDelimiter()) . $messageCore->getDelimiter()->getSegment();
         }
         $this->assertEquals($message, (string)$messageCore);
     }
@@ -116,7 +116,7 @@ class MessageTest extends TestCase
     {
         $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UKN'UNT", $this->getConfiguration());
 
-        $this->assertInstanceOf(\Proengeno\Edifact\Message\Segments\Unb::class, $messageCore->findNextSegment('UNB'));
+        $this->assertInstanceOf(\Proengeno\Edifact\Segments\Unb::class, $messageCore->findNextSegment('UNB'));
         $this->assertInstanceOf(Generic::class, $messageCore->findNextSegment('UKN'));
         $this->assertFalse($messageCore->findNextSegment('UNH'));
 
@@ -128,15 +128,15 @@ class MessageTest extends TestCase
         $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNT", $this->getConfiguration());
         $messageCore->findSegmentFromBeginn('UNH');
 
-        $this->assertInstanceOf(\Proengeno\Edifact\Message\Segments\Unh::class, $messageCore->findSegmentFromBeginn('UNH'));
+        $this->assertInstanceOf(\Proengeno\Edifact\Segments\Unh::class, $messageCore->findSegmentFromBeginn('UNH'));
         $this->assertInstanceOf(
-            \Proengeno\Edifact\Message\Segments\Unh::class,
+            \Proengeno\Edifact\Segments\Unh::class,
             $messageCore->findSegmentFromBeginn('UNH', function($segment) {
                 return $segment->referenz() == 'O160482A7C2';
             }
         ));
         $this->assertInstanceOf(
-            \Proengeno\Edifact\Message\Segments\Unh::class,
+            \Proengeno\Edifact\Segments\Unh::class,
             $messageCore->findSegmentFromBeginn('UNH', ['referenz' => 'O160482A7C2'])
         );
         $this->assertFalse(
@@ -185,5 +185,16 @@ class MessageTest extends TestCase
                . $delimiter->getSegment()
            );
         }
+    }
+
+    /** @test */
+    public function it_converts_decimal_seperator()
+    {
+        $message = Message::fromString("UNA:+_? 'MOA+QUL:20_00'", $this->getConfiguration());
+
+        /** @var \Proengeno\Edifact\Segments\Moa */
+        $moa = $message->findSegmentFromBeginn('MOA');
+
+        $this->assertSame('20.00', $moa->amount());
     }
 }

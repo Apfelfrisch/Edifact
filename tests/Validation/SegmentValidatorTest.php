@@ -2,8 +2,8 @@
 
 namespace Proengeno\Edifact\Test\Validation;
 
-use Proengeno\Edifact\Message\DataGroups;
-use Proengeno\Edifact\Message\SegmentData;
+use Proengeno\Edifact\DataGroups;
+use Proengeno\Edifact\SegmentData;
 use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\Validation\SegmentValidator;
 use Proengeno\Edifact\Exceptions\SegValidationException;

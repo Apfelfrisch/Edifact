@@ -2,10 +2,10 @@
 
 namespace Proengeno\Edifact\Test\Fixtures;
 
-use Proengeno\Edifact\Message\DataGroups;
-use Proengeno\Edifact\Message\SegmentData;
-use Proengeno\Edifact\Message\Delimiter;
-use Proengeno\Edifact\Templates\AbstractSegment;
+use Proengeno\Edifact\DataGroups;
+use Proengeno\Edifact\SegmentData;
+use Proengeno\Edifact\Delimiter;
+use Proengeno\Edifact\Segments\AbstractSegment;
 
 class Segment extends AbstractSegment
 {

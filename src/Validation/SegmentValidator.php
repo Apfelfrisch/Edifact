@@ -4,8 +4,8 @@ namespace Proengeno\Edifact\Validation;
 
 use Proengeno\Edifact\Interfaces\SegValidatorInterface;
 use Proengeno\Edifact\Exceptions\SegValidationException;
-use Proengeno\Edifact\Message\DataGroups;
-use Proengeno\Edifact\Message\SegmentData;
+use Proengeno\Edifact\DataGroups;
+use Proengeno\Edifact\SegmentData;
 
 class SegmentValidator implements SegValidatorInterface
 {

@@ -2,9 +2,9 @@
 
 namespace Proengeno\Edifact\Test\Message;
 
-use Proengeno\Edifact\Message\EdifactFile;
+use Proengeno\Edifact\EdifactFile;
 use Proengeno\Edifact\Test\TestCase;
-use Proengeno\Edifact\Message\Describer;
+use Proengeno\Edifact\Describer;
 
 class DescriberTest extends TestCase
 {

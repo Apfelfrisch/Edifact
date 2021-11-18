@@ -9,18 +9,17 @@ Highlights
 -------
 * Parse and Write Files in a memory efficient and scalable way 
 * Parse each Segment to its specific Object, this way we can define getter, setter and validation it
-* Parse each Message to its specfic Object, see above.
-* Validate the Message, with predefined rules. 
 
 Usage
 -------
+
+Parse an Edifact Message:
+
 ```php
-use Proengeno\Edifact\Edifact;
-use \Proengeno\Edifact\Message\Segments\Nad;
+use Proengeno\Edifact\Message;
+use Proengeno\Edifact\Segments\Nad;
 
-$edifact = new Edifact;
-
-$message = $edifact->resolveFromString("UNA:+.? 'NAD+DP++++Musterstr.::10+City++12345+DE");
+$message = Message::fromString("UNA:+.? 'NAD+DP++++Musterstr.::10+City++12345+DE");
 
 foreach ($message as $segment) {
     if ($segment instanceof Nad) {
@@ -29,8 +28,19 @@ foreach ($message as $segment) {
 }
 ```
 
-Notes
--------
-This Package only provides the basic Framework to work with Edifact Messages.
-You have to define your needed Segment and Message Classes at your own. 
-A Dummy implementation can be found in the tests.
+Build an Edifact Message:
+
+It takes Sgements wich implements the SegInterface. Trailing Segments (UNT and UNZ) will automatically addet.
+
+```php
+use Proengeno\Edifact\Builder;
+
+$builder = new Builder;
+
+$builder->writeSegments(
+    Unb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'unb-ref'),
+    Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co')
+);
+
+$message = $builder->get();
+```

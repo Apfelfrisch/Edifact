@@ -3,21 +3,12 @@
 namespace Proengeno\Edifact\Test\Templates;
 
 use Proengeno\Edifact\Test\TestCase;
-use Proengeno\Edifact\Message\Delimiter;
+use Proengeno\Edifact\Delimiter;
 use Proengeno\Edifact\Test\Fixtures\Segment;
 use Proengeno\Edifact\Validation\SegmentValidator;
 
 class AbstractSegmentTest extends TestCase
 {
-    /** @test */
-    public function it_can_set_a_costum_delimter()
-    {
-        $customDelimiter = new Delimiter;
-        $segment = Segment::fromAttributes($customDelimiter, 'A');
-
-        $this->assertEquals($customDelimiter, $segment->getDelimiter());
-    }
-
     /** @test */
     public function it_provides_the_validator()
     {
@@ -49,7 +40,7 @@ class AbstractSegmentTest extends TestCase
 
         $segment = Segment::fromSegLine(new Delimiter, $givenString);
 
-        $this->assertEquals($givenString, $segment->toString());
+        $this->assertEquals($givenString, $segment->toString(new Delimiter));
     }
 
     /** @test */
@@ -60,7 +51,7 @@ class AbstractSegmentTest extends TestCase
 
         $segment = Segment::fromSegLine(new Delimiter, $givenString);
 
-        $this->assertEquals($expectedString, $segment->toString());
+        $this->assertEquals($expectedString, $segment->toString(new Delimiter));
     }
 
     /** @test */
@@ -71,6 +62,6 @@ class AbstractSegmentTest extends TestCase
         $segment = Segment::fromSegLine(new Delimiter, $givenString);
 
         $this->assertEquals('B+', $segment->dummyMethod());
-        $this->assertEquals($givenString, $segment->toString());
+        $this->assertEquals($givenString, $segment->toString(new Delimiter));
     }
 }

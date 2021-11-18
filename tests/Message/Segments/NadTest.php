@@ -4,8 +4,8 @@ declare(strict_types = 1);
 
 namespace Proengeno\Edifact\Test\Message\Segments;
 
-use Proengeno\Edifact\Message\Delimiter;
-use Proengeno\Edifact\Message\Segments\Nad;
+use Proengeno\Edifact\Delimiter;
+use Proengeno\Edifact\Segments\Nad;
 use Proengeno\Edifact\Test\TestCase;
 
 final class NadTest extends TestCase
@@ -13,8 +13,8 @@ final class NadTest extends TestCase
     /** @test */
     public function test_segment(): void
     {
+        $delimiter = new Delimiter();
         $seg = Nad::fromAttributes(
-            new Delimiter(),
             'ABC',
             '12345678901234567890123456789012345',
             'CBA',
@@ -47,13 +47,12 @@ final class NadTest extends TestCase
         $this->assertEquals('26844', $seg->zip());
         $this->assertEquals('Jemgum', $seg->city());
 
-        $this->assertEquals($seg->toString(), Nad::fromSegLine(new Delimiter(), $seg->toString()));
+        $this->assertEquals($seg->toString($delimiter), Nad::fromSegLine($delimiter, $seg->toString($delimiter))->toString($delimiter));
     }
 
     public function test_initialize_from_person_address(): void
     {
         $seg = Nad::fromPersonAdress(
-            new Delimiter(),
             'ABC',
             'Refle',
             'Nils',
@@ -80,7 +79,7 @@ final class NadTest extends TestCase
     /** @test */
     public function test_initialize_from_company_adress_data(): void
     {
-        $seg = Nad::fromCompanyAdress(new Delimiter(), 'ABC', 'Company', 'Street', '3a', 'Leer', '26789');
+        $seg = Nad::fromCompanyAdress('ABC', 'Company', 'Street', '3a', 'Leer', '26789');
 
         $this->assertEquals('NAD', $seg->name());
         $this->assertEquals(null, $seg->firstName());
@@ -95,7 +94,7 @@ final class NadTest extends TestCase
     /** @test */
     public function test_initialize_from_person_data(): void
     {
-        $seg = Nad::fromPerson(new Delimiter(), 'ABC', 'Refle', 'Nils', 'Dr.');
+        $seg = Nad::fromPerson('ABC', 'Refle', 'Nils', 'Dr.');
 
         $this->assertEquals('NAD', $seg->name());
         $this->assertEquals('Nils', $seg->firstName());
@@ -107,7 +106,7 @@ final class NadTest extends TestCase
     /** @test */
     public function  test_initialize_from_company_data(): void
     {
-        $seg = Nad::fromCompany(new Delimiter(), 'ABC', 'Company');
+        $seg = Nad::fromCompany('ABC', 'Company');
 
         $this->assertEquals('NAD', $seg->name());
         $this->assertEquals('Company', $seg->company());
@@ -118,7 +117,7 @@ final class NadTest extends TestCase
     /** @test */
     public function test_initialize_from_adress_data(): void
     {
-        $seg = Nad::fromAdress(new Delimiter(), 'ABC', 'Street', '3a', 'Leer', '26789', 'LeerOrt');
+        $seg = Nad::fromAdress('ABC', 'Street', '3a', 'Leer', '26789', 'LeerOrt');
 
         $this->assertEquals('NAD', $seg->name());
         $this->assertEquals('Street', $seg->street());
@@ -132,7 +131,6 @@ final class NadTest extends TestCase
     public function test_initialize_from_adress_data_with_additional_informations(): void
     {
         $seg = Nad::fromAttributes(
-            delimiter: new Delimiter(),
             qualifier: 'ABC',
             street: 'Street',
             number: '3a',
