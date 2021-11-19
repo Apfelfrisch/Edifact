@@ -16,7 +16,6 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     public function getConfiguration()
     {
         $configuration = new Configuration;
-        $configuration->setExportSender('from');
         $configuration->addMessageDescription(__DIR__ . '/data/message_description.php', ['UNH' => '/./']);
 
         return $configuration;

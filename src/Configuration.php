@@ -3,15 +3,13 @@
 namespace Proengeno\Edifact;
 
 use Closure;
-use Proengeno\Edifact\Exceptions\EdifactException;
 use Proengeno\Edifact\Interfaces\SegInterface;
 use Proengeno\Edifact\Delimiter;
 use Proengeno\Edifact\Segments\Generic;
-use Proengeno\Edifact\Interfaces\BuilderInterface;
 
 class Configuration
 {
-    /** @var class-string<SegInterface> */
+    /** @var class-string<SegInterface>|null */
     protected ?string $genericSegment = Generic::class;
 
     protected ?string $segmentNamespace = 'Proengeno\Edifact\Segments';
@@ -19,13 +17,6 @@ class Configuration
     protected Delimiter $delimiter;
 
     protected Closure $unbRefGenerator;
-
-    /** @var ?array<string, class-string<BuilderInterface>> */
-    protected ?array $builder = null;
-
-    protected ?string $filepath = null;
-
-    protected ?string $exportSender = null;
 
     /** @var list<string> */
     protected array $readFilter = [];
@@ -57,38 +48,6 @@ class Configuration
         return $this->genericSegment;
     }
 
-    /**
-     * @param class-string<BuilderInterface> $class
-     */
-    public function addBuilder(string $key, string $class): void
-    {
-        if (!isset($this->builder[$key])) {
-            $this->builder[$key] = $class;
-        }
-    }
-
-    /**
-     * @return class-string<BuilderInterface>|null
-     */
-    public function getBuilder(string $key): ?string
-    {
-        if (isset($this->builder[$key])) {
-            return $this->builder[$key];
-        }
-
-        return null;
-    }
-
-    public function setFilepath(string $filepath): void
-    {
-        $this->filepath = $filepath;
-    }
-
-    public function getFilepath(): ?string
-    {
-        return $this->filepath;
-    }
-
     public function setReadFilter(string $filter): void
     {
         $this->readFilter[] = $filter;
@@ -113,19 +72,6 @@ class Configuration
     public function getWriteFilter(): array
     {
         return $this->writeFilter;
-    }
-
-    public function setExportSender(string $exportSender): void
-    {
-        $this->exportSender = $exportSender;
-    }
-
-    public function getExportSender(): string
-    {
-        if ($this->exportSender === null) {
-            throw new EdifactException("No exportSender in Configuration available, please set via Configuration::setExportSender ");
-        }
-        return $this->exportSender;
     }
 
     public function addMessageDescription(string $descriptionFile, array $allocationRules): void
