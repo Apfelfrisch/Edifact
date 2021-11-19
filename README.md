@@ -30,7 +30,8 @@ foreach ($message as $segment) {
 
 Build an Edifact Message:
 
-It takes Sgements wich implements the SegInterface. Trailing Segments (UNT and UNZ) will automatically addet.
+The Builder takes Segments wich implements the SegInterface, trailing Segments (UNT and UNZ) will automatically be added. 
+If no UNA Segement is provided, it uses the default values (UNA:+.? )
 
 ```php
 use Proengeno\Edifact\Builder;

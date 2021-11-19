@@ -5,9 +5,11 @@ namespace Proengeno\Edifact\Test\Message;
 use DateTime;
 use Proengeno\Edifact\Builder;
 use Proengeno\Edifact\Delimiter;
+use Proengeno\Edifact\Segments\Seq;
 use Proengeno\Edifact\Segments\Una;
 use Proengeno\Edifact\Segments\Unb;
 use Proengeno\Edifact\Segments\Unh;
+use Proengeno\Edifact\Segments\Unt;
 use Proengeno\Edifact\Test\TestCase;
 
 class BuilderTest extends TestCase
@@ -75,5 +77,51 @@ class BuilderTest extends TestCase
         );
 
         $this->assertStringEndsWith("UNT+2+unh-ref'UNZ+1+unb-ref'", (string)$builder->get());
+    }
+
+    /** @test */
+    public function test_counting_messages()
+    {
+        $builder = new Builder;
+        $builder->writeSegments(
+            Unb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'unb-ref'),
+            Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co'),
+            Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co'),
+            Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co'),
+        );
+
+        $this->assertStringEndsWith("UNZ+3+unb-ref'", (string)$builder->get());
+    }
+
+    /** @test */
+    public function test_counting_unh_segemtns()
+    {
+        $builder = new Builder;
+        $builder->writeSegments(
+            Unb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'unb-ref'),
+            Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co'),
+            Seq::fromAttributes('COD'),
+            Seq::fromAttributes('COD'),
+            Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co'),
+            Seq::fromAttributes('COD'),
+            Seq::fromAttributes('COD'),
+            Seq::fromAttributes('COD'),
+            Seq::fromAttributes('COD'),
+            Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co'),
+        );
+
+        $message = $builder->get();
+
+        /** @var Unt $unt */
+        $unt = $message->findSegmentFromBeginn('UNT');
+        $this->assertSame('4', $unt->segCount());
+
+        /** @var Unt $unt */
+        $unt = $message->findNextSegment('UNT');
+        $this->assertSame('6', $unt->segCount());
+
+        /** @var Unt $unt */
+        $unt = $message->findNextSegment('UNT');
+        $this->assertSame('2', $unt->segCount());
     }
 }
