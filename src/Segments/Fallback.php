@@ -7,7 +7,7 @@ use Proengeno\Edifact\SegmentData;
 use Proengeno\Edifact\Delimiter;
 use Proengeno\Edifact\Exceptions\EdifactException;
 
-class Generic extends AbstractSegment
+class Fallback extends AbstractSegment
 {
     public static function blueprint(): DataGroups
     {

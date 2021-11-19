@@ -38,7 +38,7 @@ class Message implements \Iterator
         $this->segmentFactory = new SegmentFactory(
             $this->configuration->getSegmentNamespace(),
             $this->getDelimiter(),
-            $this->configuration->getGenericSegment()
+            $this->configuration->getFallbackSegment()
         );
 
         foreach ($this->configuration->getReadFilter() as $callable) {

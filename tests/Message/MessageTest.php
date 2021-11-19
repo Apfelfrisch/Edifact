@@ -3,7 +3,7 @@
 namespace Proengeno\Edifact\Test\Message;
 
 use Mockery as m;
-use Proengeno\Edifact\Segments\Generic;
+use Proengeno\Edifact\Segments\Fallback;
 use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\Message;
 use Proengeno\Edifact\EdifactFile;
@@ -59,14 +59,14 @@ class MessageTest extends TestCase
     {
         $messageCore = Message::fromString("UKN", $this->getConfiguration());
 
-        $this->assertInstanceOf(Generic::class, $messageCore->getNextSegment());
+        $this->assertInstanceOf(Fallback::class, $messageCore->getNextSegment());
     }
 
     /** @test */
     public function it_throw_an_exception_if_no_generic_segment_is_set_and_a_segment_is_uknown()
     {
         $configuration = $this->getConfiguration();
-        $configuration->setGenericSegment(null);
+        $configuration->setFallbackSegment(null);
         $messageCore = Message::fromString("UKN", $configuration);
 
         $this->expectException('Proengeno\Edifact\Exceptions\ValidationException');
@@ -117,7 +117,7 @@ class MessageTest extends TestCase
         $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UKN'UNT", $this->getConfiguration());
 
         $this->assertInstanceOf(\Proengeno\Edifact\Segments\Unb::class, $messageCore->findNextSegment('UNB'));
-        $this->assertInstanceOf(Generic::class, $messageCore->findNextSegment('UKN'));
+        $this->assertInstanceOf(Fallback::class, $messageCore->findNextSegment('UKN'));
         $this->assertFalse($messageCore->findNextSegment('UNH'));
 
     }

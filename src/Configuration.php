@@ -5,12 +5,12 @@ namespace Proengeno\Edifact;
 use Closure;
 use Proengeno\Edifact\Interfaces\SegInterface;
 use Proengeno\Edifact\Delimiter;
-use Proengeno\Edifact\Segments\Generic;
+use Proengeno\Edifact\Segments\Fallback;
 
 class Configuration
 {
     /** @var class-string<SegInterface>|null */
-    protected ?string $genericSegment = Generic::class;
+    protected ?string $fallbackSegment = Fallback::class;
 
     protected ?string $segmentNamespace = 'Proengeno\Edifact\Segments';
 
@@ -33,19 +33,19 @@ class Configuration
     }
 
     /**
-     * @param class-string<SegInterface>|null $genericSegment
+     * @param class-string<SegInterface>|null $fallbackSegment
      */
-    public function setGenericSegment(?string $genericSegment): void
+    public function setFallbackSegment(?string $fallbackSegment): void
     {
-        $this->genericSegment = $genericSegment;
+        $this->fallbackSegment = $fallbackSegment;
     }
 
     /**
      * @return class-string<SegInterface>|null
      */
-    public function getGenericSegment(): ?string
+    public function getFallbackSegment(): ?string
     {
-        return $this->genericSegment;
+        return $this->fallbackSegment;
     }
 
     public function setReadFilter(string $filter): void
