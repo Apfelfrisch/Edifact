@@ -12,6 +12,9 @@ interface SegInterface
 
     public function validate(): void;
 
+    /**
+     * @psalm-return array<string, array<string, string|null>>
+     */
     public function toArray(): array;
 
     public function toString(Delimiter $delimiter): string;

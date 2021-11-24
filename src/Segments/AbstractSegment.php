@@ -32,7 +32,7 @@ abstract class AbstractSegment implements SegInterface
         $segment = new static(static::mapToBlueprint($delimiter, $segLine));
 
         if (is_subclass_of($segment, DecimalConverter::class)) {
-            /** @var DecimalConverter */
+            /** @var DecimalConverter $segment */
             $segment->setDecimalSeparator($delimiter->getDecimal());
         }
 
@@ -63,39 +63,17 @@ abstract class AbstractSegment implements SegInterface
         $this->validator->validate(static::blueprint(), $this->elements);
     }
 
+    /**
+     * @psalm-return array<string, array<string, string|null>>
+     */
     public function toArray(): array
     {
-        $result = [];
-        foreach ($this->getGetterMethods() as $method) {
-            if (null !== $value = $this->{$method}()) {
-                $result[$method] = $value;
-            }
-        }
-        return $result;
+        return $this->elements->toArray();
     }
 
     public function toString(Delimiter $delimiter): string
     {
         return $this->elements->toString($delimiter);
-    }
-
-    /**
-     * @return list<string>
-     */
-    protected function getGetterMethods(): array
-    {
-        if (isset($this->cache['getterMethods'])) {
-            return $this->cache['getterMethods'];
-        }
-
-        $this->cache['getterMethods'] = [];
-        foreach ((new \ReflectionClass(static::class))->getMethods() as $method) {
-            if ($method->class === static::class && !$method->isStatic() && $method->isPublic()) {
-                $this->cache['getterMethods'][] = $method->name;
-            }
-        }
-
-        return $this->cache['getterMethods'];
     }
 
     protected static function mapToBlueprint(Delimiter $delimiter, string $segLine): SegmentData
