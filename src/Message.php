@@ -6,7 +6,6 @@ use Proengeno\Edifact\Configuration;
 use Proengeno\Edifact\Interfaces\SegInterface;
 use Proengeno\Edifact\EdifactFile;
 use Proengeno\Edifact\SegmentFactory;
-use Proengeno\Edifact\Exceptions\EdifactException;
 use Proengeno\Edifact\Exceptions\ValidationException;
 use Proengeno\Edifact\Exceptions\SegValidationException;
 
@@ -60,16 +59,6 @@ class Message implements \Iterator
         $edifactFile = EdifactFile::fromString($string, $filename);
 
         return new self($edifactFile, $configuration);
-    }
-
-    public function getConfiguration(string $key): mixed
-    {
-        $method = 'get' . ucfirst($key);
-        if (method_exists($this->configuration, $method)) {
-            return $this->configuration->$method();
-        }
-
-        throw new EdifactException("Unknown Configuration '$key'.");
     }
 
     public function getFilepath(): string

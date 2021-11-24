@@ -13,16 +13,26 @@ final class SegmentFactory
     protected Delimiter $delimiter;
 
     /** @var class-string<SegInterface>|null */
-    private ?string $genericSegment;
+    private ?string $fallback;
 
     /**
-     * @param class-string<SegInterface>|null $genericSegment
+     * @param class-string<SegInterface>|null $fallback
      */
-    public function __construct(string $segmentNamespace = null, Delimiter $delimiter = null, ?string $genericSegment = null)
+    public function __construct(string $segmentNamespace = null, Delimiter $delimiter = null, ?string $fallback = null)
     {
         $this->segmentNamespace = $segmentNamespace;
         $this->delimiter = $delimiter ?: new Delimiter;
-        $this->genericSegment = $genericSegment;
+        $this->fallback = $fallback;
+    }
+
+    /**
+     * @param class-string<SegInterface> $fallback
+     */
+    public function addFallback(string $fallback): self
+    {
+        $this->fallback = $fallback;
+
+        return $this;
     }
 
     public function fromSegline(string $segline): SegInterface
@@ -57,7 +67,7 @@ final class SegmentFactory
         }
 
         if (! is_subclass_of($segmentClass, SegInterface::class)) {
-            if (null === $segmentClass = $this->genericSegment) {
+            if (null === $segmentClass = $this->fallback) {
                 throw SegValidationException::unknown($this->getSegname($segmentName));
             }
         }
