@@ -148,13 +148,10 @@ class MessageTest extends TestCase
     /** @test */
     public function it_uses_the_filters_from_configuration_class()
     {
-        $configuration = $this->getConfiguration();
-        $configuration->setWriteFilter('string.rot13');
-        $configuration->setReadFilter('string.tolower');
+        $messageCore = Message::fromString("FOO BAR");
+        $messageCore->addStreamFilter('string.tolower');
 
-        $messageCore = Message::fromString("FOO BAR", $configuration);
-
-        $this->assertEquals("sbb one", (string)$messageCore);
+        $this->assertEquals("foo bar", (string)$messageCore);
     }
 
     /** @test */

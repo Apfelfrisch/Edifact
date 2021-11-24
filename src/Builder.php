@@ -9,8 +9,6 @@ use Proengeno\Edifact\Interfaces\UnbInterface;
 use Proengeno\Edifact\Interfaces\UnhInterface;
 use Proengeno\Edifact\Message;
 use Proengeno\Edifact\Segments\Una;
-use Proengeno\Edifact\Segments\Unb;
-use Proengeno\Edifact\Segments\Unh;
 use Proengeno\Edifact\Segments\Unt;
 use Proengeno\Edifact\Segments\Unz;
 
@@ -19,18 +17,24 @@ class Builder
     private ?string $unbRef = null;
     private ?string $unhRef = null;
 
-    private Configuration $configuration;
     private EdifactFile $edifactFile;
     private string $filepath;
     private int $unhCounter = 0;
     private int $messageCount = 0;
     private bool $messageWasFetched = false;
 
-    public function __construct(string $filepath = 'php://temp', ?Configuration $configuration = null)
+    public function __construct(string $filepath = 'php://temp')
     {
         $this->filepath = $filepath;
-        $this->configuration = $configuration ?? new Configuration;
-        $this->edifactFile = $this->newEdifactFile();
+
+        $this->edifactFile = new EdifactFile($this->filepath, 'w');
+    }
+
+    public function addStreamFilter(string $filtername, mixed $params = null): self
+    {
+        $this->edifactFile->addWriteFilter($filtername, $params);
+
+        return $this;
     }
 
     public function __destruct()
@@ -81,7 +85,7 @@ class Builder
 
     public function get(): Message
     {
-        return new Message($this->getEdifactFile(), $this->configuration);
+        return new Message($this->getEdifactFile());
     }
 
     public function getEdifactFile(): EdifactFile
@@ -108,7 +112,7 @@ class Builder
 
     public function messageIsEmpty(): bool
     {
-        return $this->edifactFile->tell() === 0;
+        return $this->edifactFile->isEmpty();
     }
 
     private function prepareEdfactFile(SegInterface $segment): void
@@ -123,7 +127,7 @@ class Builder
          * @var Una $segment
          * @psalm-suppress PossiblyNullArgument: segment is alwas set, cause it was fromString initialized
          */
-        $this->edifactFile = $this->newEdifactFile(new Delimiter(
+        $this->edifactFile->setDelimiter(new Delimiter(
             $segment->data(),
             $segment->dataGroup(),
             $segment->decimal(),
@@ -162,16 +166,5 @@ class Builder
         }
 
         $this->unhCounter++;
-    }
-
-    private function newEdifactFile(?Delimiter $delimiter = null): EdifactFile
-    {
-        $this->edifactFile = new EdifactFile($this->filepath, 'w', $delimiter);
-
-        foreach ($this->configuration->getWriteFilter() as $callable) {
-            $this->edifactFile->addWriteFilter($callable);
-        }
-
-        return $this->edifactFile;
     }
 }

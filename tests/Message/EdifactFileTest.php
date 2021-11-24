@@ -100,6 +100,19 @@ class EdifactFileTest extends TestCase
         $this->assertTrue($edifactFile->eof());
     }
 
+    public function testStreamIsEmpty()
+    {
+        $edifactFile = $this->edifactFile;
+
+        $this->assertTrue($edifactFile->isEmpty());
+
+        $edifactFile->write('A');
+        $position = $edifactFile->tell();
+
+        $this->assertFalse($edifactFile->isEmpty());
+        $this->assertSame($position, $edifactFile->tell());
+    }
+
     public function testGettingChar()
     {
         $string = "UNA:+.? 'UNB?'UNT'";

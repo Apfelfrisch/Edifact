@@ -5,6 +5,7 @@ namespace Proengeno\Edifact;
 use SplFileInfo;
 use RuntimeException;
 use Proengeno\Edifact\Delimiter;
+use Proengeno\Edifact\Exceptions\EdifactException;
 use Throwable;
 
 final class EdifactFile extends SplFileInfo
@@ -83,6 +84,15 @@ final class EdifactFile extends SplFileInfo
         }
     }
 
+    public function setDelimiter(Delimiter $delimiter): void
+    {
+        if (! $this->isEmpty()) {
+            throw new EdifactException("Delimiter can only be set on an empty file.");
+        }
+
+        $this->delimiter = $delimiter;
+    }
+
     public function addReadFilter(string $filter, mixed $params = null): self
     {
         $this->addFilter($filter, STREAM_FILTER_READ, $params);
@@ -150,6 +160,19 @@ final class EdifactFile extends SplFileInfo
     public function tell(): int
     {
         return (int)ftell($this->resource);
+    }
+
+    public function isEmpty(): bool
+    {
+        $tell = $this->tell();
+
+        $this->seek(0, SEEK_END);
+
+        $result = $this->tell() === 0;
+
+        $this->seek($tell);
+
+        return $result;
     }
 
     public function write(string $str): int|false

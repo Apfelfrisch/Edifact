@@ -5,6 +5,7 @@ namespace Proengeno\Edifact\Test\Message;
 use DateTime;
 use Proengeno\Edifact\Builder;
 use Proengeno\Edifact\Delimiter;
+use Proengeno\Edifact\Segments\Ajt;
 use Proengeno\Edifact\Segments\Seq;
 use Proengeno\Edifact\Segments\Una;
 use Proengeno\Edifact\Segments\Unb;
@@ -57,14 +58,24 @@ class BuilderTest extends TestCase
     /** @test */
     public function test_writing_to_a_file()
     {
-        $builder = new Builder($filename = tempnam('/tmp', 'edi-test'));
+        $builder = new Builder;
         $builder->writeSegments(
-            Unb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'referenz-no')
+            Ajt::fromAttributes('COD'),
         );
 
-        $this->assertStringEndsWith("UNZ+0+referenz-no'", (string)$builder->get());
+        $this->assertSame("UNA:+.? 'AJT+COD'", (string)$builder->get());
+    }
 
-        unlink($filename);
+    /** @test */
+    public function test_using_stream_filters()
+    {
+        $builder = new Builder;
+        $builder->addStreamFilter('string.toupper');
+        $builder->writeSegments(
+            Ajt::fromAttributes('cod'),
+        );
+
+        $this->assertSame("UNA:+.? 'AJT+COD'", (string)$builder->get());
     }
 
     /** @test */

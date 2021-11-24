@@ -35,10 +35,13 @@ class Message implements \Iterator
             $this->getDelimiter(),
             $this->configuration->getFallbackSegment()
         );
+    }
 
-        foreach ($this->configuration->getReadFilter() as $callable) {
-            $this->edifactFile->addReadFilter($callable);
-        }
+    public function addStreamFilter(string $filtername, mixed $params = null): self
+    {
+        $this->edifactFile->addReadFilter($filtername, $params);
+
+        return $this;
     }
 
     public static function fromFilepath(string $string, Configuration $configuration = null): self
@@ -54,7 +57,7 @@ class Message implements \Iterator
     ): self
     {
         $configuration = $configuration ?: new Configuration;
-        $edifactFile = EdifactFile::fromString($string, $filename, $configuration->getWriteFilter());
+        $edifactFile = EdifactFile::fromString($string, $filename);
 
         return new self($edifactFile, $configuration);
     }
