@@ -6,7 +6,7 @@ use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\SegmentFactory;
 use Proengeno\Edifact\Segments\Fallback;
 use Proengeno\Edifact\Exceptions\EdifactException;
-use Proengeno\Edifact\Exceptions\ValidationException;
+use Proengeno\Edifact\Exceptions\SegValidationException;
 
 class SegmentFactoryTest extends TestCase
 {
@@ -51,7 +51,7 @@ class SegmentFactoryTest extends TestCase
     {
         $this->segFactory = new SegmentFactory($this->segmentNamespace);
 
-        $this->expectException(ValidationException::class);
+        $this->expectException(SegValidationException::class);
         $this->segFactory->fromAttributes('UKW');
     }
 }

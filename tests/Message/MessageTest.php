@@ -2,12 +2,11 @@
 
 namespace Proengeno\Edifact\Test\Message;
 
-use Mockery as m;
 use Proengeno\Edifact\Segments\Fallback;
 use Proengeno\Edifact\Test\TestCase;
 use Proengeno\Edifact\Message;
 use Proengeno\Edifact\EdifactFile;
-use Proengeno\Edifact\Validation\MessageValidator;
+use Proengeno\Edifact\Exceptions\SegValidationException;
 
 class MessageTest extends TestCase
 {
@@ -16,7 +15,7 @@ class MessageTest extends TestCase
     public function setUp(): void
     {
         $file = new EdifactFile(__DIR__ . '/../data/edifact.txt');
-        $this->messageCore = new Message($file, $this->getConfiguration(), $this->getDescriber());
+        $this->messageCore = new Message($file, $this->getConfiguration());
     }
 
     /** @test */
@@ -69,7 +68,7 @@ class MessageTest extends TestCase
         $configuration->setFallbackSegment(null);
         $messageCore = Message::fromString("UKN", $configuration);
 
-        $this->expectException('Proengeno\Edifact\Exceptions\ValidationException');
+        $this->expectException(SegValidationException::class);
         $this->assertInstanceOf('Proengeno\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getNextSegment());
     }
 
@@ -156,17 +155,6 @@ class MessageTest extends TestCase
         $messageCore = Message::fromString("FOO BAR", $configuration);
 
         $this->assertEquals("sbb one", (string)$messageCore);
-    }
-
-    /** @test */
-    public function it_can_validate_the_message()
-    {
-        $file = new EdifactFile(__DIR__ . '/../data/edifact.txt');
-        $validator = m::mock(MessageValidator::class, function($validator){
-            $validator->shouldReceive('validate')->once();
-        });
-        $messageCore = new Message($file, $this->getConfiguration(), $this->getDescriber());
-        $this->assertInstanceOf(get_class($messageCore), $messageCore->validate($validator));
     }
 
     /** @test */

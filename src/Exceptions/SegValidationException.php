@@ -26,6 +26,11 @@ class SegValidationException extends EdifactException
         parent::__construct($message, $code);
     }
 
+    public static function unknown(string $segname): self
+    {
+        return new self(null, null, "Unknown Segment [$segname]", 0);
+    }
+
     public static function forKeyValue(string $key, string $value, string $message, int $code = 0): self
     {
         $message = $key . ' (' . $value . ') : ' . $message;

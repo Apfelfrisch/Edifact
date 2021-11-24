@@ -2,7 +2,7 @@
 
 namespace Proengeno\Edifact;
 
-use Proengeno\Edifact\Exceptions\ValidationException;
+use Proengeno\Edifact\Exceptions\SegValidationException;
 use Proengeno\Edifact\Interfaces\DecimalConverter;
 use Proengeno\Edifact\Interfaces\SegInterface;
 
@@ -58,7 +58,7 @@ final class SegmentFactory
 
         if (! is_subclass_of($segmentClass, SegInterface::class)) {
             if (null === $segmentClass = $this->genericSegment) {
-                throw new ValidationException("Unknown Segment '" . $this->getSegname($segmentName) . "'");
+                throw SegValidationException::unknown($this->getSegname($segmentName));
             }
         }
 

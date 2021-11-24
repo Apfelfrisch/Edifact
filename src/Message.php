@@ -4,10 +4,8 @@ namespace Proengeno\Edifact;
 
 use Proengeno\Edifact\Configuration;
 use Proengeno\Edifact\Interfaces\SegInterface;
-use Proengeno\Edifact\Describer;
 use Proengeno\Edifact\EdifactFile;
 use Proengeno\Edifact\SegmentFactory;
-use Proengeno\Edifact\Validation\MessageValidator;
 use Proengeno\Edifact\Exceptions\EdifactException;
 use Proengeno\Edifact\Exceptions\ValidationException;
 use Proengeno\Edifact\Exceptions\SegValidationException;
@@ -16,11 +14,9 @@ class Message implements \Iterator
 {
     protected Configuration $configuration;
 
-    protected Describer|null $description;
+    protected EdifactFile $edifactFile;
 
-    private EdifactFile $edifactFile;
-
-    private SegmentFactory $segmentFactory;
+    protected SegmentFactory $segmentFactory;
 
     private int|null $pinnedPointer = null;
 
@@ -28,12 +24,11 @@ class Message implements \Iterator
 
     private int $currentSegmentNumber = -1;
 
-    public function __construct(EdifactFile $edifactFile, ?Configuration $configuration = null, ?Describer $description = null)
+    public function __construct(EdifactFile $edifactFile, ?Configuration $configuration = null)
     {
         $this->edifactFile = $edifactFile;
         $this->rewind();
 
-        $this->description = $description;
         $this->configuration = $configuration ?: new Configuration;
         $this->segmentFactory = new SegmentFactory(
             $this->configuration->getSegmentNamespace(),
@@ -46,22 +41,22 @@ class Message implements \Iterator
         }
     }
 
-    public static function fromFilepath(string $string, Configuration $configuration = null, Describer $description = null): self
+    public static function fromFilepath(string $string, Configuration $configuration = null): self
     {
         $edifactFile = new EdifactFile($string);
         $configuration = $configuration ?: new Configuration;
 
-        return new self($edifactFile, $configuration, $description);
+        return new self($edifactFile, $configuration);
     }
 
     public static function fromString(
-        string $string, Configuration $configuration = null, string $filename = 'php://temp', Describer $description = null
+        string $string, Configuration $configuration = null, string $filename = 'php://temp'
     ): self
     {
         $configuration = $configuration ?: new Configuration;
         $edifactFile = EdifactFile::fromString($string, $filename, $configuration->getWriteFilter());
 
-        return new self($edifactFile, $configuration, $description);
+        return new self($edifactFile, $configuration);
     }
 
     public function getConfiguration(string $key): mixed
@@ -72,14 +67,6 @@ class Message implements \Iterator
         }
 
         throw new EdifactException("Unknown Configuration '$key'.");
-    }
-
-    public function getDescription(string $key): string|array|null
-    {
-        if ($this->description === null) {
-            $this->description = Describer::build(self::findDescrtiptionFile($this->edifactFile, $this->configuration));
-        }
-        return $this->description->get($key);
     }
 
     public function getFilepath(): string
@@ -144,14 +131,6 @@ class Message implements \Iterator
         $this->edifactFile->seek($pinnedPointer);
 
         return $pinnedPointer;
-    }
-
-    public function validate(MessageValidator $validator = null): self
-    {
-        $validator = $validator ?: new MessageValidator;
-        $validator->validate($this);
-
-        return $this;
     }
 
     public function validateSegments(): void
@@ -229,24 +208,6 @@ class Message implements \Iterator
         $this->currentSegmentNumber++;
 
         return $this->edifactFile->getSegment();
-    }
-
-    private static function findDescrtiptionFile(EdifactFile $edifactFile, Configuration $configuration): string
-    {
-        $tmpAllocationRules = $configuration->getMessageDescriptions();
-        while ($segment = $edifactFile->getSegment()) {
-            $segmenName = substr($segment, 0, 3);
-            foreach ($tmpAllocationRules as $descriptionFile => $allocationRules) {
-                if (isset($allocationRules[$segmenName]) && preg_match($allocationRules[$segmenName], $segment)) {
-                    unset($tmpAllocationRules[$descriptionFile][$segmenName]);
-                    if (count($tmpAllocationRules[$descriptionFile]) == 0) {
-                        return $descriptionFile;
-                    }
-                }
-            }
-        }
-
-        throw EdifactException::messageUnknown($edifactFile->getFilename());
     }
 
     private function checkCriteria(callable|array|null $criteria, SegInterface $segmentObject): bool
