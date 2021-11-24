@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 
 class Nad extends AbstractSegment
 {
@@ -60,29 +59,28 @@ class Nad extends AbstractSegment
         ?string $additionalInformation = null,
     ): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('NAD', 'NAD', 'NAD')
-                ->addValue('3035', '3035', $qualifier)
-                ->addValue('C082', '3039', $id)
-                ->addValue('C082', '1131', null)
-                ->addValue('C082', '3055', $idCode)
-                ->addValue('C058', '3124', $additionalInformation)
-                ->addValue('C080', '3036:1', $lastName)
-                ->addValue('C080', '3036:2', $firstName)
-                ->addValue('C080', '3036:3', $additionalName1)
-                ->addValue('C080', '3036:4', $additionalName2)
-                ->addValue('C080', '3036:5', $title)
-                ->addValue('C080', '3045', $partnerType )
-                ->addValue('C059', '3042:1', $street !== null ? substr($street, 0, 35) : null)
-                ->addValue('C059', '3042:2', $street !== null ? substr($street, 35) : null)
-                ->addValue('C059', '3042:3', $number)
-                ->addValue('C059', '3042:4', $district)
-                ->addValue('3164', '3164', $city)
-                ->addValue('C819', '3229', null)
-                ->addValue('3251', '3251', $zip)
-                ->addValue('3207', '3251', $country)
-        ));
+        return new self((new DataGroups)
+            ->addValue('NAD', 'NAD', 'NAD')
+            ->addValue('3035', '3035', $qualifier)
+            ->addValue('C082', '3039', $id)
+            ->addValue('C082', '1131', null)
+            ->addValue('C082', '3055', $idCode)
+            ->addValue('C058', '3124', $additionalInformation)
+            ->addValue('C080', '3036:1', $lastName)
+            ->addValue('C080', '3036:2', $firstName)
+            ->addValue('C080', '3036:3', $additionalName1)
+            ->addValue('C080', '3036:4', $additionalName2)
+            ->addValue('C080', '3036:5', $title)
+            ->addValue('C080', '3045', $partnerType )
+            ->addValue('C059', '3042:1', $street !== null ? substr($street, 0, 35) : null)
+            ->addValue('C059', '3042:2', $street !== null ? substr($street, 35) : null)
+            ->addValue('C059', '3042:3', $number)
+            ->addValue('C059', '3042:4', $district)
+            ->addValue('3164', '3164', $city)
+            ->addValue('C819', '3229', null)
+            ->addValue('3251', '3251', $zip)
+            ->addValue('3207', '3251', $country)
+        );
     }
 
     public static function fromQualifier(string $qualifier): self

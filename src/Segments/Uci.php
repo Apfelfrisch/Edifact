@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 
 class Uci extends AbstractSegment
 {
@@ -42,20 +41,19 @@ class Uci extends AbstractSegment
         ?string $elementPosition = null
     ): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('UCI', 'UCI', 'UCI')
-                ->addValue('0020', '0020', $unbRef)
-                ->addValue('S002', '0004', $sender)
-                ->addValue('S002', '0007', $senderCode)
-                ->addValue('S003', '0010', $receiver)
-                ->addValue('S003', '0007', $receiverCode)
-                ->addValue('0083', '0083', $statusCode)
-                ->addValue('0085', '0085', $errorCode)
-                ->addValue('0013', '0013', $serviceSegement)
-                ->addValue('S011', '0098', $segmentPosition)
-                ->addValue('S011', '0104', $elementPosition)
-        ));
+        return new self((new DataGroups)
+            ->addValue('UCI', 'UCI', 'UCI')
+            ->addValue('0020', '0020', $unbRef)
+            ->addValue('S002', '0004', $sender)
+            ->addValue('S002', '0007', $senderCode)
+            ->addValue('S003', '0010', $receiver)
+            ->addValue('S003', '0007', $receiverCode)
+            ->addValue('0083', '0083', $statusCode)
+            ->addValue('0085', '0085', $errorCode)
+            ->addValue('0013', '0013', $serviceSegement)
+            ->addValue('S011', '0098', $segmentPosition)
+            ->addValue('S011', '0104', $elementPosition)
+        );
     }
 
     public function unbRef(): ?string

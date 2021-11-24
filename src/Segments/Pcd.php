@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 
 class Pcd extends AbstractSegment
 {
@@ -23,12 +22,11 @@ class Pcd extends AbstractSegment
 
     public static function fromAttributes(string $percent, string $qualifier = '3'): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('PCD', 'PCD', 'PCD')
-                ->addValue('C501', '5245', $qualifier)
-                ->addValue('C501', '5482', $percent)
-        ));
+        return new self((new DataGroups)
+            ->addValue('PCD', 'PCD', 'PCD')
+            ->addValue('C501', '5245', $qualifier)
+            ->addValue('C501', '5482', $percent)
+        );
     }
 
     public function qualifier(): ?string

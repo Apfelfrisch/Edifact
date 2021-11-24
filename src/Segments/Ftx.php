@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 
 class Ftx extends AbstractSegment
 {
@@ -29,18 +28,17 @@ class Ftx extends AbstractSegment
 
     public static function fromAttributes(string $qualifier, ?string $message = null, ?string $code = null): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('FTX', 'FTX', 'FTX')
-                ->addValue('4451', '4451', $qualifier)
-                ->addValue('4453', '', null)
-                ->addValue('C107', '4441', $code)
-                ->addValue('C108', '4440:1', $message !== null ? substr($message, 0, 512) : null)
-                ->addValue('C108', '4440:2', $message !== null ? substr($message, 512, 512) : null)
-                ->addValue('C108', '4440:3', $message !== null ? substr($message, 1024, 512) : null)
-                ->addValue('C108', '4440:4', $message !== null ? substr($message, 1536, 512) : null)
-                ->addValue('C108', '4440:5', $message !== null ? substr($message, 2048, 512) : null)
-        ));
+        return new self((new DataGroups)
+            ->addValue('FTX', 'FTX', 'FTX')
+            ->addValue('4451', '4451', $qualifier)
+            ->addValue('4453', '', null)
+            ->addValue('C107', '4441', $code)
+            ->addValue('C108', '4440:1', $message !== null ? substr($message, 0, 512) : null)
+            ->addValue('C108', '4440:2', $message !== null ? substr($message, 512, 512) : null)
+            ->addValue('C108', '4440:3', $message !== null ? substr($message, 1024, 512) : null)
+            ->addValue('C108', '4440:4', $message !== null ? substr($message, 1536, 512) : null)
+            ->addValue('C108', '4440:5', $message !== null ? substr($message, 2048, 512) : null)
+        );
     }
 
     public function qualifier(): ?string

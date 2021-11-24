@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Test\Fixtures;
 
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 use Proengeno\Edifact\Delimiter;
 use Proengeno\Edifact\Segments\AbstractSegment;
 
@@ -32,10 +31,10 @@ class Segment extends AbstractSegment
 
     public static function fromAttributes(Delimiter $delimiter, $attribute): self
     {
-        return new self(new SegmentData(
+        return new self(
             (new DataGroups)->addValue('A', 'A', $attribute),
             $delimiter
-        ));
+        );
     }
 
     public function dummyMethod()

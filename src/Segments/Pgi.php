@@ -2,7 +2,6 @@
 
 namespace Proengeno\Edifact\Segments;
 
-use Proengeno\Edifact\SegmentData;
 use Proengeno\Edifact\DataGroups;
 
 class Pgi extends AbstractSegment
@@ -22,11 +21,10 @@ class Pgi extends AbstractSegment
 
     public static function fromAttributes(string $code): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('PGI', 'PGI', 'PGI')
-                ->addValue('5379', '5379', $code)
-        ));
+        return new self((new DataGroups)
+            ->addValue('PGI', 'PGI', 'PGI')
+            ->addValue('5379', '5379', $code)
+        );
     }
 
     public function code(): ?string

@@ -5,7 +5,6 @@ namespace Proengeno\Edifact\Segments;
 use DateTime;
 use Proengeno\Edifact\DataGroups;
 use Proengeno\Edifact\Interfaces\UnbInterface;
-use Proengeno\Edifact\SegmentData;
 
 class Unb extends AbstractSegment implements UnbInterface
 {
@@ -48,24 +47,23 @@ class Unb extends AbstractSegment implements UnbInterface
         ?string $usageType = null,
         ?string $testMarker = null
     ): self {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('UNB', 'UNB', 'UNB')
-                ->addValue('S001', '0001', $syntaxId)
-                ->addValue('S001', '0002', $syntaxVersion)
-                ->addValue('S002', '0004', $sender)
-                ->addValue('S002', '0007', $senderQualifier)
-                ->addValue('S003', '0010', $receiver)
-                ->addValue('S003', '0007', $receiverQualifier)
-                ->addValue('S004', '0017', $creationDatetime->format('ymd'))
-                ->addValue('S004', '0019', $creationDatetime->format('Hi'))
-                ->addValue('0020', '0020', $referenzNumber)
-                ->addValue('0005', '0005', null)
-                ->addValue('0026', '0026', $usageType)
-                ->addValue('0029', '0029', null)
-                ->addValue('0032', '0032', null)
-                ->addValue('0035', '0035', $testMarker)
-        ));
+        return new self((new DataGroups)
+            ->addValue('UNB', 'UNB', 'UNB')
+            ->addValue('S001', '0001', $syntaxId)
+            ->addValue('S001', '0002', $syntaxVersion)
+            ->addValue('S002', '0004', $sender)
+            ->addValue('S002', '0007', $senderQualifier)
+            ->addValue('S003', '0010', $receiver)
+            ->addValue('S003', '0007', $receiverQualifier)
+            ->addValue('S004', '0017', $creationDatetime->format('ymd'))
+            ->addValue('S004', '0019', $creationDatetime->format('Hi'))
+            ->addValue('0020', '0020', $referenzNumber)
+            ->addValue('0005', '0005', null)
+            ->addValue('0026', '0026', $usageType)
+            ->addValue('0029', '0029', null)
+            ->addValue('0032', '0032', null)
+            ->addValue('0035', '0035', $testMarker)
+        );
     }
 
     public function reference(): string

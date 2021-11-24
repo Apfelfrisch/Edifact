@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 
 class Cci extends AbstractSegment
 {
@@ -33,16 +32,15 @@ class Cci extends AbstractSegment
         ?string $codeResponsible = null
     ): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('CCI', 'CCI', 'CCI')
-                ->addValue('7059', '7059', $type)
-                ->addValue('C502', '6313', null)
-                ->addValue('C240', '7037', $code)
-                ->addValue('C240', '1131', $codeList)
-                ->addValue('C240', '3055', $codeResponsible)
-                ->addValue('C240', '7036', $mark)
-        ));
+        return new self((new DataGroups)
+            ->addValue('CCI', 'CCI', 'CCI')
+            ->addValue('7059', '7059', $type)
+            ->addValue('C502', '6313', null)
+            ->addValue('C240', '7037', $code)
+            ->addValue('C240', '1131', $codeList)
+            ->addValue('C240', '3055', $codeResponsible)
+            ->addValue('C240', '7036', $mark)
+        );
     }
 
     public function type(): ?string

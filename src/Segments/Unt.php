@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 
 class Unt extends AbstractSegment
 {
@@ -23,12 +22,11 @@ class Unt extends AbstractSegment
 
     public static function fromAttributes(string $segCount, string $referenz): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('UNT', 'UNT', 'UNT')
-                ->addValue('0074', '0074', $segCount)
-                ->addValue('0062', '0062', $referenz)
-        ));
+        return new self((new DataGroups)
+            ->addValue('UNT', 'UNT', 'UNT')
+            ->addValue('0074', '0074', $segCount)
+            ->addValue('0062', '0062', $referenz)
+        );
     }
 
     public function segCount(): ?string

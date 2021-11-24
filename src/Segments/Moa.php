@@ -4,7 +4,6 @@ namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\Interfaces\DecimalConverter;
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 
 class Moa extends AbstractSegment implements DecimalConverter
 {
@@ -29,12 +28,11 @@ class Moa extends AbstractSegment implements DecimalConverter
      */
     public static function fromAttributes(string $qualifier, float $amount, string $decimalSeperator = '.'): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('MOA', 'MOA', 'MOA')
-                ->addValue('C516', '5025', $qualifier)
-                ->addValue('C516', '5004', number_format($amount, 2, $decimalSeperator, ''))
-        ));
+        return new self((new DataGroups)
+            ->addValue('MOA', 'MOA', 'MOA')
+            ->addValue('C516', '5025', $qualifier)
+            ->addValue('C516', '5004', number_format($amount, 2, $decimalSeperator, ''))
+        );
     }
 
     public function qualifier(): ?string

@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 
 class Pia extends AbstractSegment
 {
@@ -24,13 +23,12 @@ class Pia extends AbstractSegment
 
     public static function fromAttributes(string $number, ?string $articleNumber = null, ?string $articleCode = null): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('PIA', 'PIA', 'PIA')
-                ->addValue('4347', '4347', $number)
-                ->addValue('C212', '7140', $articleNumber)
-                ->addValue('C212', '7143', $articleCode)
-        ));
+        return new self((new DataGroups)
+            ->addValue('PIA', 'PIA', 'PIA')
+            ->addValue('4347', '4347', $number)
+            ->addValue('C212', '7140', $articleNumber)
+            ->addValue('C212', '7143', $articleCode)
+        );
     }
 
     public function number(): ?string

@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\Interfaces\DecimalConverter;
-use Proengeno\Edifact\SegmentData;
 use Proengeno\Edifact\DataGroups;
 
 class Pri extends AbstractSegment implements DecimalConverter
@@ -30,16 +29,15 @@ class Pri extends AbstractSegment implements DecimalConverter
 
     public static function fromAttributes(string $qualifier, string $amount, string $unitCode = null): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('PRI', 'PRI', 'PRI')
-                ->addValue('C509', '5125', $qualifier)
-                ->addValue('C509', '5118', $amount)
-                ->addValue('C509', '5375', null)
-                ->addValue('C509', '5387', null)
-                ->addValue('C509', '5284', null)
-                ->addValue('C509', '6411', $unitCode)
-        ));
+        return new self((new DataGroups)
+            ->addValue('PRI', 'PRI', 'PRI')
+            ->addValue('C509', '5125', $qualifier)
+            ->addValue('C509', '5118', $amount)
+            ->addValue('C509', '5375', null)
+            ->addValue('C509', '5387', null)
+            ->addValue('C509', '5284', null)
+            ->addValue('C509', '6411', $unitCode)
+        );
     }
 
     public function qualifier(): ?string

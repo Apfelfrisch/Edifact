@@ -4,7 +4,6 @@ namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\DataGroups;
 use Proengeno\Edifact\Interfaces\UnhInterface;
-use Proengeno\Edifact\SegmentData;
 
 class Unh extends AbstractSegment implements UnhInterface
 {
@@ -35,16 +34,15 @@ class Unh extends AbstractSegment implements UnhInterface
         string $organisationCode
     ): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('UNH', 'UNH', 'UNH')
-                ->addValue('0062', '0062', $referenz)
-                ->addValue('S009', '0065', $type)
-                ->addValue('S009', '0052', $versionNumber)
-                ->addValue('S009', '0054', $releaseNumber)
-                ->addValue('S009', '0051', $organisation)
-                ->addValue('S009', '0057', $organisationCode)
-        ));
+        return new self((new DataGroups)
+            ->addValue('UNH', 'UNH', 'UNH')
+            ->addValue('0062', '0062', $referenz)
+            ->addValue('S009', '0065', $type)
+            ->addValue('S009', '0052', $versionNumber)
+            ->addValue('S009', '0054', $releaseNumber)
+            ->addValue('S009', '0051', $organisation)
+            ->addValue('S009', '0057', $organisationCode)
+        );
     }
 
     public function reference(): string

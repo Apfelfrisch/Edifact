@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 
 final class Cav extends AbstractSegment
 {
@@ -32,15 +31,14 @@ final class Cav extends AbstractSegment
         ?string $codeList = null
     ): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('CAV', 'CAV', 'CAV')
-                ->addValue('C889', '7111', $code)
-                ->addValue('C889', '1131', $codeList)
-                ->addValue('C889', '3055', $responsCode)
-                ->addValue('C889', '7110:1', $valueOne)
-                ->addValue('C889', '7110:2', $valueTwo)
-        ));
+        return new self((new DataGroups)
+            ->addValue('CAV', 'CAV', 'CAV')
+            ->addValue('C889', '7111', $code)
+            ->addValue('C889', '1131', $codeList)
+            ->addValue('C889', '3055', $responsCode)
+            ->addValue('C889', '7110:1', $valueOne)
+            ->addValue('C889', '7110:2', $valueTwo)
+        );
     }
 
     public function code(): ?string

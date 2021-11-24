@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 
 class Eqd extends AbstractSegment
 {
@@ -23,12 +22,11 @@ class Eqd extends AbstractSegment
 
     public static function fromAttributes(string $qualifier, string $processNumber): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('EQD', 'EQD', 'EQD')
-                ->addValue('8053', '8053', $qualifier)
-                ->addValue('C237', '8260', $processNumber)
-        ));
+        return new self((new DataGroups)
+            ->addValue('EQD', 'EQD', 'EQD')
+            ->addValue('8053', '8053', $qualifier)
+            ->addValue('C237', '8260', $processNumber)
+        );
     }
 
     public function qualifier(): ?string

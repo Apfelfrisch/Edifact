@@ -5,7 +5,6 @@ namespace Proengeno\Edifact\Segments;
 use Proengeno\Edifact\Exceptions\SegValidationException;
 use Proengeno\Edifact\Interfaces\DecimalConverter;
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 use Proengeno\Edifact\Delimiter;
 use Proengeno\Edifact\Interfaces\SegInterface;
 use Proengeno\Edifact\Validation\SegmentValidator;
@@ -13,13 +12,13 @@ use Proengeno\Edifact\Interfaces\SegValidatorInterface;
 
 abstract class AbstractSegment implements SegInterface
 {
-    protected SegmentData $elements;
+    protected DataGroups $elements;
 
     protected array $cache = [];
 
     protected SegValidatorInterface $validator;
 
-    final protected function __construct(SegmentData $elements)
+    final protected function __construct(DataGroups $elements)
     {
         $this->elements = $elements;
         $this->validator = new SegmentValidator;
@@ -73,28 +72,59 @@ abstract class AbstractSegment implements SegInterface
 
     public function toString(Delimiter $delimiter): string
     {
-        return $this->elements->toString($delimiter);
+        $string = '';
+
+        foreach($this->elements->toArray() as $dataGroup) {
+            foreach ($dataGroup as $value) {
+                $string .= $value === null
+                    ? $delimiter->getData()
+                    : $delimiter->terminate($value) . $delimiter->getData();
+            }
+
+            $string = $this->trimEmpty(
+                $string, $delimiter->getData(), $delimiter->getTerminator()
+            ) . $delimiter->getDataGroup();
+        }
+
+        return $this->trimEmpty($string, $delimiter->getDataGroup(), $delimiter->getTerminator());
     }
 
-    protected static function mapToBlueprint(Delimiter $delimiter, string $segLine): SegmentData
+    private function trimEmpty(string $string, string $dataGroupSeperator, string $terminator): string
+    {
+        while(true) {
+            if ($dataGroupSeperator !== $string[-1] ?? null) {
+                break;
+            }
+
+            if ($terminator === $string[-2] ?? null) {
+                break;
+            }
+
+            $string = substr($string, 0, -1);
+        }
+
+        return $string;
+    }
+
+    protected static function mapToBlueprint(Delimiter $delimiter, string $segLine): DataGroups
     {
         $i = 0;
-        $dataCollection = new DataGroups;
-        $inputDataGroups = $delimiter->explodeDataGroups($segLine);
+        $dataGroups = new DataGroups;
+        $dataArray = $delimiter->explodeDataGroups($segLine);
         foreach (static::blueprint()->toArray() as $BpDataKey => $BPdataGroups) {
             $inputElement = [];
-            if (isset($inputDataGroups[$i])) {
-                $inputElement = $delimiter->explodeElements($inputDataGroups[$i]);
+            if (isset($dataArray[$i])) {
+                $inputElement = $delimiter->explodeElements($dataArray[$i]);
             }
 
             $j = 0;
             foreach (array_keys($BPdataGroups) as $key) {
-                $dataCollection->addValue($BpDataKey, $key, isset($inputElement[$j]) ? $inputElement[$j] : null);
+                $dataGroups->addValue($BpDataKey, $key, isset($inputElement[$j]) ? $inputElement[$j] : null);
                 $j++;
             }
             $i++;
         }
 
-        return new SegmentData($dataCollection);
+        return $dataGroups;
     }
 }

@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 
 class Ucm extends AbstractSegment
 {
@@ -42,21 +41,20 @@ class Ucm extends AbstractSegment
         ?string $segmentPosition = null,
         ?string $dataGroupPosition = null,
     ): self {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('UCM', 'UCM', 'UCM')
-                ->addValue('0062', '0062', $referenz)
-                ->addValue('S009', '0065', $type)
-                ->addValue('S009', '0052', $versionNumber)
-                ->addValue('S009', '0054', $releaseNumber)
-                ->addValue('S009', '0051', $organisation)
-                ->addValue('S009', '0057', $organisationCode)
-                ->addValue('0083', '0083', '4')
-                ->addValue('0085', '0085', $errorCode)
-                ->addValue('0013', '0013', $serviceSegement)
-                ->addValue('S011', '0098', $segmentPosition)
-                ->addValue('S011', '0104', $dataGroupPosition)
-        ));
+        return new self((new DataGroups)
+            ->addValue('UCM', 'UCM', 'UCM')
+            ->addValue('0062', '0062', $referenz)
+            ->addValue('S009', '0065', $type)
+            ->addValue('S009', '0052', $versionNumber)
+            ->addValue('S009', '0054', $releaseNumber)
+            ->addValue('S009', '0051', $organisation)
+            ->addValue('S009', '0057', $organisationCode)
+            ->addValue('0083', '0083', '4')
+            ->addValue('0085', '0085', $errorCode)
+            ->addValue('0013', '0013', $serviceSegement)
+            ->addValue('S011', '0098', $segmentPosition)
+            ->addValue('S011', '0104', $dataGroupPosition)
+        );
     }
 
     public function referenz(): ?string

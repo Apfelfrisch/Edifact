@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 use Proengeno\Edifact\Delimiter;
 
 class Una extends AbstractSegment
@@ -35,16 +34,15 @@ class Una extends AbstractSegment
         string $segment = '\''
     ): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('UNA', 'UNA', 'UNA')
-                ->addValue('UNA', 'data', $data)
-                ->addValue('UNA', 'dataGroup', $dataGroup)
-                ->addValue('UNA', 'decimal', $decimal)
-                ->addValue('UNA', 'terminator', $terminator)
-                ->addValue('UNA', 'empty', $empty)
-                ->addValue('UNA', 'segment', $segment)
-        ));
+        return new self((new DataGroups)
+            ->addValue('UNA', 'UNA', 'UNA')
+            ->addValue('UNA', 'data', $data)
+            ->addValue('UNA', 'dataGroup', $dataGroup)
+            ->addValue('UNA', 'decimal', $decimal)
+            ->addValue('UNA', 'terminator', $terminator)
+            ->addValue('UNA', 'empty', $empty)
+            ->addValue('UNA', 'segment', $segment)
+        );
     }
 
     public function data(): ?string
@@ -87,17 +85,17 @@ class Una extends AbstractSegment
             . $this->elements->getValue('UNA', 'empty');
     }
 
-    protected static function mapToBlueprint(Delimiter $delimiter, string $segLine): SegmentData
+    protected static function mapToBlueprint(Delimiter $delimiter, string $segLine): DataGroups
     {
         $inputElement = ['UNA'] + str_split(substr($segLine, 2));
-        $dataCollection = new DataGroups;
+        $dataGroups = new DataGroups;
 
         $i = 0;
         foreach (array_keys(self::blueprint()->getDataGroup('UNA')) as $BpDataKey) {
-            $dataCollection->addValue('UNA', $BpDataKey, $inputElement[$i] ?? null);
+            $dataGroups->addValue('UNA', $BpDataKey, $inputElement[$i] ?? null);
             $i++;
         }
 
-        return new SegmentData($dataCollection);
+        return $dataGroups;
     }
 }

@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 
 class Tax extends AbstractSegment
 {
@@ -30,19 +29,18 @@ class Tax extends AbstractSegment
 
     public static function fromAttributes(string $qualifier, string $type, string $rate, string $category): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('TAX', 'TAX', 'TAX')
-                ->addValue('5283', '5283', $qualifier)
-                ->addValue('C241', '5153', $type)
-                ->addValue('C533', '5289', null)
-                ->addValue('5286', '5286', null)
-                ->addValue('C243', '5279', null)
-                ->addValue('C243', '1131', null)
-                ->addValue('C243', '3055', null)
-                ->addValue('C243', '5278', $rate)
-                ->addValue('5305', '5305', $category)
-        ));
+        return new self((new DataGroups)
+            ->addValue('TAX', 'TAX', 'TAX')
+            ->addValue('5283', '5283', $qualifier)
+            ->addValue('C241', '5153', $type)
+            ->addValue('C533', '5289', null)
+            ->addValue('5286', '5286', null)
+            ->addValue('C243', '5279', null)
+            ->addValue('C243', '1131', null)
+            ->addValue('C243', '3055', null)
+            ->addValue('C243', '5278', $rate)
+            ->addValue('5305', '5305', $category)
+        );
     }
 
     public function qualifier(): ?string

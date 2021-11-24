@@ -4,7 +4,6 @@ namespace Proengeno\Edifact\Segments;
 
 use DateTime;
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 use Proengeno\Edifact\Exceptions\SegValidationException;
 
 class Dtm extends AbstractSegment
@@ -30,13 +29,12 @@ class Dtm extends AbstractSegment
             $date = static::serializeDateTime($date, $code);
         }
 
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('DTM', 'DTM', 'DTM')
-                ->addValue('C507', '2005', $qualifier)
-                ->addValue('C507', '2380', $date)
-                ->addValue('C507', '2379', $code)
-        ));
+        return new self((new DataGroups)
+            ->addValue('DTM', 'DTM', 'DTM')
+            ->addValue('C507', '2005', $qualifier)
+            ->addValue('C507', '2380', $date)
+            ->addValue('C507', '2379', $code)
+        );
     }
 
     public function qualifier(): ?string

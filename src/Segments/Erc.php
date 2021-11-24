@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 
 class Erc extends AbstractSegment
 {
@@ -22,11 +21,10 @@ class Erc extends AbstractSegment
 
     public static function fromAttributes(string $error): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('ERC', 'ERC', 'ERC')
-                ->addValue('C901', '9321', $error)
-        ));
+        return new self((new DataGroups)
+            ->addValue('ERC', 'ERC', 'ERC')
+            ->addValue('C901', '9321', $error)
+        );
     }
 
     public function errorCode(): ?string

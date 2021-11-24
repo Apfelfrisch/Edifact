@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 
 class Unz extends AbstractSegment
 {
@@ -23,12 +22,11 @@ class Unz extends AbstractSegment
 
     public static function fromAttributes(string $counter, string $referenz): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('UNZ', 'UNZ', 'UNZ')
-                ->addValue('0062', '0062', $counter)
-                ->addValue('S009', '0065', $referenz)
-        ));
+        return new self((new DataGroups)
+            ->addValue('UNZ', 'UNZ', 'UNZ')
+            ->addValue('0062', '0062', $counter)
+            ->addValue('S009', '0065', $referenz)
+        );
     }
 
     public function counter(): ?string

@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 
 class Cux extends AbstractSegment
 {
@@ -24,13 +23,12 @@ class Cux extends AbstractSegment
 
     public static function fromAttributes(string $type, string $currency, string $qualifier): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('CUX', 'CUX', 'CUX')
-                ->addValue('C504', '6347', $type)
-                ->addValue('C504', '6345', $currency)
-                ->addValue('C504', '6343', $qualifier)
-        ));
+        return new self((new DataGroups)
+            ->addValue('CUX', 'CUX', 'CUX')
+            ->addValue('C504', '6347', $type)
+            ->addValue('C504', '6345', $currency)
+            ->addValue('C504', '6343', $qualifier)
+        );
     }
 
     public function type(): ?string

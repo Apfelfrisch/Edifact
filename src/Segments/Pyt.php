@@ -2,7 +2,6 @@
 
 namespace Proengeno\Edifact\Segments;
 
-use Proengeno\Edifact\SegmentData;
 use Proengeno\Edifact\DataGroups;
 
 class Pyt extends AbstractSegment
@@ -22,11 +21,10 @@ class Pyt extends AbstractSegment
 
     public static function fromAttributes(string $qualifier): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('PYT', 'PYT', 'PYT')
-                ->addValue('4279', '4279', $qualifier)
-        ));
+        return new self((new DataGroups)
+            ->addValue('PYT', 'PYT', 'PYT')
+            ->addValue('4279', '4279', $qualifier)
+        );
     }
 
     public function qualifier(): ?string

@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 
 class Pac extends AbstractSegment
 {
@@ -23,12 +22,11 @@ class Pac extends AbstractSegment
 
     public static function fromAttributes(string $quantity, string $code): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('PAC', 'PAC', 'PAC')
-                ->addValue('7224', '7224', $quantity)
-                ->addValue('C531', '7075', $code)
-        ));
+        return new self((new DataGroups)
+            ->addValue('PAC', 'PAC', 'PAC')
+            ->addValue('7224', '7224', $quantity)
+            ->addValue('C531', '7075', $code)
+        );
     }
 
     public function quantity(): ?string

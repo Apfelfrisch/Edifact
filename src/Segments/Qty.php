@@ -4,7 +4,6 @@ namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\Interfaces\DecimalConverter;
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 
 class Qty extends AbstractSegment implements DecimalConverter
 {
@@ -27,13 +26,12 @@ class Qty extends AbstractSegment implements DecimalConverter
 
     public static function fromAttributes(string $qualifier, string $amount, ?string $unitCode = null): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('QTY', 'QTY', 'QTY')
-                ->addValue('C186', '6063', $qualifier)
-                ->addValue('C186', '6060', $amount)
-                ->addValue('C186', '6411', $unitCode)
-        ));
+        return new self((new DataGroups)
+            ->addValue('QTY', 'QTY', 'QTY')
+            ->addValue('C186', '6063', $qualifier)
+            ->addValue('C186', '6060', $amount)
+            ->addValue('C186', '6411', $unitCode)
+        );
     }
 
     public function qualifier(): ?string

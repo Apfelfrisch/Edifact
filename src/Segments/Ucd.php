@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 
 class Ucd extends AbstractSegment
 {
@@ -24,13 +23,12 @@ class Ucd extends AbstractSegment
 
     public static function fromAttributes(string $errorCode, string $segmentPosition, ?string $dataGroupPosition = null): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('UCD', 'UCD', 'UCD')
-                ->addValue('0085', '0085', $errorCode)
-                ->addValue('S011', '0098', $segmentPosition)
-                ->addValue('S011', '0104', $dataGroupPosition)
-        ));
+        return new self((new DataGroups)
+            ->addValue('UCD', 'UCD', 'UCD')
+            ->addValue('0085', '0085', $errorCode)
+            ->addValue('S011', '0098', $segmentPosition)
+            ->addValue('S011', '0104', $dataGroupPosition)
+        );
     }
 
     public function errorCode(): ?string

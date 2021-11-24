@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 
 class Doc extends AbstractSegment
 {
@@ -23,12 +22,11 @@ class Doc extends AbstractSegment
 
     public static function fromAttributes(string $code, string $number): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('DOC', 'DOC', 'DOC')
-                ->addValue('C002', '1001', $code)
-                ->addValue('C503', '1004', $number)
-        ));
+        return new self((new DataGroups)
+            ->addValue('DOC', 'DOC', 'DOC')
+            ->addValue('C002', '1001', $code)
+            ->addValue('C503', '1004', $number)
+        );
     }
 
     public function code(): ?string

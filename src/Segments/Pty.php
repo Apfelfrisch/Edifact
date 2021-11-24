@@ -3,7 +3,6 @@
 namespace Proengeno\Edifact\Segments;
 
 use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentData;
 
 class Pty extends AbstractSegment
 {
@@ -26,15 +25,14 @@ class Pty extends AbstractSegment
 
     public static function fromAttributes(string $qualifier, string $priority): self
     {
-        return new self(new SegmentData(
-            (new DataGroups)
-                ->addValue('PTY', 'PTY', 'PTY')
-                ->addValue('4035', '4035', $qualifier)
-                ->addValue('C585', '4037', null)
-                ->addValue('C585', '1131', null)
-                ->addValue('C585', '3055', null)
-                ->addValue('C585', '4036', $priority)
-        ));
+        return new self((new DataGroups)
+            ->addValue('PTY', 'PTY', 'PTY')
+            ->addValue('4035', '4035', $qualifier)
+            ->addValue('C585', '4037', null)
+            ->addValue('C585', '1131', null)
+            ->addValue('C585', '3055', null)
+            ->addValue('C585', '4036', $priority)
+        );
     }
 
     public function qualifier(): ?string
