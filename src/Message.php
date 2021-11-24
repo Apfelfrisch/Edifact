@@ -166,12 +166,12 @@ class Message implements \Iterator
 
     public function toArray(): array
     {
-        return array_map(function($segment) {
+        return array_map(function(SegInterface|false $segment) {
             if (! $segment) {
                 return [];
             }
             return [$segment->name() => $segment->toArray()];
-        }, iterator_to_array($this) ?: []);
+        }, iterator_to_array($this));
     }
 
     public function __toString(): string

@@ -45,29 +45,29 @@ class Una extends AbstractSegment
         );
     }
 
-    public function data(): ?string
+    public function data(): string
     {
-        return $this->elements->getValue('UNA', 'data');
+        return (string)$this->elements->getValue('UNA', 'data');
     }
 
-    public function dataGroup(): ?string
+    public function dataGroup(): string
     {
-        return $this->elements->getValue('UNA', 'dataGroup');
+        return (string)$this->elements->getValue('UNA', 'dataGroup');
     }
 
-    public function decimal(): ?string
+    public function decimal(): string
     {
-        return $this->elements->getValue('UNA', 'decimal');
+        return (string)$this->elements->getValue('UNA', 'decimal');
     }
 
-    public function terminator(): ?string
+    public function terminator(): string
     {
-        return $this->elements->getValue('UNA', 'terminator');
+        return (string)$this->elements->getValue('UNA', 'terminator');
     }
 
-    public function emptyChar(): ?string
+    public function emptyChar(): string
     {
-        return $this->elements->getValue('UNA', 'empty');
+        return (string)$this->elements->getValue('UNA', 'empty');
     }
 
     public function segment(): ?string
@@ -77,12 +77,7 @@ class Una extends AbstractSegment
 
     public function toString(Delimiter $delimiter): string
     {
-        return $this->elements->getValue('UNA', 'UNA')
-            . $this->elements->getValue('UNA', 'data')
-            . $this->elements->getValue('UNA', 'dataGroup')
-            . $this->elements->getValue('UNA', 'decimal')
-            . $this->elements->getValue('UNA', 'terminator')
-            . $this->elements->getValue('UNA', 'empty');
+        return $this->name() . $this->data() . $this->dataGroup() . $this->decimal() . $this->terminator() . $this->emptyChar();
     }
 
     protected static function mapToBlueprint(Delimiter $delimiter, string $segLine): DataGroups
