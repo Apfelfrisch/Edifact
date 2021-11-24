@@ -2,7 +2,6 @@
 
 namespace Proengeno\Edifact;
 
-use Proengeno\Edifact\Configuration;
 use Proengeno\Edifact\Interfaces\SegInterface;
 use Proengeno\Edifact\EdifactFile;
 use Proengeno\Edifact\SegmentFactory;
@@ -11,8 +10,6 @@ use Proengeno\Edifact\Exceptions\SegValidationException;
 
 class Message implements \Iterator
 {
-    protected Configuration $configuration;
-
     protected EdifactFile $edifactFile;
 
     protected SegmentFactory $segmentFactory;
@@ -23,17 +20,27 @@ class Message implements \Iterator
 
     private int $currentSegmentNumber = -1;
 
-    public function __construct(EdifactFile $edifactFile, ?Configuration $configuration = null)
+    public function __construct(EdifactFile $edifactFile, ?SegmentFactory $segmentFactory = null)
     {
         $this->edifactFile = $edifactFile;
         $this->rewind();
+        $this->segmentFactory = $segmentFactory ?? SegmentFactory::withDefaultDegments();
+    }
 
-        $this->configuration = $configuration ?: new Configuration;
-        $this->segmentFactory = new SegmentFactory(
-            $this->configuration->getSegmentNamespace(),
-            $this->getDelimiter(),
-            $this->configuration->getFallbackSegment()
-        );
+    public static function fromFilepath(string $string, ?SegmentFactory $segmentFactory = null): self
+    {
+        $edifactFile = new EdifactFile($string);
+
+        return new self($edifactFile, $segmentFactory);
+    }
+
+    public static function fromString(
+        string $string, ?SegmentFactory $segmentFactory = null, string $filename = 'php://temp'
+    ): self
+    {
+        $edifactFile = EdifactFile::fromString($string, $filename);
+
+        return new self($edifactFile, $segmentFactory);
     }
 
     public function addStreamFilter(string $filtername, mixed $params = null): self
@@ -41,24 +48,6 @@ class Message implements \Iterator
         $this->edifactFile->addReadFilter($filtername, $params);
 
         return $this;
-    }
-
-    public static function fromFilepath(string $string, Configuration $configuration = null): self
-    {
-        $edifactFile = new EdifactFile($string);
-        $configuration = $configuration ?: new Configuration;
-
-        return new self($edifactFile, $configuration);
-    }
-
-    public static function fromString(
-        string $string, Configuration $configuration = null, string $filename = 'php://temp'
-    ): self
-    {
-        $configuration = $configuration ?: new Configuration;
-        $edifactFile = EdifactFile::fromString($string, $filename);
-
-        return new self($edifactFile, $configuration);
     }
 
     public function getFilepath(): string
@@ -192,7 +181,7 @@ class Message implements \Iterator
 
     protected function getSegmentObject(string $segLine): SegInterface
     {
-        return $this->segmentFactory->fromSegline($segLine);
+        return $this->segmentFactory->build($segLine, $this->getDelimiter());
     }
 
     private function getNextSegLine(): string
