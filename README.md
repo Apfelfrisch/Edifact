@@ -78,6 +78,8 @@ If no UNA Segement is provided, it uses the default values (UNA:+.? )
 
 ```php
 use Apfelfrisch\Edifact\Builder;
+use Apfelfrisch\Edifact\Segments\Unb;
+use Apfelfrisch\Edifact\Segments\Unh;
 
 $builder = new Builder;
 
