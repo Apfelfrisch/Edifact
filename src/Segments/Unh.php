@@ -1,9 +1,9 @@
 <?php
 
-namespace Proengeno\Edifact\Segments;
+namespace Apfelfrisch\Edifact\Segments;
 
-use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\Interfaces\UnhInterface;
+use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Interfaces\UnhInterface;
 
 class Unh extends AbstractSegment implements UnhInterface
 {

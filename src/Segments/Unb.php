@@ -1,10 +1,10 @@
 <?php
 
-namespace Proengeno\Edifact\Segments;
+namespace Apfelfrisch\Edifact\Segments;
 
 use DateTime;
-use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\Interfaces\UnbInterface;
+use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Interfaces\UnbInterface;
 
 class Unb extends AbstractSegment implements UnbInterface
 {

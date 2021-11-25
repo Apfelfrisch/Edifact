@@ -1,6 +1,6 @@
 <?php
 
-namespace Proengeno\Edifact\Interfaces;
+namespace Apfelfrisch\Edifact\Interfaces;
 
 interface UnbInterface
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace Proengeno\Edifact\Segments;
+namespace Apfelfrisch\Edifact\Segments;
 
-use Proengeno\Edifact\DataGroups;
+use Apfelfrisch\Edifact\DataGroups;
 
 class Pty extends AbstractSegment
 {

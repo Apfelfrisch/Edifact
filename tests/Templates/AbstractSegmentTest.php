@@ -1,11 +1,11 @@
 <?php
 
-namespace Proengeno\Edifact\Test\Templates;
+namespace Apfelfrisch\Edifact\Test\Templates;
 
-use Proengeno\Edifact\Test\TestCase;
-use Proengeno\Edifact\Delimiter;
-use Proengeno\Edifact\Test\Fixtures\Segment;
-use Proengeno\Edifact\Validation\SegmentValidator;
+use Apfelfrisch\Edifact\Test\TestCase;
+use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\Test\Fixtures\Segment;
+use Apfelfrisch\Edifact\Validation\SegmentValidator;
 
 class AbstractSegmentTest extends TestCase
 {

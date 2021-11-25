@@ -1,9 +1,9 @@
 <?php
 
-namespace Proengeno\Edifact\Test\Exceptions;
+namespace Apfelfrisch\Edifact\Test\Exceptions;
 
-use Proengeno\Edifact\Test\TestCase;
-use Proengeno\Edifact\Exceptions\SegValidationException;
+use Apfelfrisch\Edifact\Test\TestCase;
+use Apfelfrisch\Edifact\Exceptions\SegValidationException;
 
 class SegValidationExceptionTest extends TestCase
 {

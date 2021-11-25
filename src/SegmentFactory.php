@@ -1,10 +1,10 @@
 <?php
 
-namespace Proengeno\Edifact;
+namespace Apfelfrisch\Edifact;
 
-use Proengeno\Edifact\Exceptions\SegValidationException;
-use Proengeno\Edifact\Interfaces\SegInterface;
-use Proengeno\Edifact\Segments\Fallback;
+use Apfelfrisch\Edifact\Exceptions\SegValidationException;
+use Apfelfrisch\Edifact\Interfaces\SegInterface;
+use Apfelfrisch\Edifact\Segments\Fallback;
 
 final class SegmentFactory
 {
@@ -25,7 +25,7 @@ final class SegmentFactory
 
             foreach (glob($defaultPath."???.php") as $segmentClassFile) {
                 $classBasename = basename($segmentClassFile, '.php');
-                self::$defaultFactory->addSegment($classBasename, '\\Proengeno\\Edifact\\Segments\\' . $classBasename);
+                self::$defaultFactory->addSegment($classBasename, '\\Apfelfrisch\\Edifact\\Segments\\' . $classBasename);
             }
         }
 

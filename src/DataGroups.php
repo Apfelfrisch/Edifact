@@ -1,6 +1,6 @@
 <?php
 
-namespace Proengeno\Edifact;
+namespace Apfelfrisch\Edifact;
 
 final class DataGroups
 {

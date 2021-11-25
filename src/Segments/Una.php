@@ -1,9 +1,9 @@
 <?php
 
-namespace Proengeno\Edifact\Segments;
+namespace Apfelfrisch\Edifact\Segments;
 
-use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\Delimiter;
+use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Delimiter;
 
 class Una extends AbstractSegment
 {

@@ -1,10 +1,10 @@
 <?php
 
-namespace Proengeno\Edifact\Segments;
+namespace Apfelfrisch\Edifact\Segments;
 
 use DateTime;
-use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\Exceptions\SegValidationException;
+use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Exceptions\SegValidationException;
 
 class Dtm extends AbstractSegment
 {

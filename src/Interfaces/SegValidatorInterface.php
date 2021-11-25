@@ -1,8 +1,8 @@
 <?php
 
-namespace Proengeno\Edifact\Interfaces;
+namespace Apfelfrisch\Edifact\Interfaces;
 
-use Proengeno\Edifact\DataGroups;
+use Apfelfrisch\Edifact\DataGroups;
 
 interface SegValidatorInterface
 {

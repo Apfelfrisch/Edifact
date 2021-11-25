@@ -1,18 +1,18 @@
 <?php
 
-namespace Proengeno\Edifact\Test\Message;
+namespace Apfelfrisch\Edifact\Test\Message;
 
-use Proengeno\Edifact\Delimiter;
-use Proengeno\Edifact\Test\TestCase;
-use Proengeno\Edifact\SegmentFactory;
-use Proengeno\Edifact\Segments\Fallback;
-use Proengeno\Edifact\Exceptions\EdifactException;
-use Proengeno\Edifact\Exceptions\SegValidationException;
+use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\Test\TestCase;
+use Apfelfrisch\Edifact\SegmentFactory;
+use Apfelfrisch\Edifact\Segments\Fallback;
+use Apfelfrisch\Edifact\Exceptions\EdifactException;
+use Apfelfrisch\Edifact\Exceptions\SegValidationException;
 
 class SegmentFactoryTest extends TestCase
 {
     private $segFactory;
-    private $segmentNamespace = '\Proengeno\Edifact\Segments';
+    private $segmentNamespace = '\Apfelfrisch\Edifact\Segments';
 
     public function setUp(): void
     {

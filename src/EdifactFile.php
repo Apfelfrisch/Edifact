@@ -1,11 +1,11 @@
 <?php
 
-namespace Proengeno\Edifact;
+namespace Apfelfrisch\Edifact;
 
 use SplFileInfo;
 use RuntimeException;
-use Proengeno\Edifact\Delimiter;
-use Proengeno\Edifact\Exceptions\EdifactException;
+use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use Throwable;
 
 final class EdifactFile extends SplFileInfo

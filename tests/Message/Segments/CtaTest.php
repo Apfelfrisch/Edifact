@@ -2,11 +2,11 @@
 
 declare(strict_types = 1);
 
-namespace Proengeno\Edifact\Test\Message\Segments;
+namespace Apfelfrisch\Edifact\Test\Message\Segments;
 
-use Proengeno\Edifact\Delimiter;
-use Proengeno\Edifact\Segments\Cta;
-use Proengeno\Edifact\Test\TestCase;
+use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\Segments\Cta;
+use Apfelfrisch\Edifact\Test\TestCase;
 
 final class CtaTest extends TestCase
 {

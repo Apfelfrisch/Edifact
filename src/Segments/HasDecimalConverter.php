@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Proengeno\Edifact\Segments;
+namespace Apfelfrisch\Edifact\Segments;
 
 trait HasDecimalConverter
 {

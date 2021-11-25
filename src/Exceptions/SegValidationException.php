@@ -1,6 +1,6 @@
 <?php
 
-namespace Proengeno\Edifact\Exceptions;
+namespace Apfelfrisch\Edifact\Exceptions;
 
 class SegValidationException extends EdifactException
 {

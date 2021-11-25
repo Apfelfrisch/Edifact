@@ -1,10 +1,10 @@
 <?php
 
-namespace Proengeno\Edifact\Segments;
+namespace Apfelfrisch\Edifact\Segments;
 
-use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\Delimiter;
-use Proengeno\Edifact\Exceptions\EdifactException;
+use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\Exceptions\EdifactException;
 
 class Fallback extends AbstractSegment
 {

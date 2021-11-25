@@ -1,17 +1,17 @@
 <?php
 
-namespace Proengeno\Edifact\Test\Message;
+namespace Apfelfrisch\Edifact\Test\Message;
 
 use DateTime;
-use Proengeno\Edifact\Builder;
-use Proengeno\Edifact\Delimiter;
-use Proengeno\Edifact\Segments\Ajt;
-use Proengeno\Edifact\Segments\Seq;
-use Proengeno\Edifact\Segments\Una;
-use Proengeno\Edifact\Segments\Unb;
-use Proengeno\Edifact\Segments\Unh;
-use Proengeno\Edifact\Segments\Unt;
-use Proengeno\Edifact\Test\TestCase;
+use Apfelfrisch\Edifact\Builder;
+use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\Segments\Ajt;
+use Apfelfrisch\Edifact\Segments\Seq;
+use Apfelfrisch\Edifact\Segments\Una;
+use Apfelfrisch\Edifact\Segments\Unb;
+use Apfelfrisch\Edifact\Segments\Unh;
+use Apfelfrisch\Edifact\Segments\Unt;
+use Apfelfrisch\Edifact\Test\TestCase;
 
 class BuilderTest extends TestCase
 {

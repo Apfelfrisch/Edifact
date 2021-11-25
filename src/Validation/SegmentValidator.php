@@ -1,10 +1,10 @@
 <?php
 
-namespace Proengeno\Edifact\Validation;
+namespace Apfelfrisch\Edifact\Validation;
 
-use Proengeno\Edifact\Interfaces\SegValidatorInterface;
-use Proengeno\Edifact\Exceptions\SegValidationException;
-use Proengeno\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Interfaces\SegValidatorInterface;
+use Apfelfrisch\Edifact\Exceptions\SegValidationException;
+use Apfelfrisch\Edifact\DataGroups;
 
 class SegmentValidator implements SegValidatorInterface
 {

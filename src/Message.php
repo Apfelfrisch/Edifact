@@ -1,12 +1,12 @@
 <?php
 
-namespace Proengeno\Edifact;
+namespace Apfelfrisch\Edifact;
 
-use Proengeno\Edifact\Interfaces\SegInterface;
-use Proengeno\Edifact\EdifactFile;
-use Proengeno\Edifact\SegmentFactory;
-use Proengeno\Edifact\Exceptions\ValidationException;
-use Proengeno\Edifact\Exceptions\SegValidationException;
+use Apfelfrisch\Edifact\Interfaces\SegInterface;
+use Apfelfrisch\Edifact\EdifactFile;
+use Apfelfrisch\Edifact\SegmentFactory;
+use Apfelfrisch\Edifact\Exceptions\ValidationException;
+use Apfelfrisch\Edifact\Exceptions\SegValidationException;
 
 class Message implements \Iterator
 {

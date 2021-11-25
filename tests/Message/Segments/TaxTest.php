@@ -2,11 +2,11 @@
 
 declare(strict_types = 1);
 
-namespace Proengeno\Edifact\Test\Message\Segments;
+namespace Apfelfrisch\Edifact\Test\Message\Segments;
 
-use Proengeno\Edifact\Delimiter;
-use Proengeno\Edifact\Segments\Tax;
-use Proengeno\Edifact\Test\TestCase;
+use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\Segments\Tax;
+use Apfelfrisch\Edifact\Test\TestCase;
 
 final class TaxTest extends TestCase
 {

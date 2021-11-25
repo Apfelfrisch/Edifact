@@ -1,10 +1,10 @@
 <?php
 
-namespace Proengeno\Edifact\Test\Fixtures;
+namespace Apfelfrisch\Edifact\Test\Fixtures;
 
-use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\Delimiter;
-use Proengeno\Edifact\Segments\AbstractSegment;
+use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\Segments\AbstractSegment;
 
 class Segment extends AbstractSegment
 {

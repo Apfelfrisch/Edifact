@@ -2,14 +2,14 @@
 
 declare(strict_types = 1);
 
-namespace Proengeno\Edifact\Test\Message\Segments;
+namespace Apfelfrisch\Edifact\Test\Message\Segments;
 
 use DateTime;
 use Iterator;
-use Proengeno\Edifact\Exceptions\SegValidationException;
-use Proengeno\Edifact\Delimiter;
-use Proengeno\Edifact\Segments\Dtm;
-use Proengeno\Edifact\Test\TestCase;
+use Apfelfrisch\Edifact\Exceptions\SegValidationException;
+use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\Segments\Dtm;
+use Apfelfrisch\Edifact\Test\TestCase;
 
 final class DtmTest extends TestCase
 {

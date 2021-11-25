@@ -1,9 +1,9 @@
 <?php
 
-namespace Proengeno\Edifact\Segments;
+namespace Apfelfrisch\Edifact\Segments;
 
-use Proengeno\Edifact\Interfaces\DecimalConverter;
-use Proengeno\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Interfaces\DecimalConverter;
+use Apfelfrisch\Edifact\DataGroups;
 
 class Qty extends AbstractSegment implements DecimalConverter
 {

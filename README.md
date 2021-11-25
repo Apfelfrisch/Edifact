@@ -11,11 +11,11 @@ A PHP library, wich provides a Framework to parse, build, serialize and validate
 
 ## Usage
 
-### Parse an Edifact Message
+### Parse Edifact Messages
 
 ```php
-use Proengeno\Edifact\Message;
-use Proengeno\Edifact\Segments\Nad;
+use Apfelfrisch\Edifact\Message;
+use Apfelfrisch\Edifact\Segments\Nad;
 
 $message = Message::fromString("UNA:+.? 'NAD+DP++++Musterstr.::10+City++12345+DE");
 
@@ -31,9 +31,9 @@ foreach ($message as $segment) {
 ```php
 namespace My\Namespace;
 
-use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\SegmentFactory;
-use Proengeno\Edifact\Segments\AbstractSegment;
+use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\SegmentFactory;
+use Apfelfrisch\Edifact\Segments\AbstractSegment;
 
 class Seq extends AbstractSegment
 {
@@ -77,7 +77,7 @@ The Builder takes Segments wich implements the SegInterface - trailing Segments 
 If no UNA Segement is provided, it uses the default values (UNA:+.? )
 
 ```php
-use Proengeno\Edifact\Builder;
+use Apfelfrisch\Edifact\Builder;
 
 $builder = new Builder;
 

@@ -1,16 +1,16 @@
 <?php
 
-namespace Proengeno\Edifact;
+namespace Apfelfrisch\Edifact;
 
-use Proengeno\Edifact\Interfaces\SegInterface;
-use Proengeno\Edifact\Delimiter;
-use Proengeno\Edifact\EdifactFile;
-use Proengeno\Edifact\Interfaces\UnbInterface;
-use Proengeno\Edifact\Interfaces\UnhInterface;
-use Proengeno\Edifact\Message;
-use Proengeno\Edifact\Segments\Una;
-use Proengeno\Edifact\Segments\Unt;
-use Proengeno\Edifact\Segments\Unz;
+use Apfelfrisch\Edifact\Interfaces\SegInterface;
+use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\EdifactFile;
+use Apfelfrisch\Edifact\Interfaces\UnbInterface;
+use Apfelfrisch\Edifact\Interfaces\UnhInterface;
+use Apfelfrisch\Edifact\Message;
+use Apfelfrisch\Edifact\Segments\Una;
+use Apfelfrisch\Edifact\Segments\Unt;
+use Apfelfrisch\Edifact\Segments\Unz;
 
 class Builder
 {

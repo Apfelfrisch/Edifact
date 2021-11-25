@@ -1,9 +1,9 @@
 <?php
 
-namespace Proengeno\Edifact\Test\Message;
+namespace Apfelfrisch\Edifact\Test\Message;
 
-use Proengeno\Edifact\EdifactFile;
-use Proengeno\Edifact\Test\TestCase;
+use Apfelfrisch\Edifact\EdifactFile;
+use Apfelfrisch\Edifact\Test\TestCase;
 
 class EdifactFileTest extends TestCase
 {
@@ -26,7 +26,7 @@ class EdifactFileTest extends TestCase
 
     public function testCanInstantiateWithStreamIdentifier()
     {
-        $this->assertInstanceOf('Proengeno\Edifact\EdifactFile', $this->edifactFile);
+        $this->assertInstanceOf('Apfelfrisch\Edifact\EdifactFile', $this->edifactFile);
     }
 
     public function testCanGetEdifactSegments()

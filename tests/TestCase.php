@@ -1,9 +1,9 @@
 <?php
 
-namespace Proengeno\Edifact\Test;
+namespace Apfelfrisch\Edifact\Test;
 
 use Mockery as m;
-use Proengeno\Edifact\Configuration;
+use Apfelfrisch\Edifact\Configuration;
 
 abstract class TestCase extends \PHPUnit\Framework\TestCase
 {

@@ -1,11 +1,11 @@
 <?php
 
-namespace Proengeno\Edifact\Test\Validation;
+namespace Apfelfrisch\Edifact\Test\Validation;
 
-use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\Test\TestCase;
-use Proengeno\Edifact\Validation\SegmentValidator;
-use Proengeno\Edifact\Exceptions\SegValidationException;
+use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Test\TestCase;
+use Apfelfrisch\Edifact\Validation\SegmentValidator;
+use Apfelfrisch\Edifact\Exceptions\SegValidationException;
 
 class SegmentValidatorTest extends TestCase
 {

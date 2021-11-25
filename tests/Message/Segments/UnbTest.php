@@ -2,12 +2,12 @@
 
 declare(strict_types = 1);
 
-namespace Proengeno\Edifact\Test\Message\Segments;
+namespace Apfelfrisch\Edifact\Test\Message\Segments;
 
 use DateTime;
-use Proengeno\Edifact\Delimiter;
-use Proengeno\Edifact\Segments\Unb;
-use Proengeno\Edifact\Test\TestCase;
+use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\Segments\Unb;
+use Apfelfrisch\Edifact\Test\TestCase;
 
 final class UnbTest extends TestCase
 {

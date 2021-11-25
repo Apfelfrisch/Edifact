@@ -1,14 +1,14 @@
 <?php
 
-namespace Proengeno\Edifact\Segments;
+namespace Apfelfrisch\Edifact\Segments;
 
-use Proengeno\Edifact\Exceptions\SegValidationException;
-use Proengeno\Edifact\Interfaces\DecimalConverter;
-use Proengeno\Edifact\DataGroups;
-use Proengeno\Edifact\Delimiter;
-use Proengeno\Edifact\Interfaces\SegInterface;
-use Proengeno\Edifact\Validation\SegmentValidator;
-use Proengeno\Edifact\Interfaces\SegValidatorInterface;
+use Apfelfrisch\Edifact\Exceptions\SegValidationException;
+use Apfelfrisch\Edifact\Interfaces\DecimalConverter;
+use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\Interfaces\SegInterface;
+use Apfelfrisch\Edifact\Validation\SegmentValidator;
+use Apfelfrisch\Edifact\Interfaces\SegValidatorInterface;
 
 abstract class AbstractSegment implements SegInterface
 {
