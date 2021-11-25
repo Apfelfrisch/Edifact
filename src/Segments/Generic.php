@@ -6,16 +6,30 @@ use Apfelfrisch\Edifact\DataGroups;
 use Apfelfrisch\Edifact\Delimiter;
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
 
-class Fallback extends AbstractSegment
+class Generic extends AbstractSegment
 {
     public static function blueprint(): DataGroups
     {
         throw new EdifactException('Generic Segment has no Blueprint');
     }
 
-    public static function fromAttributes(): self
+    /**
+     * @psalm-param list<list<string>> $valueArrays
+     */
+    public static function fromAttributes(array ...$valueArrays): self
     {
-        throw new EdifactException('Generic Segment can not be instanciate with "fromAttributes"');
+        $dataGroups = new DataGroups;
+        $i = 0;
+        foreach ($valueArrays as $values) {
+            $j = 0;
+            foreach($values as $value) {
+                $dataGroups->addValue((string)$i, (string)$j, $value);
+                $j++;
+            }
+            $i++;
+        }
+
+        return new self($dataGroups);
     }
 
     public function validate(): void

@@ -5,7 +5,7 @@ namespace Apfelfrisch\Edifact\Test\Message;
 use Apfelfrisch\Edifact\Delimiter;
 use Apfelfrisch\Edifact\Test\TestCase;
 use Apfelfrisch\Edifact\SegmentFactory;
-use Apfelfrisch\Edifact\Segments\Fallback;
+use Apfelfrisch\Edifact\Segments\Generic;
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use Apfelfrisch\Edifact\Exceptions\SegValidationException;
 
@@ -28,8 +28,8 @@ class SegmentFactoryTest extends TestCase
     /** @test **/
     public function it_instanciates_the_dafault_seg_if_its_allowed_and_no_secific_segement_was_found()
     {
-        $this->segFactory = (new SegmentFactory)->addFallback(Fallback::class);
-        $this->assertInstanceOf(Fallback::class, $this->segFactory->build('UKW', new Delimiter()));
+        $this->segFactory = (new SegmentFactory)->addFallback(Generic::class);
+        $this->assertInstanceOf(Generic::class, $this->segFactory->build('UKW', new Delimiter()));
     }
 
     /** @test **/

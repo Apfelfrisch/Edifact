@@ -4,7 +4,7 @@ namespace Apfelfrisch\Edifact;
 
 use Apfelfrisch\Edifact\Exceptions\SegValidationException;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
-use Apfelfrisch\Edifact\Segments\Fallback;
+use Apfelfrisch\Edifact\Segments\Generic;
 
 final class SegmentFactory
 {
@@ -32,7 +32,7 @@ final class SegmentFactory
         $instance = clone(self::$defaultFactory);
 
         if ($withFallback) {
-            $instance->addFallback(Fallback::class);
+            $instance->addFallback(Generic::class);
         }
 
         return $instance;

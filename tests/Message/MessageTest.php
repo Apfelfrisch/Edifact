@@ -76,7 +76,7 @@ class MessageTest extends TestCase
     {
         $messageCore = Message::fromString("UKN");
 
-        $this->assertInstanceOf(Segments\Fallback::class, $messageCore->getNextSegment());
+        $this->assertInstanceOf(Segments\Generic::class, $messageCore->getNextSegment());
     }
 
     /** @test */
@@ -132,7 +132,7 @@ class MessageTest extends TestCase
         $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UKN'UNT");
 
         $this->assertInstanceOf(Segments\Unb::class, $messageCore->findNextSegment('UNB'));
-        $this->assertInstanceOf(Segments\Fallback::class, $messageCore->findNextSegment('UKN'));
+        $this->assertInstanceOf(Segments\Generic::class, $messageCore->findNextSegment('UKN'));
         $this->assertFalse($messageCore->findNextSegment('UNH'));
 
     }

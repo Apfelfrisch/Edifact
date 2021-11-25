@@ -4,6 +4,8 @@ namespace Apfelfrisch\Edifact;
 
 final class DataGroups
 {
+    private ?string $name = null;
+
     /** @psalm-var array<string, array<string, string|null>> */
     private array $dataGroups = [];
 
@@ -12,6 +14,11 @@ final class DataGroups
         $this->dataGroups[$dataGroupKey][$valueKey] = $value;
 
         return $this;
+    }
+
+    public function getName(): string
+    {
+        return $this->name ??= (string)$this->getValueFromPosition(0, 0);
     }
 
     public function getValueFromPosition(int $dataGroupPosition, int $valuePosition): ?string

@@ -50,11 +50,7 @@ abstract class AbstractSegment implements SegInterface
 
     public function name(): string
     {
-        if (null === $name = $this->getValue(0,0)) {
-            throw SegValidationException::forKey('name', "Segment is empty");
-        }
-
-        return $name;
+        return $this->elements->getName();
     }
 
     public function validate(): void
