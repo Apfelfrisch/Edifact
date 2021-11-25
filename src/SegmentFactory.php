@@ -14,16 +14,22 @@ final class SegmentFactory
     /** @var class-string<SegInterface>|null */
     private ?string $fallback = null;
 
+    private static ?self $defaultFactory = null;
+
     public static function withDefaultDegments(bool $withFallback = true): self
     {
-        $defaultPath = __DIR__ . '/Segments/';
+        if (self::$defaultFactory === null) {
+            $defaultPath = __DIR__ . '/Segments/';
 
-        $instance = new self;
+            self::$defaultFactory = new self;
 
-        foreach (glob($defaultPath."???.php") as $segmentClassFile) {
-            $classBasename = basename($segmentClassFile, '.php');
-            $instance->addSegment($classBasename, '\\Proengeno\\Edifact\\Segments\\' . $classBasename);
+            foreach (glob($defaultPath."???.php") as $segmentClassFile) {
+                $classBasename = basename($segmentClassFile, '.php');
+                self::$defaultFactory->addSegment($classBasename, '\\Proengeno\\Edifact\\Segments\\' . $classBasename);
+            }
         }
+
+        $instance = clone(self::$defaultFactory);
 
         if ($withFallback) {
             $instance->addFallback(Fallback::class);
