@@ -74,6 +74,9 @@ class Message implements \Iterator
         return $this->currentSegment = $this->getSegmentObject($segLine);
     }
 
+    /**
+     * @psalm-param callable|array<string, string>|null $criteria
+     */
     public function findSegmentFromBeginn(string $searchSegment, callable|array|null $criteria = null): SegInterface|false
     {
         $this->rewind();
@@ -81,6 +84,9 @@ class Message implements \Iterator
         return $this->findNextSegment($searchSegment, $criteria);
     }
 
+    /**
+     * @psalm-param callable|array<string, string>|null $criteria
+     */
     public function findNextSegment(string $searchSegment, callable|array|null $criteria = null): SegInterface|false
     {
         while ($segmentObject = $this->getNextSegment()) {
@@ -125,7 +131,7 @@ class Message implements \Iterator
             }
         } catch (SegValidationException $e) {
             throw new ValidationException(
-                $e->getMessage(), $this->currentSegmentNumber, $segment ? $segment->name() : ''
+                $e->getMessage(), $this->currentSegmentNumber, $segment instanceof SegInterface ? $segment->name() : ''
             );
         }
 
@@ -191,6 +197,9 @@ class Message implements \Iterator
         return $this->edifactFile->getSegment();
     }
 
+    /**
+     * @psalm-param callable|array<string, string>|null $criteria
+     */
     private function checkCriteria(callable|array|null $criteria, SegInterface $segmentObject): bool
     {
         if ($criteria === null) {
@@ -206,6 +215,6 @@ class Message implements \Iterator
             return true;
         }
 
-        return $criteria($segmentObject);
+        return (bool)$criteria($segmentObject);
     }
 }

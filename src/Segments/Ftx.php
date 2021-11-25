@@ -56,7 +56,7 @@ class Ftx extends AbstractSegment
         $message = null;
         $i = 1;
         while (null !== $value = $this->elements->getValue('C108', "4440:$i")) {
-            $message .= $value;
+            $message = $message === null ? $value : $message . $value;
             $i++;
         }
         return $message;

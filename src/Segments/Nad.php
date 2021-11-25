@@ -224,7 +224,7 @@ class Nad extends AbstractSegment
             return $streetPartTwo;
         }
 
-        return $streetPartOne . $streetPartTwo;
+        return $streetPartOne . (string)$streetPartTwo;
     }
 
     public function number(): ?string
@@ -243,7 +243,7 @@ class Nad extends AbstractSegment
             return null;
         }
 
-        return $this->elements->getValue('C080', '3036:1') . $this->elements->getValue('C080', '3036:2');
+        return (string)$this->elements->getValue('C080', '3036:1') . (string)$this->elements->getValue('C080', '3036:2');
     }
 
     public function firstName(): ?string

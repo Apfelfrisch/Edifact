@@ -62,6 +62,7 @@ final class EdifactFile extends SplFileInfo
     public function __destruct()
     {
         array_walk_recursive($this->filters, static function (mixed $filter): bool {
+            /** @var resource $filter */
             return @stream_filter_remove($filter);
         });
 
@@ -204,6 +205,7 @@ final class EdifactFile extends SplFileInfo
             throw new RuntimeException('unable to locate filter `'.$filtername.'`');
         }
 
+        /** @psalm-suppress MixedArrayAssignment */
         $this->filters[$filtername][] = $res;
     }
 
