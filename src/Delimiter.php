@@ -101,7 +101,7 @@ final class Delimiter
     {
         $string = str_replace(["\r", "\n"], '', $string);
 
-        if ($foundTermination = (boolean)strpos($string, $this->terminator . $pattern)) {
+        if ($foundTermination = (bool)strpos($string, $this->terminator . $pattern)) {
             $string = str_replace($this->terminator . $pattern, self::PLACE_HOLDER, $string);
         }
 

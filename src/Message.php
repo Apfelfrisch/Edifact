@@ -172,11 +172,8 @@ class Message implements \Iterator
 
     public function toArray(): array
     {
-        return array_map(function(SegInterface|false $segment) {
-            if (! $segment) {
-                return [];
-            }
-            return [$segment->name() => $segment->toArray()];
+        return array_map(function(SegInterface|false $segment): array {
+            return $segment ? $segment->toArray() : [];
         }, iterator_to_array($this));
     }
 

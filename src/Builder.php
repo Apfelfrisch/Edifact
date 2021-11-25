@@ -39,7 +39,7 @@ class Builder
 
     public function __destruct()
     {
-        // Delete File if build process could not finshed (Expetion, etc)
+        // Delete File if build process could not finshed
         $filepath = $this->edifactFile->getRealPath();
         if ($this->messageWasFetched === false && file_exists($filepath)) {
             unlink($filepath);

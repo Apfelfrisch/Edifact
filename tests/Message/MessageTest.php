@@ -2,12 +2,12 @@
 
 namespace Apfelfrisch\Edifact\Test\Message;
 
-use Apfelfrisch\Edifact\Segments\Fallback;
-use Apfelfrisch\Edifact\Test\TestCase;
-use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\EdifactFile;
 use Apfelfrisch\Edifact\Exceptions\SegValidationException;
+use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\SegmentFactory;
+use Apfelfrisch\Edifact\Segments;
+use Apfelfrisch\Edifact\Test\TestCase;
 
 class MessageTest extends TestCase
 {
@@ -46,12 +46,29 @@ class MessageTest extends TestCase
     }
 
     /** @test */
+    public function it_can_cast_the_edifact_content_to_an_array()
+    {
+        $array = [
+            [
+              "UNH" => ["UNH" => "UNH"],
+              "0062" => ["0062" => "O160482A7C2"],
+              "S009" => ["0065" => "ORDERS", "0052" => "D", "0054" => "09B", "0051" => "UN", "0057" => "1.1e"],
+            ],
+            [
+              "RFF" => ["RFF" => "RFF"],
+              "C506" => [1153 => "Z13", 1154 => "17103"],
+            ]
+        ];
+        $this->assertEquals($array, $this->messageCore->toArray());
+    }
+
+    /** @test */
     public function it_fetch_the_current_segement_from_stream()
     {
         $messageCore = Message::fromString("UNH'UNB");
 
-        $this->assertInstanceOf(\Apfelfrisch\Edifact\Segments\Unh::class, $messageCore->getNextSegment());
-        $this->assertInstanceOf(\Apfelfrisch\Edifact\Segments\Unh::class, $messageCore->getCurrentSegment());
+        $this->assertInstanceOf(Segments\Unh::class, $messageCore->getNextSegment());
+        $this->assertInstanceOf(Segments\Unh::class, $messageCore->getCurrentSegment());
     }
 
     /** @test */
@@ -59,7 +76,7 @@ class MessageTest extends TestCase
     {
         $messageCore = Message::fromString("UKN");
 
-        $this->assertInstanceOf(Fallback::class, $messageCore->getNextSegment());
+        $this->assertInstanceOf(Segments\Fallback::class, $messageCore->getNextSegment());
     }
 
     /** @test */
@@ -68,15 +85,15 @@ class MessageTest extends TestCase
         $messageCore = Message::fromString("UKN", SegmentFactory::withDefaultDegments(withFallback: false));
 
         $this->expectException(SegValidationException::class);
-        $this->assertInstanceOf('Apfelfrisch\Edifact\Test\Fixtures\Segments\Unh', $messageCore->getNextSegment());
+        $this->assertInstanceOf(Segments\Unh::class, $messageCore->getNextSegment());
     }
 
     /** @test */
     public function it_fetch_the_next_segement_from_stream()
     {
         $messageCore = Message::fromString("UNH'UNB");
-        $this->assertInstanceOf(\Apfelfrisch\Edifact\Segments\Unh::class, $messageCore->getNextSegment());
-        $this->assertInstanceOf(\Apfelfrisch\Edifact\Segments\Unb::class, $messageCore->getNextSegment());
+        $this->assertInstanceOf(Segments\Unh::class, $messageCore->getNextSegment());
+        $this->assertInstanceOf(Segments\Unb::class, $messageCore->getNextSegment());
     }
 
     /** @test */
@@ -84,18 +101,18 @@ class MessageTest extends TestCase
     {
         $messageCore = Message::fromString("UNH'UNB");
         $messageCore->pinPointer();
-        $this->assertInstanceOf(\Apfelfrisch\Edifact\Segments\Unh::class, $messageCore->getNextSegment());
+        $this->assertInstanceOf(Segments\Unh::class, $messageCore->getNextSegment());
         $messageCore->jumpToPinnedPointer();
-        $this->assertInstanceOf(\Apfelfrisch\Edifact\Segments\Unh::class, $messageCore->getNextSegment());
+        $this->assertInstanceOf(Segments\Unh::class, $messageCore->getNextSegment());
     }
 
     /** @test */
     public function it_jumps_to_the_actual_position_if_no_pointer_was_pinned()
     {
         $messageCore = Message::fromString("UNH'UNB");
-        $this->assertInstanceOf(\Apfelfrisch\Edifact\Segments\Unh::class, $messageCore->getNextSegment());
+        $this->assertInstanceOf(Segments\Unh::class, $messageCore->getNextSegment());
         $messageCore->jumpToPinnedPointer();
-        $this->assertInstanceOf(\Apfelfrisch\Edifact\Segments\Unb::class, $messageCore->getNextSegment());
+        $this->assertInstanceOf(Segments\Unb::class, $messageCore->getNextSegment());
     }
 
     /** @test */
@@ -114,8 +131,8 @@ class MessageTest extends TestCase
     {
         $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UKN'UNT");
 
-        $this->assertInstanceOf(\Apfelfrisch\Edifact\Segments\Unb::class, $messageCore->findNextSegment('UNB'));
-        $this->assertInstanceOf(Fallback::class, $messageCore->findNextSegment('UKN'));
+        $this->assertInstanceOf(Segments\Unb::class, $messageCore->findNextSegment('UNB'));
+        $this->assertInstanceOf(Segments\Fallback::class, $messageCore->findNextSegment('UKN'));
         $this->assertFalse($messageCore->findNextSegment('UNH'));
 
     }
@@ -126,15 +143,15 @@ class MessageTest extends TestCase
         $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNT");
         $messageCore->findSegmentFromBeginn('UNH');
 
-        $this->assertInstanceOf(\Apfelfrisch\Edifact\Segments\Unh::class, $messageCore->findSegmentFromBeginn('UNH'));
+        $this->assertInstanceOf(Segments\Unh::class, $messageCore->findSegmentFromBeginn('UNH'));
         $this->assertInstanceOf(
-            \Apfelfrisch\Edifact\Segments\Unh::class,
+            Segments\Unh::class,
             $messageCore->findSegmentFromBeginn('UNH', function($segment) {
                 return $segment->referenz() == 'O160482A7C2';
             }
         ));
         $this->assertInstanceOf(
-            \Apfelfrisch\Edifact\Segments\Unh::class,
+            Segments\Unh::class,
             $messageCore->findSegmentFromBeginn('UNH', ['referenz' => 'O160482A7C2'])
         );
         $this->assertFalse(
@@ -176,7 +193,7 @@ class MessageTest extends TestCase
     {
         $message = Message::fromString("UNA:+_? 'MOA+QUL:20_00'");
 
-        /** @var \Apfelfrisch\Edifact\Segments\Moa */
+        /** @var Segments\Moa */
         $moa = $message->findSegmentFromBeginn('MOA');
 
         $this->assertSame('20.00', $moa->amount());

@@ -1,6 +1,8 @@
 <?php
 
-namespace Apfelfrisch\Edifact\Test\Templates;
+declare(strict_types = 1);
+
+namespace Code\Php\Edifact\tests\Message\Segments;
 
 use Apfelfrisch\Edifact\Test\TestCase;
 use Apfelfrisch\Edifact\Delimiter;
@@ -34,13 +36,31 @@ class AbstractSegmentTest extends TestCase
     }
 
     /** @test */
-    public function it_can_provide_the_segling()
+    public function it_cast_itself_as_a_string()
     {
         $givenString = 'A+B+1:2:3:4:5+D+E';
 
         $segment = Segment::fromSegLine(new Delimiter, $givenString);
 
         $this->assertEquals($givenString, $segment->toString(new Delimiter));
+    }
+
+    /** @test */
+    public function it_cast_itself_as_an_array()
+    {
+        $givenString = 'A+B+1:2:3:4:5+D+E';
+        $expectedArray = [
+          "A" => ["A" => "A",],
+          "B" => ["B" => "B",],
+          "C" => [1 => "1", 2 => "2", 3 => "3", 4 => "4", 5 => "5",],
+          "D" => ["D" => "D",],
+          "E" => ["E" => "E",],
+          "F" => ["F" => null,],
+        ];
+
+        $segment = Segment::fromSegLine(new Delimiter, $givenString);
+
+        $this->assertEquals($expectedArray, $segment->toArray());
     }
 
     /** @test */
