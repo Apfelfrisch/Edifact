@@ -13,6 +13,7 @@ A PHP library, wich provides a Framework to parse, build, serialize and validate
 
 ### Parse Edifact Messages
 
+#### Parse to the default Segments
 ```php
 use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Segments\Nad;
@@ -26,7 +27,24 @@ foreach ($message as $segment) {
 }
 ```
 
-#### Use your own Segments
+#### Parse to the generic Segment
+```php
+use Apfelfrisch\Edifact\Message;
+use Apfelfrisch\Edifact\Segments\Generic;
+
+$segmentFactory = new SegmentFactory;
+$segmentFactory->addFallback(Generic::class);
+
+$message = Message::fromString("UNA:+.? 'NAD+DP++++Musterstr.::10+City++12345+DE", $segmentFactory);
+
+foreach ($message as $segment) {
+    if ($segment instanceof Generic) {
+        echo $segment->name(); // UNA.
+    }
+}
+```
+
+#### Parse to your own Segments
 
 ```php
 namespace My\Namespace;
@@ -73,8 +91,7 @@ $message = Message::fromString("UNA:+.? 'SEQ+1", $segmentFactory);
 
 ### Build an Edifact Message:
 
-The Builder takes Segments wich implements the SegInterface - trailing Segments (UNT and UNZ) will automatically be added. 
-If no UNA Segement is provided, it uses the default values (UNA:+.? )
+You can build Edifact Messages like so:
 
 ```php
 use Apfelfrisch\Edifact\Builder;
@@ -90,3 +107,5 @@ $builder->writeSegments(
 
 $message = $builder->get();
 ```
+Trailing Segments (UNT and UNZ) will be added automatically. 
+If no UNA Segement is provided, it uses the default values (UNA:+.? )
