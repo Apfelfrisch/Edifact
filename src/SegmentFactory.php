@@ -8,10 +8,10 @@ use Apfelfrisch\Edifact\Segments\Fallback;
 
 final class SegmentFactory
 {
-    /** @var array<string, class-string<SegInterface>> */
+    /** @psalm-var array<string, class-string<SegInterface>> */
     private array $segmentClasses = [];
 
-    /** @var class-string<SegInterface>|null */
+    /** @psalm-var class-string<SegInterface>|null */
     private ?string $fallback = null;
 
     private static ?self $defaultFactory = null;
@@ -39,7 +39,7 @@ final class SegmentFactory
     }
 
     /**
-     * @param $segmentClass class-string<SegInterface>
+     * @psalm-param $segmentClass class-string<SegInterface>
      */
     public function addSegment(string $name, string $segmentClass): self
     {
@@ -50,7 +50,7 @@ final class SegmentFactory
     }
 
     /**
-     * @param class-string<SegInterface> $fallback
+     * @psalm-param class-string<SegInterface> $fallback
      */
     public function addFallback(string $fallback): self
     {
@@ -61,7 +61,18 @@ final class SegmentFactory
 
     public function build(string $segline, Delimiter $delimiter): SegInterface
     {
-        $segmentName = strtoupper(substr($segline, 0, 3));
+        /** @var class-string<SegInterface> */
+        $segmentClass = $this->getClassname(substr($segline, 0, 3));
+
+        return $segmentClass::fromSegLine($delimiter, $segline);
+    }
+
+    /*
+     * @psalm-return class-string<SegInterface>
+     */
+    public function getClassname(string $segmentName): string
+    {
+        $segmentName = strtoupper($segmentName);
 
         if (null === $segmentClass = $this->segmentClasses[$segmentName] ?? null) {
             if (null === $segmentClass = $this->fallback) {
@@ -69,6 +80,6 @@ final class SegmentFactory
             }
         }
 
-        return $segmentClass::fromSegLine($delimiter, $segline);
+        return $segmentClass;
     }
 }
