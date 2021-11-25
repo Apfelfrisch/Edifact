@@ -5,15 +5,13 @@
 
 A PHP library, wich provides a Framework to parse, build, serialize and validate UN/EDIFACT messages.
 
-Highlights
--------
+## Highlights
 * Parse and Write Files in a memory efficient and scalable way 
 * Parse each Segment to its specific Object, this way we can define getter, setter and validation it
 
-Usage
--------
+## Usage
 
-Parse an Edifact Message:
+### Parse an Edifact Message
 
 ```php
 use Proengeno\Edifact\Message;
@@ -28,9 +26,54 @@ foreach ($message as $segment) {
 }
 ```
 
-Build an Edifact Message:
+#### Use your own Segments
 
-The Builder takes Segments wich implements the SegInterface, trailing Segments (UNT and UNZ) will automatically be added. 
+```php
+namespace My\Namespace;
+
+use Proengeno\Edifact\DataGroups;
+use Proengeno\Edifact\SegmentFactory;
+use Proengeno\Edifact\Segments\AbstractSegment;
+
+class Seq extends AbstractSegment
+{
+    private static ?DataGroups $validationBlueprint = null;
+
+    public static function blueprint(): DataGroups
+    {
+        if (self::$validationBlueprint === null) {
+            self::$validationBlueprint = (new DataGroups)
+                ->addValue('SEQ', 'SEQ', 'M|a|3')
+                ->addValue('1229', '1229', 'M|an|3');
+        }
+
+        return self::$validationBlueprint;
+    }
+
+    public static function fromAttributes(string $code): self
+    {
+        return new self((new DataGroups)
+            ->addValue('SEQ', 'SEQ', 'SEQ')
+            ->addValue('1229', '1229', $code)
+        );
+    }
+
+    public function code(): ?string
+    {
+        return $this->elements->getValue('1229', '1229');
+    }
+}
+
+$segmentFactory = new SegmentFactory;
+$segmentFactory->addSegment('SEQ', Seq::class);
+
+$message = Message::fromString("UNA:+.? 'SEQ+1", $segmentFactory);
+```
+
+
+### Build an Edifact Message:
+
+The Builder takes Segments wich implements the SegInterface - trailing Segments (UNT and UNZ) will automatically be added. 
 If no UNA Segement is provided, it uses the default values (UNA:+.? )
 
 ```php
