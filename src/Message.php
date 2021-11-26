@@ -2,15 +2,15 @@
 
 namespace Apfelfrisch\Edifact;
 
-use Apfelfrisch\Edifact\Interfaces\SegInterface;
-use Apfelfrisch\Edifact\EdifactFile;
-use Apfelfrisch\Edifact\SegmentFactory;
-use Apfelfrisch\Edifact\Exceptions\ValidationException;
 use Apfelfrisch\Edifact\Exceptions\SegValidationException;
+use Apfelfrisch\Edifact\Exceptions\ValidationException;
+use Apfelfrisch\Edifact\Interfaces\SegInterface;
+use Apfelfrisch\Edifact\SegmentFactory;
+use Apfelfrisch\Edifact\Stream;
 
 class Message implements \Iterator
 {
-    protected EdifactFile $edifactFile;
+    protected Stream $edifactFile;
 
     protected SegmentFactory $segmentFactory;
 
@@ -20,7 +20,7 @@ class Message implements \Iterator
 
     private int $currentSegmentNumber = -1;
 
-    public function __construct(EdifactFile $edifactFile, ?SegmentFactory $segmentFactory = null)
+    public function __construct(Stream $edifactFile, ?SegmentFactory $segmentFactory = null)
     {
         $this->edifactFile = $edifactFile;
         $this->rewind();
@@ -29,7 +29,7 @@ class Message implements \Iterator
 
     public static function fromFilepath(string $string, ?SegmentFactory $segmentFactory = null): self
     {
-        $edifactFile = new EdifactFile($string);
+        $edifactFile = new Stream($string);
 
         return new self($edifactFile, $segmentFactory);
     }
@@ -38,7 +38,7 @@ class Message implements \Iterator
         string $string, ?SegmentFactory $segmentFactory = null, string $filename = 'php://temp'
     ): self
     {
-        $edifactFile = EdifactFile::fromString($string, $filename);
+        $edifactFile = Stream::fromString($string, $filename);
 
         return new self($edifactFile, $segmentFactory);
     }

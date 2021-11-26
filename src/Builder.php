@@ -2,22 +2,22 @@
 
 namespace Apfelfrisch\Edifact;
 
-use Apfelfrisch\Edifact\Interfaces\SegInterface;
 use Apfelfrisch\Edifact\Delimiter;
-use Apfelfrisch\Edifact\EdifactFile;
+use Apfelfrisch\Edifact\Interfaces\SegInterface;
 use Apfelfrisch\Edifact\Interfaces\UnbInterface;
 use Apfelfrisch\Edifact\Interfaces\UnhInterface;
 use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Segments\Una;
 use Apfelfrisch\Edifact\Segments\Unt;
 use Apfelfrisch\Edifact\Segments\Unz;
+use Apfelfrisch\Edifact\Stream;
 
 class Builder
 {
     private ?string $unbRef = null;
     private ?string $unhRef = null;
 
-    private EdifactFile $edifactFile;
+    private Stream $edifactFile;
     private string $filepath;
     private int $unhCounter = 0;
     private int $messageCount = 0;
@@ -27,7 +27,7 @@ class Builder
     {
         $this->filepath = $filepath;
 
-        $this->edifactFile = new EdifactFile($this->filepath, 'w');
+        $this->edifactFile = new Stream($this->filepath, 'w');
     }
 
     public function addStreamFilter(string $filtername, mixed $params = null): self
@@ -88,7 +88,7 @@ class Builder
         return new Message($this->getEdifactFile());
     }
 
-    public function getEdifactFile(): EdifactFile
+    public function getEdifactFile(): Stream
     {
         if (! $this->messageIsEmpty()) {
             if ($this->unhRef !== null) {
@@ -107,7 +107,7 @@ class Builder
             return $this->edifactFile;
         }
 
-        return new EdifactFile($this->filepath);
+        return new Stream($this->filepath);
     }
 
     public function messageIsEmpty(): bool

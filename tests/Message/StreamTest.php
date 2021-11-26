@@ -2,19 +2,19 @@
 
 namespace Apfelfrisch\Edifact\Test\Message;
 
-use Apfelfrisch\Edifact\EdifactFile;
+use Apfelfrisch\Edifact\Stream;
 use Apfelfrisch\Edifact\Test\TestCase;
 
-class EdifactFileTest extends TestCase
+class StreamTest extends TestCase
 {
     private string $tempname;
 
-    private EdifactFile $edifactFile;
+    private Stream $edifactFile;
 
     public function setUp(): void
     {
         $this->tempname = tempnam(sys_get_temp_dir(), 'diac');
-        $this->edifactFile = new EdifactFile($this->tempname, 'w+');
+        $this->edifactFile = new Stream($this->tempname, 'w+');
     }
 
     public function tearDown(): void
@@ -26,12 +26,12 @@ class EdifactFileTest extends TestCase
 
     public function testCanInstantiateWithStreamIdentifier()
     {
-        $this->assertInstanceOf('Apfelfrisch\Edifact\EdifactFile', $this->edifactFile);
+        $this->assertInstanceOf(Stream::class, $this->edifactFile);
     }
 
     public function testCanGetEdifactSegments()
     {
-        $edifactFile = new EdifactFile(__DIR__ . '/../data/edifact.txt');
+        $edifactFile = new Stream(__DIR__ . '/../data/edifact.txt');
 
         while (! $edifactFile->eof()) {
             $string[] = $edifactFile->getSegment();
@@ -63,7 +63,7 @@ class EdifactFileTest extends TestCase
     {
         $this->tempname = tempnam(sys_get_temp_dir(), 'diac');
         file_put_contents($this->tempname, 'FOO BAR');
-        $edifactFile = new EdifactFile($this->tempname, 'w');
+        $edifactFile = new Stream($this->tempname, 'w');
 
         $this->assertEquals('', $edifactFile->__toString());
     }
@@ -71,7 +71,7 @@ class EdifactFileTest extends TestCase
     public function testSeekAndTellCurrentPositionInResource()
     {
         file_put_contents($this->tempname, 'FOO BAR');
-        $edifactFile = new EdifactFile($this->tempname, 'r');
+        $edifactFile = new Stream($this->tempname, 'r');
         $edifactFile->seek(2);
 
         $this->assertEquals(2, $edifactFile->tell());
@@ -85,7 +85,7 @@ class EdifactFileTest extends TestCase
     public function testEofReportsFalseWhenNotAtEndOfStream()
     {
         file_put_contents($this->tempname, 'FOO BAR');
-        $edifactFile = new EdifactFile($this->tempname, 'r');
+        $edifactFile = new Stream($this->tempname, 'r');
         $edifactFile->seek(2);
         $this->assertFalse($edifactFile->eof());
     }
@@ -93,7 +93,7 @@ class EdifactFileTest extends TestCase
     public function testEofReportsTrueWhenAtEndOfStream()
     {
         file_put_contents($this->tempname, 'FOO BAR');
-        $edifactFile = new EdifactFile($this->tempname, 'r');
+        $edifactFile = new Stream($this->tempname, 'r');
 
         $edifactFile->seek(0, SEEK_END);
         $edifactFile->getChar();
@@ -117,7 +117,7 @@ class EdifactFileTest extends TestCase
     {
         $string = "UNA:+.? 'UNB?'UNT'";
         file_put_contents($this->tempname, $string);
-        $edifactFile = new EdifactFile($this->tempname, 'r');
+        $edifactFile = new Stream($this->tempname, 'r');
 
         $edifactFile->seek(0);
         $i = 0;
@@ -130,7 +130,7 @@ class EdifactFileTest extends TestCase
     public function testRewindResetsToStartOfStream()
     {
         file_put_contents($this->tempname, 'FOO BAR');
-        $edifactFile = new EdifactFile($this->tempname, 'r+');
+        $edifactFile = new Stream($this->tempname, 'r+');
         $this->assertTrue($edifactFile->seek(2));
         $edifactFile->rewind();
         $this->assertEquals(0, $edifactFile->tell());
@@ -139,7 +139,7 @@ class EdifactFileTest extends TestCase
     public function testReadFilter()
     {
         file_put_contents($this->tempname, 'foo bar');
-        $edifactFile = new EdifactFile($this->tempname, 'r+');
+        $edifactFile = new Stream($this->tempname, 'r+');
 
         $edifactFile->addReadFilter('string.toupper');
 
@@ -156,7 +156,7 @@ class EdifactFileTest extends TestCase
 
     public function testWriteFilter()
     {
-        $edifactFile = new EdifactFile('php://temp', 'w+');
+        $edifactFile = new Stream('php://temp', 'w+');
         $edifactFile->addWriteFilter('string.toupper', STREAM_FILTER_WRITE);
         $edifactFile->write('foo bar');
         $edifactFile->rewind();
@@ -165,7 +165,7 @@ class EdifactFileTest extends TestCase
 
     public function testUsingWriteFilterOverStaticConstructor()
     {
-        $edifactFile = EdifactFile::fromString('foo bar', 'php://temp', ['string.toupper']);
+        $edifactFile = Stream::fromString('foo bar', 'php://temp', ['string.toupper']);
         $this->assertEquals('FOO BAR', $edifactFile->getContents());
     }
 }

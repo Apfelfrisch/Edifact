@@ -2,11 +2,11 @@
 
 namespace Apfelfrisch\Edifact\Test\Message;
 
-use Apfelfrisch\Edifact\EdifactFile;
 use Apfelfrisch\Edifact\Exceptions\SegValidationException;
 use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\SegmentFactory;
 use Apfelfrisch\Edifact\Segments;
+use Apfelfrisch\Edifact\Stream;
 use Apfelfrisch\Edifact\Test\TestCase;
 
 class MessageTest extends TestCase
@@ -15,7 +15,7 @@ class MessageTest extends TestCase
 
     public function setUp(): void
     {
-        $file = new EdifactFile(__DIR__ . '/../data/edifact.txt');
+        $file = new Stream(__DIR__ . '/../data/edifact.txt');
         $this->messageCore = new Message($file);
     }
 

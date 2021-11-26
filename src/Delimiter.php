@@ -16,7 +16,7 @@ final class Delimiter
         private string $segment = '\''
     ) { }
 
-    public static function setFromFile(EdifactFile $file, ?self $fallback = null): self
+    public static function setFromFile(Stream $file, ?self $fallback = null): self
     {
         $position = $file->tell();
         $file->rewind();

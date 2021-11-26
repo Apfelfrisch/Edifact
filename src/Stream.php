@@ -2,13 +2,13 @@
 
 namespace Apfelfrisch\Edifact;
 
-use SplFileInfo;
-use RuntimeException;
 use Apfelfrisch\Edifact\Delimiter;
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
+use RuntimeException;
+use SplFileInfo;
 use Throwable;
 
-final class EdifactFile extends SplFileInfo
+final class Stream extends SplFileInfo
 {
     /* @var array<string, array<resource>> */
     private array $filters = [];
