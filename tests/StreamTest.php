@@ -34,7 +34,7 @@ class StreamTest extends TestCase
         $edifactFile = new Stream(__DIR__ . '/data/edifact.txt');
 
         while (! $edifactFile->eof()) {
-            $string[] = $edifactFile->getSegment();
+            $string[] = $edifactFile->getSegmentTerminator();
         }
 
         $this->assertEquals('UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e', $string[0]);
@@ -47,7 +47,7 @@ class StreamTest extends TestCase
         $this->edifactFile->writeAndRewind($message);
 
         while (! $this->edifactFile->eof()) {
-            $string[] = $this->edifactFile->getSegment();
+            $string[] = $this->edifactFile->getSegmentTerminator();
         }
         $this->assertEquals("SEG+Up'Verd'", $string[0]);
     }
@@ -147,7 +147,7 @@ class StreamTest extends TestCase
         $edifactFile->rewind();
         $this->assertEquals('FOO BAR', $edifactFile->getContents());
         $edifactFile->rewind();
-        $this->assertEquals('FOO BAR', $edifactFile->getSegment());
+        $this->assertEquals('FOO BAR', $edifactFile->getSegmentTerminator());
         $edifactFile->rewind();
         $this->assertEquals('FOO BAR', $edifactFile->read(1024));
         $edifactFile->rewind();

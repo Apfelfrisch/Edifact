@@ -8,12 +8,12 @@ final class Delimiter
     const PLACE_HOLDER = '«>~<«';
 
     public function __construct(
-        private string $data = ':',
-        private string $dataGroup = '+',
-        private string $decimal = '.',
-        private string $terminator = '?',
-        private string $empty = ' ',
-        private string $segment = '\''
+        private string $componentSeparator = ':',
+        private string $elementSeparator = '+',
+        private string $decimalPoint = '.',
+        private string $escapeCharacter = '?',
+        private string $spaceCharacter = ' ',
+        private string $segmentTerminator = '\''
     ) { }
 
     public static function setFromFile(Stream $file, ?self $fallback = null): self
@@ -46,8 +46,8 @@ final class Delimiter
     public function terminate(string $string): string
     {
         return str_replace(
-            [$this->data, $this->dataGroup, '\\n'],
-            [$this->terminator . $this->data, $this->terminator . $this->dataGroup, ''],
+            [$this->componentSeparator, $this->elementSeparator, '\\n'],
+            [$this->escapeCharacter . $this->componentSeparator, $this->escapeCharacter . $this->elementSeparator, ''],
             $string
         );
     }
@@ -55,43 +55,43 @@ final class Delimiter
     /** @return list<string> */
     public function explodeDataGroups(string $string): array
     {
-        return $this->explodeString($string, $this->dataGroup);
+        return $this->explodeString($string, $this->elementSeparator);
     }
 
     /** @return list<string> */
     public function explodeElements(string $string): array
     {
-        return $this->explodeString($string, $this->data);
+        return $this->explodeString($string, $this->componentSeparator);
     }
 
-    public function getData(): string
+    public function getComponentSeparator(): string
     {
-        return $this->data;
+        return $this->componentSeparator;
     }
 
-    public function getDataGroup(): string
+    public function getElementSeparator(): string
     {
-        return $this->dataGroup;
+        return $this->elementSeparator;
     }
 
-    public function getDecimal(): string
+    public function getDecimalPoint(): string
     {
-        return $this->decimal;
+        return $this->decimalPoint;
     }
 
-    public function getTerminator(): string
+    public function getEscapeCharacter(): string
     {
-        return $this->terminator;
+        return $this->escapeCharacter;
     }
 
-    public function getEmpty(): string
+    public function getSpaceCharacter(): string
     {
-        return $this->empty;
+        return $this->spaceCharacter;
     }
 
-    public function getSegment(): string
+    public function getSegmentTerminator(): string
     {
-        return $this->segment;
+        return $this->segmentTerminator;
     }
 
     /**
@@ -101,8 +101,8 @@ final class Delimiter
     {
         $string = str_replace(["\r", "\n"], '', $string);
 
-        if ($foundTermination = (bool)strpos($string, $this->terminator . $pattern)) {
-            $string = str_replace($this->terminator . $pattern, self::PLACE_HOLDER, $string);
+        if ($foundTermination = (bool)strpos($string, $this->escapeCharacter . $pattern)) {
+            $string = str_replace($this->escapeCharacter . $pattern, self::PLACE_HOLDER, $string);
         }
 
         $explodedString = explode($pattern, $string);

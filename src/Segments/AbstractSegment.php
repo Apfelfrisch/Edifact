@@ -31,7 +31,7 @@ abstract class AbstractSegment implements SegInterface
 
         if (is_subclass_of($segment, DecimalConverter::class)) {
             /** @var DecimalConverter $segment */
-            $segment->setDecimalSeparator($delimiter->getDecimal());
+            $segment->setDecimalSeparator($delimiter->getDecimalPoint());
         }
 
         return $segment;
@@ -77,16 +77,16 @@ abstract class AbstractSegment implements SegInterface
         foreach($this->elements->toArray() as $dataGroup) {
             foreach ($dataGroup as $value) {
                 $string .= $value === null
-                    ? $delimiter->getData()
-                    : $delimiter->terminate($value) . $delimiter->getData();
+                    ? $delimiter->getComponentSeparator()
+                    : $delimiter->terminate($value) . $delimiter->getComponentSeparator();
             }
 
             $string = $this->trimEmpty(
-                $string, $delimiter->getData(), $delimiter->getTerminator()
-            ) . $delimiter->getDataGroup();
+                $string, $delimiter->getComponentSeparator(), $delimiter->getEscapeCharacter()
+            ) . $delimiter->getElementSeparator();
         }
 
-        return $this->trimEmpty($string, $delimiter->getDataGroup(), $delimiter->getTerminator());
+        return $this->trimEmpty($string, $delimiter->getElementSeparator(), $delimiter->getEscapeCharacter());
     }
 
     private function trimEmpty(string $string, string $dataGroupSeperator, string $terminator): string

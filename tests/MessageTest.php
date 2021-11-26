@@ -121,7 +121,7 @@ class MessageTest extends TestCase
         $messageCore = Message::fromString("UNH'UNB'");
         $message = "";
         foreach ($messageCore as $segment) {
-            $message .= $segment->toString($messageCore->getDelimiter()) . $messageCore->getDelimiter()->getSegment();
+            $message .= $segment->toString($messageCore->getDelimiter()) . $messageCore->getDelimiter()->getSegmentTerminator();
         }
         $this->assertEquals($message, (string)$messageCore);
     }
@@ -178,12 +178,12 @@ class MessageTest extends TestCase
             $messageCore = Message::fromString("UNA" . $unaValue . "UNH+'");
             $delimiter = $messageCore->getDelimiter();
             $this->assertEquals($unaValue,
-                 $delimiter->getData()
-               . $delimiter->getDataGroup()
-               . $delimiter->getDecimal()
-               . $delimiter->getTerminator()
-               . $delimiter->getEmpty()
-               . $delimiter->getSegment()
+                 $delimiter->getComponentSeparator()
+               . $delimiter->getElementSeparator()
+               . $delimiter->getDecimalPoint()
+               . $delimiter->getEscapeCharacter()
+               . $delimiter->getSpaceCharacter()
+               . $delimiter->getSegmentTerminator()
            );
         }
     }

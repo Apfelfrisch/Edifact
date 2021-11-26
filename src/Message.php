@@ -117,10 +117,10 @@ class Message implements \Iterator
             $segmentName = substr($segLine, 0, 3);
 
             if ($segmentName === $header) {
-                $unwrappedString = $segLine.$this->getDelimiter()->getSegment();
+                $unwrappedString = $segLine.$this->getDelimiter()->getSegmentTerminator();
             }
 
-            $unwrappedString .= $segLine.$this->getDelimiter()->getSegment();
+            $unwrappedString .= $segLine.$this->getDelimiter()->getSegmentTerminator();
 
             if ($segmentName === $trailer) {
                 yield self::fromString($unwrappedString, $this->segmentFactory);
@@ -225,7 +225,7 @@ class Message implements \Iterator
     {
         $this->currentSegmentNumber++;
 
-        return $this->stream->getSegment();
+        return $this->stream->getSegmentTerminator();
     }
 
     /**

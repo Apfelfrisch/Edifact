@@ -77,7 +77,7 @@ class Builder
     private function writeSegment(SegInterface $segment): void
     {
         $this->edifactFile->write(
-            $segment->toString($this->delimiter()) . $this->delimiter()->getSegment()
+            $segment->toString($this->delimiter()) . $this->delimiter()->getSegmentTerminator()
         );
 
         $this->countSegments($segment);
@@ -140,11 +140,11 @@ class Builder
     private function buildUnaFromDelimter(): Una
     {
         return Una::fromAttributes(
-            $this->delimiter()->getData(),
-            $this->delimiter()->getDataGroup(),
-            $this->delimiter()->getDecimal(),
-            $this->delimiter()->getTerminator(),
-            $this->delimiter()->getEmpty(),
+            $this->delimiter()->getComponentSeparator(),
+            $this->delimiter()->getElementSeparator(),
+            $this->delimiter()->getDecimalPoint(),
+            $this->delimiter()->getEscapeCharacter(),
+            $this->delimiter()->getSpaceCharacter(),
         );
     }
 

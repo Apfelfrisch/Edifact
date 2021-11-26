@@ -130,7 +130,7 @@ final class Stream extends SplFileInfo
         return fgetc($this->resource);
     }
 
-    public function getSegment(): string
+    public function getSegmentTerminator(): string
     {
         return $this->fetchSegment();
     }
@@ -219,7 +219,7 @@ final class Stream extends SplFileInfo
                 return $mergedLines . $line;
             }
 
-            $mergedLines .= substr_replace($line, $this->getDelimiter()->getSegment(), -1);
+            $mergedLines .= substr_replace($line, $this->getDelimiter()->getSegmentTerminator(), -1);
         }
 
         return $mergedLines;
@@ -227,12 +227,12 @@ final class Stream extends SplFileInfo
 
     private function streamGetLine(): string|false
     {
-        return stream_get_line($this->resource, 0, $this->getDelimiter()->getSegment());
+        return stream_get_line($this->resource, 0, $this->getDelimiter()->getSegmentTerminator());
     }
 
     private function delimiterWasTerminated(string $line): bool
     {
-        return str_ends_with($line, $this->getDelimiter()->getTerminator());
+        return str_ends_with($line, $this->getDelimiter()->getEscapeCharacter());
     }
 }
 
