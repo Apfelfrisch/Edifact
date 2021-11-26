@@ -2,7 +2,6 @@
 
 namespace Apfelfrisch\Edifact\Segments;
 
-use Apfelfrisch\Edifact\Exceptions\SegValidationException;
 use Apfelfrisch\Edifact\Interfaces\DecimalConverter;
 use Apfelfrisch\Edifact\DataGroups;
 use Apfelfrisch\Edifact\Delimiter;
@@ -38,9 +37,14 @@ abstract class AbstractSegment implements SegInterface
         return $segment;
     }
 
-    public function getValue(int $dataGroupKey, int $valueKey): ?string
+    public function getValueFromPosition(int $dataGroupPosition, int $valuePosition): ?string
     {
-        return $this->elements->getValueFromPosition($dataGroupKey, $valueKey);
+        return $this->elements->getValueFromPosition($dataGroupPosition, $valuePosition);
+    }
+
+    public function getValue(string $dataGroupKey, string $valueKey): ?string
+    {
+        return $this->elements->getValue($dataGroupKey, $valueKey);
     }
 
     public function getValidator(): SegValidatorInterface

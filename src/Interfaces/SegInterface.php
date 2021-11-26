@@ -12,6 +12,10 @@ interface SegInterface
 
     public function validate(): void;
 
+    public function getValue(string $dataGroupKey, string $valueKey): ?string;
+
+    public function getValueFromPosition(int $dataGroupPosition, int $valuePosition): ?string;
+
     /**
      * @psalm-return array<string, array<string, string|null>>
      */
