@@ -8,19 +8,19 @@ use Apfelfrisch\Edifact\Exceptions\SegValidationException;
 
 class Dtm extends AbstractSegment
 {
-    private static ?DataGroups $validationBlueprint = null;
+    private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
     {
-        if (self::$validationBlueprint === null) {
-            self::$validationBlueprint = (new DataGroups)
+        if (self::$blueprint === null) {
+            self::$blueprint = (new DataGroups)
                 ->addValue('DTM', 'DTM', 'M|a|3')
                 ->addValue('C507', '2005', 'M|an|3')
                 ->addValue('C507', '2380', 'M|an|35')
                 ->addValue('C507', '2379', 'M|an|3');
         }
 
-        return self::$validationBlueprint;
+        return self::$blueprint;
     }
 
     public static function fromAttributes(string $qualifier, DateTime|string $date, string $code): self

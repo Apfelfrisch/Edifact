@@ -18,7 +18,7 @@ final class DataGroups
 
     public function getName(): string
     {
-        return $this->name ??= array_values(reset($this->dataGroups))[0] ?? '';
+        return $this->name ??= $this->getValueFromPosition(0, 0) ?? '';
     }
 
     public function getValueFromPosition(int $dataGroupPosition, int $valuePosition): ?string

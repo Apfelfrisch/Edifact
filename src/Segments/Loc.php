@@ -6,12 +6,12 @@ use Apfelfrisch\Edifact\DataGroups;
 
 class Loc extends AbstractSegment
 {
-    private static ?DataGroups $validationBlueprint = null;
+    private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
     {
-        if (self::$validationBlueprint === null) {
-            self::$validationBlueprint = (new DataGroups)
+        if (self::$blueprint === null) {
+            self::$blueprint = (new DataGroups)
                 ->addValue('LOC', 'LOC', 'M|a|3')
                 ->addValue('3227', '3227', 'M|an|3')
                 ->addValue('C517', '3225', 'M|an|35')
@@ -20,7 +20,7 @@ class Loc extends AbstractSegment
                 ->addValue('5479', '5479', 'O|n|1');
         }
 
-        return self::$validationBlueprint;
+        return self::$blueprint;
     }
 
     public static function fromAttributes(string $qualifier, string $number, ?string $priority = null): self

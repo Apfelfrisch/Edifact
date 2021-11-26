@@ -6,17 +6,17 @@ use Apfelfrisch\Edifact\DataGroups;
 
 class Pyt extends AbstractSegment
 {
-    private static ?DataGroups $validationBlueprint = null;
+    private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
     {
-        if (self::$validationBlueprint === null) {
-            self::$validationBlueprint = (new DataGroups)
+        if (self::$blueprint === null) {
+            self::$blueprint = (new DataGroups)
                 ->addValue('PYT', 'PYT', 'M|a|3')
                 ->addValue('4279', '4279', 'M|n|3');
         }
 
-        return self::$validationBlueprint;
+        return self::$blueprint;
     }
 
     public static function fromAttributes(string $qualifier): self

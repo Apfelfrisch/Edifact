@@ -8,12 +8,12 @@ use Apfelfrisch\Edifact\Segments\AbstractSegment;
 
 class Segment extends AbstractSegment
 {
-    private static ?DataGroups $validationBlueprint = null;
+    private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
     {
-        if (self::$validationBlueprint === null) {
-            self::$validationBlueprint = (new DataGroups)
+        if (self::$blueprint === null) {
+            self::$blueprint = (new DataGroups)
                 ->addValue('A', 'A', 'M|an|3')
                 ->addValue('B', 'B', 'O|an|3')
                 ->addValue('C', '1', 'M|an|3')
@@ -26,7 +26,7 @@ class Segment extends AbstractSegment
                 ->addValue('F', 'F', 'O|an|3');
         }
 
-        return self::$validationBlueprint;
+        return self::$blueprint;
     }
 
     public static function fromAttributes(Delimiter $delimiter, $attribute): self

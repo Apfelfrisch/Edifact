@@ -6,12 +6,12 @@ use Apfelfrisch\Edifact\DataGroups;
 
 class Tax extends AbstractSegment
 {
-    private static ?DataGroups $validationBlueprint = null;
+    private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
     {
-        if (self::$validationBlueprint === null) {
-            self::$validationBlueprint = (new DataGroups)
+        if (self::$blueprint === null) {
+            self::$blueprint = (new DataGroups)
                 ->addValue('TAX' , 'TAX' , 'M|a|3')
                 ->addValue('5283', '5283', 'M|n|3')
                 ->addValue('C241', '5153', 'M|n|3')
@@ -24,7 +24,7 @@ class Tax extends AbstractSegment
                 ->addValue('5305', '5305', 'M|an|3');
         }
 
-        return self::$validationBlueprint;
+        return self::$blueprint;
     }
 
     public static function fromAttributes(string $qualifier, string $type, string $rate, string $category): self

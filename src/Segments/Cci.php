@@ -6,12 +6,12 @@ use Apfelfrisch\Edifact\DataGroups;
 
 class Cci extends AbstractSegment
 {
-    private static ?DataGroups $validationBlueprint = null;
+    private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
     {
-        if (self::$validationBlueprint === null) {
-            self::$validationBlueprint = (new DataGroups)
+        if (self::$blueprint === null) {
+            self::$blueprint = (new DataGroups)
                 ->addValue('CCI', 'CCI', 'M|a|3')
                 ->addValue('7059', '7059', 'O|an|3')
                 ->addValue('C502', '6313', null)
@@ -21,7 +21,7 @@ class Cci extends AbstractSegment
                 ->addValue('C240', '7036', 'O|an|35');
         }
 
-        return self::$validationBlueprint;
+        return self::$blueprint;
     }
 
     public static function fromAttributes(

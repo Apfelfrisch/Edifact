@@ -6,18 +6,18 @@ use Apfelfrisch\Edifact\DataGroups;
 
 class Ide extends AbstractSegment
 {
-    private static ?DataGroups $validationBlueprint = null;
+    private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
     {
-        if (self::$validationBlueprint === null) {
-            self::$validationBlueprint = (new DataGroups)
+        if (self::$blueprint === null) {
+            self::$blueprint = (new DataGroups)
                 ->addValue('IDE', 'IDE', 'M|a|3')
                 ->addValue('7495', '7495', 'M|an|3')
                 ->addValue('C206', '7402', 'M|an|35');
         }
 
-        return self::$validationBlueprint;
+        return self::$blueprint;
     }
 
     public static function fromAttributes(string $qualifier, string $idNumber): self

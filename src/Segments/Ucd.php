@@ -6,19 +6,19 @@ use Apfelfrisch\Edifact\DataGroups;
 
 class Ucd extends AbstractSegment
 {
-    private static ?DataGroups $validationBlueprint = null;
+    private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
     {
-        if (self::$validationBlueprint === null) {
-            self::$validationBlueprint = (new DataGroups)
+        if (self::$blueprint === null) {
+            self::$blueprint = (new DataGroups)
                 ->addValue('UCD', 'UCD', 'M|an|3')
                 ->addValue('0085', '0085', 'M|n|2')
                 ->addValue('S011', '0098', 'M|n|3')
                 ->addValue('S011', '0104', 'O|an|3');
         }
 
-        return self::$validationBlueprint;
+        return self::$blueprint;
     }
 
     public static function fromAttributes(string $errorCode, string $segmentPosition, ?string $dataGroupPosition = null): self

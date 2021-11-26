@@ -6,12 +6,12 @@ use Apfelfrisch\Edifact\DataGroups;
 
 final class Cav extends AbstractSegment
 {
-    private static ?DataGroups $validationBlueprint = null;
+    private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
     {
-        if (self::$validationBlueprint === null) {
-            self::$validationBlueprint = (new DataGroups)
+        if (self::$blueprint === null) {
+            self::$blueprint = (new DataGroups)
                 ->addValue('CAV', 'CAV', 'M|a|3')
                 ->addValue('C889', '7111', 'O|an|3')
                 ->addValue('C889', '1131', 'O|an|17')
@@ -20,7 +20,7 @@ final class Cav extends AbstractSegment
                 ->addValue('C889', '7110:2', 'O|an|35');
         }
 
-        return self::$validationBlueprint;
+        return self::$blueprint;
     }
 
     public static function fromAttributes(

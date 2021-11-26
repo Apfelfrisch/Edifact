@@ -9,12 +9,12 @@ class Nad extends AbstractSegment
     const PERSON_ADRESS = 'Z01';
     const COMPANY_ADRESS = 'Z02';
 
-    private static ?DataGroups $validationBlueprint = null;
+    private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
     {
-        if (self::$validationBlueprint === null) {
-            self::$validationBlueprint = (new DataGroups)
+        if (self::$blueprint === null) {
+            self::$blueprint = (new DataGroups)
                 ->addValue('NAD', 'NAD', 'M|an|3')
                 ->addValue('3035', '3035', 'M|an|3')
                 ->addValue('C082', '3039', 'D|an|35')
@@ -37,7 +37,7 @@ class Nad extends AbstractSegment
                 ->addValue('3207', '3207', 'D|an|3');
         }
 
-        return self::$validationBlueprint;
+        return self::$blueprint;
     }
 
     public static function fromAttributes(

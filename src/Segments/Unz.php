@@ -6,18 +6,18 @@ use Apfelfrisch\Edifact\DataGroups;
 
 class Unz extends AbstractSegment
 {
-    private static ?DataGroups $validationBlueprint = null;
+    private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
     {
-        if (self::$validationBlueprint === null) {
-            self::$validationBlueprint = (new DataGroups)
+        if (self::$blueprint === null) {
+            self::$blueprint = (new DataGroups)
                 ->addValue('UNZ', 'UNZ', 'M|an|3')
                 ->addValue('0062', '0062', 'M|n|6')
                 ->addValue('S009', '0065', 'M|an|35');
         }
 
-        return self::$validationBlueprint;
+        return self::$blueprint;
     }
 
     public static function fromAttributes(string $counter, string $referenz): self

@@ -6,19 +6,19 @@ use Apfelfrisch\Edifact\DataGroups;
 
 class Pia extends AbstractSegment
 {
-    private static ?DataGroups $validationBlueprint = null;
+    private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
     {
-        if (self::$validationBlueprint === null) {
-            self::$validationBlueprint = (new DataGroups)
+        if (self::$blueprint === null) {
+            self::$blueprint = (new DataGroups)
                 ->addValue('PIA', 'PIA', 'M|a|3')
                 ->addValue('4347', '4347', 'M|n|3')
                 ->addValue('C212', '7140', 'D|an|35')
                 ->addValue('C212', '7143', 'D|an|3');
         }
 
-        return self::$validationBlueprint;
+        return self::$blueprint;
     }
 
     public static function fromAttributes(string $number, ?string $articleNumber = null, ?string $articleCode = null): self

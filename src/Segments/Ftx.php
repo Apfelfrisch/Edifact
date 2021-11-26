@@ -6,12 +6,12 @@ use Apfelfrisch\Edifact\DataGroups;
 
 class Ftx extends AbstractSegment
 {
-    private static ?DataGroups $validationBlueprint = null;
+    private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
     {
-        if (self::$validationBlueprint === null) {
-            self::$validationBlueprint = (new DataGroups)
+        if (self::$blueprint === null) {
+            self::$blueprint = (new DataGroups)
                 ->addValue('FTX', 'FTX', 'M|a|3')
                 ->addValue('4451', '4451', 'M|an|3')
                 ->addValue('4453', '4453', null)
@@ -23,7 +23,7 @@ class Ftx extends AbstractSegment
                 ->addValue('C108', '4440:5', 'O|an|512');
         }
 
-        return self::$validationBlueprint;
+        return self::$blueprint;
     }
 
     public static function fromAttributes(string $qualifier, ?string $message = null, ?string $code = null): self

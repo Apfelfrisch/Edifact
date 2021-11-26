@@ -6,19 +6,19 @@ use Apfelfrisch\Edifact\DataGroups;
 
 class Cux extends AbstractSegment
 {
-    private static ?DataGroups $validationBlueprint = null;
+    private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
     {
-        if (self::$validationBlueprint === null) {
-            self::$validationBlueprint = (new DataGroups)
+        if (self::$blueprint === null) {
+            self::$blueprint = (new DataGroups)
                 ->addValue('CUX', 'CUX', 'M|a|3')
                 ->addValue('C504', '6347', 'M|an|3')
                 ->addValue('C504', '6345', 'M|an|3')
                 ->addValue('C504', '6343', 'M|an|3');
         }
 
-        return self::$validationBlueprint;
+        return self::$blueprint;
     }
 
     public static function fromAttributes(string $type, string $currency, string $qualifier): self

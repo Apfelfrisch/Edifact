@@ -6,18 +6,18 @@ use Apfelfrisch\Edifact\DataGroups;
 
 class Pac extends AbstractSegment
 {
-    private static ?DataGroups $validationBlueprint = null;
+    private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
     {
-        if (self::$validationBlueprint === null) {
-            self::$validationBlueprint = (new DataGroups)
+        if (self::$blueprint === null) {
+            self::$blueprint = (new DataGroups)
                 ->addValue('PAC', 'PAC', 'M|a|3')
                 ->addValue('7224', '7224', 'M|a|8')
                 ->addValue('C531', '7075', 'M|an|3');
         }
 
-        return self::$validationBlueprint;
+        return self::$blueprint;
     }
 
     public static function fromAttributes(string $quantity, string $code): self

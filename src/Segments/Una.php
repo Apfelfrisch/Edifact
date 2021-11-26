@@ -7,12 +7,12 @@ use Apfelfrisch\Edifact\Delimiter;
 
 class Una extends AbstractSegment
 {
-    private static ?DataGroups $validationBlueprint = null;
+    private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
     {
-        if (self::$validationBlueprint === null) {
-            self::$validationBlueprint = (new DataGroups)
+        if (self::$blueprint === null) {
+            self::$blueprint = (new DataGroups)
                 ->addValue('UNA', 'UNA', 'M|a|3')
                 ->addValue('UNA', 'data', 'M|an|1')
                 ->addValue('UNA', 'dataGroup', 'M|an|1')
@@ -22,7 +22,7 @@ class Una extends AbstractSegment
                 ->addValue('UNA', 'segment', 'O|an|1');
         }
 
-        return self::$validationBlueprint;
+        return self::$blueprint;
     }
 
     public static function fromAttributes(

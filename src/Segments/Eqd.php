@@ -6,18 +6,18 @@ use Apfelfrisch\Edifact\DataGroups;
 
 class Eqd extends AbstractSegment
 {
-    private static ?DataGroups $validationBlueprint = null;
+    private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
     {
-        if (self::$validationBlueprint === null) {
-            self::$validationBlueprint = (new DataGroups)
+        if (self::$blueprint === null) {
+            self::$blueprint = (new DataGroups)
                 ->addValue('EQD', 'EQD', 'M|a|3')
                 ->addValue('8053', '8053', 'M|an|3')
                 ->addValue('C237', '8260', 'M|n|17');
         }
 
-        return self::$validationBlueprint;
+        return self::$blueprint;
     }
 
     public static function fromAttributes(string $qualifier, string $processNumber): self

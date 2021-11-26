@@ -7,12 +7,12 @@ use Apfelfrisch\Edifact\DataGroups;
 
 class Unb extends AbstractSegment
 {
-    private static ?DataGroups $validationBlueprint = null;
+    private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
     {
-        if (self::$validationBlueprint === null) {
-            self::$validationBlueprint = (new DataGroups)
+        if (self::$blueprint === null) {
+            self::$blueprint = (new DataGroups)
                 ->addValue('UNB', 'UNB', 'M|an|3')
                 ->addValue('S001', '0001', 'M|a|4')
                 ->addValue('S001', '0002', 'm|n|1')
@@ -31,7 +31,7 @@ class Unb extends AbstractSegment
                 ->addValue('0035', '0035', 'O|n|1');
         }
 
-        return self::$validationBlueprint;
+        return self::$blueprint;
     }
 
     public static function fromAttributes(

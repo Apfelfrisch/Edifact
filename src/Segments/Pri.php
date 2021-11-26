@@ -9,12 +9,12 @@ class Pri extends AbstractSegment implements DecimalConverter
 {
     use HasDecimalConverter;
 
-    private static ?DataGroups $validationBlueprint = null;
+    private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
     {
-        if (self::$validationBlueprint === null) {
-            self::$validationBlueprint = (new DataGroups)
+        if (self::$blueprint === null) {
+            self::$blueprint = (new DataGroups)
                 ->addValue('PRI', 'PRI', 'M|a|3')
                 ->addValue('C509', '5125', 'M|n|3')
                 ->addValue('C509', '5118', 'M|n|15')
@@ -24,7 +24,7 @@ class Pri extends AbstractSegment implements DecimalConverter
                 ->addValue('C509', '6411', 'D|an|8');
         }
 
-        return self::$validationBlueprint;
+        return self::$blueprint;
     }
 
     public static function fromAttributes(string $qualifier, string $amount, string $unitCode = null): self

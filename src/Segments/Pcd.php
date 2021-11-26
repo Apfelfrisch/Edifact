@@ -6,18 +6,18 @@ use Apfelfrisch\Edifact\DataGroups;
 
 class Pcd extends AbstractSegment
 {
-    private static ?DataGroups $validationBlueprint = null;
+    private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
     {
-        if (self::$validationBlueprint === null) {
-            self::$validationBlueprint = (new DataGroups)
+        if (self::$blueprint === null) {
+            self::$blueprint = (new DataGroups)
                 ->addValue('PCD', 'PCD', 'M|a|3')
                 ->addValue('C501', '5245', 'M|an|3')
                 ->addValue('C501', '5482', 'M|n|10');
         }
 
-        return self::$validationBlueprint;
+        return self::$blueprint;
     }
 
     public static function fromAttributes(string $percent, string $qualifier = '3'): self

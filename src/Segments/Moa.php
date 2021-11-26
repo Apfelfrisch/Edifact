@@ -9,18 +9,18 @@ class Moa extends AbstractSegment implements DecimalConverter
 {
     use HasDecimalConverter;
 
-    private static ?DataGroups $validationBlueprint = null;
+    private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
     {
-        if (self::$validationBlueprint === null) {
-            self::$validationBlueprint = (new DataGroups)
+        if (self::$blueprint === null) {
+            self::$blueprint = (new DataGroups)
                 ->addValue('MOA', 'MOA', 'M|a|3')
                 ->addValue('C516', '5025', 'M|an|3')
                 ->addValue('C516', '5004', 'M|n|35');
         }
 
-        return self::$validationBlueprint;
+        return self::$blueprint;
     }
 
     /**
