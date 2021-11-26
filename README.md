@@ -20,7 +20,7 @@ use Apfelfrisch\Edifact\Segments\Nad;
 
 $message = Message::fromString("UNA:+.? 'NAD+DP++++Musterstr.::10+City++12345+DE");
 
-foreach ($message as $segment) {
+foreach ($message->getSegments() as $segment) {
     if ($segment instanceof Nad) {
         echo $segment->street(); // Musterstr.
     }
@@ -37,7 +37,7 @@ $segmentFactory->addFallback(Generic::class);
 
 $message = Message::fromString("UNA:+.? 'NAD+DP++++Musterstr.::10+City++12345+DE", $segmentFactory);
 
-foreach ($message as $segment) {
+foreach ($message->getSegments() as $segment) {
     if ($segment instanceof Generic) {
         echo $segment->name(); // UNA.
     }

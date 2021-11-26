@@ -102,7 +102,7 @@ class MessageTest extends TestCase
     {
         $messageCore = Message::fromString("UNH'UNB'");
         $message = "";
-        foreach ($messageCore as $segment) {
+        foreach ($messageCore->getSegments() as $segment) {
             $message .= $segment->toString($messageCore->getDelimiter()) . $messageCore->getDelimiter()->getSegmentTerminator();
         }
         $this->assertEquals($message, (string)$messageCore);
