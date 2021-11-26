@@ -58,16 +58,16 @@ class Builder
         }
 
         foreach ($segments as $segment) {
-            if ($segment instanceof UnbInterface) {
-                $this->unbRef = $segment->reference();
+            if ($segment->name() === 'UNB') {
+                $this->unbRef = $segment->getValueFromPosition(5, 0) ?? '';
             }
 
-            if ($segment instanceof UnhInterface) {
+            if ($segment->name() === 'UNH') {
                 if ($this->unhRef !== null) {
                     $this->writeSegment(Unt::fromAttributes((string)++$this->unhCounter, $this->unhRef));
                 }
 
-                $this->unhRef = $segment->reference();
+                $this->unhRef = $segment->getValueFromPosition(1, 0) ?? '';
             }
 
             $this->writeSegment($segment);

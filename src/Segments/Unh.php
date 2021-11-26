@@ -3,9 +3,8 @@
 namespace Apfelfrisch\Edifact\Segments;
 
 use Apfelfrisch\Edifact\DataGroups;
-use Apfelfrisch\Edifact\Interfaces\UnhInterface;
 
-class Unh extends AbstractSegment implements UnhInterface
+class Unh extends AbstractSegment
 {
     private static ?DataGroups $validationBlueprint = null;
 

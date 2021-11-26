@@ -4,9 +4,8 @@ namespace Apfelfrisch\Edifact\Segments;
 
 use DateTime;
 use Apfelfrisch\Edifact\DataGroups;
-use Apfelfrisch\Edifact\Interfaces\UnbInterface;
 
-class Unb extends AbstractSegment implements UnbInterface
+class Unb extends AbstractSegment
 {
     private static ?DataGroups $validationBlueprint = null;
 
