@@ -95,6 +95,7 @@ You can build Edifact Messages like so:
 
 ```php
 use Apfelfrisch\Edifact\Builder;
+use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Segments\Unb;
 use Apfelfrisch\Edifact\Segments\Unh;
 
@@ -105,7 +106,7 @@ $builder->writeSegments(
     Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co')
 );
 
-$message = $builder->get();
+$message = new Message($builder->get());
 ```
 Trailing Segments (UNT and UNZ) will be added automatically. 
 If no UNA Segement is provided, it uses the default values (UNA:+.? )

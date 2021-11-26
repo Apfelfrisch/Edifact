@@ -2,6 +2,7 @@
 
 namespace Apfelfrisch\Edifact\Test\Message;
 
+use Apfelfrisch\Edifact\Message;
 use DateTime;
 use Apfelfrisch\Edifact\Builder;
 use Apfelfrisch\Edifact\Delimiter;
@@ -105,7 +106,7 @@ class BuilderTest extends TestCase
     }
 
     /** @test */
-    public function test_counting_unh_segemtns()
+    public function test_counting_unh_segments()
     {
         $builder = new Builder;
         $builder->writeSegments(
@@ -121,7 +122,7 @@ class BuilderTest extends TestCase
             Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co'),
         );
 
-        $message = $builder->get();
+        $message = new Message($builder->get());
 
         /** @var Unt $unt */
         $unt = $message->findSegmentFromBeginn('UNT');

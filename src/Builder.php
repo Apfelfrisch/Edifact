@@ -83,12 +83,7 @@ class Builder
         $this->countSegments($segment);
     }
 
-    public function get(): Message
-    {
-        return new Message($this->getEdifactFile());
-    }
-
-    public function getEdifactFile(): Stream
+    public function get(): Stream
     {
         if (! $this->messageIsEmpty()) {
             if ($this->unhRef !== null) {
