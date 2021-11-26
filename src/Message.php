@@ -15,11 +15,11 @@ class Message implements \Iterator
 
     protected SegmentFactory $segmentFactory;
 
-    private int|null $pinnedPointer = null;
+    private ?SegInterface $currentSegment = null;
 
-    private SegInterface|false $currentSegment = false;
+    private int $currentSegmentNumber = 0;
 
-    private int $currentSegmentNumber = -1;
+    private ?string $nextSegline = null;
 
     public function __construct(Stream $stream, ?SegmentFactory $segmentFactory = null)
     {
@@ -58,21 +58,36 @@ class Message implements \Iterator
 
     public function getCurrentSegment(): SegInterface|false
     {
-        if ($this->currentSegment === false) {
-            $this->currentSegment = $this->getNextSegment();
+        if ($this->currentSegment !== null) {
+            return $this->currentSegment;
         }
-        return $this->currentSegment;
+
+        if (! $this->valid()) {
+            return false;
+        }
+
+        return $this->currentSegment = $this->current();
     }
 
     public function getNextSegment(): SegInterface|false
     {
-        $segLine = $this->getNextSegLine();
-
-        if ($segLine == false) {
+        if (! $this->valid()) {
             return false;
         }
 
-        return $this->currentSegment = $this->getSegmentObject($segLine);
+        $this->currentSegment = $this->current();
+
+        $this->next();
+
+        return $this->currentSegment;
+    }
+
+    /**
+     * @psalm-return list<SegInterface>
+     */
+    public function getAllSegments(): array
+    {
+        return array_values(iterator_to_array($this));
     }
 
     /**
@@ -107,13 +122,11 @@ class Message implements \Iterator
      */
     public function unwrap(string $header = 'UNH', string $trailer = 'UNT'): Generator
     {
-        $this->pinPointer();
-
         $this->rewind();
 
         $stream = null;
 
-        while ($segLine = $this->getNextSegLine()) {
+        while (null !== $segLine = $this->getNextSegLine()) {
             $segmentName = substr($segLine, 0, 3);
 
             if ($segmentName === $header) {
@@ -132,27 +145,6 @@ class Message implements \Iterator
                 $stream = null;
             }
         }
-
-        $this->jumpToPinnedPointer();
-    }
-
-    public function pinPointer(): void
-    {
-        $this->pinnedPointer = $this->stream->tell();
-    }
-
-    public function jumpToPinnedPointer(): int
-    {
-        if ($this->pinnedPointer === null) {
-            return $this->stream->tell();
-        }
-
-        $pinnedPointer = $this->pinnedPointer;
-        $this->pinnedPointer = null;
-
-        $this->stream->seek($pinnedPointer);
-
-        return $pinnedPointer;
     }
 
     public function validateSegments(): void
@@ -161,7 +153,7 @@ class Message implements \Iterator
 
         $segment = false;
         try {
-            while ($segment = $this->getNextSegment()) {
+            foreach ($this as $segment) {
                 $segment->validate();
             }
         } catch (SegValidationException $e) {
@@ -178,9 +170,9 @@ class Message implements \Iterator
         return $this->stream->getDelimiter();
     }
 
-    public function current(): SegInterface|false
+    public function current(): SegInterface
     {
-        return $this->getCurrentSegment();
+        return $this->getSegmentObject((string)$this->nextSegline);
     }
 
     public function key(): int
@@ -190,26 +182,29 @@ class Message implements \Iterator
 
     public function next(): void
     {
-        $this->currentSegment = false;
+        $this->currentSegmentNumber++;
+
+        $this->nextSegline = $this->getNextSegLine();
     }
 
     public function rewind(): void
     {
         $this->stream->rewind();
-        $this->currentSegmentNumber = -1;
-        $this->currentSegment = false;
+        $this->currentSegmentNumber = 0;
+        $this->currentSegment = null;
+        $this->nextSegline = $this->getNextSegLine();
     }
 
     public function valid(): bool
     {
-        return $this->current() !== false;
+        return $this->nextSegline !== null;
     }
 
     public function toArray(): array
     {
-        return array_map(function(SegInterface|false $segment): array {
-            return $segment ? $segment->toArray() : [];
-        }, iterator_to_array($this));
+        return array_map(function(SegInterface $segment): array {
+            return $segment->toArray();
+        }, $this->getAllSegments());
     }
 
     public function toString(): string
@@ -227,11 +222,12 @@ class Message implements \Iterator
         return $this->segmentFactory->build($segLine, $this->getDelimiter());
     }
 
-    private function getNextSegLine(): string
+    private function getNextSegLine(): ?string
     {
-        $this->currentSegmentNumber++;
-
-        return $this->stream->getSegment();
+        if ('' !== $segline = $this->stream->getSegment()) {
+            return $segline;
+        }
+        return null;
     }
 
     /**

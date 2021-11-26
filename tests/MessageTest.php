@@ -3,6 +3,7 @@
 namespace Apfelfrisch\Edifact\Test;
 
 use Apfelfrisch\Edifact\Exceptions\SegValidationException;
+use Apfelfrisch\Edifact\Interfaces\SegInterface;
 use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\SegmentFactory;
 use Apfelfrisch\Edifact\Segments;
@@ -93,25 +94,6 @@ class MessageTest extends TestCase
     {
         $messageCore = Message::fromString("UNH'UNB");
         $this->assertInstanceOf(Segments\Unh::class, $messageCore->getNextSegment());
-        $this->assertInstanceOf(Segments\Unb::class, $messageCore->getNextSegment());
-    }
-
-    /** @test */
-    public function it_pinns_and_jumps_to_the_pointer_position()
-    {
-        $messageCore = Message::fromString("UNH'UNB");
-        $messageCore->pinPointer();
-        $this->assertInstanceOf(Segments\Unh::class, $messageCore->getNextSegment());
-        $messageCore->jumpToPinnedPointer();
-        $this->assertInstanceOf(Segments\Unh::class, $messageCore->getNextSegment());
-    }
-
-    /** @test */
-    public function it_jumps_to_the_actual_position_if_no_pointer_was_pinned()
-    {
-        $messageCore = Message::fromString("UNH'UNB");
-        $this->assertInstanceOf(Segments\Unh::class, $messageCore->getNextSegment());
-        $messageCore->jumpToPinnedPointer();
         $this->assertInstanceOf(Segments\Unb::class, $messageCore->getNextSegment());
     }
 
@@ -208,5 +190,16 @@ class MessageTest extends TestCase
 
         $this->assertSame("UNH+1+ORDERS:D:96A:UN'UNT+2+1'", $firstMessage->toString());
         $this->assertSame("UNH+2+ORDERS:D:96A:UN'UNT+2+2'", $secondMessage->toString());
+    }
+
+    /** @test */
+    public function it_provdes_all_segments()
+    {
+        $messageCore = Message::fromString("UNA:+.? 'UNH+1+ORDERS:D:96A:UN'UNT+2+1'UNH+2+ORDERS:D:96A:UN'UNT+2+2'");
+
+        $this->assertCount(5, $messageCore->getAllSegments());
+        foreach ($messageCore->getAllSegments() as $segment) {
+            $this->assertInstanceOf(SegInterface::class, $segment);
+        }
     }
 }
