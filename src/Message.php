@@ -111,19 +111,25 @@ class Message implements \Iterator
 
         $this->rewind();
 
-        $unwrappedString = '';
+        $stream = null;
 
         while ($segLine = $this->getNextSegLine()) {
             $segmentName = substr($segLine, 0, 3);
 
             if ($segmentName === $header) {
-                $unwrappedString = $segLine.$this->getDelimiter()->getSegmentTerminator();
+                $stream = new Stream('php://temp', 'w+', $this->getDelimiter());
             }
 
-            $unwrappedString .= $segLine.$this->getDelimiter()->getSegmentTerminator();
+            if ($stream === null) {
+                continue;
+            }
+
+            $stream->write($segLine.$this->getDelimiter()->getSegmentTerminator());
 
             if ($segmentName === $trailer) {
-                yield self::fromString($unwrappedString, $this->segmentFactory);
+                yield new self($stream, $this->segmentFactory);
+
+                $stream = null;
             }
         }
 

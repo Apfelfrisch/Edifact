@@ -100,18 +100,12 @@ foreach ($message->unwrap() as $partialMessage) {
 }
 ```
 
-#### Add Streamfilters
+#### Add Streamfilter to Message
 ```php
 use Apfelfrisch\Edifact\Message;
 
 $message = Message::fromString("UNA:+.? 'NAD+DP++++Musterstr.::10+City++12345+DE");
 $message->addStreamFilter('iso-to-utf8', 'convert.iconv.ISO-8859-1.UTF-8');
-
-foreach ($message as $segment) {
-    if ($segment instanceof Generic) {
-        echo $segment->name(); // UNA.
-    }
-}
 ```
 
 
@@ -137,16 +131,16 @@ $message = new Message($builder->get());
 Trailing Segments (UNT and UNZ) will be added automatically. 
 If no UNA Segement is provided, it uses the default values (UNA:+.? )
 
-#### Add builing Streamfilter 
+#### Add Streamfilter to Builder
 ```php
 use Apfelfrisch\Edifact\Builder;
 use Apfelfrisch\Edifact\Segments\Unb;
 
 $builder = new Builder;
+$builder->addStreamFilter('utf8-to-iso', 'convert.iconv.UTF-8.ISO-8859-1');
 
 $builder->writeSegments(
     Unb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'unb-ref'),
     Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co')
 );
-$builder->addStreamFilter('utf8-to-iso', 'convert.iconv.UTF-8.ISO-8859-1');
 ```
