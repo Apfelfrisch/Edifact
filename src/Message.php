@@ -11,7 +11,7 @@ use Generator;
 
 class Message implements \Iterator
 {
-    protected Stream $edifactFile;
+    protected Stream $stream;
 
     protected SegmentFactory $segmentFactory;
 
@@ -21,39 +21,39 @@ class Message implements \Iterator
 
     private int $currentSegmentNumber = -1;
 
-    public function __construct(Stream $edifactFile, ?SegmentFactory $segmentFactory = null)
+    public function __construct(Stream $stream, ?SegmentFactory $segmentFactory = null)
     {
-        $this->edifactFile = $edifactFile;
+        $this->stream = $stream;
         $this->rewind();
         $this->segmentFactory = $segmentFactory ?? SegmentFactory::withDefaultDegments();
     }
 
     public static function fromFilepath(string $string, ?SegmentFactory $segmentFactory = null): self
     {
-        $edifactFile = new Stream($string);
+        $stream = new Stream($string);
 
-        return new self($edifactFile, $segmentFactory);
+        return new self($stream, $segmentFactory);
     }
 
     public static function fromString(
         string $string, ?SegmentFactory $segmentFactory = null, string $filename = 'php://temp'
     ): self
     {
-        $edifactFile = Stream::fromString($string, $filename);
+        $stream = Stream::fromString($string, $filename);
 
-        return new self($edifactFile, $segmentFactory);
+        return new self($stream, $segmentFactory);
     }
 
     public function addStreamFilter(string $filtername, mixed $params = null): self
     {
-        $this->edifactFile->addReadFilter($filtername, $params);
+        $this->stream->addReadFilter($filtername, $params);
 
         return $this;
     }
 
     public function getFilepath(): string
     {
-        return $this->edifactFile->getRealPath();
+        return $this->stream->getRealPath();
     }
 
     public function getCurrentSegment(): SegInterface|false
@@ -132,19 +132,19 @@ class Message implements \Iterator
 
     public function pinPointer(): void
     {
-        $this->pinnedPointer = $this->edifactFile->tell();
+        $this->pinnedPointer = $this->stream->tell();
     }
 
     public function jumpToPinnedPointer(): int
     {
         if ($this->pinnedPointer === null) {
-            return $this->edifactFile->tell();
+            return $this->stream->tell();
         }
 
         $pinnedPointer = $this->pinnedPointer;
         $this->pinnedPointer = null;
 
-        $this->edifactFile->seek($pinnedPointer);
+        $this->stream->seek($pinnedPointer);
 
         return $pinnedPointer;
     }
@@ -169,7 +169,7 @@ class Message implements \Iterator
 
     public function getDelimiter(): Delimiter
     {
-        return $this->edifactFile->getDelimiter();
+        return $this->stream->getDelimiter();
     }
 
     public function current(): SegInterface|false
@@ -189,7 +189,7 @@ class Message implements \Iterator
 
     public function rewind(): void
     {
-        $this->edifactFile->rewind();
+        $this->stream->rewind();
         $this->currentSegmentNumber = -1;
         $this->currentSegment = false;
     }
@@ -208,7 +208,7 @@ class Message implements \Iterator
 
     public function toString(): string
     {
-        return $this->edifactFile->toString();
+        return $this->stream->toString();
     }
 
     public function __toString(): string
@@ -225,7 +225,7 @@ class Message implements \Iterator
     {
         $this->currentSegmentNumber++;
 
-        return $this->edifactFile->getSegment();
+        return $this->stream->getSegment();
     }
 
     /**
