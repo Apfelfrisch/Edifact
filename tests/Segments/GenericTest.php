@@ -14,7 +14,7 @@ final class GenericTest extends TestCase
     public function test_segment()
     {
         $delimiter = new Delimiter();
-        $seg = Generic::fromAttributes(['TST'], ['a', '1', '2'], ['b', '1']);
+        $seg = Generic::fromAttributes('TST', ['a', '1', '2'], ['b', '1']);
 
         $this->assertEquals('TST', $seg->name());
         $this->assertEquals($seg->toString($delimiter), Generic::fromSegLine($delimiter, $seg->toString($delimiter))->toString($delimiter));

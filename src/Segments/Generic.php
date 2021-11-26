@@ -16,12 +16,13 @@ class Generic extends AbstractSegment
     /**
      * @psalm-param list<list<string>> $valueArrays
      */
-    public static function fromAttributes(array ...$valueArrays): self
+    public static function fromAttributes(string $name, array ...$valueArrays): self
     {
         $dataGroups = new DataGroups;
-        $i = 0;
+        $dataGroups->addValue('0', '0', $name);
+        $i = 1;
         foreach ($valueArrays as $values) {
-            $j = 0;
+            $j = 1;
             foreach($values as $value) {
                 $dataGroups->addValue((string)$i, (string)$j, $value);
                 $j++;
