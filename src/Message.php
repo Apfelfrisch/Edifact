@@ -103,7 +103,7 @@ class Message implements \Iterator
     }
 
     /**
-     * @psalm-param Generator<self>
+     * @psalm-return Generator<self>
      */
     public function unwrap(string $header = 'UNH', string $trailer = 'UNT'): Generator
     {
@@ -206,9 +206,14 @@ class Message implements \Iterator
         }, iterator_to_array($this));
     }
 
+    public function toString(): string
+    {
+        return $this->edifactFile->toString();
+    }
+
     public function __toString(): string
     {
-        return $this->edifactFile->__toString();
+        return $this->toString();
     }
 
     protected function getSegmentObject(string $segLine): SegInterface

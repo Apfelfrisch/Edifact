@@ -71,10 +71,7 @@ final class Stream extends SplFileInfo
         unset($this->resource);
     }
 
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function toString(): string
     {
         try {
             $this->rewind();
@@ -83,6 +80,11 @@ final class Stream extends SplFileInfo
         } catch (RuntimeException) {
             return '';
         }
+    }
+
+    public function __toString(): string
+    {
+        return $this->toString();
     }
 
     public function setDelimiter(Delimiter $delimiter): void
