@@ -231,7 +231,7 @@ class Message implements \Iterator
     {
         $this->currentSegmentNumber++;
 
-        return $this->stream->getSegmentTerminator();
+        return $this->stream->getSegment();
     }
 
     /**

@@ -130,7 +130,7 @@ final class Stream extends SplFileInfo
         return fgetc($this->resource);
     }
 
-    public function getSegmentTerminator(): string
+    public function getSegment(): string
     {
         return $this->fetchSegment();
     }
