@@ -198,4 +198,16 @@ class MessageTest extends TestCase
 
         $this->assertSame('20.00', $moa->amount());
     }
+
+    /** @test */
+    public function it_unwraps_the_message_with_the_default_header_and_trailer()
+    {
+        $messageCore = Message::fromString("UNA:+_? 'UNB'UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNT'UNZ'");
+
+        foreach ($messageCore->unwrap() as $partialMessage) {
+            $this->assertInstanceOf(Message::class, $partialMessage);
+            $this->assertStringStartsWith("UNH", (string)$partialMessage);
+            $this->assertStringEndsWith("UNT'", (string)$partialMessage);
+        }
+    }
 }

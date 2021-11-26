@@ -7,6 +7,7 @@ use Apfelfrisch\Edifact\Exceptions\ValidationException;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
 use Apfelfrisch\Edifact\SegmentFactory;
 use Apfelfrisch\Edifact\Stream;
+use Generator;
 
 class Message implements \Iterator
 {
@@ -99,6 +100,34 @@ class Message implements \Iterator
         }
 
         return false;
+    }
+
+    /**
+     * @psalm-param Generator<self>
+     */
+    public function unwrap(string $header = 'UNH', string $trailer = 'UNT'): Generator
+    {
+        $this->pinPointer();
+
+        $this->rewind();
+
+        $unwrappedString = '';
+
+        while ($segLine = $this->getNextSegLine()) {
+            $segmentName = substr($segLine, 0, 3);
+
+            if ($segmentName === $header) {
+                $unwrappedString = $segLine.$this->getDelimiter()->getSegment();
+            }
+
+            $unwrappedString .= $segLine.$this->getDelimiter()->getSegment();
+
+            if ($segmentName === $trailer) {
+                yield self::fromString($unwrappedString, $this->segmentFactory);
+            }
+        }
+
+        $this->jumpToPinnedPointer();
     }
 
     public function pinPointer(): void
