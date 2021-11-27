@@ -40,7 +40,7 @@ class Builder
     {
         // Delete File if build process could not finshed
         $filepath = $this->edifactFile->getRealPath();
-        if ($this->messageWasFetched === false && file_exists($filepath)) {
+        if ($this->messageWasFetched === false && $filepath && file_exists($filepath)) {
             unlink($filepath);
         }
     }
@@ -124,7 +124,7 @@ class Builder
          */
         $this->edifactFile->setDelimiter(new Delimiter(
             $segment->data(),
-            $segment->dataGroup(),
+            $segment->element(),
             $segment->decimal(),
             $segment->terminator(),
             $segment->emptyChar(),

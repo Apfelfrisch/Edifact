@@ -2,16 +2,16 @@
 
 namespace Apfelfrisch\Edifact\Segments;
 
-use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Elements;
 
 class Unt extends AbstractSegment
 {
-    private static ?DataGroups $blueprint = null;
+    private static ?Elements $blueprint = null;
 
-    public static function blueprint(): DataGroups
+    public static function blueprint(): Elements
     {
         if (self::$blueprint === null) {
-            self::$blueprint = (new DataGroups)
+            self::$blueprint = (new Elements)
                 ->addValue('UNT', 'UNT', 'M|a|3')
                 ->addValue('0074', '0074', 'M|n|6')
                 ->addValue('0062', '0062', 'M|an|15');
@@ -22,7 +22,7 @@ class Unt extends AbstractSegment
 
     public static function fromAttributes(string $segCount, string $referenz): self
     {
-        return new self((new DataGroups)
+        return new self((new Elements)
             ->addValue('UNT', 'UNT', 'UNT')
             ->addValue('0074', '0074', $segCount)
             ->addValue('0062', '0062', $referenz)

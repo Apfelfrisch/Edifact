@@ -2,16 +2,16 @@
 
 namespace Apfelfrisch\Edifact\Segments;
 
-use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Elements;
 
 class Cni extends AbstractSegment
 {
-    private static ?DataGroups $blueprint = null;
+    private static ?Elements $blueprint = null;
 
-    public static function blueprint(): DataGroups
+    public static function blueprint(): Elements
     {
         if (self::$blueprint === null) {
-            self::$blueprint = (new DataGroups)
+            self::$blueprint = (new Elements)
                 ->addValue('CNI', 'CNI', 'M|a|3')
                 ->addValue('1490', '1490', 'M|n|5');
         }
@@ -21,7 +21,7 @@ class Cni extends AbstractSegment
 
     public static function fromAttributes(string $number): self
     {
-        return new self((new DataGroups)
+        return new self((new Elements)
             ->addValue('CNI', 'CNI', 'CNI')
             ->addValue('1490', '1490', $number)
         );

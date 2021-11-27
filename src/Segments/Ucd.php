@@ -2,16 +2,16 @@
 
 namespace Apfelfrisch\Edifact\Segments;
 
-use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Elements;
 
 class Ucd extends AbstractSegment
 {
-    private static ?DataGroups $blueprint = null;
+    private static ?Elements $blueprint = null;
 
-    public static function blueprint(): DataGroups
+    public static function blueprint(): Elements
     {
         if (self::$blueprint === null) {
-            self::$blueprint = (new DataGroups)
+            self::$blueprint = (new Elements)
                 ->addValue('UCD', 'UCD', 'M|an|3')
                 ->addValue('0085', '0085', 'M|n|2')
                 ->addValue('S011', '0098', 'M|n|3')
@@ -21,13 +21,13 @@ class Ucd extends AbstractSegment
         return self::$blueprint;
     }
 
-    public static function fromAttributes(string $errorCode, string $segmentPosition, ?string $dataGroupPosition = null): self
+    public static function fromAttributes(string $errorCode, string $segmentPosition, ?string $elementPosition = null): self
     {
-        return new self((new DataGroups)
+        return new self((new Elements)
             ->addValue('UCD', 'UCD', 'UCD')
             ->addValue('0085', '0085', $errorCode)
             ->addValue('S011', '0098', $segmentPosition)
-            ->addValue('S011', '0104', $dataGroupPosition)
+            ->addValue('S011', '0104', $elementPosition)
         );
     }
 
@@ -41,7 +41,7 @@ class Ucd extends AbstractSegment
         return $this->elements->getValue('S011', '0098');
     }
 
-    public function dataGroupPosition(): ?string
+    public function elementPosition(): ?string
     {
         return $this->elements->getValue('S011', '0104');
     }

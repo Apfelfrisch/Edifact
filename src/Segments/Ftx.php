@@ -2,16 +2,16 @@
 
 namespace Apfelfrisch\Edifact\Segments;
 
-use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Elements;
 
 class Ftx extends AbstractSegment
 {
-    private static ?DataGroups $blueprint = null;
+    private static ?Elements $blueprint = null;
 
-    public static function blueprint(): DataGroups
+    public static function blueprint(): Elements
     {
         if (self::$blueprint === null) {
-            self::$blueprint = (new DataGroups)
+            self::$blueprint = (new Elements)
                 ->addValue('FTX', 'FTX', 'M|a|3')
                 ->addValue('4451', '4451', 'M|an|3')
                 ->addValue('4453', '4453', null)
@@ -28,7 +28,7 @@ class Ftx extends AbstractSegment
 
     public static function fromAttributes(string $qualifier, ?string $message = null, ?string $code = null): self
     {
-        return new self((new DataGroups)
+        return new self((new Elements)
             ->addValue('FTX', 'FTX', 'FTX')
             ->addValue('4451', '4451', $qualifier)
             ->addValue('4453', '', null)

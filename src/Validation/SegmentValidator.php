@@ -4,7 +4,7 @@ namespace Apfelfrisch\Edifact\Validation;
 
 use Apfelfrisch\Edifact\Interfaces\SegValidatorInterface;
 use Apfelfrisch\Edifact\Exceptions\SegValidationException;
-use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Elements;
 
 class SegmentValidator implements SegValidatorInterface
 {
@@ -12,22 +12,22 @@ class SegmentValidator implements SegValidatorInterface
     const NUMERIC = 'n';
     const ALPHA_NUMERIC = 'an';
 
-    public function validate(DataGroups $blueprint, DataGroups $elements): SegValidatorInterface
+    public function validate(Elements $blueprint, Elements $elements): SegValidatorInterface
     {
-        foreach ($blueprint->toArray() as $dataGroupKey => $dataGroup) {
-            foreach ($dataGroup as $dataKey => $validation) {
+        foreach ($blueprint->toArray() as $elementKey => $element) {
+            foreach ($element as $dataKey => $validation) {
                 if ($validation !== null) {
                     list($necessaryStatus, $type, $lenght) = explode('|', $validation);
 
                     if ($this->isDatafieldOptional($necessaryStatus)) {
-                        if (! $this->isDataIsAvailable($elements, $dataGroupKey, $dataKey)) {
+                        if (! $this->isDataIsAvailable($elements, $elementKey, $dataKey)) {
                             continue;
                         }
                     }
 
-                    $this->checkAvailability($elements, $dataGroupKey, $dataKey);
-                    $this->checkStringType($type, $elements, $dataGroupKey, $dataKey);
-                    $this->checkStringLenght($lenght, $elements, $dataGroupKey, $dataKey);
+                    $this->checkAvailability($elements, $elementKey, $dataKey);
+                    $this->checkStringType($type, $elements, $elementKey, $dataKey);
+                    $this->checkStringLenght($lenght, $elements, $elementKey, $dataKey);
                 }
             }
         }
@@ -35,19 +35,19 @@ class SegmentValidator implements SegValidatorInterface
         return $this;
     }
 
-    private function isDataIsAvailable(DataGroups $elements, string $dataGroupKey, string $dataKey): bool
+    private function isDataIsAvailable(Elements $elements, string $elementKey, string $dataKey): bool
     {
-        return ($elements->getValue($dataGroupKey, $dataKey) ?? '') !== '';
+        return ($elements->getValue($elementKey, $dataKey) ?? '') !== '';
     }
 
-    private function isDatafieldIsAvailable(DataGroups $elements, string $dataGroupKey, string $dataKey): bool
+    private function isDatafieldIsAvailable(Elements $elements, string $elementKey, string $dataKey): bool
     {
-        return $elements->getValue($dataGroupKey, $dataKey) !== null;
+        return $elements->getValue($elementKey, $dataKey) !== null;
     }
 
-    private function checkAvailability(DataGroups $elements, string $dataGroupKey, string $dataKey): void
+    private function checkAvailability(Elements $elements, string $elementKey, string $dataKey): void
     {
-        if ($this->isDatafieldIsAvailable($elements, $dataGroupKey, $dataKey)) {
+        if ($this->isDatafieldIsAvailable($elements, $elementKey, $dataKey)) {
             return;
         }
 
@@ -59,9 +59,9 @@ class SegmentValidator implements SegValidatorInterface
         return !($necessaryStatus === 'M' || $necessaryStatus === 'R');
     }
 
-    private function checkStringType(?string $type, DataGroups $elements, string $dataGroupKey, string $dataKey): void
+    private function checkStringType(?string $type, Elements $elements, string $elementKey, string $dataKey): void
     {
-        $string = $elements->getValue($dataGroupKey, $dataKey) ?? '';
+        $string = $elements->getValue($elementKey, $dataKey) ?? '';
 
         if ($type === static::ALPHA_NUMERIC || $type == null) {
             return;
@@ -74,9 +74,9 @@ class SegmentValidator implements SegValidatorInterface
         }
     }
 
-    private function checkStringLenght(string $lenght, DataGroups $elements, string $dataGroupKey, string $dataKey): void
+    private function checkStringLenght(string $lenght, Elements $elements, string $elementKey, string $dataKey): void
     {
-        $string = $elements->getValue($dataGroupKey, $dataKey) ?? '';
+        $string = $elements->getValue($elementKey, $dataKey) ?? '';
 
         $strLen = strlen($string);
 

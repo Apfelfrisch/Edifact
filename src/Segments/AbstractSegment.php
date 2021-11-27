@@ -2,7 +2,7 @@
 
 namespace Apfelfrisch\Edifact\Segments;
 
-use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Elements;
 use Apfelfrisch\Edifact\Delimiter;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
 use Apfelfrisch\Edifact\Validation\SegmentValidator;
@@ -12,17 +12,17 @@ abstract class AbstractSegment implements SegInterface
 {
     protected ?Delimiter $delimiter = null;
 
-    protected DataGroups $elements;
+    protected Elements $elements;
 
     protected SegValidatorInterface $validator;
 
-    final protected function __construct(DataGroups $elements)
+    final protected function __construct(Elements $elements)
     {
         $this->elements = $elements;
         $this->validator = new SegmentValidator;
     }
 
-    abstract public static function blueprint(): DataGroups;
+    abstract public static function blueprint(): Elements;
 
     public static function fromSegLine(Delimiter $delimiter, string $segLine): static
     {
@@ -37,14 +37,14 @@ abstract class AbstractSegment implements SegInterface
         $this->delimiter = $delimiter;
     }
 
-    public function getValueFromPosition(int $dataGroupPosition, int $valuePosition): ?string
+    public function getValueFromPosition(int $elementPosition, int $valuePosition): ?string
     {
-        return $this->elements->getValueFromPosition($dataGroupPosition, $valuePosition);
+        return $this->elements->getValueFromPosition($elementPosition, $valuePosition);
     }
 
-    public function getValue(string $dataGroupKey, string $valueKey): ?string
+    public function getValue(string $elementKey, string $componentKey): ?string
     {
-        return $this->elements->getValue($dataGroupKey, $valueKey);
+        return $this->elements->getValue($elementKey, $componentKey);
     }
 
     public function replaceDecimalPoint(?string $value): ?string
@@ -87,8 +87,8 @@ abstract class AbstractSegment implements SegInterface
     {
         $string = '';
 
-        foreach($this->elements->toArray() as $dataGroup) {
-            foreach ($dataGroup as $value) {
+        foreach($this->elements->toArray() as $element) {
+            foreach ($element as $value) {
                 $string .= $value === null
                     ? $this->getDelimiter()->getComponentSeparator()
                     : $this->getDelimiter()->escapeString($value) . $this->getDelimiter()->getComponentSeparator();
@@ -107,10 +107,10 @@ abstract class AbstractSegment implements SegInterface
         return $this->delimiter ??= Delimiter::getDefault();
     }
 
-    private function trimEmpty(string $string, string $dataGroupSeperator, string $terminator): string
+    private function trimEmpty(string $string, string $elementSeperator, string $terminator): string
     {
         while(true) {
-            if ($dataGroupSeperator !== $string[-1] ?? null) {
+            if ($elementSeperator !== $string[-1] ?? null) {
                 break;
             }
 
@@ -124,25 +124,25 @@ abstract class AbstractSegment implements SegInterface
         return $string;
     }
 
-    protected static function mapToBlueprint(Delimiter $delimiter, string $segLine): DataGroups
+    protected static function mapToBlueprint(Delimiter $delimiter, string $segLine): Elements
     {
         $i = 0;
-        $dataGroups = new DataGroups;
-        $dataArray = $delimiter->explodeDataGroups($segLine);
-        foreach (static::blueprint()->toArray() as $BpDataKey => $BPdataGroups) {
+        $elements = new Elements;
+        $dataArray = $delimiter->explodeElements($segLine);
+        foreach (static::blueprint()->toArray() as $BpDataKey => $BPelements) {
             $inputElement = [];
             if (isset($dataArray[$i])) {
                 $inputElement = $delimiter->explodeComponents($dataArray[$i]);
             }
 
             $j = 0;
-            foreach (array_keys($BPdataGroups) as $key) {
-                $dataGroups->addValue($BpDataKey, $key, isset($inputElement[$j]) ? $inputElement[$j] : null);
+            foreach (array_keys($BPelements) as $key) {
+                $elements->addValue($BpDataKey, $key, isset($inputElement[$j]) ? $inputElement[$j] : null);
                 $j++;
             }
             $i++;
         }
 
-        return $dataGroups;
+        return $elements;
     }
 }

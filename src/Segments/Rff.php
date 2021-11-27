@@ -2,16 +2,16 @@
 
 namespace Apfelfrisch\Edifact\Segments;
 
-use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Elements;
 
 class Rff extends AbstractSegment
 {
-    private static ?DataGroups $blueprint = null;
+    private static ?Elements $blueprint = null;
 
-    public static function blueprint(): DataGroups
+    public static function blueprint(): Elements
     {
         if (self::$blueprint === null) {
-            self::$blueprint = (new DataGroups)
+            self::$blueprint = (new Elements)
                 ->addValue('RFF', 'RFF', 'M|a|3')
                 ->addValue('C506', '1153', 'M|an|3')
                 ->addValue('C506', '1154', 'M|an|70');
@@ -22,7 +22,7 @@ class Rff extends AbstractSegment
 
     public static function fromAttributes(string $code, ?string $referenz = null): self
     {
-        return new self((new DataGroups)
+        return new self((new Elements)
             ->addValue('RFF', 'RFF', 'RFF')
             ->addValue('C506', '1153', $code)
             ->addValue('C506', '1154', $referenz)

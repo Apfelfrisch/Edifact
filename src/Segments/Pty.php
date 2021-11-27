@@ -2,16 +2,16 @@
 
 namespace Apfelfrisch\Edifact\Segments;
 
-use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Elements;
 
 class Pty extends AbstractSegment
 {
-    private static ?DataGroups $blueprint = null;
+    private static ?Elements $blueprint = null;
 
-    public static function blueprint(): DataGroups
+    public static function blueprint(): Elements
     {
         if (self::$blueprint === null) {
-            self::$blueprint = (new DataGroups)
+            self::$blueprint = (new Elements)
                 ->addValue('PTY', 'PTY', 'M|a|3')
                 ->addValue('4035', '4035', 'M|an|3')
                 ->addValue('C585', '4037', null)
@@ -25,7 +25,7 @@ class Pty extends AbstractSegment
 
     public static function fromAttributes(string $qualifier, string $priority): self
     {
-        return new self((new DataGroups)
+        return new self((new Elements)
             ->addValue('PTY', 'PTY', 'PTY')
             ->addValue('4035', '4035', $qualifier)
             ->addValue('C585', '4037', null)

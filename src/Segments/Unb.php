@@ -3,16 +3,16 @@
 namespace Apfelfrisch\Edifact\Segments;
 
 use DateTime;
-use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Elements;
 
 class Unb extends AbstractSegment
 {
-    private static ?DataGroups $blueprint = null;
+    private static ?Elements $blueprint = null;
 
-    public static function blueprint(): DataGroups
+    public static function blueprint(): Elements
     {
         if (self::$blueprint === null) {
-            self::$blueprint = (new DataGroups)
+            self::$blueprint = (new Elements)
                 ->addValue('UNB', 'UNB', 'M|an|3')
                 ->addValue('S001', '0001', 'M|a|4')
                 ->addValue('S001', '0002', 'm|n|1')
@@ -46,7 +46,7 @@ class Unb extends AbstractSegment
         ?string $usageType = null,
         ?string $testMarker = null
     ): self {
-        return new self((new DataGroups)
+        return new self((new Elements)
             ->addValue('UNB', 'UNB', 'UNB')
             ->addValue('S001', '0001', $syntaxId)
             ->addValue('S001', '0002', $syntaxVersion)

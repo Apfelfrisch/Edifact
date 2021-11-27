@@ -2,16 +2,16 @@
 
 namespace Apfelfrisch\Edifact\Segments;
 
-use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Elements;
 
 class Uci extends AbstractSegment
 {
-    private static ?DataGroups $blueprint = null;
+    private static ?Elements $blueprint = null;
 
-    public static function blueprint(): DataGroups
+    public static function blueprint(): Elements
     {
         if (self::$blueprint === null) {
-            self::$blueprint = (new DataGroups)
+            self::$blueprint = (new Elements)
                 ->addValue('UCI', 'UCI', 'M|an|3')
                 ->addValue('0020', '0020', 'M|an|14')
                 ->addValue('S002', '0004', 'M|an|35')
@@ -41,7 +41,7 @@ class Uci extends AbstractSegment
         ?string $elementPosition = null
     ): self
     {
-        return new self((new DataGroups)
+        return new self((new Elements)
             ->addValue('UCI', 'UCI', 'UCI')
             ->addValue('0020', '0020', $unbRef)
             ->addValue('S002', '0004', $sender)

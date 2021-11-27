@@ -2,16 +2,16 @@
 
 namespace Apfelfrisch\Edifact\Segments;
 
-use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Elements;
 
 class Eqd extends AbstractSegment
 {
-    private static ?DataGroups $blueprint = null;
+    private static ?Elements $blueprint = null;
 
-    public static function blueprint(): DataGroups
+    public static function blueprint(): Elements
     {
         if (self::$blueprint === null) {
-            self::$blueprint = (new DataGroups)
+            self::$blueprint = (new Elements)
                 ->addValue('EQD', 'EQD', 'M|a|3')
                 ->addValue('8053', '8053', 'M|an|3')
                 ->addValue('C237', '8260', 'M|n|17');
@@ -22,7 +22,7 @@ class Eqd extends AbstractSegment
 
     public static function fromAttributes(string $qualifier, string $processNumber): self
     {
-        return new self((new DataGroups)
+        return new self((new Elements)
             ->addValue('EQD', 'EQD', 'EQD')
             ->addValue('8053', '8053', $qualifier)
             ->addValue('C237', '8260', $processNumber)
