@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Apfelfrisch\Edifact\Exceptions;
 
 class ValidationException extends EdifactException

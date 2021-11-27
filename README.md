@@ -27,6 +27,24 @@ foreach ($message->getSegments() as $segment) {
 }
 ```
 
+#### Filter Segments
+```php
+use Apfelfrisch\Edifact\Message;
+use Apfelfrisch\Edifact\Segments\Nad;
+
+$message = Message::fromString("UNA:+.? 'NAD+DP++++Musterstr.::10+City++12345+DE");
+
+foreach ($message->filterSegments(Nad::class) as $segment) {
+    echo $segment->name(); // NAD
+}
+
+$message->filterSegments(Nad::class, fn(Nad $seg): bool 
+    => $seg->street() === 'Musterstr.'
+);
+
+echo $message->findFirstSegment(Nad::class)->name(); // NAD
+```
+
 #### Parse to the generic Segment
 ```php
 use Apfelfrisch\Edifact\Message;
@@ -100,14 +118,13 @@ foreach ($message->unwrap() as $partialMessage) {
 }
 ```
 
-#### Add Streamfilter to Message
+#### Add Streamfilter to the Message
 ```php
 use Apfelfrisch\Edifact\Message;
 
 $message = Message::fromString("UNA:+.? 'NAD+DP++++Musterstr.::10+City++12345+DE");
 $message->addStreamFilter('iso-to-utf8', 'convert.iconv.ISO-8859-1.UTF-8');
 ```
-
 
 ### Build an Edifact Message:
 
@@ -131,7 +148,7 @@ $message = new Message($builder->get());
 Trailing Segments (UNT and UNZ) will be added automatically. 
 If no UNA Segement is provided, it uses the default values (UNA:+.? )
 
-#### Add Streamfilter to Builder
+#### Add Streamfilter to the Builder
 ```php
 use Apfelfrisch\Edifact\Builder;
 use Apfelfrisch\Edifact\Segments\Unb;

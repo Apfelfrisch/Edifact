@@ -121,7 +121,7 @@ class MessageTest extends TestCase
     {
         $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNT");
 
-        $foundSegments = $messageCore->findAllSegments(Segments\Unh::class);
+        $foundSegments = $messageCore->filterAllSegments(Segments\Unh::class);
 
         $this->assertCount(2, $foundSegments);
         $this->assertInstanceOf(Segments\Unh::class, $foundSegments[0]);
@@ -133,7 +133,7 @@ class MessageTest extends TestCase
     {
         $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNH+O11111+ORDERS:D:09B:UN:1.1e'UNT");
 
-        $foundSegments = $messageCore->findAllSegments(Segments\Unh::class, fn(Segments\Unh $seg): bool =>
+        $foundSegments = $messageCore->filterAllSegments(Segments\Unh::class, fn(Segments\Unh $seg): bool =>
             $seg->reference() === 'O160482A7C2'
         );
 

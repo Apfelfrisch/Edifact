@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Apfelfrisch\Edifact;
 
 use Apfelfrisch\Edifact\Exceptions\SegValidationException;
@@ -74,7 +76,7 @@ class Message
      * @psalm-suppress InvalidReturnType
      * @psalm-return Generator<int, T, mixed, void>
      */
-    public function findSegments(string $segmentClass, ?Closure $closure = null): Generator
+    public function filterSegments(string $segmentClass, ?Closure $closure = null): Generator
     {
         foreach ($this->getAllSegments() as $segment) {
             if ($segment::class !== $segmentClass) {
@@ -91,9 +93,9 @@ class Message
      * @psalm-param class-string<T> $segmentClass
      * @psalm-return list<T>
      */
-    public function findAllSegments(string $segmentClass, ?Closure $closure = null): array
+    public function filterAllSegments(string $segmentClass, ?Closure $closure = null): array
     {
-        return array_values(iterator_to_array($this->findSegments($segmentClass, $closure)));
+        return array_values(iterator_to_array($this->filterSegments($segmentClass, $closure)));
     }
 
     /**
@@ -103,7 +105,7 @@ class Message
      */
     public function findFirstSegment(string $segmentClass, ?Closure $closure = null): ?SegInterface
     {
-        foreach ($this->findSegments($segmentClass, $closure) as $segment) {
+        foreach ($this->filterSegments($segmentClass, $closure) as $segment) {
             return $segment;
         }
 

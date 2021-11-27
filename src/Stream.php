@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Apfelfrisch\Edifact;
 
 use Apfelfrisch\Edifact\Delimiter;
@@ -125,7 +127,7 @@ final class Stream extends SplFileInfo
         return fflush($this->resource);
     }
 
-    public function getChar(): string
+    public function getChar(): string|false
     {
         return fgetc($this->resource);
     }

@@ -1,12 +1,11 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Apfelfrisch\Edifact;
 
 use Apfelfrisch\Edifact\Delimiter;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
-use Apfelfrisch\Edifact\Interfaces\UnbInterface;
-use Apfelfrisch\Edifact\Interfaces\UnhInterface;
-use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Segments\Una;
 use Apfelfrisch\Edifact\Segments\Unt;
 use Apfelfrisch\Edifact\Segments\Unz;
