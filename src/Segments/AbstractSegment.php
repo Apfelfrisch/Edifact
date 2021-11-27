@@ -91,7 +91,7 @@ abstract class AbstractSegment implements SegInterface
             foreach ($dataGroup as $value) {
                 $string .= $value === null
                     ? $this->getDelimiter()->getComponentSeparator()
-                    : $this->getDelimiter()->terminate($value) . $this->getDelimiter()->getComponentSeparator();
+                    : $this->getDelimiter()->escapeString($value) . $this->getDelimiter()->getComponentSeparator();
             }
 
             $string = $this->trimEmpty(
@@ -132,7 +132,7 @@ abstract class AbstractSegment implements SegInterface
         foreach (static::blueprint()->toArray() as $BpDataKey => $BPdataGroups) {
             $inputElement = [];
             if (isset($dataArray[$i])) {
-                $inputElement = $delimiter->explodeElements($dataArray[$i]);
+                $inputElement = $delimiter->explodeComponents($dataArray[$i]);
             }
 
             $j = 0;

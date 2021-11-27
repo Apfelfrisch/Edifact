@@ -4,8 +4,6 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact;
 
-use Apfelfrisch\Edifact\Exceptions\SegValidationException;
-use Apfelfrisch\Edifact\Exceptions\ValidationException;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
 use Apfelfrisch\Edifact\SegmentFactory;
 use Apfelfrisch\Edifact\Stream;
@@ -150,15 +148,8 @@ class Message
      */
     public function validateSegments(): void
     {
-        $segment = false;
-        try {
-            foreach ($this->getSegments() as $segment) {
-                $segment->validate();
-            }
-        } catch (SegValidationException $e) {
-            throw new ValidationException(
-                $e->getMessage(), $this->iterator->key(), $segment instanceof SegInterface ? $segment->name() : ''
-            );
+        foreach ($this->getSegments() as $segment) {
+            $segment->validate();
         }
     }
 
@@ -167,6 +158,9 @@ class Message
         return $this->stream->getDelimiter();
     }
 
+    /**
+     * @psalm-return list<array<string, array<string, string|null>>>
+     */
     public function toArray(): array
     {
         return array_map(function(SegInterface $segment): array {

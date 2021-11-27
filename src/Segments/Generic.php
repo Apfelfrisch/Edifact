@@ -45,7 +45,7 @@ class Generic extends AbstractSegment
         $dataGroups = new DataGroups;
 
         for ($i = 0; $i < $_ = count($inputDataGroups); $i++) {
-            $inputElements = $delimiter->explodeElements($inputDataGroups[$i]);
+            $inputElements = $delimiter->explodeComponents($inputDataGroups[$i]);
 
             for($j = 0; $j < $__ = count($inputElements); $j++) {
                 $dataGroups->addValue((string)$i, (string)$j, $inputElements[$j]);

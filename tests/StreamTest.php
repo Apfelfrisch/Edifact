@@ -41,7 +41,7 @@ class StreamTest extends TestCase
         $this->assertEquals('RFF+Z13:17103', $string[1]);
     }
 
-    public function testTerminateSegmentDelimiter()
+    public function testEscapeMessage()
     {
         $message = "SEG+Up?'Verd?''";
         $this->edifactFile->writeAndRewind($message);

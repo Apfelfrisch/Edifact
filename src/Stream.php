@@ -217,7 +217,7 @@ final class Stream extends SplFileInfo
     {
         $mergedLines = '';
         while (($line = $this->streamGetLine()) && !ctype_cntrl($line)) {
-            if (! $this->delimiterWasTerminated($line)) {
+            if (! $this->terminatorWasEscaped($line)) {
                 return $mergedLines . $line;
             }
 
@@ -232,7 +232,7 @@ final class Stream extends SplFileInfo
         return stream_get_line($this->resource, 0, $this->getDelimiter()->getSegmentTerminator());
     }
 
-    private function delimiterWasTerminated(string $line): bool
+    private function terminatorWasEscaped(string $line): bool
     {
         return str_ends_with($line, $this->getDelimiter()->getEscapeCharacter());
     }

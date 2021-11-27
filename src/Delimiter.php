@@ -56,7 +56,7 @@ final class Delimiter
         return self::$defaultDelimiter;
     }
 
-    public function terminate(string $string): string
+    public function escapeString(string $string): string
     {
         return str_replace(
             [$this->componentSeparator, $this->elementSeparator, '\\n'],
@@ -72,7 +72,7 @@ final class Delimiter
     }
 
     /** @return list<string> */
-    public function explodeElements(string $string): array
+    public function explodeComponents(string $string): array
     {
         return $this->explodeString($string, $this->componentSeparator);
     }
@@ -121,9 +121,10 @@ final class Delimiter
         $explodedString = explode($pattern, $string);
 
         if ($foundTermination) {
-            for ($i = 0, $count = count($explodedString); $i < $count; $i++) {
-                $explodedString[$i] = str_replace(self::PLACE_HOLDER, $pattern, $explodedString[$i]);
-            }
+            $explodedString = array_map(
+                fn(string $string): string => str_replace(self::PLACE_HOLDER, $pattern, $string),
+                $explodedString
+            );
         }
 
         return $this->trimLastItem($explodedString);
