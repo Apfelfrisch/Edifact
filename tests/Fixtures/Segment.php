@@ -2,18 +2,18 @@
 
 namespace Apfelfrisch\Edifact\Test\Fixtures;
 
-use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Elements;
 use Apfelfrisch\Edifact\Delimiter;
 use Apfelfrisch\Edifact\Segments\AbstractSegment;
 
 class Segment extends AbstractSegment
 {
-    private static ?DataGroups $blueprint = null;
+    private static ?Elements $blueprint = null;
 
-    public static function blueprint(): DataGroups
+    public static function blueprint(): Elements
     {
         if (self::$blueprint === null) {
-            self::$blueprint = (new DataGroups)
+            self::$blueprint = (new Elements)
                 ->addValue('A', 'A', 'M|an|3')
                 ->addValue('B', 'B', 'O|an|3')
                 ->addValue('C', '1', 'M|an|3')
@@ -32,7 +32,7 @@ class Segment extends AbstractSegment
     public static function fromAttributes(Delimiter $delimiter, $attribute): self
     {
         return new self(
-            (new DataGroups)->addValue('A', 'A', $attribute),
+            (new Elements)->addValue('A', 'A', $attribute),
             $delimiter
         );
     }

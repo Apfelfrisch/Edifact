@@ -18,7 +18,7 @@ final class UnaTest extends TestCase
 
         $this->assertEquals('UNA', $seg->name());
         $this->assertEquals(':', $seg->data());
-        $this->assertEquals('+', $seg->dataGroup());
+        $this->assertEquals('+', $seg->element());
         $this->assertEquals('.', $seg->decimal());
         $this->assertEquals('?', $seg->terminator());
         $this->assertEquals(' ', $seg->emptyChar());

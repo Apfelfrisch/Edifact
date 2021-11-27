@@ -26,7 +26,7 @@ final class UcmTest extends TestCase
         $this->assertEquals('ECD', $seg->errorCode());
         $this->assertEquals('SEG', $seg->serviceSegement());
         $this->assertEquals('SPO', $seg->segmentPosition());
-        $this->assertEquals('DPO', $seg->dataGroupPosition());
+        $this->assertEquals('DPO', $seg->elementPosition());
 
         $this->assertEquals($seg->toString($delimiter), Ucm::fromSegLine($delimiter, $seg->toString($delimiter))->toString($delimiter));
     }

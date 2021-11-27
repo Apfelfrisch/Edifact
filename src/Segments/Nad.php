@@ -2,19 +2,19 @@
 
 namespace Apfelfrisch\Edifact\Segments;
 
-use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Elements;
 
 class Nad extends AbstractSegment
 {
     const PERSON_ADRESS = 'Z01';
     const COMPANY_ADRESS = 'Z02';
 
-    private static ?DataGroups $blueprint = null;
+    private static ?Elements $blueprint = null;
 
-    public static function blueprint(): DataGroups
+    public static function blueprint(): Elements
     {
         if (self::$blueprint === null) {
-            self::$blueprint = (new DataGroups)
+            self::$blueprint = (new Elements)
                 ->addValue('NAD', 'NAD', 'M|an|3')
                 ->addValue('3035', '3035', 'M|an|3')
                 ->addValue('C082', '3039', 'D|an|35')
@@ -59,7 +59,7 @@ class Nad extends AbstractSegment
         ?string $additionalInformation = null,
     ): self
     {
-        return new self((new DataGroups)
+        return new self((new Elements)
             ->addValue('NAD', 'NAD', 'NAD')
             ->addValue('3035', '3035', $qualifier)
             ->addValue('C082', '3039', $id)

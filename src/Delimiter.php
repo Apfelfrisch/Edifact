@@ -66,7 +66,7 @@ final class Delimiter
     }
 
     /** @return list<string> */
-    public function explodeDataGroups(string $string): array
+    public function explodeElements(string $string): array
     {
         return $this->explodeString($string, $this->elementSeparator);
     }

@@ -19,7 +19,7 @@ final class UcdTest extends TestCase
         $this->assertEquals('UCD', $seg->name());
         $this->assertEquals('ECD', $seg->errorCode());
         $this->assertEquals('66', $seg->segmentPosition());
-        $this->assertEquals('666', $seg->dataGroupPosition());
+        $this->assertEquals('666', $seg->elementPosition());
         $this->assertEquals($seg->toString($delimiter), Ucd::fromSegLine($delimiter, $seg->toString($delimiter))->toString($delimiter));
     }
 }

@@ -13,12 +13,23 @@ A PHP library, wich provides a Framework to parse, build, serialize and validate
 
 ### Parse Edifact Messages
 
-#### Parse to the default Segments
+#### Parse from String
 ```php
 use Apfelfrisch\Edifact\Message;
-use Apfelfrisch\Edifact\Segments\Nad;
 
 $message = Message::fromString("UNA:+.? 'NAD+DP++++Musterstr.::10+City++12345+DE");
+```
+
+#### Parse from File
+```php
+use Apfelfrisch\Edifact\Message;
+
+$message = Message::fromFilepath("path/to/file.txt");
+```
+
+#### Parse to the default Segments
+```php
+use Apfelfrisch\Edifact\Segments\Nad;
 
 foreach ($message->getSegments() as $segment) {
     if ($segment instanceof Nad) {
@@ -29,10 +40,7 @@ foreach ($message->getSegments() as $segment) {
 
 #### Filter Segments
 ```php
-use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Segments\Nad;
-
-$message = Message::fromString("UNA:+.? 'NAD+DP++++Musterstr.::10+City++12345+DE");
 
 foreach ($message->filterSegments(Nad::class) as $segment) {
     echo $segment->name(); // NAD
@@ -43,6 +51,19 @@ $message->filterSegments(Nad::class, fn(Nad $seg): bool
 );
 
 echo $message->findFirstSegment(Nad::class)->name(); // NAD
+```
+
+#### Unwrap Messages
+```php
+foreach ($message->unwrap() as $partialMessage) {
+    echo $partialMessage::class // \Apfelfrisch\Edifact\Message
+    echo $partialMessage->toString() // UNH+1+ORDERS:D:96A:UN'UNT+2+1', UNH+2+ORDERS:D:96A:UN'UNT+2+2'
+}
+```
+
+#### Add Readfilter to the Message
+```php
+$message->addStreamFilter('iso-to-utf8', 'convert.iconv.ISO-8859-1.UTF-8');
 ```
 
 #### Parse to the generic Segment
@@ -67,18 +88,18 @@ foreach ($message->getSegments() as $segment) {
 ```php
 namespace My\Namespace;
 
-use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Elements;
 use Apfelfrisch\Edifact\SegmentFactory;
 use Apfelfrisch\Edifact\Segments\AbstractSegment;
 
 class Seq extends AbstractSegment
 {
-    private static ?DataGroups $blueprint = null;
+    private static ?Elements $blueprint = null;
 
-    public static function blueprint(): DataGroups
+    public static function blueprint(): Elements
     {
         if (self::$blueprint === null) {
-            self::$blueprint = (new DataGroups)
+            self::$blueprint = (new Elements)
                 ->addValue('SEQ', 'SEQ', 'M|a|3')
                 ->addValue('1229', '1229', 'M|an|3');
         }
@@ -88,7 +109,7 @@ class Seq extends AbstractSegment
 
     public static function fromAttributes(string $code): self
     {
-        return new self((new DataGroups)
+        return new self((new Elements)
             ->addValue('SEQ', 'SEQ', 'SEQ')
             ->addValue('1229', '1229', $code)
         );
@@ -104,26 +125,6 @@ $segmentFactory = new SegmentFactory;
 $segmentFactory->addSegment('SEQ', Seq::class);
 
 $message = Message::fromString("UNA:+.? 'SEQ+1", $segmentFactory);
-```
-
-#### Unwrap Messages
-```php
-use Apfelfrisch\Edifact\Message;
-
-$message = Message::fromString("UNA:+.? 'UNH+1+ORDERS:D:96A:UN'UNT+2+1'UNH+2+ORDERS:D:96A:UN'UNT+2+2'");
-
-foreach ($message->unwrap() as $partialMessage) {
-    echo $partialMessage::class // \Apfelfrisch\Edifact\Message
-    echo $partialMessage->toString() // UNH+1+ORDERS:D:96A:UN'UNT+2+1', UNH+2+ORDERS:D:96A:UN'UNT+2+2'
-}
-```
-
-#### Add Streamfilter to the Message
-```php
-use Apfelfrisch\Edifact\Message;
-
-$message = Message::fromString("UNA:+.? 'NAD+DP++++Musterstr.::10+City++12345+DE");
-$message->addStreamFilter('iso-to-utf8', 'convert.iconv.ISO-8859-1.UTF-8');
 ```
 
 ### Build an Edifact Message:
@@ -145,10 +146,10 @@ $builder->writeSegments(
 
 $message = new Message($builder->get());
 ```
-Trailing Segments (UNT and UNZ) will be added automatically. 
-If no UNA Segement is provided, it uses the default values (UNA:+.? )
+Trailing Segments (UNT and UNZ) will be added automatically. If no UNA Segement is provided, it uses the default "UNA:+.? '". 
+For now the Spaceseperator and Decimalseprator will be ignored by the Builder, you have to take care of it on Segment initialising.
 
-#### Add Streamfilter to the Builder
+#### Add Writefilter to the Builder
 ```php
 use Apfelfrisch\Edifact\Builder;
 use Apfelfrisch\Edifact\Segments\Unb;

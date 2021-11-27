@@ -2,20 +2,20 @@
 
 namespace Apfelfrisch\Edifact\Segments;
 
-use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Elements;
 use Apfelfrisch\Edifact\Delimiter;
 
 class Una extends AbstractSegment
 {
-    private static ?DataGroups $blueprint = null;
+    private static ?Elements $blueprint = null;
 
-    public static function blueprint(): DataGroups
+    public static function blueprint(): Elements
     {
         if (self::$blueprint === null) {
-            self::$blueprint = (new DataGroups)
+            self::$blueprint = (new Elements)
                 ->addValue('UNA', 'UNA', 'M|a|3')
                 ->addValue('UNA', 'data', 'M|an|1')
-                ->addValue('UNA', 'dataGroup', 'M|an|1')
+                ->addValue('UNA', 'element', 'M|an|1')
                 ->addValue('UNA', 'decimal', 'M|an|1')
                 ->addValue('UNA', 'terminator', 'M|an|1')
                 ->addValue('UNA', 'empty', 'M|an|1')
@@ -27,17 +27,17 @@ class Una extends AbstractSegment
 
     public static function fromAttributes(
         string $data = ':',
-        string $dataGroup = '+',
+        string $element = '+',
         string $decimal = '.',
         string $terminator = '?',
         string $empty = ' ',
         string $segment = '\''
     ): self
     {
-        return new self((new DataGroups)
+        return new self((new Elements)
             ->addValue('UNA', 'UNA', 'UNA')
             ->addValue('UNA', 'data', $data)
-            ->addValue('UNA', 'dataGroup', $dataGroup)
+            ->addValue('UNA', 'element', $element)
             ->addValue('UNA', 'decimal', $decimal)
             ->addValue('UNA', 'terminator', $terminator)
             ->addValue('UNA', 'empty', $empty)
@@ -50,9 +50,9 @@ class Una extends AbstractSegment
         return (string)$this->elements->getValue('UNA', 'data');
     }
 
-    public function dataGroup(): string
+    public function element(): string
     {
-        return (string)$this->elements->getValue('UNA', 'dataGroup');
+        return (string)$this->elements->getValue('UNA', 'element');
     }
 
     public function decimal(): string
@@ -77,20 +77,20 @@ class Una extends AbstractSegment
 
     public function toString(): string
     {
-        return $this->name() . $this->data() . $this->dataGroup() . $this->decimal() . $this->terminator() . $this->emptyChar();
+        return $this->name() . $this->data() . $this->element() . $this->decimal() . $this->terminator() . $this->emptyChar();
     }
 
-    protected static function mapToBlueprint(Delimiter $delimiter, string $segLine): DataGroups
+    protected static function mapToBlueprint(Delimiter $delimiter, string $segLine): Elements
     {
         $inputElement = ['UNA'] + str_split(substr($segLine, 2));
-        $dataGroups = new DataGroups;
+        $elements = new Elements;
 
         $i = 0;
-        foreach (array_keys(self::blueprint()->getDataGroup('UNA')) as $BpDataKey) {
-            $dataGroups->addValue('UNA', $BpDataKey, $inputElement[$i] ?? null);
+        foreach (array_keys(self::blueprint()->getElement('UNA')) as $BpDataKey) {
+            $elements->addValue('UNA', $BpDataKey, $inputElement[$i] ?? null);
             $i++;
         }
 
-        return $dataGroups;
+        return $elements;
     }
 }

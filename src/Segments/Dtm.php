@@ -3,17 +3,17 @@
 namespace Apfelfrisch\Edifact\Segments;
 
 use DateTime;
-use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Elements;
 use Apfelfrisch\Edifact\Exceptions\SegValidationException;
 
 class Dtm extends AbstractSegment
 {
-    private static ?DataGroups $blueprint = null;
+    private static ?Elements $blueprint = null;
 
-    public static function blueprint(): DataGroups
+    public static function blueprint(): Elements
     {
         if (self::$blueprint === null) {
-            self::$blueprint = (new DataGroups)
+            self::$blueprint = (new Elements)
                 ->addValue('DTM', 'DTM', 'M|a|3')
                 ->addValue('C507', '2005', 'M|an|3')
                 ->addValue('C507', '2380', 'M|an|35')
@@ -29,7 +29,7 @@ class Dtm extends AbstractSegment
             $date = static::serializeDateTime($date, $code);
         }
 
-        return new self((new DataGroups)
+        return new self((new Elements)
             ->addValue('DTM', 'DTM', 'DTM')
             ->addValue('C507', '2005', $qualifier)
             ->addValue('C507', '2380', $date)

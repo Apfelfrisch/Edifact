@@ -2,16 +2,16 @@
 
 namespace Apfelfrisch\Edifact\Segments;
 
-use Apfelfrisch\Edifact\DataGroups;
+use Apfelfrisch\Edifact\Elements;
 
 class Pri extends AbstractSegment
 {
-    private static ?DataGroups $blueprint = null;
+    private static ?Elements $blueprint = null;
 
-    public static function blueprint(): DataGroups
+    public static function blueprint(): Elements
     {
         if (self::$blueprint === null) {
-            self::$blueprint = (new DataGroups)
+            self::$blueprint = (new Elements)
                 ->addValue('PRI', 'PRI', 'M|a|3')
                 ->addValue('C509', '5125', 'M|n|3')
                 ->addValue('C509', '5118', 'M|n|15')
@@ -26,7 +26,7 @@ class Pri extends AbstractSegment
 
     public static function fromAttributes(string $qualifier, string $amount, string $unitCode = null): self
     {
-        return new self((new DataGroups)
+        return new self((new Elements)
             ->addValue('PRI', 'PRI', 'PRI')
             ->addValue('C509', '5125', $qualifier)
             ->addValue('C509', '5118', $amount)
