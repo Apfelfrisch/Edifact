@@ -128,16 +128,10 @@ class BuilderTest extends TestCase
 
         $message = new Message($builder->get());
 
-        /** @var Unt $unt */
-        $unt = $message->findSegmentFromBeginn('UNT');
-        $this->assertSame('4', $unt->segCount());
+        $unts = $message->findAllSegments(Unt::class);
 
-        /** @var Unt $unt */
-        $unt = $message->findNextSegment('UNT');
-        $this->assertSame('6', $unt->segCount());
-
-        /** @var Unt $unt */
-        $unt = $message->findNextSegment('UNT');
-        $this->assertSame('2', $unt->segCount());
+        $this->assertSame('4', $unts[0]->segCount());
+        $this->assertSame('6', $unts[1]->segCount());
+        $this->assertSame('2', $unts[2]->segCount());
     }
 }

@@ -19,6 +19,34 @@ final class StreamIterator implements Iterator
         $this->segline = $this->getNextSegLine();
     }
 
+    public function getFirst(): ?SegInterface
+    {
+        $this->rewind();
+
+        if (! $this->valid()) {
+            return null;
+        }
+
+        return $this->current();
+    }
+
+    public function getCurrent(): ?SegInterface
+    {
+        if (! $this->valid()) {
+            return null;
+        }
+
+        return $this->current();
+    }
+
+    /**
+     * @psalm-return list<SegInterface>
+     */
+    public function getAll(): array
+    {
+        return array_values(iterator_to_array($this));
+    }
+
     public function currentSegline(): string
     {
         return (string)$this->segline;

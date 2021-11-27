@@ -68,8 +68,8 @@ class MessageTest extends TestCase
     {
         $messageCore = Message::fromString("UNH'UNB");
 
-        $this->assertInstanceOf(Segments\Unh::class, $messageCore->getNextSegment());
-        $this->assertInstanceOf(Segments\Unh::class, $messageCore->getCurrentSegment());
+        $this->assertInstanceOf(Segments\Unh::class, $messageCore->getSegments()->getCurrent());
+        $this->assertInstanceOf(Segments\Unh::class, $messageCore->getSegments()->getCurrent());
     }
 
     /** @test */
@@ -77,7 +77,7 @@ class MessageTest extends TestCase
     {
         $messageCore = Message::fromString("UKN");
 
-        $this->assertInstanceOf(Segments\Generic::class, $messageCore->getNextSegment());
+        $this->assertInstanceOf(Segments\Generic::class, $messageCore->getSegments()->getCurrent());
     }
 
     /** @test */
@@ -86,15 +86,7 @@ class MessageTest extends TestCase
         $messageCore = Message::fromString("UKN", SegmentFactory::withDefaultDegments(withFallback: false));
 
         $this->expectException(SegValidationException::class);
-        $this->assertInstanceOf(Segments\Unh::class, $messageCore->getNextSegment());
-    }
-
-    /** @test */
-    public function it_fetch_the_next_segement_from_stream()
-    {
-        $messageCore = Message::fromString("UNH'UNB");
-        $this->assertInstanceOf(Segments\Unh::class, $messageCore->getNextSegment());
-        $this->assertInstanceOf(Segments\Unb::class, $messageCore->getNextSegment());
+        $messageCore->getAllSegments();
     }
 
     /** @test */
@@ -113,34 +105,41 @@ class MessageTest extends TestCase
     {
         $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UKN'UNT");
 
-        $this->assertInstanceOf(Segments\Unb::class, $messageCore->findNextSegment('UNB'));
-        $this->assertInstanceOf(Segments\Generic::class, $messageCore->findNextSegment('UKN'));
-        $this->assertFalse($messageCore->findNextSegment('UNH'));
-
+        $this->assertInstanceOf(
+            Segments\Unb::class,
+            $messageCore->findFirstSegment(Segments\Unb::class)
+        );
+        $this->assertInstanceOf(
+            Segments\Generic::class,
+            $messageCore->findFirstSegment(Segments\Generic::class, fn(Segments\Generic $seg): bool => $seg->name() === 'UKN')
+        );
+        $this->assertNull($messageCore->findFirstSegment(Segments\Seq::class));
     }
 
     /** @test */
-    public function it_fetch_a_specific_segement_from_start_of_the_stream()
+    public function it_finds_segments_by_class_name()
     {
-        $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNT");
-        $messageCore->findSegmentFromBeginn('UNH');
+        $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNT");
 
-        $this->assertInstanceOf(Segments\Unh::class, $messageCore->findSegmentFromBeginn('UNH'));
-        $this->assertInstanceOf(
-            Segments\Unh::class,
-            $messageCore->findSegmentFromBeginn('UNH', function($segment) {
-                return $segment->referenz() == 'O160482A7C2';
-            }
-        ));
-        $this->assertInstanceOf(
-            Segments\Unh::class,
-            $messageCore->findSegmentFromBeginn('UNH', ['referenz' => 'O160482A7C2'])
+        $foundSegments = $messageCore->findAllSegments(Segments\Unh::class);
+
+        $this->assertCount(2, $foundSegments);
+        $this->assertInstanceOf(Segments\Unh::class, $foundSegments[0]);
+        $this->assertInstanceOf(Segments\Unh::class, $foundSegments[1]);
+    }
+
+    /** @test */
+    public function it_finds_segments_by_class_name_and_closure()
+    {
+        $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNH+O11111+ORDERS:D:09B:UN:1.1e'UNT");
+
+        $foundSegments = $messageCore->findAllSegments(Segments\Unh::class, fn(Segments\Unh $seg): bool =>
+            $seg->reference() === 'O160482A7C2'
         );
-        $this->assertFalse(
-            $messageCore->findSegmentFromBeginn('UNH', function($segment) {
-                return $segment->referenz() == 'UNKNOW';
-            })
-        );
+
+        $this->assertCount(1, $foundSegments);
+        $this->assertInstanceOf(Segments\Unh::class, $foundSegments[0]);
+        $this->assertSame('O160482A7C2', $foundSegments[0]->reference());
     }
 
     /** @test */
@@ -176,7 +175,7 @@ class MessageTest extends TestCase
         $message = Message::fromString("UNA:+_? 'MOA+QUL:20_00'");
 
         /** @var Segments\Moa */
-        $moa = $message->findSegmentFromBeginn('MOA');
+        $moa = $message->findFirstSegment(Segments\Moa::class);
 
         $this->assertSame('20.00', $moa->amount());
     }

@@ -7,8 +7,8 @@ use Apfelfrisch\Edifact\Exceptions\ValidationException;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
 use Apfelfrisch\Edifact\SegmentFactory;
 use Apfelfrisch\Edifact\Stream;
+use Closure;
 use Generator;
-use Iterator;
 
 class Message
 {
@@ -17,8 +17,6 @@ class Message
     protected StreamIterator $iterator;
 
     protected SegmentFactory $segmentFactory;
-
-    private ?SegInterface $currentSegment = null;
 
     public function __construct(Stream $stream, ?SegmentFactory $segmentFactory = null)
     {
@@ -62,65 +60,54 @@ class Message
         return $this->iterator;
     }
 
-    public function getCurrentSegment(): SegInterface|false
-    {
-        if ($this->currentSegment !== null) {
-            return $this->currentSegment;
-        }
-
-        if (! $this->iterator->valid()) {
-            return false;
-        }
-
-        return $this->currentSegment = $this->iterator->current();
-    }
-
-    public function getNextSegment(): SegInterface|false
-    {
-        if (! $this->iterator->valid()) {
-            return false;
-        }
-
-        $this->currentSegment = $this->iterator->current();
-
-        $this->iterator->next();
-
-        return $this->currentSegment;
-    }
-
     /**
      * @psalm-return list<SegInterface>
      */
     public function getAllSegments(): array
     {
-        return array_values(iterator_to_array($this->getSegments()));
+        return $this->getSegments()->getAll();
     }
 
     /**
-     * @psalm-param callable|array<string, string>|null $criteria
+     * @template T of SegInterface
+     * @psalm-param class-string<T> $segmentClass
+     * @psalm-suppress InvalidReturnType
+     * @psalm-return Generator<int, T, mixed, void>
      */
-    public function findSegmentFromBeginn(string $searchSegment, callable|array|null $criteria = null): SegInterface|false
+    public function findSegments(string $segmentClass, ?Closure $closure = null): Generator
     {
-        $this->iterator->rewind();
-
-        return $this->findNextSegment($searchSegment, $criteria);
-    }
-
-    /**
-     * @psalm-param callable|array<string, string>|null $criteria
-     */
-    public function findNextSegment(string $searchSegment, callable|array|null $criteria = null): SegInterface|false
-    {
-        while ($segmentObject = $this->getNextSegment()) {
-            if ($segmentObject->name() == $searchSegment) {
-                if ($this->checkCriteria($criteria, $segmentObject) === true) {
-                    return $segmentObject;
-                }
+        foreach ($this->getAllSegments() as $segment) {
+            if ($segment::class !== $segmentClass) {
                 continue;
             }
+            if ($closure === null || $closure($segment) === true) {
+                yield $segment;
+            }
+        }
+    }
+
+    /**
+     * @template T of SegInterface
+     * @psalm-param class-string<T> $segmentClass
+     * @psalm-return list<T>
+     */
+    public function findAllSegments(string $segmentClass, ?Closure $closure = null): array
+    {
+        return array_values(iterator_to_array($this->findSegments($segmentClass, $closure)));
+    }
+
+    /**
+     * @template T of SegInterface
+     * @psalm-param class-string<T> $segmentClass
+     * @psalm-return T|null
+     */
+    public function findFirstSegment(string $segmentClass, ?Closure $closure = null): ?SegInterface
+    {
+        foreach ($this->findSegments($segmentClass, $closure) as $segment) {
+            return $segment;
         }
 
-        return false;
+        return null;
     }
 
     /**
@@ -190,26 +177,5 @@ class Message
     public function __toString(): string
     {
         return $this->toString();
-    }
-
-    /**
-     * @psalm-param callable|array<string, string>|null $criteria
-     */
-    private function checkCriteria(callable|array|null $criteria, SegInterface $segmentObject): bool
-    {
-        if ($criteria === null) {
-            return true;
-        }
-
-        if (is_array($criteria)) {
-            foreach ($criteria as $getter => $pattern) {
-                if ($segmentObject->$getter() != $pattern) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        return (bool)$criteria($segmentObject);
     }
 }
