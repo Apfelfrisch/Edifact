@@ -8,6 +8,8 @@ interface SegInterface
 {
     public static function fromSegLine(Delimiter $delimiter, string $segLine): self|static;
 
+    public function setDelimiter(Delimiter $delimiter): void;
+
     public function name(): string;
 
     public function validate(): void;
@@ -21,5 +23,5 @@ interface SegInterface
      */
     public function toArray(): array;
 
-    public function toString(Delimiter $delimiter): string;
+    public function toString(): string;
 }

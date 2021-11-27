@@ -76,8 +76,9 @@ class Builder
 
     private function writeSegment(SegInterface $segment): void
     {
+        $segment->setDelimiter($this->delimiter());
         $this->edifactFile->write(
-            $segment->toString($this->delimiter()) . $this->delimiter()->getSegmentTerminator()
+            $segment->toString() . $this->delimiter()->getSegmentTerminator()
         );
 
         $this->countSegments($segment);

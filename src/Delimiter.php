@@ -4,6 +4,8 @@ namespace Apfelfrisch\Edifact;
 
 final class Delimiter
 {
+    private static ?self $defaultDelimiter = null;
+
     const UNA_SEGMENT = 'UNA';
     const PLACE_HOLDER = '«>~<«';
 
@@ -41,6 +43,15 @@ final class Delimiter
         return new self(
             $string[3], $string[4], $string[5], $string[6], $string[7], $string[8]
         );
+    }
+
+    public static function getDefault(): self
+    {
+        if (self::$defaultDelimiter === null) {
+            self::$defaultDelimiter = new self();
+        }
+
+        return self::$defaultDelimiter;
     }
 
     public function terminate(string $string): string

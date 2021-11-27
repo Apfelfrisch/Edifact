@@ -35,14 +35,18 @@ class BuilderTest extends TestCase
     {
         $builder = new Builder;
         $builder->writeSegments(
-            Una::fromAttributes('|', '+', '.', '?', ' '),
+            Una::fromAttributes('|', '#', '.', '!', ' '),
             Unb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'referenz-no')
         );
 
         $message = $builder->get();
 
-        $this->assertStringStartsWith("UNA|+.? '", $message);
-        $this->assertEquals(new Delimiter('|'), $message->getDelimiter());
+        $this->assertStringStartsWith("UNA|#.! '", $message);
+        $this->assertEquals(new Delimiter('|', '#', '.', '!'), $message->getDelimiter());
+        $this->assertSame(
+            "UNA|#.! 'UNB#1|2#sender|500#receiver|400#210101|1201#referenz-no'UNZ#0#referenz-no'",
+            $message->toString()
+        );
     }
 
     /** @test */

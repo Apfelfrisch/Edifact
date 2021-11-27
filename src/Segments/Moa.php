@@ -2,13 +2,10 @@
 
 namespace Apfelfrisch\Edifact\Segments;
 
-use Apfelfrisch\Edifact\Interfaces\DecimalConverter;
 use Apfelfrisch\Edifact\DataGroups;
 
-class Moa extends AbstractSegment implements DecimalConverter
+class Moa extends AbstractSegment
 {
-    use HasDecimalConverter;
-
     private static ?DataGroups $blueprint = null;
 
     public static function blueprint(): DataGroups
@@ -42,6 +39,6 @@ class Moa extends AbstractSegment implements DecimalConverter
 
     public function amount(): ?string
     {
-        return $this->convertToNumeric((string)$this->elements->getValue('C516', '5004'));
+        return $this->replaceDecimalPoint((string)$this->elements->getValue('C516', '5004'));
     }
 }

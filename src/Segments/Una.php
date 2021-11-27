@@ -75,7 +75,7 @@ class Una extends AbstractSegment
         return $this->elements->getValue('UNA', 'segment');
     }
 
-    public function toString(Delimiter $delimiter): string
+    public function toString(): string
     {
         return $this->name() . $this->data() . $this->dataGroup() . $this->decimal() . $this->terminator() . $this->emptyChar();
     }

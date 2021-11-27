@@ -61,7 +61,7 @@ final class SegmentFactory
 
     public function build(string $segline, Delimiter $delimiter): SegInterface
     {
-        /** @var class-string<SegInterface> */
+        /** @psalm-var class-string<SegInterface> */
         $segmentClass = $this->getClassname(substr($segline, 0, 3));
 
         return $segmentClass::fromSegLine($delimiter, $segline);

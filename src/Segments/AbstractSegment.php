@@ -2,7 +2,6 @@
 
 namespace Apfelfrisch\Edifact\Segments;
 
-use Apfelfrisch\Edifact\Interfaces\DecimalConverter;
 use Apfelfrisch\Edifact\DataGroups;
 use Apfelfrisch\Edifact\Delimiter;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
@@ -11,9 +10,9 @@ use Apfelfrisch\Edifact\Interfaces\SegValidatorInterface;
 
 abstract class AbstractSegment implements SegInterface
 {
-    protected DataGroups $elements;
+    protected ?Delimiter $delimiter = null;
 
-    protected array $cache = [];
+    protected DataGroups $elements;
 
     protected SegValidatorInterface $validator;
 
@@ -28,13 +27,14 @@ abstract class AbstractSegment implements SegInterface
     public static function fromSegLine(Delimiter $delimiter, string $segLine): static
     {
         $segment = new static(static::mapToBlueprint($delimiter, $segLine));
-
-        if (is_subclass_of($segment, DecimalConverter::class)) {
-            /** @var DecimalConverter $segment */
-            $segment->setDecimalSeparator($delimiter->getDecimalPoint());
-        }
+        $segment->setDelimiter($delimiter);
 
         return $segment;
+    }
+
+    public function setDelimiter(Delimiter $delimiter): void
+    {
+        $this->delimiter = $delimiter;
     }
 
     public function getValueFromPosition(int $dataGroupPosition, int $valuePosition): ?string
@@ -47,9 +47,22 @@ abstract class AbstractSegment implements SegInterface
         return $this->elements->getValue($dataGroupKey, $valueKey);
     }
 
-    public function getValidator(): SegValidatorInterface
+    public function replaceDecimalPoint(?string $value): ?string
     {
-        return $this->validator;
+        if ($this->getDelimiter()->getDecimalPoint() !== '.' && $value !== null) {
+            return str_replace($this->getDelimiter()->getDecimalPoint(), '.', $value);
+        }
+
+        return $value;
+    }
+
+    public function replaceSpaceCharacter(?string $value): ?string
+    {
+        if ($this->getDelimiter()->getSpaceCharacter() !== ' ' && $value !== null) {
+            return str_replace($this->getDelimiter()->getSpaceCharacter(), '.', $value);
+        }
+
+        return $value;
     }
 
     public function name(): string
@@ -70,23 +83,28 @@ abstract class AbstractSegment implements SegInterface
         return $this->elements->toArray();
     }
 
-    public function toString(Delimiter $delimiter): string
+    public function toString(): string
     {
         $string = '';
 
         foreach($this->elements->toArray() as $dataGroup) {
             foreach ($dataGroup as $value) {
                 $string .= $value === null
-                    ? $delimiter->getComponentSeparator()
-                    : $delimiter->terminate($value) . $delimiter->getComponentSeparator();
+                    ? $this->getDelimiter()->getComponentSeparator()
+                    : $this->getDelimiter()->terminate($value) . $this->getDelimiter()->getComponentSeparator();
             }
 
             $string = $this->trimEmpty(
-                $string, $delimiter->getComponentSeparator(), $delimiter->getEscapeCharacter()
-            ) . $delimiter->getElementSeparator();
+                $string, $this->getDelimiter()->getComponentSeparator(), $this->getDelimiter()->getEscapeCharacter()
+            ) . $this->getDelimiter()->getElementSeparator();
         }
 
-        return $this->trimEmpty($string, $delimiter->getElementSeparator(), $delimiter->getEscapeCharacter());
+        return $this->trimEmpty($string, $this->getDelimiter()->getElementSeparator(), $this->getDelimiter()->getEscapeCharacter());
+    }
+
+    private function getDelimiter(): Delimiter
+    {
+        return $this->delimiter ??= Delimiter::getDefault();
     }
 
     private function trimEmpty(string $string, string $dataGroupSeperator, string $terminator): string

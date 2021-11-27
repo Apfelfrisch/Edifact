@@ -7,18 +7,9 @@ namespace Code\Php\Edifact\tests\Message\Segments;
 use Apfelfrisch\Edifact\Test\TestCase;
 use Apfelfrisch\Edifact\Delimiter;
 use Apfelfrisch\Edifact\Test\Fixtures\Segment;
-use Apfelfrisch\Edifact\Validation\SegmentValidator;
 
 class AbstractSegmentTest extends TestCase
 {
-    /** @test */
-    public function it_provides_the_validator()
-    {
-        $segment = Segment::fromAttributes(new Delimiter(), 'A');
-
-        $this->assertInstanceOf(SegmentValidator::class, $segment->getValidator());
-    }
-
     /** @test */
     public function it_gives_its_segment_name()
     {
