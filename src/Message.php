@@ -145,6 +145,9 @@ class Message
         }
     }
 
+    /**
+     * @todo This is shitty, rewrite the whole validation
+     */
     public function validateSegments(): void
     {
         $segment = false;

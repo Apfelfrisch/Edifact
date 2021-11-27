@@ -2,7 +2,7 @@
 
 namespace Apfelfrisch\Edifact\Test;
 
-use Apfelfrisch\Edifact\Exceptions\SegValidationException;
+use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
 use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\SegmentFactory;
@@ -85,7 +85,7 @@ class MessageTest extends TestCase
     {
         $messageCore = Message::fromString("UKN", SegmentFactory::withDefaultDegments(withFallback: false));
 
-        $this->expectException(SegValidationException::class);
+        $this->expectException(EdifactException::class);
         $messageCore->getAllSegments();
     }
 

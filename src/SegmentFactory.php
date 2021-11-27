@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact;
 
-use Apfelfrisch\Edifact\Exceptions\SegValidationException;
+use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
 use Apfelfrisch\Edifact\Segments\Generic;
 
@@ -78,7 +78,7 @@ final class SegmentFactory
 
         if (null === $segmentClass = $this->segmentClasses[$segmentName] ?? null) {
             if (null === $segmentClass = $this->fallback) {
-                throw SegValidationException::unknown($segmentName);
+                throw EdifactException::segmentUnknown($segmentName);
             }
         }
 

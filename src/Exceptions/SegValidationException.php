@@ -6,31 +6,15 @@ namespace Apfelfrisch\Edifact\Exceptions;
 
 class SegValidationException extends EdifactException
 {
-    protected string|null $key;
+    private ?string $key;
+    private ?string $value;
 
-    protected string|null $value;
-
-    /**
-     * @param string|null $key
-     * @param string|null $value
-     * @param string $message
-     * @param int $code
-     *
-     * @return static
-     *
-     * @psalm-suppress UnsafeInstantiation
-     */
-    public function __construct($key, $value, $message, $code)
+    public function __construct(?string $key, ?string $value, string $message, int $code)
     {
         $this->key = $key;
         $this->value = $value;
 
         parent::__construct($message, $code);
-    }
-
-    public static function unknown(string $segname): self
-    {
-        return new self(null, null, "Unknown Segment [$segname]", 0);
     }
 
     public static function forKeyValue(string $key, string $value, string $message, int $code = 0): self
@@ -54,12 +38,12 @@ class SegValidationException extends EdifactException
         return new self(null, $value, $message, $code);
     }
 
-    public function getKey(): string|null
+    public function getKey(): ?string
     {
         return $this->key;
     }
 
-    public function getValue(): string|null
+    public function getValue(): ?string
     {
         return $this->value;
     }
