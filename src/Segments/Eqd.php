@@ -13,8 +13,8 @@ class Eqd extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('EQD', 'EQD', 'M|a|3')
-                ->addValue('8053', '8053', 'M|an|3')
-                ->addValue('C237', '8260', 'M|n|17');
+                ->addValue('8053', '8053', 'M|an|..3')
+                ->addValue('C237', '8260', 'M|n|..17');
         }
 
         return self::$blueprint;

@@ -13,9 +13,9 @@ class Qty extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('QTY', 'QTY', 'M|a|3')
-                ->addValue('C186', '6063', 'M|an|3')
-                ->addValue('C186', '6060', 'M|an|35')
-                ->addValue('C186', '6411', 'D|an|8');
+                ->addValue('C186', '6063', 'M|an|..3')
+                ->addValue('C186', '6060', 'M|an|..35')
+                ->addValue('C186', '6411', 'O|an|..8');
         }
 
         return self::$blueprint;

@@ -13,8 +13,8 @@ class Rff extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('RFF', 'RFF', 'M|a|3')
-                ->addValue('C506', '1153', 'M|an|3')
-                ->addValue('C506', '1154', 'M|an|70');
+                ->addValue('C506', '1153', 'M|an|..3')
+                ->addValue('C506', '1154', 'M|an|..70');
         }
 
         return self::$blueprint;

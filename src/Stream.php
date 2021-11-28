@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact;
 
-use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\UnaSegment;
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use RuntimeException;
 use SplFileInfo;
@@ -18,12 +18,12 @@ final class Stream extends SplFileInfo
     /** @var resource */
     private $resource;
 
-    private Delimiter $delimiter;
+    private UnaSegment $unaSegment;
 
     public function __construct(
         string $filename,
         string $openMode = 'r',
-        ?Delimiter $delimiter = null
+        ?UnaSegment $unaSegment = null
     ) {
         parent::__construct($filename);
 
@@ -39,9 +39,9 @@ final class Stream extends SplFileInfo
         $this->resource = $resource;
 
         if ($openMode === 'r' || substr($openMode, 1, 1) === '+') { // Stream is readable
-            $this->delimiter = Delimiter::setFromFile($this, fallback: $delimiter);
+            $this->unaSegment = UnaSegment::setFromStream($this, fallback: $unaSegment);
         } else {
-            $this->delimiter = $delimiter ?? new Delimiter;
+            $this->unaSegment = $unaSegment ?? new UnaSegment;
         }
     }
 
@@ -50,7 +50,7 @@ final class Stream extends SplFileInfo
      */
     public static function fromString(string $string, string $filename = 'php://temp', array $writeFilter = []): self
     {
-        $instance = new self($filename, 'w+', Delimiter::setFromString($string));
+        $instance = new self($filename, 'w+', UnaSegment::setFromString($string));
 
         foreach ($writeFilter as $callable) {
             $instance->addWriteFilter($callable);
@@ -89,13 +89,13 @@ final class Stream extends SplFileInfo
         return $this->toString();
     }
 
-    public function setDelimiter(Delimiter $delimiter): void
+    public function setUnaSegment(UnaSegment $unaSegment): void
     {
         if (! $this->isEmpty()) {
-            throw new EdifactException("Delimiter can only be set on an empty file.");
+            throw new EdifactException("UnaSegment can only be set on an empty file.");
         }
 
-        $this->delimiter = $delimiter;
+        $this->unaSegment = $unaSegment;
     }
 
     public function addReadFilter(string $filter, mixed $params = null): self
@@ -191,9 +191,9 @@ final class Stream extends SplFileInfo
         $this->rewind();
     }
 
-    public function getDelimiter(): Delimiter
+    public function getUnaSegment(): UnaSegment
     {
-        return $this->delimiter;
+        return $this->unaSegment;
     }
 
     public function rewind(): void
@@ -221,7 +221,7 @@ final class Stream extends SplFileInfo
                 return $mergedLines . $line;
             }
 
-            $mergedLines .= substr_replace($line, $this->getDelimiter()->getSegmentTerminator(), -1);
+            $mergedLines .= substr_replace($line, $this->getUnaSegment()->segmentTerminator(), -1);
         }
 
         return $mergedLines;
@@ -229,12 +229,12 @@ final class Stream extends SplFileInfo
 
     private function streamGetLine(): string|false
     {
-        return stream_get_line($this->resource, 0, $this->getDelimiter()->getSegmentTerminator());
+        return stream_get_line($this->resource, 0, $this->getUnaSegment()->segmentTerminator());
     }
 
     private function terminatorWasEscaped(string $line): bool
     {
-        return str_ends_with($line, $this->getDelimiter()->getEscapeCharacter());
+        return str_ends_with($line, $this->getUnaSegment()->escapeCharacter());
     }
 }
 

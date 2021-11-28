@@ -13,8 +13,8 @@ class Agr extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('AGR', 'AGR', 'M|a|3')
-                ->addValue('C543', '7431', 'M|an|3')
-                ->addValue('C543', '7433', 'M|an|3');
+                ->addValue('C543', '7431', 'M|an|..3')
+                ->addValue('C543', '7433', 'M|an|..3');
         }
 
         return self::$blueprint;

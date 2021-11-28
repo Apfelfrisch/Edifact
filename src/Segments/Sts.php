@@ -13,10 +13,10 @@ class Sts extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('STS', 'STS', 'M|a|3')
-                ->addValue('C601', '9015', 'M|an|3')
-                ->addValue('C555', '4405', 'D|an|3')
-                ->addValue('C556', '9013', 'D|an|3')
-                ->addValue('C556', '1131', 'D|an|17');
+                ->addValue('C601', '9015', 'M|an|..3')
+                ->addValue('C555', '4405', 'O|an|..3')
+                ->addValue('C556', '9013', 'O|an|..3')
+                ->addValue('C556', '1131', 'O|an|..17');
         }
 
         return self::$blueprint;

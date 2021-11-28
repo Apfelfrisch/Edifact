@@ -13,17 +13,17 @@ class Ucm extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('UCM', 'UCM', 'M|an|3')
-                ->addValue('0062', '0062', 'M|an|14')
-                ->addValue('S009', '0065', 'M|an|6')
-                ->addValue('S009', '0052', 'M|an|3')
-                ->addValue('S009', '0054', 'M|an|3')
-                ->addValue('S009', '0051', 'M|an|2')
-                ->addValue('S009', '0057', 'M|an|6')
-                ->addValue('0083', '0083', 'M|n|1')
-                ->addValue('0085', '0085', 'O|n|2')
-                ->addValue('0013', '0013', 'O|a|3')
-                ->addValue('S011', '0098', 'O|n|3')
-                ->addValue('S011', '0104', 'O|n|3');
+                ->addValue('0062', '0062', 'M|an|..14')
+                ->addValue('S009', '0065', 'M|an|..6')
+                ->addValue('S009', '0052', 'M|an|..3')
+                ->addValue('S009', '0054', 'M|an|..3')
+                ->addValue('S009', '0051', 'M|an|..2')
+                ->addValue('S009', '0057', 'M|an|..6')
+                ->addValue('0083', '0083', 'M|n|..1')
+                ->addValue('0085', '0085', 'O|n|..2')
+                ->addValue('0013', '0013', 'O|a|..3')
+                ->addValue('S011', '0098', 'O|n|..3')
+                ->addValue('S011', '0104', 'O|n|..3');
         }
 
         return self::$blueprint;

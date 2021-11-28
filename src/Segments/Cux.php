@@ -13,9 +13,9 @@ class Cux extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('CUX', 'CUX', 'M|a|3')
-                ->addValue('C504', '6347', 'M|an|3')
-                ->addValue('C504', '6345', 'M|an|3')
-                ->addValue('C504', '6343', 'M|an|3');
+                ->addValue('C504', '6347', 'M|an|..3')
+                ->addValue('C504', '6345', 'M|an|..3')
+                ->addValue('C504', '6343', 'M|an|..3');
         }
 
         return self::$blueprint;

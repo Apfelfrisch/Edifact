@@ -13,7 +13,7 @@ class Cni extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('CNI', 'CNI', 'M|a|3')
-                ->addValue('1490', '1490', 'M|n|5');
+                ->addValue('1490', '1490', 'M|n|..5');
         }
 
         return self::$blueprint;

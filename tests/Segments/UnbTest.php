@@ -4,8 +4,8 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact\Test\Segments;
 
+use Apfelfrisch\Edifact\SeglineParser;
 use DateTime;
-use Apfelfrisch\Edifact\Delimiter;
 use Apfelfrisch\Edifact\Segments\Unb;
 use Apfelfrisch\Edifact\Test\TestCase;
 
@@ -14,7 +14,6 @@ final class UnbTest extends TestCase
     /** @test */
     public function test_segment(): void
     {
-        $delimiter = new Delimiter();
         $seg = Unb::fromAttributes('1234', '8', 'sender', '500', 'receiver', '600', new DateTime, 'ref-no', 'usage-type', '1');
 
         $this->assertEquals('UNB', $seg->name());
@@ -29,6 +28,6 @@ final class UnbTest extends TestCase
         $this->assertEquals('usage-type', $seg->usageType());
         $this->assertEquals('1', $seg->testMarker());
 
-        $this->assertEquals($seg->toString($delimiter), Unb::fromSegLine($delimiter, $seg->toString($delimiter))->toString($delimiter));
+        $this->assertEquals($seg->toString(), $seg::fromSegLine(new SeglineParser, $seg->toString())->toString());
     }
 }

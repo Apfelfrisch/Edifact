@@ -13,11 +13,11 @@ final class Cav extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('CAV', 'CAV', 'M|a|3')
-                ->addValue('C889', '7111', 'O|an|3')
-                ->addValue('C889', '1131', 'O|an|17')
-                ->addValue('C889', '3055', 'O|an|3')
-                ->addValue('C889', '7110:1', 'O|an|35')
-                ->addValue('C889', '7110:2', 'O|an|35');
+                ->addValue('C889', '7111', 'O|an|..3')
+                ->addValue('C889', '1131', 'O|an|..17')
+                ->addValue('C889', '3055', 'O|an|..3')
+                ->addValue('C889', '7110:1', 'O|an|..35')
+                ->addValue('C889', '7110:2', 'O|an|..35');
         }
 
         return self::$blueprint;

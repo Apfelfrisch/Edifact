@@ -4,9 +4,8 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact;
 
-use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\UnaSegment;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
-use Apfelfrisch\Edifact\Segments\Una;
 use Apfelfrisch\Edifact\Segments\Unt;
 use Apfelfrisch\Edifact\Segments\Unz;
 use Apfelfrisch\Edifact\Stream;
@@ -16,22 +15,26 @@ class Builder
     private ?string $unbRef = null;
     private ?string $unhRef = null;
 
-    private Stream $edifactFile;
-    private string $filepath;
-    private int $unhCounter = 0;
-    private int $messageCount = 0;
     private bool $messageWasFetched = false;
 
-    public function __construct(string $filepath = 'php://temp')
+    private Stream $stream;
+    private string $filepath;
+    private StringFormatter $stringFormatter;
+    private SegmentCounter $counter;
+
+    public function __construct(UnaSegment $unaSegment = null, string $filepath = 'php://temp')
     {
         $this->filepath = $filepath;
 
-        $this->edifactFile = new Stream($this->filepath, 'w');
+        $this->stream = new Stream($this->filepath, 'w', $unaSegment);
+        $this->counter = new SegmentCounter;
+        $this->stringFormatter = new StringFormatter($this->stream->getUnaSegment());
+        $this->stringFormatter->prefixUna();
     }
 
     public function addStreamFilter(string $filtername, mixed $params = null): self
     {
-        $this->edifactFile->addWriteFilter($filtername, $params);
+        $this->stream->addWriteFilter($filtername, $params);
 
         return $this;
     }
@@ -39,7 +42,7 @@ class Builder
     public function __destruct()
     {
         // Delete File if build process could not finshed
-        $filepath = $this->edifactFile->getRealPath();
+        $filepath = $this->stream->getRealPath();
         if ($this->messageWasFetched === false && $filepath && file_exists($filepath)) {
             unlink($filepath);
         }
@@ -47,15 +50,11 @@ class Builder
 
     public function getMessageCount(): int
     {
-        return $this->messageCount;
+        return $this->counter->messageCount();
     }
 
     public function writeSegments(SegInterface ...$segments): void
     {
-        if ($this->messageIsEmpty()) {
-            $this->prepareEdfactFile($segments[0]);
-        }
-
         foreach ($segments as $segment) {
             if ($segment->name() === 'UNB') {
                 $this->unbRef = $segment->getValueFromPosition(5, 0) ?? '';
@@ -63,7 +62,8 @@ class Builder
 
             if ($segment->name() === 'UNH') {
                 if ($this->unhRef !== null) {
-                    $this->writeSegment(Unt::fromAttributes((string)++$this->unhCounter, $this->unhRef));
+                    $unhCount = $this->counter->unhCount() + 1;
+                    $this->writeSegment(Unt::fromAttributes((string)$unhCount, $this->unhRef));
                 }
 
                 $this->unhRef = $segment->getValueFromPosition(1, 0) ?? '';
@@ -75,23 +75,23 @@ class Builder
 
     private function writeSegment(SegInterface $segment): void
     {
-        $segment->setDelimiter($this->delimiter());
-        $this->edifactFile->write(
-            $segment->toString() . $this->delimiter()->getSegmentTerminator()
+        $this->stream->write(
+            $this->stringFormatter->format($segment)
         );
 
-        $this->countSegments($segment);
+        $this->counter->count($segment);
     }
 
     public function get(): Stream
     {
         if (! $this->messageIsEmpty()) {
             if ($this->unhRef !== null) {
-                $this->writeSegment(Unt::fromAttributes((string)++$this->unhCounter, $this->unhRef));
+                $unhCount = $this->counter->unhCount() + 1;
+                $this->writeSegment(Unt::fromAttributes((string)$unhCount, $this->unhRef));
                 $this->unhRef = null;
             }
             if ($this->unbRef !== null) {
-                $this->writeSegment(Unz::fromAttributes((string)$this->messageCount, $this->unbRef));
+                $this->writeSegment(Unz::fromAttributes((string)$this->counter->messageCount(), $this->unbRef));
                 $this->unbRef = null;
             }
         }
@@ -99,7 +99,7 @@ class Builder
         $this->messageWasFetched = true;
 
         if (str_starts_with($this->filepath, 'php://')) {
-            return $this->edifactFile;
+            return $this->stream;
         }
 
         return new Stream($this->filepath);
@@ -107,59 +107,6 @@ class Builder
 
     public function messageIsEmpty(): bool
     {
-        return $this->edifactFile->isEmpty();
-    }
-
-    private function prepareEdfactFile(SegInterface $segment): void
-    {
-        if ($segment->name() !== 'UNA') {
-            $this->writeSegment($this->buildUnaFromDelimter());
-
-            return;
-        }
-
-        /**
-         * @var Una $segment
-         * @psalm-suppress PossiblyNullArgument: segment is alwas set, cause it was fromString initialized
-         */
-        $this->edifactFile->setDelimiter(new Delimiter(
-            $segment->data(),
-            $segment->element(),
-            $segment->decimal(),
-            $segment->terminator(),
-            $segment->emptyChar(),
-            $segment->segment(),
-        ));
-    }
-
-    private function delimiter(): Delimiter
-    {
-        return $this->edifactFile->getDelimiter();
-    }
-
-    private function buildUnaFromDelimter(): Una
-    {
-        return Una::fromAttributes(
-            $this->delimiter()->getComponentSeparator(),
-            $this->delimiter()->getElementSeparator(),
-            $this->delimiter()->getDecimalPoint(),
-            $this->delimiter()->getEscapeCharacter(),
-            $this->delimiter()->getSpaceCharacter(),
-        );
-    }
-
-    private function countSegments(SegInterface $segment): void
-    {
-        if ($segment->name() === 'UNA' || $segment->name() === 'UNB') {
-            return;
-        }
-
-        if (strtoupper($segment->name()) === 'UNH') {
-            $this->unhCounter = 1;
-            $this->messageCount++;
-            return;
-        }
-
-        $this->unhCounter++;
+        return $this->stream->isEmpty();
     }
 }

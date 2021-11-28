@@ -13,12 +13,12 @@ class Pri extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('PRI', 'PRI', 'M|a|3')
-                ->addValue('C509', '5125', 'M|n|3')
-                ->addValue('C509', '5118', 'M|n|15')
+                ->addValue('C509', '5125', 'M|n|..3')
+                ->addValue('C509', '5118', 'M|n|..15')
                 ->addValue('C509', '5375', null)
                 ->addValue('C509', '5387', null)
                 ->addValue('C509', '5284', null)
-                ->addValue('C509', '6411', 'D|an|8');
+                ->addValue('C509', '6411', 'O|an|..8');
         }
 
         return self::$blueprint;

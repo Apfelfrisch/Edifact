@@ -13,8 +13,8 @@ class Unz extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('UNZ', 'UNZ', 'M|an|3')
-                ->addValue('0062', '0062', 'M|n|6')
-                ->addValue('S009', '0065', 'M|an|35');
+                ->addValue('0062', '0062', 'M|n|..6')
+                ->addValue('S009', '0065', 'M|an|..35');
         }
 
         return self::$blueprint;

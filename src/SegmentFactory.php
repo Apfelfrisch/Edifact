@@ -18,6 +18,22 @@ final class SegmentFactory
 
     private static ?self $defaultFactory = null;
 
+    private UnaSegment $unaSegment;
+
+    private SeglineParser $parser;
+
+    public function __construct(?UnaSegment $unaSegment = null)
+    {
+        $this->unaSegment = $unaSegment ?? UnaSegment::getDefault();
+        $this->parser = new SeglineParser($this->unaSegment);
+    }
+
+    public function setUnaSegment(UnaSegment $unaSegment): void
+    {
+        $this->unaSegment = $unaSegment;
+        $this->parser = new SeglineParser($this->unaSegment);
+    }
+
     public static function withDefaultDegments(bool $withFallback = true): self
     {
         if (self::$defaultFactory === null) {
@@ -61,12 +77,14 @@ final class SegmentFactory
         return $this;
     }
 
-    public function build(string $segline, Delimiter $delimiter): SegInterface
+    public function build(string $segline): SegInterface
     {
         /** @psalm-var class-string<SegInterface> */
         $segmentClass = $this->getClassname(substr($segline, 0, 3));
 
-        return $segmentClass::fromSegLine($delimiter, $segline);
+        $segment = $segmentClass::fromSegLine($this->parser, $segline);
+
+        return $segment;
     }
 
     /*

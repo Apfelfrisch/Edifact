@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact\Test\Segments;
 
-use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\SeglineParser;
 use Apfelfrisch\Edifact\Segments\Nad;
 use Apfelfrisch\Edifact\Test\TestCase;
 
@@ -13,7 +13,6 @@ final class NadTest extends TestCase
     /** @test */
     public function test_segment(): void
     {
-        $delimiter = new Delimiter();
         $seg = Nad::fromAttributes(
             'ABC',
             '12345678901234567890123456789012345',
@@ -47,7 +46,7 @@ final class NadTest extends TestCase
         $this->assertEquals('26844', $seg->zip());
         $this->assertEquals('Jemgum', $seg->city());
 
-        $this->assertEquals($seg->toString($delimiter), Nad::fromSegLine($delimiter, $seg->toString($delimiter))->toString($delimiter));
+        $this->assertEquals($seg->toString(), $seg::fromSegLine(new SeglineParser, $seg->toString())->toString());
     }
 
     public function test_initialize_from_person_address(): void
@@ -77,7 +76,7 @@ final class NadTest extends TestCase
     }
 
     /** @test */
-    public function test_initialize_from_company_adress_data(): void
+    public function test_initialize_from_company_adress_componentSeparator(): void
     {
         $seg = Nad::fromCompanyAdress('ABC', 'Company', 'Street', '3a', 'Leer', '26789');
 
@@ -92,7 +91,7 @@ final class NadTest extends TestCase
     }
 
     /** @test */
-    public function test_initialize_from_person_data(): void
+    public function test_initialize_from_person_componentSeparator(): void
     {
         $seg = Nad::fromPerson('ABC', 'Refle', 'Nils', 'Dr.');
 
@@ -104,7 +103,7 @@ final class NadTest extends TestCase
     }
 
     /** @test */
-    public function  test_initialize_from_company_data(): void
+    public function  test_initialize_from_company_componentSeparator(): void
     {
         $seg = Nad::fromCompany('ABC', 'Company');
 
@@ -115,7 +114,7 @@ final class NadTest extends TestCase
     }
 
     /** @test */
-    public function test_initialize_from_adress_data(): void
+    public function test_initialize_from_adress_componentSeparator(): void
     {
         $seg = Nad::fromAdress('ABC', 'Street', '3a', 'Leer', '26789', 'LeerOrt');
 

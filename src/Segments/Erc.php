@@ -13,7 +13,7 @@ class Erc extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('ERC', 'ERC', 'M|a|3')
-                ->addValue('C901', '9321', 'M|an|8');
+                ->addValue('C901', '9321', 'M|an|..8');
         }
 
         return self::$blueprint;

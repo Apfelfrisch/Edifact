@@ -13,9 +13,9 @@ class Bgm extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('BGM', 'BGM', 'M|a|3')
-                ->addValue('C002', '1001', 'M|an|3')
-                ->addValue('C106', '1004', 'M|an|35')
-                ->addValue('1225', '1225', 'O|an|3');
+                ->addValue('C002', '1001', 'M|an|..3')
+                ->addValue('C106', '1004', 'M|an|..35')
+                ->addValue('1225', '1225', 'O|an|..3');
         }
 
         return self::$blueprint;

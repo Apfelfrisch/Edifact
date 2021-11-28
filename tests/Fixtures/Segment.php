@@ -3,7 +3,7 @@
 namespace Apfelfrisch\Edifact\Test\Fixtures;
 
 use Apfelfrisch\Edifact\Elements;
-use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\UnaSegment;
 use Apfelfrisch\Edifact\Segments\AbstractSegment;
 
 class Segment extends AbstractSegment
@@ -29,11 +29,11 @@ class Segment extends AbstractSegment
         return self::$blueprint;
     }
 
-    public static function fromAttributes(Delimiter $delimiter, $attribute): self
+    public static function fromAttributes(UnaSegment $unaSegment, $attribute): self
     {
         return new self(
             (new Elements)->addValue('A', 'A', $attribute),
-            $delimiter
+            $unaSegment
         );
     }
 
