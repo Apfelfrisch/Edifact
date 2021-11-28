@@ -27,7 +27,7 @@ use Apfelfrisch\Edifact\Message;
 $message = Message::fromFilepath("path/to/file.txt");
 ```
 
-#### Parse to the default Segments
+#### Iterate over the Segments
 ```php
 use Apfelfrisch\Edifact\Segments\Nad;
 
