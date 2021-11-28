@@ -14,70 +14,70 @@ class Una extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('UNA', 'UNA', 'M|a|3')
-                ->addValue('UNA', 'data', 'M|an|1')
-                ->addValue('UNA', 'element', 'M|an|1')
-                ->addValue('UNA', 'decimal', 'M|an|1')
-                ->addValue('UNA', 'terminator', 'M|an|1')
-                ->addValue('UNA', 'empty', 'M|an|1')
-                ->addValue('UNA', 'segment', 'O|an|1');
+                ->addValue('UNA', 'componentSeparator', 'M|an|1')
+                ->addValue('UNA', 'elementSeparator', 'M|an|1')
+                ->addValue('UNA', 'decimalPoint', 'M|an|1')
+                ->addValue('UNA', 'escapeCharacter', 'M|an|1')
+                ->addValue('UNA', 'spaceCharacter', 'M|an|1')
+                ->addValue('UNA', 'segmentTerminator', 'O|an|1');
         }
 
         return self::$blueprint;
     }
 
     public static function fromAttributes(
-        string $data = ':',
-        string $element = '+',
-        string $decimal = '.',
-        string $terminator = '?',
-        string $empty = ' ',
-        string $segment = '\''
+        string $componentSeparator = ':',
+        string $elementSeparator = '+',
+        string $decimalPoint = '.',
+        string $escapeCharacter = '?',
+        string $spaceCharacter = ' ',
+        string $segmentTerminator = '\''
     ): self
     {
         return new self((new Elements)
             ->addValue('UNA', 'UNA', 'UNA')
-            ->addValue('UNA', 'data', $data)
-            ->addValue('UNA', 'element', $element)
-            ->addValue('UNA', 'decimal', $decimal)
-            ->addValue('UNA', 'terminator', $terminator)
-            ->addValue('UNA', 'empty', $empty)
-            ->addValue('UNA', 'segment', $segment)
+            ->addValue('UNA', 'componentSeparator', $componentSeparator)
+            ->addValue('UNA', 'elementSeparator', $elementSeparator)
+            ->addValue('UNA', 'decimalPoint', $decimalPoint)
+            ->addValue('UNA', 'escapeCharacter', $escapeCharacter)
+            ->addValue('UNA', 'spaceCharacter', $spaceCharacter)
+            ->addValue('UNA', 'segmentTerminator', $segmentTerminator)
         );
     }
 
-    public function data(): string
+    public function componentSeparator(): string
     {
-        return (string)$this->elements->getValue('UNA', 'data');
+        return (string)$this->elements->getValue('UNA', 'componentSeparator');
     }
 
-    public function element(): string
+    public function elementSeparator(): string
     {
-        return (string)$this->elements->getValue('UNA', 'element');
+        return (string)$this->elements->getValue('UNA', 'elementSeparator');
     }
 
-    public function decimal(): string
+    public function decimalPoint(): string
     {
-        return (string)$this->elements->getValue('UNA', 'decimal');
+        return (string)$this->elements->getValue('UNA', 'decimalPoint');
     }
 
-    public function terminator(): string
+    public function escapeCharacter(): string
     {
-        return (string)$this->elements->getValue('UNA', 'terminator');
+        return (string)$this->elements->getValue('UNA', 'escapeCharacter');
     }
 
-    public function emptyChar(): string
+    public function spaceCharacter(): string
     {
-        return (string)$this->elements->getValue('UNA', 'empty');
+        return (string)$this->elements->getValue('UNA', 'spaceCharacter');
     }
 
-    public function segment(): ?string
+    public function segmentTerminator(): ?string
     {
-        return $this->elements->getValue('UNA', 'segment');
+        return $this->elements->getValue('UNA', 'segmentTerminator');
     }
 
     public function toString(): string
     {
-        return $this->name() . $this->data() . $this->element() . $this->decimal() . $this->terminator() . $this->emptyChar();
+        return $this->name() . $this->componentSeparator() . $this->elementSeparator() . $this->decimalPoint() . $this->escapeCharacter() . $this->spaceCharacter();
     }
 
     protected static function mapToBlueprint(Delimiter $delimiter, string $segLine): Elements

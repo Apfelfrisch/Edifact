@@ -77,7 +77,7 @@ final class NadTest extends TestCase
     }
 
     /** @test */
-    public function test_initialize_from_company_adress_data(): void
+    public function test_initialize_from_company_adress_componentSeparator(): void
     {
         $seg = Nad::fromCompanyAdress('ABC', 'Company', 'Street', '3a', 'Leer', '26789');
 
@@ -92,7 +92,7 @@ final class NadTest extends TestCase
     }
 
     /** @test */
-    public function test_initialize_from_person_data(): void
+    public function test_initialize_from_person_componentSeparator(): void
     {
         $seg = Nad::fromPerson('ABC', 'Refle', 'Nils', 'Dr.');
 
@@ -104,7 +104,7 @@ final class NadTest extends TestCase
     }
 
     /** @test */
-    public function  test_initialize_from_company_data(): void
+    public function  test_initialize_from_company_componentSeparator(): void
     {
         $seg = Nad::fromCompany('ABC', 'Company');
 
@@ -115,7 +115,7 @@ final class NadTest extends TestCase
     }
 
     /** @test */
-    public function test_initialize_from_adress_data(): void
+    public function test_initialize_from_adress_componentSeparator(): void
     {
         $seg = Nad::fromAdress('ABC', 'Street', '3a', 'Leer', '26789', 'LeerOrt');
 

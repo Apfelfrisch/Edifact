@@ -123,12 +123,12 @@ class Builder
          * @psalm-suppress PossiblyNullArgument: segment is alwas set, cause it was fromString initialized
          */
         $this->edifactFile->setDelimiter(new Delimiter(
-            $segment->data(),
-            $segment->element(),
-            $segment->decimal(),
-            $segment->terminator(),
-            $segment->emptyChar(),
-            $segment->segment(),
+            $segment->componentSeparator(),
+            $segment->elementSeparator(),
+            $segment->decimalPoint(),
+            $segment->escapeCharacter(),
+            $segment->spaceCharacter(),
+            $segment->segmentTerminator(),
         ));
     }
 

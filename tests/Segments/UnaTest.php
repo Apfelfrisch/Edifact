@@ -17,11 +17,11 @@ final class UnaTest extends TestCase
         $seg = Una::fromAttributes(':', '+', '.', '?', ' ');
 
         $this->assertEquals('UNA', $seg->name());
-        $this->assertEquals(':', $seg->data());
-        $this->assertEquals('+', $seg->element());
-        $this->assertEquals('.', $seg->decimal());
-        $this->assertEquals('?', $seg->terminator());
-        $this->assertEquals(' ', $seg->emptyChar());
+        $this->assertEquals(':', $seg->componentSeparator());
+        $this->assertEquals('+', $seg->elementSeparator());
+        $this->assertEquals('.', $seg->decimalPoint());
+        $this->assertEquals('?', $seg->escapeCharacter());
+        $this->assertEquals(' ', $seg->spaceCharacter());
 
         $this->assertEquals($seg->toString($delimiter), Una::fromSegLine($delimiter, $seg->toString($delimiter))->toString($delimiter));
     }
