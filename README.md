@@ -38,7 +38,7 @@ foreach ($message->getSegments() as $segment) {
 }
 ```
 
-#### Filter Segments
+#### Filter the Segments
 ```php
 use Apfelfrisch\Edifact\Segments\Nad;
 
