@@ -22,6 +22,7 @@ class Message
     {
         $this->stream = $stream;
         $this->segmentFactory = $segmentFactory ?? SegmentFactory::withDefaultDegments();
+        $this->segmentFactory->setDelimiter($this->stream->getDelimiter());
         $this->iterator = new StreamIterator($this->stream, $this->segmentFactory);
     }
 

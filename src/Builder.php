@@ -6,7 +6,6 @@ namespace Apfelfrisch\Edifact;
 
 use Apfelfrisch\Edifact\Delimiter;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
-use Apfelfrisch\Edifact\Segments\Una;
 use Apfelfrisch\Edifact\Segments\Unt;
 use Apfelfrisch\Edifact\Segments\Unz;
 use Apfelfrisch\Edifact\Stream;
@@ -16,17 +15,20 @@ class Builder
     private ?string $unbRef = null;
     private ?string $unhRef = null;
 
-    private Stream $edifactFile;
-    private string $filepath;
     private int $unhCounter = 0;
     private int $messageCount = 0;
     private bool $messageWasFetched = false;
 
-    public function __construct(string $filepath = 'php://temp')
+    private Stream $edifactFile;
+    private string $filepath;
+    private StringFormatter $stringFormatter;
+
+    public function __construct(Delimiter $delimiter = null, string $filepath = 'php://temp')
     {
         $this->filepath = $filepath;
 
-        $this->edifactFile = new Stream($this->filepath, 'w');
+        $this->edifactFile = new Stream($this->filepath, 'w', $delimiter);
+        $this->stringFormatter = new StringFormatter($this->edifactFile->getDelimiter());
     }
 
     public function addStreamFilter(string $filtername, mixed $params = null): self
@@ -53,10 +55,14 @@ class Builder
     public function writeSegments(SegInterface ...$segments): void
     {
         if ($this->messageIsEmpty()) {
-            $this->prepareEdfactFile($segments[0]);
+            $this->writeUna();
         }
 
         foreach ($segments as $segment) {
+            if ($segment->name() === 'UNA') {
+                continue;
+            }
+
             if ($segment->name() === 'UNB') {
                 $this->unbRef = $segment->getValueFromPosition(5, 0) ?? '';
             }
@@ -75,9 +81,8 @@ class Builder
 
     private function writeSegment(SegInterface $segment): void
     {
-        $segment->setDelimiter($this->delimiter());
         $this->edifactFile->write(
-            $segment->toString() . $this->delimiter()->getSegmentTerminator()
+            $this->stringFormatter->format($segment)
         );
 
         $this->countSegments($segment);
@@ -110,41 +115,18 @@ class Builder
         return $this->edifactFile->isEmpty();
     }
 
-    private function prepareEdfactFile(SegInterface $segment): void
+    private function writeUna(): void
     {
-        if ($segment->name() !== 'UNA') {
-            $this->writeSegment($this->buildUnaFromDelimter());
+        $delimiter = $this->edifactFile->getDelimiter();
 
-            return;
-        }
-
-        /**
-         * @var Una $segment
-         * @psalm-suppress PossiblyNullArgument: segment is alwas set, cause it was fromString initialized
-         */
-        $this->edifactFile->setDelimiter(new Delimiter(
-            $segment->componentSeparator(),
-            $segment->elementSeparator(),
-            $segment->decimalPoint(),
-            $segment->escapeCharacter(),
-            $segment->spaceCharacter(),
-            $segment->segmentTerminator(),
-        ));
-    }
-
-    private function delimiter(): Delimiter
-    {
-        return $this->edifactFile->getDelimiter();
-    }
-
-    private function buildUnaFromDelimter(): Una
-    {
-        return Una::fromAttributes(
-            $this->delimiter()->getComponentSeparator(),
-            $this->delimiter()->getElementSeparator(),
-            $this->delimiter()->getDecimalPoint(),
-            $this->delimiter()->getEscapeCharacter(),
-            $this->delimiter()->getSpaceCharacter(),
+        $this->edifactFile->write(
+            'UNA'
+            . $delimiter->getComponentSeparator()
+            . $delimiter->getElementSeparator()
+            . $delimiter->getDecimalPoint()
+            . $delimiter->getEscapeCharacter()
+            . $delimiter->getSpaceCharacter()
+            . $delimiter->getSegmentTerminator()
         );
     }
 

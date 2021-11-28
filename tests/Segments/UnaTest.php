@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact\Test\Segments;
 
-use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\SeglineParser;
 use Apfelfrisch\Edifact\Segments\Una;
 use Apfelfrisch\Edifact\Test\TestCase;
 
@@ -13,7 +13,6 @@ final class UnaTest extends TestCase
     /** @test */
     public function test_segment(): void
     {
-        $delimiter = new Delimiter();
         $seg = Una::fromAttributes(':', '+', '.', '?', ' ');
 
         $this->assertEquals('UNA', $seg->name());
@@ -23,6 +22,6 @@ final class UnaTest extends TestCase
         $this->assertEquals('?', $seg->escapeCharacter());
         $this->assertEquals(' ', $seg->spaceCharacter());
 
-        $this->assertEquals($seg->toString($delimiter), Una::fromSegLine($delimiter, $seg->toString($delimiter))->toString($delimiter));
+        $this->assertEquals($seg->toString(), $seg::fromSegLine(new SeglineParser, $seg->toString())->toString());
     }
 }

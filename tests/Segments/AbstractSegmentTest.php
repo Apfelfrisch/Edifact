@@ -4,8 +4,8 @@ declare(strict_types = 1);
 
 namespace Code\Php\Edifact\tests\Message\Segments;
 
+use Apfelfrisch\Edifact\SeglineParser;
 use Apfelfrisch\Edifact\Test\TestCase;
-use Apfelfrisch\Edifact\Delimiter;
 use Apfelfrisch\Edifact\Test\Fixtures\Segment;
 
 class AbstractSegmentTest extends TestCase
@@ -13,7 +13,7 @@ class AbstractSegmentTest extends TestCase
     /** @test */
     public function it_gives_its_segment_name()
     {
-        $segment = Segment::fromSegLine(new Delimiter, 'A');
+        $segment = Segment::fromSegLine(new SeglineParser, 'A');
 
         $this->assertEquals('A', $segment->name());
     }
@@ -21,7 +21,7 @@ class AbstractSegmentTest extends TestCase
     /** @test */
     public function it_validates_itself()
     {
-        $segment = Segment::fromSegLine(new Delimiter, "A++1:2::4:5");
+        $segment = Segment::fromSegLine(new SeglineParser, "A++1:2::4:5");
 
         $this->assertNull($segment->validate());
     }
@@ -31,9 +31,9 @@ class AbstractSegmentTest extends TestCase
     {
         $givenString = 'A+B+1:2:3:4:5+D+E';
 
-        $segment = Segment::fromSegLine(new Delimiter, $givenString);
+        $segment = Segment::fromSegLine(new SeglineParser, $givenString);
 
-        $this->assertEquals($givenString, $segment->toString(new Delimiter));
+        $this->assertEquals($givenString, $segment->toString(new SeglineParser));
     }
 
     /** @test */
@@ -49,7 +49,7 @@ class AbstractSegmentTest extends TestCase
           "F" => ["F" => null,],
         ];
 
-        $segment = Segment::fromSegLine(new Delimiter, $givenString);
+        $segment = Segment::fromSegLine(new SeglineParser, $givenString);
 
         $this->assertEquals($expectedArray, $segment->toArray());
     }
@@ -60,9 +60,9 @@ class AbstractSegmentTest extends TestCase
         $givenString = "A+B+1:2:::+D++";
         $expectedString = "A+B+1:2+D";
 
-        $segment = Segment::fromSegLine(new Delimiter, $givenString);
+        $segment = Segment::fromSegLine(new SeglineParser, $givenString);
 
-        $this->assertEquals($expectedString, $segment->toString(new Delimiter));
+        $this->assertEquals($expectedString, $segment->toString());
     }
 
     /** @test */
@@ -70,9 +70,9 @@ class AbstractSegmentTest extends TestCase
     {
         $givenString = "A+B?+";
 
-        $segment = Segment::fromSegLine(new Delimiter, $givenString);
+        $segment = Segment::fromSegLine(new SeglineParser, $givenString);
 
         $this->assertEquals('B+', $segment->dummyMethod());
-        $this->assertEquals($givenString, $segment->toString(new Delimiter));
+        $this->assertEquals($givenString, $segment->toString());
     }
 }

@@ -5,10 +5,11 @@ declare(strict_types = 1);
 namespace Apfelfrisch\Edifact\Interfaces;
 
 use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\SeglineParser;
 
 interface SegInterface
 {
-    public static function fromSegLine(Delimiter $delimiter, string $segLine): self|static;
+    public static function fromSegLine(SeglineParser $parser, string $segLine): self|static;
 
     public function setDelimiter(Delimiter $delimiter): void;
 

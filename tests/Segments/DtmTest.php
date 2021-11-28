@@ -4,10 +4,10 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact\Test\Segments;
 
+use Apfelfrisch\Edifact\SeglineParser;
 use DateTime;
 use Iterator;
 use Apfelfrisch\Edifact\Exceptions\SegValidationException;
-use Apfelfrisch\Edifact\Delimiter;
 use Apfelfrisch\Edifact\Segments\Dtm;
 use Apfelfrisch\Edifact\Test\TestCase;
 
@@ -16,14 +16,13 @@ final class DtmTest extends TestCase
     /** @test */
     public function test_ajt_segment(): void
     {
-        $delimiter = new Delimiter();
         $seg = Dtm::fromAttributes('102', '20200101', '102');
 
         $this->assertEquals('DTM', $seg->name());
         $this->assertEquals('102', $seg->code());
         $this->assertEquals('2020-01-01', $seg->date()->format('Y-m-d'));
         $this->assertEquals('20200101', $seg->rawDate());
-        $this->assertEquals($seg->toString($delimiter), Dtm::fromSegLine($delimiter, $seg->toString($delimiter))->toString($delimiter));
+        $this->assertEquals($seg->toString(), $seg::fromSegLine(new SeglineParser, $seg->toString())->toString());
     }
 
     /**

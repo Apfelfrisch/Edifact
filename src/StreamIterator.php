@@ -83,7 +83,7 @@ final class StreamIterator implements Iterator
 
     private function getSegmentObject(string $segLine): SegInterface
     {
-        return $this->segmentFactory->build($segLine, $this->stream->getDelimiter());
+        return $this->segmentFactory->build($segLine);
     }
 
     private function getNextSegLine(): ?string

@@ -8,7 +8,6 @@ use Apfelfrisch\Edifact\Builder;
 use Apfelfrisch\Edifact\Delimiter;
 use Apfelfrisch\Edifact\Segments\Ajt;
 use Apfelfrisch\Edifact\Segments\Seq;
-use Apfelfrisch\Edifact\Segments\Una;
 use Apfelfrisch\Edifact\Segments\Unb;
 use Apfelfrisch\Edifact\Segments\Unh;
 use Apfelfrisch\Edifact\Segments\Unt;
@@ -31,11 +30,10 @@ class BuilderTest extends TestCase
     }
 
     /** @test */
-    public function test_using_delimter_from_una()
+    public function test_using_custom_delimter()
     {
-        $builder = new Builder;
+        $builder = new Builder(new Delimiter('|', '#', '.', '!', ' '));
         $builder->writeSegments(
-            Una::fromAttributes('|', '#', '.', '!', ' '),
             Unb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'referenz-no')
         );
 

@@ -95,7 +95,7 @@ class MessageTest extends TestCase
         $messageCore = Message::fromString("UNH'UNB'");
         $message = "";
         foreach ($messageCore->getSegments() as $segment) {
-            $message .= $segment->toString($messageCore->getDelimiter()) . $messageCore->getDelimiter()->getSegmentTerminator();
+            $message .= $segment->toString() . $messageCore->getDelimiter()->getSegmentTerminator();
         }
         $this->assertEquals($message, (string)$messageCore);
     }

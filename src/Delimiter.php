@@ -9,7 +9,6 @@ final class Delimiter
     private static ?self $defaultDelimiter = null;
 
     const UNA_SEGMENT = 'UNA';
-    const PLACE_HOLDER = '«>~<«';
 
     public function __construct(
         private string $componentSeparator = ':',
@@ -56,27 +55,6 @@ final class Delimiter
         return self::$defaultDelimiter;
     }
 
-    public function escapeString(string $string): string
-    {
-        return str_replace(
-            [$this->componentSeparator, $this->elementSeparator, '\\n'],
-            [$this->escapeCharacter . $this->componentSeparator, $this->escapeCharacter . $this->elementSeparator, ''],
-            $string
-        );
-    }
-
-    /** @return list<string> */
-    public function explodeElements(string $string): array
-    {
-        return $this->explodeString($string, $this->elementSeparator);
-    }
-
-    /** @return list<string> */
-    public function explodeComponents(string $string): array
-    {
-        return $this->explodeString($string, $this->componentSeparator);
-    }
-
     public function getComponentSeparator(): string
     {
         return $this->componentSeparator;
@@ -105,42 +83,5 @@ final class Delimiter
     public function getSegmentTerminator(): string
     {
         return $this->segmentTerminator;
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function explodeString(string $string, string $pattern): array
-    {
-        $string = str_replace(["\r", "\n"], '', $string);
-
-        if ($foundTermination = (bool)strpos($string, $this->escapeCharacter . $pattern)) {
-            $string = str_replace($this->escapeCharacter . $pattern, self::PLACE_HOLDER, $string);
-        }
-
-        $explodedString = explode($pattern, $string);
-
-        if ($foundTermination) {
-            $explodedString = array_map(
-                fn(string $string): string => str_replace(self::PLACE_HOLDER, $pattern, $string),
-                $explodedString
-            );
-        }
-
-        return $this->trimLastItem($explodedString);
-    }
-
-    /**
-     * @param list<string> $array
-     *
-     * @return list<string>
-     */
-    private function trimLastItem(array $array): array
-    {
-        if (end($array) == '') {
-            array_pop($array);
-        }
-
-        return $array;
     }
 }

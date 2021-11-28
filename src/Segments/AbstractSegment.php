@@ -7,6 +7,8 @@ use Apfelfrisch\Edifact\Delimiter;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
 use Apfelfrisch\Edifact\Validation\SegmentValidator;
 use Apfelfrisch\Edifact\Interfaces\SegValidatorInterface;
+use Apfelfrisch\Edifact\SeglineParser;
+use Apfelfrisch\Edifact\StringFormatter;
 
 abstract class AbstractSegment implements SegInterface
 {
@@ -24,10 +26,10 @@ abstract class AbstractSegment implements SegInterface
 
     abstract public static function blueprint(): Elements;
 
-    public static function fromSegLine(Delimiter $delimiter, string $segLine): static
+    public static function fromSegLine(SeglineParser $parser, string $segLine): static
     {
-        $segment = new static(static::mapToBlueprint($delimiter, $segLine));
-        $segment->setDelimiter($delimiter);
+        $segment = new static($parser->parseToBlueprint($segLine, static::blueprint()));
+        $segment->setDelimiter($parser->getDelimiter());
 
         return $segment;
     }
@@ -85,64 +87,11 @@ abstract class AbstractSegment implements SegInterface
 
     public function toString(): string
     {
-        $string = '';
-
-        foreach($this->elements->toArray() as $element) {
-            foreach ($element as $value) {
-                $string .= $value === null
-                    ? $this->getDelimiter()->getComponentSeparator()
-                    : $this->getDelimiter()->escapeString($value) . $this->getDelimiter()->getComponentSeparator();
-            }
-
-            $string = $this->trimEmpty(
-                $string, $this->getDelimiter()->getComponentSeparator(), $this->getDelimiter()->getEscapeCharacter()
-            ) . $this->getDelimiter()->getElementSeparator();
-        }
-
-        return $this->trimEmpty($string, $this->getDelimiter()->getElementSeparator(), $this->getDelimiter()->getEscapeCharacter());
+        return substr((new StringFormatter($this->getDelimiter()))->format($this), 0, -1);
     }
 
     private function getDelimiter(): Delimiter
     {
         return $this->delimiter ??= Delimiter::getDefault();
-    }
-
-    private function trimEmpty(string $string, string $elementSeperator, string $terminator): string
-    {
-        while(true) {
-            if ($elementSeperator !== $string[-1] ?? null) {
-                break;
-            }
-
-            if ($terminator === $string[-2] ?? null) {
-                break;
-            }
-
-            $string = substr($string, 0, -1);
-        }
-
-        return $string;
-    }
-
-    protected static function mapToBlueprint(Delimiter $delimiter, string $segLine): Elements
-    {
-        $i = 0;
-        $elements = new Elements;
-        $dataArray = $delimiter->explodeElements($segLine);
-        foreach (static::blueprint()->toArray() as $BpDataKey => $BPelements) {
-            $inputElement = [];
-            if (isset($dataArray[$i])) {
-                $inputElement = $delimiter->explodeComponents($dataArray[$i]);
-            }
-
-            $j = 0;
-            foreach (array_keys($BPelements) as $key) {
-                $elements->addValue($BpDataKey, $key, isset($inputElement[$j]) ? $inputElement[$j] : null);
-                $j++;
-            }
-            $i++;
-        }
-
-        return $elements;
     }
 }

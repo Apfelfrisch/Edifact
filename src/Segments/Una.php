@@ -4,6 +4,7 @@ namespace Apfelfrisch\Edifact\Segments;
 
 use Apfelfrisch\Edifact\Elements;
 use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\SeglineParser;
 
 class Una extends AbstractSegment
 {
@@ -23,6 +24,14 @@ class Una extends AbstractSegment
         }
 
         return self::$blueprint;
+    }
+
+    public static function fromSegLine(SeglineParser $parser, string $segLine): static
+    {
+        $segment = new static(static::mapToBlueprint($parser->getDelimiter(), $segLine));
+        $segment->setDelimiter($parser->getDelimiter());
+
+        return $segment;
     }
 
     public static function fromAttributes(

@@ -5,12 +5,21 @@ namespace Apfelfrisch\Edifact\Segments;
 use Apfelfrisch\Edifact\Elements;
 use Apfelfrisch\Edifact\Delimiter;
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
+use Apfelfrisch\Edifact\SeglineParser;
 
 class Generic extends AbstractSegment
 {
     public static function blueprint(): Elements
     {
         throw new EdifactException('Generic Segment has no Blueprint');
+    }
+
+    public static function fromSegLine(SeglineParser $parser, string $segLine): static
+    {
+        $segment = new static($parser->parse($segLine));
+        $segment->setDelimiter($parser->getDelimiter());
+
+        return $segment;
     }
 
     /**
@@ -36,22 +45,5 @@ class Generic extends AbstractSegment
     public function validate(): void
     {
         return;
-    }
-
-    protected static function mapToBlueprint(Delimiter $delimiter, string $segLine): Elements
-    {
-        $inputElements = $delimiter->explodeElements($segLine);
-
-        $elements = new Elements;
-
-        for ($i = 0; $i < $_ = count($inputElements); $i++) {
-            $inputComponents = $delimiter->explodeComponents($inputElements[$i]);
-
-            for($j = 0; $j < $__ = count($inputComponents); $j++) {
-                $elements->addValue((string)$i, (string)$j, $inputComponents[$j]);
-            }
-        }
-
-        return $elements;
     }
 }
