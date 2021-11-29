@@ -77,7 +77,7 @@ class Message
      */
     public function filterSegments(string $segmentClass, ?Closure $closure = null): Generator
     {
-        foreach ($this->getAllSegments() as $segment) {
+        foreach ($this->getSegments() as $segment) {
             if ($segment::class !== $segmentClass) {
                 continue;
             }
