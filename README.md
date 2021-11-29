@@ -7,7 +7,8 @@ A PHP library, wich provides a Framework to parse, build and serialize UN/EDIFAC
 
 ## Highlights
 * Parse and Write Files in a memory efficient and scalable way 
-* Parse each Segment to its specific Object, this way we can define getter, setter and have Intelligent code completion
+* Parse each Segment to its specific Object
+* Define your own Segments
 
 ## Usage
 
@@ -146,6 +147,8 @@ $builder->writeSegments(
 
 $message = new Message($builder->get());
 ```
+UNA and the trailing Segments (UNT and UNZ) will be added automatically. If no UNA Segement is provided, it uses the default values [UNA:+.? ']. 
+For now the Spacecharacter and Decimalpoint will be ignored, you have to take care of it on Segment initialising.
 
 #### Build with custom Una
 
@@ -155,9 +158,6 @@ use Apfelfrisch\Edifact\UnaSegment;
 
 $builder = new Builder(new UnaSegment('|', '#', '.', '!', ' ', '"'));
 ```
-
-Trailing Segments (UNT and UNZ) will be added automatically. If no UNA Segement is provided, it uses the default "UNA:+.? '". 
-For now the Spaceseperator and Decimalseprator will be ignored, you have to take care of it on Segment initialising.
 
 #### Add Writefilter to the Builder
 ```php
