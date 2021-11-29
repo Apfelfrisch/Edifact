@@ -3,11 +3,11 @@
 ![Unit Test](https://github.com/Apfelfrisch/Edifact/actions/workflows/phpunit.yml/badge.svg)
 ![Static Analysis](https://github.com/Apfelfrisch/Edifact/actions/workflows/psalm.yml/badge.svg)
 
-A PHP library, wich provides a Framework to parse, build, serialize and validate UN/EDIFACT messages.
+A PHP library, wich provides a Framework to parse, build and serialize UN/EDIFACT messages.
 
 ## Highlights
 * Parse and Write Files in a memory efficient and scalable way 
-* Parse each Segment to its specific Object, this way we can define getter, setter and validation it
+* Parse each Segment to its specific Object, this way we can define getter, setter and have Intelligent code completion
 
 ## Usage
 
@@ -78,7 +78,7 @@ $message = Message::fromString("UNA:+.? 'NAD+DP++++Musterstr.::10+City++12345+DE
 
 foreach ($message->getSegments() as $segment) {
     if ($segment instanceof Generic) {
-        echo $segment->name(); // UNA.
+        echo $segment->name(); // NAD.
     }
 }
 ```
@@ -129,7 +129,7 @@ $message = Message::fromString("UNA:+.? 'SEQ+1", $segmentFactory);
 
 ### Build an Edifact Message:
 
-You can build Edifact Messages like so:
+#### Build with default Una
 
 ```php
 use Apfelfrisch\Edifact\Builder;
@@ -146,8 +146,18 @@ $builder->writeSegments(
 
 $message = new Message($builder->get());
 ```
+
+#### Build with custom Una
+
+```php
+use Apfelfrisch\Edifact\Builder;
+use Apfelfrisch\Edifact\UnaSegment;
+
+$builder = new Builder(new UnaSegment('|', '#', '.', '!', ' ', '"'));
+```
+
 Trailing Segments (UNT and UNZ) will be added automatically. If no UNA Segement is provided, it uses the default "UNA:+.? '". 
-For now the Spaceseperator and Decimalseprator will be ignored by the Builder, you have to take care of it on Segment initialising.
+For now the Spaceseperator and Decimalseprator will be ignored, you have to take care of it on Segment initialising.
 
 #### Add Writefilter to the Builder
 ```php
@@ -156,9 +166,4 @@ use Apfelfrisch\Edifact\Segments\Unb;
 
 $builder = new Builder;
 $builder->addStreamFilter('utf8-to-iso', 'convert.iconv.UTF-8.ISO-8859-1');
-
-$builder->writeSegments(
-    Unb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'unb-ref'),
-    Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co')
-);
 ```

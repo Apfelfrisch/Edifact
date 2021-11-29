@@ -10,13 +10,13 @@ use Iterator;
 final class StreamIterator implements Iterator
 {
     private int $currentSegmentNumber = 0;
-    private ?string $segline;
+    private ?string $segline = null;
 
     public function __construct(
         private Stream $stream,
         private SegmentFactory $segmentFactory
     ) {
-        $this->segline = $this->getNextSegLine();
+        $stream->rewind();
     }
 
     public function getFirst(): ?SegInterface
@@ -74,6 +74,9 @@ final class StreamIterator implements Iterator
         $this->stream->rewind();
         $this->currentSegmentNumber = 0;
         $this->segline = $this->getNextSegLine();
+        if ($this->segline !== null && str_starts_with($this->segline, UnaSegment::UNA)) {
+            $this->segline = $this->getNextSegLine();
+        }
     }
 
     public function valid(): bool

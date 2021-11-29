@@ -4,14 +4,14 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact\Interfaces;
 
-use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\UnaSegment;
 use Apfelfrisch\Edifact\SeglineParser;
 
 interface SegInterface
 {
     public static function fromSegLine(SeglineParser $parser, string $segLine): self|static;
 
-    public function setDelimiter(Delimiter $delimiter): void;
+    public function setUnaSegment(UnaSegment $unaSegment): void;
 
     public function name(): string;
 
@@ -25,6 +25,4 @@ interface SegInterface
      * @psalm-return array<string, array<string, string|null>>
      */
     public function toArray(): array;
-
-    public function toString(): string;
 }

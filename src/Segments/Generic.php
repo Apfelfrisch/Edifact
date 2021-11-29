@@ -3,7 +3,7 @@
 namespace Apfelfrisch\Edifact\Segments;
 
 use Apfelfrisch\Edifact\Elements;
-use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\UnaSegment;
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use Apfelfrisch\Edifact\SeglineParser;
 
@@ -17,7 +17,7 @@ class Generic extends AbstractSegment
     public static function fromSegLine(SeglineParser $parser, string $segLine): static
     {
         $segment = new static($parser->parse($segLine));
-        $segment->setDelimiter($parser->getDelimiter());
+        $segment->setUnaSegment($parser->getUnaSegment());
 
         return $segment;
     }

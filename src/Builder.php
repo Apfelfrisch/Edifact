@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact;
 
-use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\UnaSegment;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
 use Apfelfrisch\Edifact\Segments\Unt;
 use Apfelfrisch\Edifact\Segments\Unz;
@@ -23,12 +23,13 @@ class Builder
     private string $filepath;
     private StringFormatter $stringFormatter;
 
-    public function __construct(Delimiter $delimiter = null, string $filepath = 'php://temp')
+    public function __construct(UnaSegment $unaSegment = null, string $filepath = 'php://temp')
     {
         $this->filepath = $filepath;
 
-        $this->edifactFile = new Stream($this->filepath, 'w', $delimiter);
-        $this->stringFormatter = new StringFormatter($this->edifactFile->getDelimiter());
+        $this->edifactFile = new Stream($this->filepath, 'w', $unaSegment);
+        $this->stringFormatter = new StringFormatter($this->edifactFile->getUnaSegment());
+        $this->stringFormatter->prefixUna();
     }
 
     public function addStreamFilter(string $filtername, mixed $params = null): self
@@ -54,15 +55,7 @@ class Builder
 
     public function writeSegments(SegInterface ...$segments): void
     {
-        if ($this->messageIsEmpty()) {
-            $this->writeUna();
-        }
-
         foreach ($segments as $segment) {
-            if ($segment->name() === 'UNA') {
-                continue;
-            }
-
             if ($segment->name() === 'UNB') {
                 $this->unbRef = $segment->getValueFromPosition(5, 0) ?? '';
             }
@@ -117,22 +110,22 @@ class Builder
 
     private function writeUna(): void
     {
-        $delimiter = $this->edifactFile->getDelimiter();
+        $unaSegment = $this->edifactFile->getUnaSegment();
 
         $this->edifactFile->write(
-            'UNA'
-            . $delimiter->getComponentSeparator()
-            . $delimiter->getElementSeparator()
-            . $delimiter->getDecimalPoint()
-            . $delimiter->getEscapeCharacter()
-            . $delimiter->getSpaceCharacter()
-            . $delimiter->getSegmentTerminator()
+            $unaSegment::UNA
+            . $unaSegment->componentSeparator()
+            . $unaSegment->elementSeparator()
+            . $unaSegment->decimalPoint()
+            . $unaSegment->escapeCharacter()
+            . $unaSegment->spaceCharacter()
+            . $unaSegment->segmentTerminator()
         );
     }
 
     private function countSegments(SegInterface $segment): void
     {
-        if ($segment->name() === 'UNA' || $segment->name() === 'UNB') {
+        if ($segment->name() === 'UNB') {
             return;
         }
 

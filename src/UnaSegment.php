@@ -4,11 +4,11 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact;
 
-final class Delimiter
+final class UnaSegment
 {
-    private static ?self $defaultDelimiter = null;
+    private static ?self $defaultUnaSegment = null;
 
-    const UNA_SEGMENT = 'UNA';
+    public const UNA = 'UNA';
 
     public function __construct(
         private string $componentSeparator = ':',
@@ -19,21 +19,21 @@ final class Delimiter
         private string $segmentTerminator = '\''
     ) { }
 
-    public static function setFromFile(Stream $file, ?self $fallback = null): self
+    public static function setFromStream(Stream $stream, ?self $fallback = null): self
     {
-        $position = $file->tell();
-        $file->rewind();
+        $position = $stream->tell();
+        $stream->rewind();
 
-        $instance = self::setFromString($file->read(9), $fallback);
+        $instance = self::setFromString($stream->read(9), $fallback);
 
-        $file->seek($position);
+        $stream->seek($position);
 
         return $instance;
     }
 
     public static function setFromString(string $string, ?self $fallback = null): self
     {
-        if (substr($string, 0, 3) !== self::UNA_SEGMENT) {
+        if (substr($string, 0, 3) !== self::UNA) {
             return $fallback ?? new self();
         }
 
@@ -48,40 +48,51 @@ final class Delimiter
 
     public static function getDefault(): self
     {
-        if (self::$defaultDelimiter === null) {
-            self::$defaultDelimiter = new self();
+        if (self::$defaultUnaSegment === null) {
+            self::$defaultUnaSegment = new self();
         }
 
-        return self::$defaultDelimiter;
+        return self::$defaultUnaSegment;
     }
 
-    public function getComponentSeparator(): string
+    public function componentSeparator(): string
     {
         return $this->componentSeparator;
     }
 
-    public function getElementSeparator(): string
+    public function elementSeparator(): string
     {
         return $this->elementSeparator;
     }
 
-    public function getDecimalPoint(): string
+    public function decimalPoint(): string
     {
         return $this->decimalPoint;
     }
 
-    public function getEscapeCharacter(): string
+    public function escapeCharacter(): string
     {
         return $this->escapeCharacter;
     }
 
-    public function getSpaceCharacter(): string
+    public function spaceCharacter(): string
     {
         return $this->spaceCharacter;
     }
 
-    public function getSegmentTerminator(): string
+    public function segmentTerminator(): string
     {
         return $this->segmentTerminator;
+    }
+
+    public function toString(): string
+    {
+        return self::UNA
+            . $this->componentSeparator()
+            . $this->elementSeparator()
+            . $this->decimalPoint()
+            . $this->escapeCharacter()
+            . $this->spaceCharacter()
+            . $this->segmentTerminator();
     }
 }

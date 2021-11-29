@@ -18,20 +18,20 @@ final class SegmentFactory
 
     private static ?self $defaultFactory = null;
 
-    private Delimiter $delimiter;
+    private UnaSegment $unaSegment;
 
     private SeglineParser $parser;
 
-    public function __construct(?Delimiter $delimiter = null)
+    public function __construct(?UnaSegment $unaSegment = null)
     {
-        $this->delimiter = $delimiter ?? Delimiter::getDefault();
-        $this->parser = new SeglineParser($this->delimiter);
+        $this->unaSegment = $unaSegment ?? UnaSegment::getDefault();
+        $this->parser = new SeglineParser($this->unaSegment);
     }
 
-    public function setDelimiter(Delimiter $delimiter): void
+    public function setUnaSegment(UnaSegment $unaSegment): void
     {
-        $this->delimiter = $delimiter;
-        $this->parser = new SeglineParser($this->delimiter);
+        $this->unaSegment = $unaSegment;
+        $this->parser = new SeglineParser($this->unaSegment);
     }
 
     public static function withDefaultDegments(bool $withFallback = true): self

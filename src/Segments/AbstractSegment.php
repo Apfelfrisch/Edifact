@@ -3,7 +3,7 @@
 namespace Apfelfrisch\Edifact\Segments;
 
 use Apfelfrisch\Edifact\Elements;
-use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\UnaSegment;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
 use Apfelfrisch\Edifact\Validation\SegmentValidator;
 use Apfelfrisch\Edifact\Interfaces\SegValidatorInterface;
@@ -12,7 +12,11 @@ use Apfelfrisch\Edifact\StringFormatter;
 
 abstract class AbstractSegment implements SegInterface
 {
-    protected ?Delimiter $delimiter = null;
+    public const SPACE_CHARACTER = ' ';
+
+    public const DECIMAL_POINT = '.';
+
+    protected ?UnaSegment $unaSegment = null;
 
     protected Elements $elements;
 
@@ -29,14 +33,14 @@ abstract class AbstractSegment implements SegInterface
     public static function fromSegLine(SeglineParser $parser, string $segLine): static
     {
         $segment = new static($parser->parseToBlueprint($segLine, static::blueprint()));
-        $segment->setDelimiter($parser->getDelimiter());
+        $segment->setUnaSegment($parser->getUnaSegment());
 
         return $segment;
     }
 
-    public function setDelimiter(Delimiter $delimiter): void
+    public function setUnaSegment(UnaSegment $unaSegment): void
     {
-        $this->delimiter = $delimiter;
+        $this->unaSegment = $unaSegment;
     }
 
     public function getValueFromPosition(int $elementPosition, int $valuePosition): ?string
@@ -51,8 +55,8 @@ abstract class AbstractSegment implements SegInterface
 
     public function replaceDecimalPoint(?string $value): ?string
     {
-        if ($this->getDelimiter()->getDecimalPoint() !== '.' && $value !== null) {
-            return str_replace($this->getDelimiter()->getDecimalPoint(), '.', $value);
+        if ($this->getUnaSegment()->decimalPoint() !== self::DECIMAL_POINT && $value !== null) {
+            return str_replace($this->getUnaSegment()->decimalPoint(), self::DECIMAL_POINT, $value);
         }
 
         return $value;
@@ -60,8 +64,8 @@ abstract class AbstractSegment implements SegInterface
 
     public function replaceSpaceCharacter(?string $value): ?string
     {
-        if ($this->getDelimiter()->getSpaceCharacter() !== ' ' && $value !== null) {
-            return str_replace($this->getDelimiter()->getSpaceCharacter(), '.', $value);
+        if ($this->getUnaSegment()->spaceCharacter() !== self::SPACE_CHARACTER && $value !== null) {
+            return str_replace($this->getUnaSegment()->spaceCharacter(), self::SPACE_CHARACTER, $value);
         }
 
         return $value;
@@ -87,11 +91,11 @@ abstract class AbstractSegment implements SegInterface
 
     public function toString(): string
     {
-        return substr((new StringFormatter($this->getDelimiter()))->format($this), 0, -1);
+        return substr((new StringFormatter($this->getUnaSegment()))->format($this), 0, -1);
     }
 
-    private function getDelimiter(): Delimiter
+    private function getUnaSegment(): UnaSegment
     {
-        return $this->delimiter ??= Delimiter::getDefault();
+        return $this->unaSegment ??= UnaSegment::getDefault();
     }
 }

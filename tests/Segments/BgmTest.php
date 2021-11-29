@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact\Test\Segments;
 
-use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\UnaSegment;
 use Apfelfrisch\Edifact\SeglineParser;
 use Apfelfrisch\Edifact\Segments\Bgm;
 use Apfelfrisch\Edifact\Test\TestCase;

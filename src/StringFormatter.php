@@ -9,24 +9,26 @@ use Apfelfrisch\Edifact\Interfaces\SegInterface;
 
 final class StringFormatter implements FormatterInterface
 {
+    private bool $prefixUna = false;
+
     public function __construct(
-        private Delimiter $delimiter
+        private UnaSegment $unaSegment
     ) { }
+
+    public function prefixUna(): self
+    {
+        $this->prefixUna = true;
+
+        return $this;
+    }
 
     public function format(SegInterface ...$segments): string
     {
         $string = '';
 
-        if ($segments[0]->name() === 'UNA') {
-            array_shift($segments);
-
-            $string = 'UNA'
-                . $this->delimiter->getComponentSeparator()
-                . $this->delimiter->getElementSeparator()
-                . $this->delimiter->getDecimalPoint()
-                . $this->delimiter->getEscapeCharacter()
-                . $this->delimiter->getSpaceCharacter()
-                . $this->delimiter->getSegmentTerminator();
+        if ($this->prefixUna) {
+            $string = $this->unaSegment->toString();
+            $this->prefixUna = false;
         }
 
         foreach ($segments as $segment) {
@@ -34,15 +36,15 @@ final class StringFormatter implements FormatterInterface
             foreach($segment->toArray() as $element) {
                 foreach ($element as $value) {
                     $segmentString .= $value === null
-                        ? $this->delimiter->getComponentSeparator()
-                        : $this->escapeString($value) . $this->delimiter->getComponentSeparator();
+                        ? $this->unaSegment->componentSeparator()
+                        : $this->escapeString($value) . $this->unaSegment->componentSeparator();
                 }
 
                 $segmentString = $this->trimEmpty(
-                    $segmentString, $this->delimiter->getComponentSeparator()
-                ) . $this->delimiter->getElementSeparator();
+                    $segmentString, $this->unaSegment->componentSeparator()
+                ) . $this->unaSegment->elementSeparator();
             }
-            $string .= $this->trimEmpty($segmentString, $this->delimiter->getElementSeparator()) . $this->delimiter->getSegmentTerminator();
+            $string .= $this->trimEmpty($segmentString, $this->unaSegment->elementSeparator()) . $this->unaSegment->segmentTerminator();
         }
 
         return $string;
@@ -52,13 +54,13 @@ final class StringFormatter implements FormatterInterface
     {
         return str_replace(
             [
-                $this->delimiter->getComponentSeparator(),
-                $this->delimiter->getElementSeparator(),
+                $this->unaSegment->componentSeparator(),
+                $this->unaSegment->elementSeparator(),
                 '\\n'
             ],
             [
-                $this->delimiter->getEscapeCharacter() . $this->delimiter->getComponentSeparator(),
-                $this->delimiter->getEscapeCharacter() . $this->delimiter->getElementSeparator(),
+                $this->unaSegment->escapeCharacter() . $this->unaSegment->componentSeparator(),
+                $this->unaSegment->escapeCharacter() . $this->unaSegment->elementSeparator(),
                 ''
             ],
             $string
@@ -72,7 +74,7 @@ final class StringFormatter implements FormatterInterface
                 break;
             }
 
-            if ($this->delimiter->getEscapeCharacter() === $string[-2] ?? null) {
+            if ($this->unaSegment->escapeCharacter() === $string[-2] ?? null) {
                 break;
             }
 

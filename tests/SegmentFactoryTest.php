@@ -2,7 +2,7 @@
 
 namespace Apfelfrisch\Edifact\Test;
 
-use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\UnaSegment;
 use Apfelfrisch\Edifact\Test\TestCase;
 use Apfelfrisch\Edifact\SegmentFactory;
 use Apfelfrisch\Edifact\Segments\Generic;

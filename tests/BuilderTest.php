@@ -5,7 +5,7 @@ namespace Apfelfrisch\Edifact\Test\Message;
 use Apfelfrisch\Edifact\Message;
 use DateTime;
 use Apfelfrisch\Edifact\Builder;
-use Apfelfrisch\Edifact\Delimiter;
+use Apfelfrisch\Edifact\UnaSegment;
 use Apfelfrisch\Edifact\Segments\Ajt;
 use Apfelfrisch\Edifact\Segments\Seq;
 use Apfelfrisch\Edifact\Segments\Unb;
@@ -16,7 +16,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 class BuilderTest extends TestCase
 {
     /** @test */
-    public function test_setting_default_delimiter()
+    public function test_setting_default_unaSegment()
     {
         $builder = new Builder;
         $builder->writeSegments(
@@ -26,13 +26,13 @@ class BuilderTest extends TestCase
         $message = $builder->get();
 
         $this->assertStringStartsWith("UNA:+.? '", $message);
-        $this->assertEquals(new Delimiter(), $message->getDelimiter());
+        $this->assertEquals(new UnaSegment(), $message->getUnaSegment());
     }
 
     /** @test */
     public function test_using_custom_delimter()
     {
-        $builder = new Builder(new Delimiter('|', '#', '.', '!', ' '));
+        $builder = new Builder(new UnaSegment('|', '#', '.', '!', ' '));
         $builder->writeSegments(
             Unb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'referenz-no')
         );
@@ -40,7 +40,7 @@ class BuilderTest extends TestCase
         $message = $builder->get();
 
         $this->assertStringStartsWith("UNA|#.! '", $message);
-        $this->assertEquals(new Delimiter('|', '#', '.', '!'), $message->getDelimiter());
+        $this->assertEquals(new UnaSegment('|', '#', '.', '!'), $message->getUnaSegment());
         $this->assertSame(
             "UNA|#.! 'UNB#1|2#sender|500#receiver|400#210101|1201#referenz-no'UNZ#0#referenz-no'",
             $message->toString()

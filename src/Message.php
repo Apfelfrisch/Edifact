@@ -14,7 +14,7 @@ class Message
 {
     protected Stream $stream;
 
-    protected StreamIterator $iterator;
+    protected StreamIterator $segmentIterator;
 
     protected SegmentFactory $segmentFactory;
 
@@ -22,8 +22,8 @@ class Message
     {
         $this->stream = $stream;
         $this->segmentFactory = $segmentFactory ?? SegmentFactory::withDefaultDegments();
-        $this->segmentFactory->setDelimiter($this->stream->getDelimiter());
-        $this->iterator = new StreamIterator($this->stream, $this->segmentFactory);
+        $this->segmentFactory->setUnaSegment($this->stream->getUnaSegment());
+        $this->segmentIterator = new StreamIterator($this->stream, $this->segmentFactory);
     }
 
     public static function fromFilepath(string $string, ?SegmentFactory $segmentFactory = null): self
@@ -56,9 +56,9 @@ class Message
 
     public function getSegments(): StreamIterator
     {
-        $this->iterator->rewind();
+        $this->segmentIterator->rewind();
 
-        return $this->iterator;
+        return $this->segmentIterator;
     }
 
     /**
@@ -116,25 +116,25 @@ class Message
      */
     public function unwrap(string $header = 'UNH', string $trailer = 'UNT'): Generator
     {
-        $this->iterator->rewind();
+        $this->segmentIterator->rewind();
 
         $stream = null;
 
-        while ($this->iterator->valid()) {
-            $segLine = $this->iterator->currentSegline();
-            $this->iterator->next();
+        while ($this->segmentIterator->valid()) {
+            $segLine = $this->segmentIterator->currentSegline();
+            $this->segmentIterator->next();
 
             $segmentName = substr($segLine, 0, 3);
 
             if ($segmentName === $header) {
-                $stream = new Stream('php://temp', 'w+', $this->getDelimiter());
+                $stream = new Stream('php://temp', 'w+', $this->getUnaSegment());
             }
 
             if ($stream === null) {
                 continue;
             }
 
-            $stream->write($segLine.$this->getDelimiter()->getSegmentTerminator());
+            $stream->write($segLine.$this->getUnaSegment()->segmentTerminator());
 
             if ($segmentName === $trailer) {
                 yield new self($stream, $this->segmentFactory);
@@ -154,9 +154,9 @@ class Message
         }
     }
 
-    public function getDelimiter(): Delimiter
+    public function getUnaSegment(): UnaSegment
     {
-        return $this->stream->getDelimiter();
+        return $this->stream->getUnaSegment();
     }
 
     /**

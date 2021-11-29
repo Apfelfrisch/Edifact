@@ -6,28 +6,28 @@ final class SeglineParser
 {
     private const PLACE_HOLDER = '«>~<«';
 
-    private Delimiter $delimiter;
+    private UnaSegment $unaSegment;
 
-    public function __construct(?Delimiter $delimiter = null)
+    public function __construct(?UnaSegment $unaSegment = null)
     {
-        $this->delimiter = $delimiter ?? Delimiter::getDefault();
+        $this->unaSegment = $unaSegment ?? UnaSegment::getDefault();
     }
 
-    public function getDelimiter(): Delimiter
+    public function getUnaSegment(): UnaSegment
     {
-        return $this->delimiter;
+        return $this->unaSegment;
     }
 
     public function parseToBlueprint(string $segline, Elements $blueprint): Elements
     {
         $i = 0;
         $elements = new Elements;
-        $dataArray = $this->explodeString($segline, $this->delimiter->getElementSeparator());
+        $dataArray = $this->explodeString($segline, $this->unaSegment->elementSeparator());
 
         foreach ($blueprint->toArray() as $BpDataKey => $BPelements) {
             $inputElement = [];
             if (isset($dataArray[$i])) {
-                $inputElement = $this->explodeString($dataArray[$i], $this->delimiter->getComponentSeparator());
+                $inputElement = $this->explodeString($dataArray[$i], $this->unaSegment->componentSeparator());
             }
 
             $j = 0;
@@ -43,13 +43,13 @@ final class SeglineParser
 
     public function parse(string $segline): Elements
     {
-        $segLineElements = $this->explodeString($segline, $this->delimiter->getElementSeparator());
+        $segLineElements = $this->explodeString($segline, $this->unaSegment->elementSeparator());
 
         $elements = new Elements;
 
         $i = 0;
         foreach ($segLineElements as $element) {
-            $components = $this->explodeString($element, $this->delimiter->getComponentSeparator());
+            $components = $this->explodeString($element, $this->unaSegment->componentSeparator());
 
             $j = 0;
             foreach ($components as $component) {
@@ -69,8 +69,8 @@ final class SeglineParser
     {
         $string = str_replace(["\r", "\n"], '', $string);
 
-        if ($foundTermination = (bool)strpos($string, $this->delimiter->getEscapeCharacter() . $pattern)) {
-            $string = str_replace($this->delimiter->getEscapeCharacter() . $pattern, self::PLACE_HOLDER, $string);
+        if ($foundTermination = (bool)strpos($string, $this->unaSegment->escapeCharacter() . $pattern)) {
+            $string = str_replace($this->unaSegment->escapeCharacter() . $pattern, self::PLACE_HOLDER, $string);
         }
 
         $explodedString = explode($pattern, $string);
