@@ -19,7 +19,7 @@ class Builder
     private int $messageCount = 0;
     private bool $messageWasFetched = false;
 
-    private Stream $edifactFile;
+    private Stream $stream;
     private string $filepath;
     private StringFormatter $stringFormatter;
 
@@ -27,14 +27,14 @@ class Builder
     {
         $this->filepath = $filepath;
 
-        $this->edifactFile = new Stream($this->filepath, 'w', $unaSegment);
-        $this->stringFormatter = new StringFormatter($this->edifactFile->getUnaSegment());
+        $this->stream = new Stream($this->filepath, 'w', $unaSegment);
+        $this->stringFormatter = new StringFormatter($this->stream->getUnaSegment());
         $this->stringFormatter->prefixUna();
     }
 
     public function addStreamFilter(string $filtername, mixed $params = null): self
     {
-        $this->edifactFile->addWriteFilter($filtername, $params);
+        $this->stream->addWriteFilter($filtername, $params);
 
         return $this;
     }
@@ -42,7 +42,7 @@ class Builder
     public function __destruct()
     {
         // Delete File if build process could not finshed
-        $filepath = $this->edifactFile->getRealPath();
+        $filepath = $this->stream->getRealPath();
         if ($this->messageWasFetched === false && $filepath && file_exists($filepath)) {
             unlink($filepath);
         }
@@ -74,7 +74,7 @@ class Builder
 
     private function writeSegment(SegInterface $segment): void
     {
-        $this->edifactFile->write(
+        $this->stream->write(
             $this->stringFormatter->format($segment)
         );
 
@@ -97,7 +97,7 @@ class Builder
         $this->messageWasFetched = true;
 
         if (str_starts_with($this->filepath, 'php://')) {
-            return $this->edifactFile;
+            return $this->stream;
         }
 
         return new Stream($this->filepath);
@@ -105,22 +105,7 @@ class Builder
 
     public function messageIsEmpty(): bool
     {
-        return $this->edifactFile->isEmpty();
-    }
-
-    private function writeUna(): void
-    {
-        $unaSegment = $this->edifactFile->getUnaSegment();
-
-        $this->edifactFile->write(
-            $unaSegment::UNA
-            . $unaSegment->componentSeparator()
-            . $unaSegment->elementSeparator()
-            . $unaSegment->decimalPoint()
-            . $unaSegment->escapeCharacter()
-            . $unaSegment->spaceCharacter()
-            . $unaSegment->segmentTerminator()
-        );
+        return $this->stream->isEmpty();
     }
 
     private function countSegments(SegInterface $segment): void
