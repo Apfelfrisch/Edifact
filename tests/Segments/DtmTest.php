@@ -4,10 +4,10 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact\Test\Segments;
 
+use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use Apfelfrisch\Edifact\SeglineParser;
 use DateTime;
 use Iterator;
-use Apfelfrisch\Edifact\Exceptions\SegValidationException;
 use Apfelfrisch\Edifact\Segments\Dtm;
 use Apfelfrisch\Edifact\Test\TestCase;
 
@@ -55,7 +55,7 @@ final class DtmTest extends TestCase
         $code = '999';
         $date = new DateTime;
 
-        $this->expectException(SegValidationException::class);
+        $this->expectException(EdifactException::class);
         Dtm::fromAttributes('137', $date, $code);
     }
 

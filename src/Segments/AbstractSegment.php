@@ -20,12 +20,9 @@ abstract class AbstractSegment implements SegInterface
 
     protected Elements $elements;
 
-    protected SegValidatorInterface $validator;
-
     final protected function __construct(Elements $elements)
     {
         $this->elements = $elements;
-        $this->validator = new SegmentValidator;
     }
 
     abstract public static function blueprint(): Elements;
@@ -74,11 +71,6 @@ abstract class AbstractSegment implements SegInterface
     public function name(): string
     {
         return $this->elements->getName();
-    }
-
-    public function validate(): void
-    {
-        $this->validator->validate(static::blueprint(), $this->elements);
     }
 
     /**

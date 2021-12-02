@@ -144,16 +144,6 @@ class Message
         }
     }
 
-    /**
-     * @todo This is shitty, rewrite the whole validation
-     */
-    public function validateSegments(): void
-    {
-        foreach ($this->getSegments() as $segment) {
-            $segment->validate();
-        }
-    }
-
     public function getUnaSegment(): UnaSegment
     {
         return $this->stream->getUnaSegment();

@@ -12,11 +12,11 @@ use Apfelfrisch\Edifact\Stream;
 
 class Builder
 {
+    use SegmentCountTrait;
+
     private ?string $unbRef = null;
     private ?string $unhRef = null;
 
-    private int $unhCounter = 0;
-    private int $messageCount = 0;
     private bool $messageWasFetched = false;
 
     private Stream $stream;
@@ -50,7 +50,7 @@ class Builder
 
     public function getMessageCount(): int
     {
-        return $this->messageCount;
+        return $this->messageCounter;
     }
 
     public function writeSegments(SegInterface ...$segments): void
@@ -89,7 +89,7 @@ class Builder
                 $this->unhRef = null;
             }
             if ($this->unbRef !== null) {
-                $this->writeSegment(Unz::fromAttributes((string)$this->messageCount, $this->unbRef));
+                $this->writeSegment(Unz::fromAttributes((string)$this->messageCounter, $this->unbRef));
                 $this->unbRef = null;
             }
         }
@@ -106,20 +106,5 @@ class Builder
     public function messageIsEmpty(): bool
     {
         return $this->stream->isEmpty();
-    }
-
-    private function countSegments(SegInterface $segment): void
-    {
-        if ($segment->name() === 'UNB') {
-            return;
-        }
-
-        if (strtoupper($segment->name()) === 'UNH') {
-            $this->unhCounter = 1;
-            $this->messageCount++;
-            return;
-        }
-
-        $this->unhCounter++;
     }
 }
