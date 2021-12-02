@@ -4,7 +4,7 @@ namespace Apfelfrisch\Edifact\Segments;
 
 use DateTime;
 use Apfelfrisch\Edifact\Elements;
-use Apfelfrisch\Edifact\Exceptions\SegValidationException;
+use Apfelfrisch\Edifact\Exceptions\EdifactException;
 
 class Dtm extends AbstractSegment
 {
@@ -66,7 +66,7 @@ class Dtm extends AbstractSegment
             '303' => $date->format('YmdHi') . substr($date->format('O'), 0, 3),
             '602' => $date->format('Y'),
             '610' => $date->format('Ym'),
-            default => throw SegValidationException::forKeyValue('DTM', $code, "Timecode doesnt Support DateTime or is unknown.")
+            default => throw new EdifactException(__CLASS__ . ": Timecode [$code] doesnt Support DateTime or is unknown.")
         };
     }
 
@@ -99,7 +99,7 @@ class Dtm extends AbstractSegment
                 return $string;
         }
 
-        throw SegValidationException::forKeyValue('DTM', $code, "Timecode unknown.");
+        throw new EdifactException(__CLASS__ . ": Timecode [$code] Timecode unknown.");
     }
 
     protected function getGetterMethods(): array

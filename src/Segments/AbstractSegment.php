@@ -5,10 +5,11 @@ namespace Apfelfrisch\Edifact\Segments;
 use Apfelfrisch\Edifact\Elements;
 use Apfelfrisch\Edifact\UnaSegment;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
-use Apfelfrisch\Edifact\Validation\SegmentValidator;
 use Apfelfrisch\Edifact\Interfaces\SegValidatorInterface;
+use Apfelfrisch\Edifact\Validation\SegmentValidator;
 use Apfelfrisch\Edifact\SeglineParser;
 use Apfelfrisch\Edifact\StringFormatter;
+use Iterator;
 
 abstract class AbstractSegment implements SegInterface
 {
@@ -20,12 +21,9 @@ abstract class AbstractSegment implements SegInterface
 
     protected Elements $elements;
 
-    protected SegValidatorInterface $validator;
-
     final protected function __construct(Elements $elements)
     {
         $this->elements = $elements;
-        $this->validator = new SegmentValidator;
     }
 
     abstract public static function blueprint(): Elements;
@@ -41,6 +39,12 @@ abstract class AbstractSegment implements SegInterface
     public function setUnaSegment(UnaSegment $unaSegment): void
     {
         $this->unaSegment = $unaSegment;
+    }
+
+    /** @psalm-return Iterator<\Apfelfrisch\Edifact\Validation\Failure> */
+    public function validate(SegValidatorInterface $segmentValidator): Iterator
+    {
+        return $segmentValidator->validate(static::blueprint(), $this->elements);
     }
 
     public function getValueFromPosition(int $elementPosition, int $valuePosition): ?string
@@ -74,11 +78,6 @@ abstract class AbstractSegment implements SegInterface
     public function name(): string
     {
         return $this->elements->getName();
-    }
-
-    public function validate(): void
-    {
-        $this->validator->validate(static::blueprint(), $this->elements);
     }
 
     /**

@@ -15,19 +15,19 @@ class Builder
     private ?string $unbRef = null;
     private ?string $unhRef = null;
 
-    private int $unhCounter = 0;
-    private int $messageCount = 0;
     private bool $messageWasFetched = false;
 
     private Stream $stream;
     private string $filepath;
     private StringFormatter $stringFormatter;
+    private SegmentCounter $counter;
 
     public function __construct(UnaSegment $unaSegment = null, string $filepath = 'php://temp')
     {
         $this->filepath = $filepath;
 
         $this->stream = new Stream($this->filepath, 'w', $unaSegment);
+        $this->counter = new SegmentCounter;
         $this->stringFormatter = new StringFormatter($this->stream->getUnaSegment());
         $this->stringFormatter->prefixUna();
     }
@@ -50,7 +50,7 @@ class Builder
 
     public function getMessageCount(): int
     {
-        return $this->messageCount;
+        return $this->counter->messageCount();
     }
 
     public function writeSegments(SegInterface ...$segments): void
@@ -62,7 +62,8 @@ class Builder
 
             if ($segment->name() === 'UNH') {
                 if ($this->unhRef !== null) {
-                    $this->writeSegment(Unt::fromAttributes((string)++$this->unhCounter, $this->unhRef));
+                    $unhCount = $this->counter->unhCount() + 1;
+                    $this->writeSegment(Unt::fromAttributes((string)$unhCount, $this->unhRef));
                 }
 
                 $this->unhRef = $segment->getValueFromPosition(1, 0) ?? '';
@@ -78,18 +79,19 @@ class Builder
             $this->stringFormatter->format($segment)
         );
 
-        $this->countSegments($segment);
+        $this->counter->count($segment);
     }
 
     public function get(): Stream
     {
         if (! $this->messageIsEmpty()) {
             if ($this->unhRef !== null) {
-                $this->writeSegment(Unt::fromAttributes((string)++$this->unhCounter, $this->unhRef));
+                $unhCount = $this->counter->unhCount() + 1;
+                $this->writeSegment(Unt::fromAttributes((string)$unhCount, $this->unhRef));
                 $this->unhRef = null;
             }
             if ($this->unbRef !== null) {
-                $this->writeSegment(Unz::fromAttributes((string)$this->messageCount, $this->unbRef));
+                $this->writeSegment(Unz::fromAttributes((string)$this->counter->messageCount(), $this->unbRef));
                 $this->unbRef = null;
             }
         }
@@ -106,20 +108,5 @@ class Builder
     public function messageIsEmpty(): bool
     {
         return $this->stream->isEmpty();
-    }
-
-    private function countSegments(SegInterface $segment): void
-    {
-        if ($segment->name() === 'UNB') {
-            return;
-        }
-
-        if (strtoupper($segment->name()) === 'UNH') {
-            $this->unhCounter = 1;
-            $this->messageCount++;
-            return;
-        }
-
-        $this->unhCounter++;
     }
 }

@@ -19,14 +19,6 @@ class AbstractSegmentTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_itself()
-    {
-        $segment = Segment::fromSegLine(new SeglineParser, "A++1:2::4:5");
-
-        $this->assertNull($segment->validate());
-    }
-
-    /** @test */
     public function it_cast_itself_as_a_string()
     {
         $givenString = 'A+B+1:2:3:4:5+D+E';
@@ -41,12 +33,12 @@ class AbstractSegmentTest extends TestCase
     {
         $givenString = 'A+B+1:2:3:4:5+D+E';
         $expectedArray = [
-          "A" => ["A" => "A",],
-          "B" => ["B" => "B",],
-          "C" => [1 => "1", 2 => "2", 3 => "3", 4 => "4", 5 => "5",],
-          "D" => ["D" => "D",],
-          "E" => ["E" => "E",],
-          "F" => ["F" => null,],
+            "A" => ["A" => "A",],
+            "B" => ["B" => "B",],
+            "C" => [1 => "1", 2 => "2", 3 => "3", 4 => "4", 5 => "5",],
+            "D" => ["D" => "D",],
+            "E" => ["E" => "E",],
+            "F" => ["F" => null,],
         ];
 
         $segment = Segment::fromSegLine(new SeglineParser, $givenString);

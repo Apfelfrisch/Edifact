@@ -2,90 +2,77 @@
 
 namespace Apfelfrisch\Edifact\Validation;
 
-use Apfelfrisch\Edifact\Interfaces\SegValidatorInterface;
-use Apfelfrisch\Edifact\Exceptions\SegValidationException;
 use Apfelfrisch\Edifact\Elements;
+use Apfelfrisch\Edifact\Exceptions\EdifactException;
+use Apfelfrisch\Edifact\Interfaces\SegValidatorInterface;
+use Iterator;
+use Laminas\Validator\StringLength;
+use Laminas\Validator\ValidatorInterface;
+use Throwable;
 
 class SegmentValidator implements SegValidatorInterface
 {
-    const ALPHA = 'a';
-    const NUMERIC = 'n';
-    const ALPHA_NUMERIC = 'an';
+    public const ELEMENT_TYPE_ALPHA = 'a';
+    public const ELEMENT_TYPE_NUMERIC = 'n';
+    public const ELEMENT_TYPE_ALPHA_NUMERIC = 'an';
+    public const ELEMENT_NEEDED = 'M';
+    public const ELEMENT_OPTIONAL = 'O';
 
-    public function validate(Elements $blueprint, Elements $elements): SegValidatorInterface
+
+    public function __construct(
+        private StringLength $stringLengthValidator,
+        private ValidatorInterface $digitsValidator,
+        private ValidatorInterface $alphaValidator,
+    ) { }
+
+    /** @psalm-return Iterator<Failure> */
+    public function validate(Elements $blueprint, Elements $data): Iterator
     {
-        foreach ($blueprint->toArray() as $elementKey => $element) {
-            foreach ($element as $dataKey => $validation) {
-                if ($validation !== null) {
-                    list($necessaryStatus, $type, $lenght) = explode('|', $validation);
+        foreach ($blueprint->toArray() as $elementKey => $components) {
+            foreach ($components as $componentKey => $rules) {
+                if ($rules === null) {
+                    continue;
+                }
 
-                    if ($this->isDatafieldOptional($necessaryStatus)) {
-                        if (! $this->isDataIsAvailable($elements, $elementKey, $dataKey)) {
-                            continue;
-                        }
+                $value = $data->getValue($elementKey, $componentKey);
+
+                [$necessaryState, $type, $lenght] = $this->explodeRules($rules);
+
+                if ($necessaryState === self::ELEMENT_OPTIONAL && $value === null) {
+                    continue;
+                }
+
+                if ($type === self::ELEMENT_TYPE_NUMERIC && ! $this->digitsValidator->isValid($value)) {
+                    /** @var string $message */
+                    foreach ($this->digitsValidator->getMessages() as $message) {
+                        yield new Failure($data->getName(), $elementKey, $componentKey, $value, $message);
                     }
+                }
 
-                    $this->checkAvailability($elements, $elementKey, $dataKey);
-                    $this->checkStringType($type, $elements, $elementKey, $dataKey);
-                    $this->checkStringLenght($lenght, $elements, $elementKey, $dataKey);
+                if ($type === self::ELEMENT_TYPE_ALPHA && ! $this->alphaValidator->isValid($value)) {
+                    /** @var string $message */
+                    foreach ($this->alphaValidator->getMessages() as $message) {
+                        yield new Failure($data->getName(), $elementKey, $componentKey, $value, $message);
+                    }
+                }
+
+                $this->stringLengthValidator->setMax((int)$lenght);
+                if (! $this->stringLengthValidator->isValid((string)$value)) {
+                    /** @var string $message */
+                    foreach ($this->stringLengthValidator->getMessages() as $message) {
+                        yield new Failure($data->getName(), $elementKey, $componentKey, $value, $message);
+                    }
                 }
             }
         }
-
-        return $this;
     }
 
-    private function isDataIsAvailable(Elements $elements, string $elementKey, string $dataKey): bool
+    private function explodeRules(string $rules): array
     {
-        return ($elements->getValue($elementKey, $dataKey) ?? '') !== '';
-    }
-
-    private function isDatafieldIsAvailable(Elements $elements, string $elementKey, string $dataKey): bool
-    {
-        return $elements->getValue($elementKey, $dataKey) !== null;
-    }
-
-    private function checkAvailability(Elements $elements, string $elementKey, string $dataKey): void
-    {
-        if ($this->isDatafieldIsAvailable($elements, $elementKey, $dataKey)) {
-            return;
-        }
-
-        throw SegValidationException::forKey($dataKey, 'Data-Element not available, but needed.', 1);
-    }
-
-    private function isDatafieldOptional(?string $necessaryStatus): bool
-    {
-        return !($necessaryStatus === 'M' || $necessaryStatus === 'R');
-    }
-
-    private function checkStringType(?string $type, Elements $elements, string $elementKey, string $dataKey): void
-    {
-        $string = $elements->getValue($elementKey, $dataKey) ?? '';
-
-        if ($type === static::ALPHA_NUMERIC || $type == null) {
-            return;
-        }
-        if ($type === static::NUMERIC && ! is_numeric($string)) {
-            throw SegValidationException::forKeyValue($dataKey, $string, 'Data-Element contains non-numeric characters.', 2);
-        }
-        if ($type === static::ALPHA && ! ctype_alpha(str_replace(' ', '', $string))) {
-            throw SegValidationException::forKeyValue($dataKey, $string, 'Data-Element contains non-alpha characters.', 3);
-        }
-    }
-
-    private function checkStringLenght(string $lenght, Elements $elements, string $elementKey, string $dataKey): void
-    {
-        $string = $elements->getValue($elementKey, $dataKey) ?? '';
-
-        $strLen = strlen($string);
-
-        if ($strLen === 0) {
-            throw SegValidationException::forKeyValue($dataKey, $string, 'Data-Element unavailable or empty.', 4);
-        }
-
-        if ($lenght < $strLen) {
-            throw SegValidationException::forKeyValue($dataKey, $string, 'Data-Element has more than' . $lenght . ' Characters.', 5);
+        try {
+            return explode('|', $rules);
+        } catch (Throwable) {
+            throw new EdifactException("Invalid Validation Rule [$rules]");
         }
     }
 }

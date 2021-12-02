@@ -3,9 +3,11 @@
 namespace Apfelfrisch\Edifact\Segments;
 
 use Apfelfrisch\Edifact\Elements;
+use Apfelfrisch\Edifact\Interfaces\SegValidatorInterface;
 use Apfelfrisch\Edifact\UnaSegment;
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use Apfelfrisch\Edifact\SeglineParser;
+use Iterator;
 
 class Generic extends AbstractSegment
 {
@@ -42,8 +44,9 @@ class Generic extends AbstractSegment
         return new self($elements);
     }
 
-    public function validate(): void
+    /** @psalm-return Iterator<\Apfelfrisch\Edifact\Validation\Failure> */
+    public function validate(SegValidatorInterface $segmentValidator): Iterator
     {
-        return;
+        return $segmentValidator->validate(new Elements, new Elements);
     }
 }
