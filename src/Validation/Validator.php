@@ -2,9 +2,9 @@
 
 namespace Apfelfrisch\Edifact\Validation;
 
+use Apfelfrisch\Edifact\SegmentCountTrait;
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use Apfelfrisch\Edifact\Message;
-use Apfelfrisch\Edifact\SegmentCountTrait;
 use Iterator;
 use Laminas\Validator\Digits;
 use Laminas\Validator\Regex;
@@ -41,49 +41,10 @@ class Validator
     {
         foreach ($message->getSegments() as $segment) {
             $this->countSegments($segment);
-            foreach ($segment::blueprint()->toArray() as $elementKey => $components) {
-                foreach ($components as $componentKey => $rules) {
-                    if ($rules === null) {
-                        continue;
-                    }
 
-                    $value = $segment->getValue($elementKey, $componentKey);
-
-                    [$necessaryState, $type, $lenght] = $this->explodeRules($rules);
-
-                    if ($necessaryState === self::ELEMENT_OPTIONAL && $value === null) {
-                        continue;
-                    }
-
-                    if ($type === self::ELEMENT_TYPE_NUMERIC && ! $this->digitsValidator->isValid($value)) {
-                        /** @var string $message */
-                        foreach ($this->digitsValidator->getMessages() as $message) {
-                            yield new Failure($segment->name(), $this->messageCounter, $this->unhCounter, $elementKey, $componentKey, $value, $message);
-                        }
-                    }
-
-                    if ($type === self::ELEMENT_TYPE_ALPHA && ! $this->alphaValidator->isValid($value)) {
-                        /** @var string $message */
-                        foreach ($this->alphaValidator->getMessages() as $message) {
-                            yield new Failure($segment->name(), $this->messageCounter, $this->unhCounter, $elementKey, $componentKey, $value, $message);
-                        }
-                    }
-
-                    $this->stringLengthValidator->setMax((int)$lenght);
-                    if (! $this->stringLengthValidator->isValid((string)$value)) {
-                        /** @var string $message */
-                        foreach ($this->stringLengthValidator->getMessages() as $message) {
-                            yield new Failure(
-                                $segment->name(),
-                                $this->messageCounter,
-                                $this->unhCounter,
-                                $elementKey,
-                                $componentKey,
-                                $value,
-                                $message
-                            );
-                        }
-                    }
+            foreach ($segment->validate() as $failure) {
+                if ($failure !== null) {
+                    yield $failure->setMessageCount($this->messageCounter)->setUnhCount($this->unhCounter);
                 }
             }
         }

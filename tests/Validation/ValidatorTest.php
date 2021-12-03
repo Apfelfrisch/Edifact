@@ -4,6 +4,7 @@ namespace Apfelfrisch\Edifact\Test\Validation;
 
 use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Test\TestCase;
+use Apfelfrisch\Edifact\Validation\Failure;
 use Apfelfrisch\Edifact\Validation\Validator;
 
 class ValidatorTest extends TestCase
@@ -27,9 +28,25 @@ class ValidatorTest extends TestCase
     }
 
     /** @test */
-    public function test_validate_alph_values()
+    public function test_iterate_over_failures()
     {
         $validator = new Validator;
+
+        $results = $validator->validate(Message::fromString("EQD+AN+6b'UCS+a15+GH'"));
+
+        $i = 0;
+        foreach ($results as $result) {
+            $i++;
+            $this->assertInstanceOf(Failure::class, $result);
+        }
+
+        $this->assertSame($i, 2);
+    }
+
+    /** @test */
+    public function test_validate_alph_values()
+    {
+        $validator = new Validator();
 
         $this->assertNull(
             $validator->validateUntilFirstFailure(Message::fromString('UCS+ABCDEF+GH'))

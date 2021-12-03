@@ -6,9 +6,9 @@ use Apfelfrisch\Edifact\Elements;
 use Apfelfrisch\Edifact\UnaSegment;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
 use Apfelfrisch\Edifact\Validation\SegmentValidator;
-use Apfelfrisch\Edifact\Interfaces\SegValidatorInterface;
 use Apfelfrisch\Edifact\SeglineParser;
 use Apfelfrisch\Edifact\StringFormatter;
+use Apfelfrisch\Edifact\Interfaces\SegValidatorInterface;
 
 abstract class AbstractSegment implements SegInterface
 {
@@ -26,6 +26,11 @@ abstract class AbstractSegment implements SegInterface
     }
 
     abstract public static function blueprint(): Elements;
+
+    public function validate(): SegValidatorInterface
+    {
+        return (new SegmentValidator())->validate(static::blueprint(), $this->elements);
+    }
 
     public static function fromSegLine(SeglineParser $parser, string $segLine): static
     {

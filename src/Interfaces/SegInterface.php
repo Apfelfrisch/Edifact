@@ -4,19 +4,18 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact\Interfaces;
 
-use Apfelfrisch\Edifact\Elements;
 use Apfelfrisch\Edifact\UnaSegment;
 use Apfelfrisch\Edifact\SeglineParser;
 
 interface SegInterface
 {
-    public static function blueprint(): Elements;
-
     public static function fromSegLine(SeglineParser $parser, string $segLine): self|static;
 
     public function setUnaSegment(UnaSegment $unaSegment): void;
 
     public function name(): string;
+
+    public function validate(): SegValidatorInterface;
 
     public function getValue(string $elementKey, string $componentKey): ?string;
 
