@@ -13,8 +13,8 @@ class Loc extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('LOC', 'LOC', 'M|a|3')
-                ->addValue('3227', '3227', 'M|an|3')
-                ->addValue('C517', '3225', 'M|an|35')
+                ->addValue('3227', '3227', 'M|an|..3')
+                ->addValue('C517', '3225', 'M|an|..35')
                 ->addValue('C519', '3223', null)
                 ->addValue('C553', '3233', null)
                 ->addValue('5479', '5479', 'O|n|1');

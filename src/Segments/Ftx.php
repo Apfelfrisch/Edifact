@@ -13,14 +13,14 @@ class Ftx extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('FTX', 'FTX', 'M|a|3')
-                ->addValue('4451', '4451', 'M|an|3')
+                ->addValue('4451', '4451', 'M|an|..3')
                 ->addValue('4453', '4453', null)
                 ->addValue('C107', '4441', null)
-                ->addValue('C108', '4440:1', 'O|an|512')
-                ->addValue('C108', '4440:2', 'O|an|512')
-                ->addValue('C108', '4440:3', 'O|an|512')
-                ->addValue('C108', '4440:4', 'O|an|512')
-                ->addValue('C108', '4440:5', 'O|an|512');
+                ->addValue('C108', '4440:1', 'O|an|..512')
+                ->addValue('C108', '4440:2', 'O|an|..512')
+                ->addValue('C108', '4440:3', 'O|an|..512')
+                ->addValue('C108', '4440:4', 'O|an|..512')
+                ->addValue('C108', '4440:5', 'O|an|..512');
         }
 
         return self::$blueprint;

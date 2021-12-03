@@ -167,3 +167,21 @@ use Apfelfrisch\Edifact\Segments\Unb;
 $builder = new Builder;
 $builder->addStreamFilter('utf8-to-iso', 'convert.iconv.UTF-8.ISO-8859-1');
 ```
+
+### Validate Messages Segments
+```php
+use Apfelfrisch\Edifact\Message;
+use Apfelfrisch\Edifact\Validation\Failure;
+use Apfelfrisch\Edifact\Validation\Validator;
+
+$message = Message::fromString("UNA:+.? 'SEQ+9999", $segmentFactory);
+
+$validator = new Validator;
+
+if(! $validator->isValid($message)) {
+    foreach ($validator->getFailures() as $failure) {
+        echo $failure instanceof Failure;
+    }
+}
+
+```

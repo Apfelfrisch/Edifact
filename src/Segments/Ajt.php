@@ -13,7 +13,7 @@ class Ajt extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('AJT', 'AJT', 'M|a|3')
-                ->addValue('4465', '4465', 'M|an|3');
+                ->addValue('4465', '4465', 'M|an|..3');
         }
 
         return self::$blueprint;

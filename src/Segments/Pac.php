@@ -13,8 +13,8 @@ class Pac extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('PAC', 'PAC', 'M|a|3')
-                ->addValue('7224', '7224', 'M|a|8')
-                ->addValue('C531', '7075', 'M|an|3');
+                ->addValue('7224', '7224', 'M|a|..8')
+                ->addValue('C531', '7075', 'M|an|..3');
         }
 
         return self::$blueprint;

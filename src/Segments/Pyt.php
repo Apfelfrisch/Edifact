@@ -13,7 +13,7 @@ class Pyt extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('PYT', 'PYT', 'M|a|3')
-                ->addValue('4279', '4279', 'M|n|3');
+                ->addValue('4279', '4279', 'M|n|..3');
         }
 
         return self::$blueprint;

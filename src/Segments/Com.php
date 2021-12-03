@@ -13,8 +13,8 @@ class Com extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('COM', 'COM', 'M|a|3')
-                ->addValue('C076', '3148', 'M|an|512')
-                ->addValue('C076', '3155', 'M|an|3');
+                ->addValue('C076', '3148', 'M|an|..512')
+                ->addValue('C076', '3155', 'M|an|..3');
         }
 
         return self::$blueprint;

@@ -4,6 +4,8 @@ namespace Apfelfrisch\Edifact;
 
 final class SeglineParser
 {
+    private const SEG_UNKOWN_KEY_PREFIX = 'unknown';
+
     private const PLACE_HOLDER = '«>~<«';
 
     private UnaSegment $unaSegment;
@@ -20,22 +22,28 @@ final class SeglineParser
 
     public function parseToBlueprint(string $segline, Elements $blueprint): Elements
     {
-        $i = 0;
         $elements = new Elements;
-        $dataArray = $this->explodeString($segline, $this->unaSegment->elementSeparator());
 
-        foreach ($blueprint->toArray() as $BpDataKey => $BPelements) {
-            $inputElement = [];
-            if (isset($dataArray[$i])) {
-                $inputElement = $this->explodeString($dataArray[$i], $this->unaSegment->componentSeparator());
+        $elementKeys = array_keys($blueprint->toArray());
+        foreach ($this->explodeString($segline, $this->unaSegment->elementSeparator()) as $elementPosition => $elementsArray) {
+            $components = $this->explodeString($elementsArray, $this->unaSegment->componentSeparator());
+
+            if (null !== $elementKey = $elementKeys[$elementPosition] ?? null) {
+                $componentKeys = array_keys($blueprint->toArray()[$elementKey]);
+                foreach ($components as $componentPosition => $value) {
+                    if (null !== $componentKey = $componentKeys[$componentPosition] ?? null) {
+                        $elements->addValue($elementKey, $componentKey, $value);
+                        continue;
+                    }
+
+                    $elements->addValue($elementKey, self::SEG_UNKOWN_KEY_PREFIX . "-$componentPosition", $value);
+                }
+                continue;
             }
 
-            $j = 0;
-            foreach (array_keys($BPelements) as $key) {
-                $elements->addValue($BpDataKey, $key, isset($inputElement[$j]) ? $inputElement[$j] : null);
-                $j++;
+            foreach ($components as $componentPosition => $value) {
+                $elements->addValue(self::SEG_UNKOWN_KEY_PREFIX . "-$elementPosition", self::SEG_UNKOWN_KEY_PREFIX . "-$componentPosition", $value);
             }
-            $i++;
         }
 
         return $elements;
@@ -63,7 +71,7 @@ final class SeglineParser
     }
 
     /**
-     * @return list<string>
+     * @return array<int, string>
      */
     private function explodeString(string $string, string $pattern): array
     {
@@ -82,20 +90,6 @@ final class SeglineParser
             );
         }
 
-        return $this->trimLastItem($explodedString);
-    }
-
-    /**
-     * @param list<string> $array
-     *
-     * @return list<string>
-     */
-    private function trimLastItem(array $array): array
-    {
-        if (end($array) == '') {
-            array_pop($array);
-        }
-
-        return $array;
+        return $explodedString;
     }
 }

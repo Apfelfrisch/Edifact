@@ -13,8 +13,8 @@ class Pcd extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('PCD', 'PCD', 'M|a|3')
-                ->addValue('C501', '5245', 'M|an|3')
-                ->addValue('C501', '5482', 'M|n|10');
+                ->addValue('C501', '5245', 'M|an|..3')
+                ->addValue('C501', '5482', 'M|n|..10');
         }
 
         return self::$blueprint;

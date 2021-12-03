@@ -15,9 +15,9 @@ class Dtm extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('DTM', 'DTM', 'M|a|3')
-                ->addValue('C507', '2005', 'M|an|3')
-                ->addValue('C507', '2380', 'M|an|35')
-                ->addValue('C507', '2379', 'M|an|3');
+                ->addValue('C507', '2005', 'M|an|..3')
+                ->addValue('C507', '2380', 'M|an|..35')
+                ->addValue('C507', '2379', 'M|an|..3');
         }
 
         return self::$blueprint;

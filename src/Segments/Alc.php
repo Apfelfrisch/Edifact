@@ -13,9 +13,9 @@ class Alc extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('ALC', 'ALC', 'M|a|3')
-                ->addValue('5463', '5463', 'M|an|3')
+                ->addValue('5463', '5463', 'M|an|..3')
                 ->addValue('C552', '1230', null)
-                ->addValue('C552', '5189', 'M|an|3');
+                ->addValue('C552', '5189', 'M|an|..3');
         }
 
         return self::$blueprint;

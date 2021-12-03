@@ -13,10 +13,10 @@ class Lin extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('LIN', 'LIN', 'M|a|3')
-                ->addValue('1082', '1082', 'M|n|6')
+                ->addValue('1082', '1082', 'M|n|..6')
                 ->addValue('1229', '1229', null)
-                ->addValue('C212', '7140', 'D|an|35')
-                ->addValue('C212', '7143', 'D|an|3');
+                ->addValue('C212', '7140', 'O|an|..35')
+                ->addValue('C212', '7143', 'O|an|..3');
         }
 
         return self::$blueprint;

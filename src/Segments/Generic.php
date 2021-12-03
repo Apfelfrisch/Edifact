@@ -3,25 +3,20 @@
 namespace Apfelfrisch\Edifact\Segments;
 
 use Apfelfrisch\Edifact\Elements;
-use Apfelfrisch\Edifact\Interfaces\SegValidatorInterface;
-use Apfelfrisch\Edifact\UnaSegment;
-use Apfelfrisch\Edifact\Exceptions\EdifactException;
+use Apfelfrisch\Edifact\Interfaces\SegInterface;
+use Apfelfrisch\Edifact\StringFormatter;
 use Apfelfrisch\Edifact\SeglineParser;
-use Iterator;
+use Apfelfrisch\Edifact\UnaSegment;
 
-class Generic extends AbstractSegment
+class Generic implements SegInterface
 {
-    public static function blueprint(): Elements
-    {
-        throw new EdifactException('Generic Segment has no Blueprint');
-    }
+    private Elements $elements;
 
-    public static function fromSegLine(SeglineParser $parser, string $segLine): static
-    {
-        $segment = new static($parser->parse($segLine));
-        $segment->setUnaSegment($parser->getUnaSegment());
+    private ?UnaSegment $unaSegment = null;
 
-        return $segment;
+    final protected function __construct(Elements $elements)
+    {
+        $this->elements = $elements;
     }
 
     /**
@@ -44,9 +39,49 @@ class Generic extends AbstractSegment
         return new self($elements);
     }
 
-    /** @psalm-return Iterator<\Apfelfrisch\Edifact\Validation\Failure> */
-    public function validate(SegValidatorInterface $segmentValidator): Iterator
+    public static function fromSegLine(SeglineParser $parser, string $segLine): static
     {
-        return $segmentValidator->validate(new Elements, new Elements);
+        $segment = new static($parser->parse($segLine));
+        $segment->setUnaSegment($parser->getUnaSegment());
+
+        return $segment;
+    }
+
+    public function setUnaSegment(UnaSegment $unaSegment): void
+    {
+        $this->unaSegment = $unaSegment;
+    }
+
+    public function getValueFromPosition(int $elementPosition, int $valuePosition): ?string
+    {
+        return $this->elements->getValueFromPosition($elementPosition, $valuePosition);
+    }
+
+    public function getValue(string $elementKey, string $componentKey): ?string
+    {
+        return $this->elements->getValue($elementKey, $componentKey);
+    }
+
+    public function name(): string
+    {
+        return $this->elements->getName();
+    }
+
+    /**
+     * @psalm-return array<string, array<string, string|null>>
+     */
+    public function toArray(): array
+    {
+        return $this->elements->toArray();
+    }
+
+    public function toString(): string
+    {
+        return substr((new StringFormatter($this->getUnaSegment()))->format($this), 0, -1);
+    }
+
+    private function getUnaSegment(): UnaSegment
+    {
+        return $this->unaSegment ??= UnaSegment::getDefault();
     }
 }

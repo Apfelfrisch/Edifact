@@ -12,9 +12,6 @@ interface SegInterface
 {
     public static function fromSegLine(SeglineParser $parser, string $segLine): self|static;
 
-    /** @psalm-return Iterator<\Apfelfrisch\Edifact\Validation\Failure> */
-    public function validate(SegValidatorInterface $segmentValidator): Iterator;
-
     public function setUnaSegment(UnaSegment $unaSegment): void;
 
     public function name(): string;

@@ -13,8 +13,8 @@ class Unt extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('UNT', 'UNT', 'M|a|3')
-                ->addValue('0074', '0074', 'M|n|6')
-                ->addValue('0062', '0062', 'M|an|15');
+                ->addValue('0074', '0074', 'M|n|..6')
+                ->addValue('0062', '0062', 'M|an|..15');
         }
 
         return self::$blueprint;

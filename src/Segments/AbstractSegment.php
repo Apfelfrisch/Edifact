@@ -5,13 +5,13 @@ namespace Apfelfrisch\Edifact\Segments;
 use Apfelfrisch\Edifact\Elements;
 use Apfelfrisch\Edifact\UnaSegment;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
-use Apfelfrisch\Edifact\Interfaces\SegValidatorInterface;
+use Apfelfrisch\Edifact\Interfaces\ValidateableInterface;
 use Apfelfrisch\Edifact\Validation\SegmentValidator;
 use Apfelfrisch\Edifact\SeglineParser;
 use Apfelfrisch\Edifact\StringFormatter;
 use Iterator;
 
-abstract class AbstractSegment implements SegInterface
+abstract class AbstractSegment implements SegInterface, ValidateableInterface
 {
     public const SPACE_CHARACTER = ' ';
 
@@ -42,7 +42,7 @@ abstract class AbstractSegment implements SegInterface
     }
 
     /** @psalm-return Iterator<\Apfelfrisch\Edifact\Validation\Failure> */
-    public function validate(SegValidatorInterface $segmentValidator): Iterator
+    public function validate(SegmentValidator $segmentValidator): Iterator
     {
         return $segmentValidator->validate(static::blueprint(), $this->elements);
     }

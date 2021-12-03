@@ -13,7 +13,7 @@ class Seq extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('SEQ', 'SEQ', 'M|a|3')
-                ->addValue('1229', '1229', 'M|an|3');
+                ->addValue('1229', '1229', 'M|an|..3');
         }
 
         return self::$blueprint;

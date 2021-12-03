@@ -3,14 +3,11 @@
 namespace Apfelfrisch\Edifact\Validation;
 
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
+use Apfelfrisch\Edifact\Interfaces\ValidateableInterface;
 use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\SegmentCounter;
 use EmptyIterator;
 use Iterator;
-use Laminas\Validator\Digits;
-use Laminas\Validator\Regex;
-use Laminas\Validator\StringLength;
-use Laminas\Validator\ValidatorInterface;
 
 class Validator
 {
@@ -19,18 +16,11 @@ class Validator
     /** @psalm-var Iterator<Failure>|null */
     private ?Iterator $failures = null;
 
-    public function __construct(
-        StringLength $stringLengthValidator = null,
-        ValidatorInterface $digitsValidator = null,
-        ValidatorInterface $alphaValidator = null,
-    ) {
+    public function __construct()
+    {
         $this->failures = new EmptyIterator;
         $this->counter = new SegmentCounter;
-        $this->segmentValidator = new SegmentValidator(
-            $stringLengthValidator ?? new StringLength,
-            $digitsValidator ?? new Digits,
-            $alphaValidator ?? new Regex("/^[A-Za-z]*$/")
-        );
+        $this->segmentValidator = new SegmentValidator();
     }
 
     public function isValid(Message $message): bool
@@ -67,6 +57,10 @@ class Validator
     {
         foreach ($message->getSegments() as $segment) {
             $this->counter->count($segment);
+
+            if (!($segment instanceof ValidateableInterface)) {
+                throw new EdifactException("[" . $segment::class . "] not validateable.");
+            }
 
             foreach ($segment->validate($this->segmentValidator) as $failure) {
                 yield $failure->setMessageCounter($this->counter->messageCount())->setUnhCounter($this->counter->unhCount());

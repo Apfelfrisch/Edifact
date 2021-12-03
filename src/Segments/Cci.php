@@ -13,12 +13,12 @@ class Cci extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('CCI', 'CCI', 'M|a|3')
-                ->addValue('7059', '7059', 'O|an|3')
+                ->addValue('7059', '7059', 'O|an|..3')
                 ->addValue('C502', '6313', null)
-                ->addValue('C240', '7037', 'O|an|17')
-                ->addValue('C240', '1131', 'O|an|17')
-                ->addValue('C240', '3055', 'O|an|3')
-                ->addValue('C240', '7036', 'O|an|35');
+                ->addValue('C240', '7037', 'O|an|..17')
+                ->addValue('C240', '1131', 'O|an|..17')
+                ->addValue('C240', '3055', 'O|an|..3')
+                ->addValue('C240', '7036', 'O|an|..35');
         }
 
         return self::$blueprint;

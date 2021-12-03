@@ -4,11 +4,11 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact\Interfaces;
 
-use Apfelfrisch\Edifact\Elements;
+use Apfelfrisch\Edifact\Validation\SegmentValidator;
 use Iterator;
 
-interface SegValidatorInterface
+interface ValidateableInterface
 {
     /** @psalm-return Iterator<\Apfelfrisch\Edifact\Validation\Failure> */
-    public function validate(Elements $blueprint, Elements $data): Iterator;
+    public function validate(SegmentValidator $segmentValidator): Iterator;
 }
