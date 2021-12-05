@@ -1,5 +1,6 @@
 {
     "name": "apfelfrisch/edifact",
+    "description": "Parse, build, serialize and validate UN/EDIFACT messages",    
     "license": "MIT",
     "require": { 
         "php": "^8.0",
