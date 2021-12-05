@@ -25,7 +25,7 @@ $message = Message::fromString("UNA:+.? 'NAD+DP++++Musterstr.::10+City++12345+DE
 ```php
 use Apfelfrisch\Edifact\Message;
 
-$message = Message::fromFilepath("path/to/file.txt");
+$message = Message::fromFilepath('path/to/file.txt');
 ```
 
 #### Iterate over the Segments
@@ -58,7 +58,6 @@ echo $message->findFirstSegment(Nad::class)->name(); // NAD
 ```php
 foreach ($message->unwrap() as $partialMessage) {
     echo $partialMessage::class // \Apfelfrisch\Edifact\Message
-    echo $partialMessage->toString() // UNH+1+ORDERS:D:96A:UN'UNT+2+1', UNH+2+ORDERS:D:96A:UN'UNT+2+2'
 }
 ```
 
@@ -148,7 +147,7 @@ $builder->writeSegments(
 $message = new Message($builder->get());
 ```
 UNA and the trailing Segments (UNT and UNZ) will be added automatically. If no UNA Segement is provided, it uses the default values [UNA:+.? ']. 
-For now the Spacecharacter and Decimalpoint will be ignored, you have to take care of it on Segment initialising.
+For now the Spacecharacter and Decimalpoint will be ignored, you have to take care of it on Segment initialization.
 
 #### Build with custom Una
 
@@ -157,6 +156,15 @@ use Apfelfrisch\Edifact\Builder;
 use Apfelfrisch\Edifact\UnaSegment;
 
 $builder = new Builder(new UnaSegment('|', '#', '.', '!', ' ', '"'));
+```
+
+#### Write directly into File
+
+```php
+use Apfelfrisch\Edifact\Builder;
+use Apfelfrisch\Edifact\UnaSegment;
+
+$builder = new Builder(new UnaSegment, 'path/to/file.txt');
 ```
 
 #### Add Writefilter to the Builder
