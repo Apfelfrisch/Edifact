@@ -66,7 +66,9 @@ class SegmentValidator
                 }
 
                 /** @var string $rules */
-                $rules = $blueprintArray[$elementKey][$componentKey];
+                if (null === $rules = $blueprintArray[$elementKey][$componentKey]) {
+                    continue;
+                }
 
                 [$necessaryState, $type, $minLenght, $maxLength] = $this->explodeRules($rules);
 
