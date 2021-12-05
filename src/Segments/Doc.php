@@ -13,8 +13,8 @@ class Doc extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('DOC', 'DOC', 'M|a|3')
-                ->addValue('C002', '1001', 'M|an|3')
-                ->addValue('C503', '1004', 'M|an|35');
+                ->addValue('C002', '1001', 'M|an|..3')
+                ->addValue('C503', '1004', 'M|an|..35');
         }
 
         return self::$blueprint;

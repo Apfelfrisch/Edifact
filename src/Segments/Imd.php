@@ -14,8 +14,8 @@ class Imd extends AbstractSegment
             self::$blueprint = (new Elements)
                 ->addValue('IMD', 'IMD', 'M|a|3')
                 ->addValue('7077', '7077', null)
-                ->addValue('C272', '7081', 'M|an|3')
-                ->addValue('C273', '7009', 'O|an|17');
+                ->addValue('C272', '7081', 'M|an|..3')
+                ->addValue('C273', '7009', 'O|an|..17');
         }
 
         return self::$blueprint;

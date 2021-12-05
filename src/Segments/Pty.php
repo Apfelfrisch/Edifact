@@ -13,11 +13,11 @@ class Pty extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('PTY', 'PTY', 'M|a|3')
-                ->addValue('4035', '4035', 'M|an|3')
+                ->addValue('4035', '4035', 'M|an|..3')
                 ->addValue('C585', '4037', null)
                 ->addValue('C585', '1131', null)
                 ->addValue('C585', '3055', null)
-                ->addValue('C585', '4036', 'M|n|35');
+                ->addValue('C585', '4036', 'M|n|..35');
         }
 
         return self::$blueprint;

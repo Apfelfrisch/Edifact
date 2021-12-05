@@ -2,90 +2,182 @@
 
 namespace Apfelfrisch\Edifact\Validation;
 
-use Apfelfrisch\Edifact\Interfaces\SegValidatorInterface;
-use Apfelfrisch\Edifact\Exceptions\SegValidationException;
 use Apfelfrisch\Edifact\Elements;
+use Apfelfrisch\Edifact\Exceptions\EdifactException;
+use Iterator;
+use Respect\Validation\Rules\Alpha;
+use Respect\Validation\Rules\Digit;
+use Respect\Validation\Rules\Length;
+use Throwable;
 
-class SegmentValidator implements SegValidatorInterface
+class SegmentValidator
 {
-    const ALPHA = 'a';
-    const NUMERIC = 'n';
-    const ALPHA_NUMERIC = 'an';
+    public const ELEMENT_TYPE_ALPHA = 'a';
+    public const ELEMENT_TYPE_NUMERIC = 'n';
+    public const ELEMENT_TYPE_ALPHA_NUMERIC = 'an';
+    public const ELEMENT_NEEDED = 'M';
+    public const ELEMENT_OPTIONAL = 'O';
 
-    public function validate(Elements $blueprint, Elements $elements): SegValidatorInterface
+    /** @psalm-var array<string, string> */
+    private array $messages = [
+        Failure::VALUE_NOT_ALPHA => 'String must contain only alphabetic characters',
+        Failure::VALUE_NOT_DIGIT => 'String must contain only digits',
+        Failure::VALUE_TOO_LONG => 'String is more than %max% characters long',
+        Failure::VALUE_TOO_SHORT => 'String is less than %min% characters long',
+        Failure::VALUE_LENGTH_INVALID => 'String is not %len% characters long',
+        Failure::UNKOWN_ELEMENT => 'The input Element is unkown',
+        Failure::UNKOWN_COMPONENT => 'The input Component is unkown',
+    ];
+
+    /** @psalm-return Iterator<Failure> */
+    public function validate(Elements $blueprint, Elements $data): Iterator
     {
-        foreach ($blueprint->toArray() as $elementKey => $element) {
-            foreach ($element as $dataKey => $validation) {
-                if ($validation !== null) {
-                    list($necessaryStatus, $type, $lenght) = explode('|', $validation);
+        $blueprintArray = $blueprint->toArray();
 
-                    if ($this->isDatafieldOptional($necessaryStatus)) {
-                        if (! $this->isDataIsAvailable($elements, $elementKey, $dataKey)) {
-                            continue;
-                        }
+        $elementPosition = -1;
+        foreach ($data->toArray() as $elementKey => $components) {
+            $elementPosition++;
+            $componentPosition = -1;
+            foreach ($components as $componentKey => $value) {
+                $componentPosition++;
+
+                if (! array_key_exists($elementKey, $blueprintArray)) {
+                    yield new Failure(
+                        Failure::UNKOWN_ELEMENT,
+                        $data->getName(),
+                        $elementPosition,
+                        $componentPosition,
+                        $value,
+                        $this->buildMessage(Failure::UNKOWN_ELEMENT)
+                    );
+                    continue;
+                }
+
+                if (! array_key_exists($componentKey, $blueprintArray[$elementKey])) {
+                    yield new Failure(
+                        Failure::UNKOWN_COMPONENT,
+                        $data->getName(),
+                        $elementPosition,
+                        $componentPosition,
+                        $value,
+                        $this->buildMessage(Failure::UNKOWN_COMPONENT)
+                    );
+                    continue;
+                }
+
+                /** @var string $rules */
+                $rules = $blueprintArray[$elementKey][$componentKey];
+
+                [$necessaryState, $type, $minLenght, $maxLength] = $this->explodeRules($rules);
+
+                if ($necessaryState === self::ELEMENT_OPTIONAL && $value === null) {
+                    continue;
+                }
+
+                if ($type === self::ELEMENT_TYPE_NUMERIC && ! (new Digit)->validate($value)) {
+                    yield new Failure(
+                        Failure::VALUE_NOT_DIGIT,
+                        $data->getName(),
+                        $elementPosition,
+                        $componentPosition,
+                        $value,
+                        $this->buildMessage(Failure::VALUE_NOT_DIGIT)
+                    );
+                }
+
+                if ($type === self::ELEMENT_TYPE_ALPHA && ! (new Alpha)->validate((string)$value)) {
+                    yield new Failure(
+                        Failure::VALUE_NOT_ALPHA ,
+                        $data->getName(),
+                        $elementPosition,
+                        $componentPosition,
+                        $value,
+                        $this->buildMessage(Failure::VALUE_NOT_ALPHA)
+                    );
+                }
+
+                if ($minLenght !== $maxLength && ! (new Length($minLenght))->validate((string)$value)) {
+                    yield new Failure(
+                        Failure::VALUE_TOO_SHORT,
+                        $data->getName(),
+                        $elementPosition,
+                        $componentPosition,
+                        $value,
+                        $this->buildStringTooShortMessage($minLenght)
+                    );
+                    continue;
+                }
+
+                if (! (new Length($minLenght, $maxLength))->validate((string)$value)) {
+                    if ($minLenght === $maxLength) {
+                        yield new Failure(
+                            Failure::VALUE_LENGTH_INVALID,
+                            $data->getName(),
+                            $elementPosition,
+                            $componentPosition,
+                            $value,
+                            $this->buildInvalidStringLengtMessage($maxLength)
+                        );
+                        continue;
                     }
-
-                    $this->checkAvailability($elements, $elementKey, $dataKey);
-                    $this->checkStringType($type, $elements, $elementKey, $dataKey);
-                    $this->checkStringLenght($lenght, $elements, $elementKey, $dataKey);
+                    yield new Failure(
+                        Failure::VALUE_TOO_LONG,
+                        $data->getName(),
+                        $elementPosition,
+                        $componentPosition,
+                        $value,
+                        $this->buildStringTooLongMessage($maxLength)
+                    );
                 }
             }
         }
-
-        return $this;
     }
 
-    private function isDataIsAvailable(Elements $elements, string $elementKey, string $dataKey): bool
+    /**
+     * @psalm-return array{string, string, int, int}
+     */
+    private function explodeRules(string $rules): array
     {
-        return ($elements->getValue($elementKey, $dataKey) ?? '') !== '';
-    }
+        try {
+            $rulesArray = explode('|', $rules);
 
-    private function isDatafieldIsAvailable(Elements $elements, string $elementKey, string $dataKey): bool
-    {
-        return $elements->getValue($elementKey, $dataKey) !== null;
-    }
+            if (substr($rulesArray[2], 0, 2) === '..') {
+                return [
+                    $rulesArray[0],
+                    $rulesArray[1],
+                    1,
+                    (int)substr($rulesArray[2], 2)
+                ];
+            }
 
-    private function checkAvailability(Elements $elements, string $elementKey, string $dataKey): void
-    {
-        if ($this->isDatafieldIsAvailable($elements, $elementKey, $dataKey)) {
-            return;
-        }
-
-        throw SegValidationException::forKey($dataKey, 'Data-Element not available, but needed.', 1);
-    }
-
-    private function isDatafieldOptional(?string $necessaryStatus): bool
-    {
-        return !($necessaryStatus === 'M' || $necessaryStatus === 'R');
-    }
-
-    private function checkStringType(?string $type, Elements $elements, string $elementKey, string $dataKey): void
-    {
-        $string = $elements->getValue($elementKey, $dataKey) ?? '';
-
-        if ($type === static::ALPHA_NUMERIC || $type == null) {
-            return;
-        }
-        if ($type === static::NUMERIC && ! is_numeric($string)) {
-            throw SegValidationException::forKeyValue($dataKey, $string, 'Data-Element contains non-numeric characters.', 2);
-        }
-        if ($type === static::ALPHA && ! ctype_alpha(str_replace(' ', '', $string))) {
-            throw SegValidationException::forKeyValue($dataKey, $string, 'Data-Element contains non-alpha characters.', 3);
+            return [
+                $rulesArray[0],
+                $rulesArray[1],
+                (int)$rulesArray[2],
+                (int)$rulesArray[2]
+            ];
+        } catch (Throwable) {
+            throw new EdifactException("Invalid Validation Rule [$rules]");
         }
     }
 
-    private function checkStringLenght(string $lenght, Elements $elements, string $elementKey, string $dataKey): void
+    private function buildStringTooShortMessage(int $stringLength): string
     {
-        $string = $elements->getValue($elementKey, $dataKey) ?? '';
+        return str_replace('%min%', (string) $stringLength, $this->buildMessage(Failure::VALUE_TOO_SHORT));
+    }
 
-        $strLen = strlen($string);
+    private function buildStringTooLongMessage(int $stringLength): string
+    {
+        return str_replace('%max%', (string) $stringLength, $this->buildMessage(Failure::VALUE_TOO_LONG));
+    }
 
-        if ($strLen === 0) {
-            throw SegValidationException::forKeyValue($dataKey, $string, 'Data-Element unavailable or empty.', 4);
-        }
+    private function buildInvalidStringLengtMessage(int $stringLength): string
+    {
+        return str_replace('%len%', (string) $stringLength, $this->buildMessage(Failure::VALUE_LENGTH_INVALID));
+    }
 
-        if ($lenght < $strLen) {
-            throw SegValidationException::forKeyValue($dataKey, $string, 'Data-Element has more than' . $lenght . ' Characters.', 5);
-        }
+    private function buildMessage(string $key): string
+    {
+        return $this->messages[$key] ?? throw new EdifactException("Unkown message key [$key]");
     }
 }

@@ -13,8 +13,8 @@ class Moa extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('MOA', 'MOA', 'M|a|3')
-                ->addValue('C516', '5025', 'M|an|3')
-                ->addValue('C516', '5004', 'M|n|35');
+                ->addValue('C516', '5025', 'M|an|..3')
+                ->addValue('C516', '5004', 'M|n|..35');
         }
 
         return self::$blueprint;

@@ -12,16 +12,16 @@ class Tax extends AbstractSegment
     {
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
-                ->addValue('TAX' , 'TAX' , 'M|a|3')
-                ->addValue('5283', '5283', 'M|n|3')
-                ->addValue('C241', '5153', 'M|n|3')
+                ->addValue('TAX' , 'TAX' , 'M|a|..3')
+                ->addValue('5283', '5283', 'M|n|..3')
+                ->addValue('C241', '5153', 'M|n|..3')
                 ->addValue('C533', '5289', null)
                 ->addValue('5286', '5286', null)
                 ->addValue('C243', '5279', null)
                 ->addValue('C243', '1131', null)
                 ->addValue('C243', '3055', null)
-                ->addValue('C243', '5278', 'D|n|17')
-                ->addValue('5305', '5305', 'M|an|3');
+                ->addValue('C243', '5278', 'O|n|..17')
+                ->addValue('5305', '5305', 'M|an|..3');
         }
 
         return self::$blueprint;

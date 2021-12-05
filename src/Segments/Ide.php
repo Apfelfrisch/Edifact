@@ -13,8 +13,8 @@ class Ide extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('IDE', 'IDE', 'M|a|3')
-                ->addValue('7495', '7495', 'M|an|3')
-                ->addValue('C206', '7402', 'M|an|35');
+                ->addValue('7495', '7495', 'M|an|..3')
+                ->addValue('C206', '7402', 'M|an|..35');
         }
 
         return self::$blueprint;

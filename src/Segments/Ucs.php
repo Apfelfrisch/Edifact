@@ -13,8 +13,8 @@ class Ucs extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('UCS', 'UCS', 'M|an|3')
-                ->addValue('0096', '0096', 'M|a|6')
-                ->addValue('0085', '0085', 'M|a|2');
+                ->addValue('0096', '0096', 'M|a|..6')
+                ->addValue('0085', '0085', 'M|a|..2');
         }
 
         return self::$blueprint;

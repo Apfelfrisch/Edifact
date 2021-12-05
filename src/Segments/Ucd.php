@@ -13,9 +13,9 @@ class Ucd extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('UCD', 'UCD', 'M|an|3')
-                ->addValue('0085', '0085', 'M|n|2')
-                ->addValue('S011', '0098', 'M|n|3')
-                ->addValue('S011', '0104', 'O|an|3');
+                ->addValue('0085', '0085', 'M|n|..2')
+                ->addValue('S011', '0098', 'M|n|..3')
+                ->addValue('S011', '0104', 'O|an|..3');
         }
 
         return self::$blueprint;

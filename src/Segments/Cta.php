@@ -13,9 +13,9 @@ class Cta extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('CTA', 'CTA', 'M|a|3')
-                ->addValue('3139', '3139', 'M|an|3')
+                ->addValue('3139', '3139', 'M|an|..3')
                 ->addValue('C056', '3413', null)
-                ->addValue('C056', '3412','M|an|35');
+                ->addValue('C056', '3412','M|an|..35');
         }
 
         return self::$blueprint;

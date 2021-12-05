@@ -95,7 +95,7 @@ class MessageTest extends TestCase
         $messageCore = Message::fromString("UNH'UNB'");
         $message = "";
         foreach ($messageCore->getSegments() as $segment) {
-            $message .= $segment->toString($messageCore->getDelimiter()) . $messageCore->getDelimiter()->getSegmentTerminator();
+            $message .= $segment->toString() . $messageCore->getUnaSegment()->segmentTerminator();
         }
         $this->assertEquals($message, (string)$messageCore);
     }
@@ -157,14 +157,14 @@ class MessageTest extends TestCase
         $unaValues = [":+.? '", "abcdef"];
         foreach ($unaValues as $unaValue) {
             $messageCore = Message::fromString("UNA" . $unaValue . "UNH+'");
-            $delimiter = $messageCore->getDelimiter();
+            $unaSegment = $messageCore->getUnaSegment();
             $this->assertEquals($unaValue,
-                 $delimiter->getComponentSeparator()
-               . $delimiter->getElementSeparator()
-               . $delimiter->getDecimalPoint()
-               . $delimiter->getEscapeCharacter()
-               . $delimiter->getSpaceCharacter()
-               . $delimiter->getSegmentTerminator()
+                 $unaSegment->componentSeparator()
+               . $unaSegment->elementSeparator()
+               . $unaSegment->decimalPoint()
+               . $unaSegment->escapeCharacter()
+               . $unaSegment->spaceCharacter()
+               . $unaSegment->segmentTerminator()
            );
         }
     }
@@ -196,7 +196,7 @@ class MessageTest extends TestCase
     {
         $messageCore = Message::fromString("UNA:+.? 'UNH+1+ORDERS:D:96A:UN'UNT+2+1'UNH+2+ORDERS:D:96A:UN'UNT+2+2'");
 
-        $this->assertCount(5, $messageCore->getAllSegments());
+        $this->assertCount(4, $messageCore->getAllSegments());
         foreach ($messageCore->getAllSegments() as $segment) {
             $this->assertInstanceOf(SegInterface::class, $segment);
         }

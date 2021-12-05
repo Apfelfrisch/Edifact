@@ -13,7 +13,7 @@ class Pgi extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('PGI', 'PGI', 'M|a|3')
-                ->addValue('5379', '5379', 'M|an|3');
+                ->addValue('5379', '5379', 'M|an|..3');
         }
 
         return self::$blueprint;

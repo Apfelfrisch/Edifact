@@ -13,9 +13,9 @@ class Pia extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('PIA', 'PIA', 'M|a|3')
-                ->addValue('4347', '4347', 'M|n|3')
-                ->addValue('C212', '7140', 'D|an|35')
-                ->addValue('C212', '7143', 'D|an|3');
+                ->addValue('4347', '4347', 'M|n|..3')
+                ->addValue('C212', '7140', 'O|an|..35')
+                ->addValue('C212', '7143', 'O|an|..3');
         }
 
         return self::$blueprint;
