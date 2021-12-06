@@ -63,7 +63,7 @@ echo $message->findFirstSegment(Nad::class)->name(); // NAD
 #### Unwrap Messages
 ```php
 foreach ($message->unwrap() as $partialMessage) {
-    echo $partialMessage::class // \Apfelfrisch\Edifact\Message
+    echo $segment instanceof \Apfelfrisch\Edifact\Message;
 }
 ```
 
