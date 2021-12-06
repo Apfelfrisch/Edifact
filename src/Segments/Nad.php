@@ -33,8 +33,8 @@ class Nad extends AbstractSegment
                 ->addValue('C059', '3042:4', 'O|an|..35')
                 ->addValue('3164', '3164', 'O|an|..35')
                 ->addValue('C819', '3229', null)
-                ->addValue('3251', '3251', 'O|an|17')
-                ->addValue('3207', '3207', 'O|an|3');
+                ->addValue('3251', '3251', 'O|an|..17')
+                ->addValue('3207', '3207', 'O|an|..3');
         }
 
         return self::$blueprint;

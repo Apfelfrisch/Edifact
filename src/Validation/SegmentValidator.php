@@ -72,7 +72,7 @@ class SegmentValidator
 
                 [$necessaryState, $type, $minLenght, $maxLength] = $this->explodeRules($rules);
 
-                if ($necessaryState === self::ELEMENT_OPTIONAL && $value === null) {
+                if ($necessaryState === self::ELEMENT_OPTIONAL && ($value === null || $value === '')) {
                     continue;
                 }
 
