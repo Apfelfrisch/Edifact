@@ -77,13 +77,13 @@ final class SeglineParser
     {
         $string = str_replace(["\r", "\n"], '', $string);
 
-        if ($foundTermination = (bool)strpos($string, $this->unaSegment->escapeCharacter() . $pattern)) {
+        if ($foundEscapeCharacter = str_contains($string, $this->unaSegment->escapeCharacter() . $pattern)) {
             $string = str_replace($this->unaSegment->escapeCharacter() . $pattern, self::PLACE_HOLDER, $string);
         }
 
         $explodedString = explode($pattern, $string);
 
-        if ($foundTermination) {
+        if ($foundEscapeCharacter) {
             $explodedString = array_map(
                 fn(string $string): string => str_replace(self::PLACE_HOLDER, $pattern, $string),
                 $explodedString

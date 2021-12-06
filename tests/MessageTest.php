@@ -187,4 +187,18 @@ class MessageTest extends TestCase
             $this->assertInstanceOf(SegInterface::class, $segment);
         }
     }
+
+    /** @test */
+    public function test_escaping_string(): void
+    {
+        $message = Message::fromString("UNH+?:?+?''");
+
+        $this->assertInstanceOf(SegInterface::class, $segment = $message->findFirstSegment(Segments\Unh::class));
+        $this->assertSame(":+'", $segment->getValueFromPosition(1, 0));
+
+        $message = Message::fromString("UNA|-.! _UNH-!|!-!__");
+
+        $this->assertInstanceOf(SegInterface::class, $segment = $message->findFirstSegment(Segments\Unh::class));
+        $this->assertSame("|-_", $segment->getValueFromPosition(1, 0));
+    }
 }

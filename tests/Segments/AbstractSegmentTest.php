@@ -57,13 +57,13 @@ class AbstractSegmentTest extends TestCase
     }
 
     /** @test */
-    public function test_handling_string_termination(): void
+    public function test_escaping_string(): void
     {
-        $givenString = "A+B?+";
+        $givenString = "A+?:?+";
 
         $segment = Segment::fromSegLine(new SeglineParser, $givenString);
 
-        $this->assertEquals('B+', $segment->dummyMethod());
+        $this->assertEquals(':+', $segment->dummyMethod());
         $this->assertEquals($givenString, $segment->toString());
     }
 }
