@@ -13,7 +13,7 @@ final class SegmentCounter
 
     public function count(SegInterface $segment): void
     {
-        if ($segment->name() === 'UNA' || $segment->name() === 'UNB') {
+        if ($segment->name() === 'UNB') {
             return;
         }
 
