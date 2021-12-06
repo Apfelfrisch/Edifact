@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Validation\Validator;
 class ValidatorTest extends TestCase
 {
     /** @test */
-    public function test_validate_unkown_elements()
+    public function test_validate_unkown_elements(): void
     {
         TestSegment::$rule = 'M|n|1';
 
@@ -19,14 +19,14 @@ class ValidatorTest extends TestCase
 
         $this->assertFalse($validator->isValid($this->buildMessage('1+unkown-element:unkown-component')));
 
-        $failure = $validator->getFirstFailure();
+        $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
         $this->assertSame(2, $failure->getElementPosition());
         $this->assertSame('unkown-element', $failure->getValue());
         $this->assertSame('The input Element is unkown', $failure->getMessage());
     }
 
     /** @test */
-    public function test_validate_unkown_components()
+    public function test_validate_unkown_components(): void
     {
         TestSegment::$rule = 'M|n|1';
 
@@ -34,7 +34,7 @@ class ValidatorTest extends TestCase
 
         $this->assertFalse($validator->isValid($this->buildMessage('1:unkown-component')));
 
-        $failure = $validator->getFirstFailure();
+        $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
         $this->assertSame(1, $failure->getElementPosition());
         $this->assertSame(1, $failure->getComponentPosition());
         $this->assertSame('unkown-component', $failure->getValue());
@@ -42,7 +42,7 @@ class ValidatorTest extends TestCase
     }
 
     /** @test */
-    public function test_validate_digit_values()
+    public function test_validate_digit_values(): void
     {
         TestSegment::$rule = 'M|n|..11';
         $digits = implode(range(0, 9));
@@ -51,7 +51,7 @@ class ValidatorTest extends TestCase
 
         $this->assertTrue($validator->isValid($this->buildMessage($digits)));
         $this->assertFalse($validator->isValid($this->buildMessage($digits . 'A')));
-        $failure = $validator->getFirstFailure();
+        $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
         $this->assertSame('TST', $failure->getSegmentName());
         $this->assertSame(1, $failure->getElementPosition());
         $this->assertSame(0, $failure->getComponentPosition());
@@ -60,7 +60,7 @@ class ValidatorTest extends TestCase
     }
 
     /** @test */
-    public function test_validate_alpha_values()
+    public function test_validate_alpha_values(): void
     {
         TestSegment::$rule = 'M|a|..53';
         $alphaValues = implode(array_merge(range('a', 'z'), range('A', 'Z')));
@@ -69,13 +69,13 @@ class ValidatorTest extends TestCase
 
         $this->assertTrue($validator->isValid($this->buildMessage($alphaValues)));
         $this->assertFalse($validator->isValid($this->buildMessage($alphaValues . '1')));
-        $failure = $validator->getFirstFailure();
+        $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
         $this->assertSame($alphaValues . '1', $failure->getValue());
         $this->assertSame("String must contain only alphabetic characters", $failure->getMessage());
     }
 
     /** @test */
-    public function test_validate_max_lenght()
+    public function test_validate_max_lenght(): void
     {
         TestSegment::$rule = 'M|an|..2';
 
@@ -84,13 +84,13 @@ class ValidatorTest extends TestCase
         $this->assertTrue($validator->isValid($this->buildMessage('A')));
 
         $this->assertFalse($validator->isValid($this->buildMessage('ABC')));
-        $failure = $validator->getFirstFailure();
+        $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
         $this->assertSame('ABC', $failure->getValue());
         $this->assertSame("String is more than 2 characters long", $failure->getMessage());
     }
 
     /** @test */
-    public function test_validate_min_lenght()
+    public function test_validate_min_lenght(): void
     {
         TestSegment::$rule = 'M|an|..2';
 
@@ -99,13 +99,13 @@ class ValidatorTest extends TestCase
         $this->assertTrue($validator->isValid($this->buildMessage('A')));
 
         $this->assertFalse($validator->isValid($this->buildMessage('')));
-        $failure = $validator->getFirstFailure();
+        $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
         $this->assertSame('', $failure->getValue());
         $this->assertSame("String is less than 1 characters long", $failure->getMessage());
     }
 
     /** @test */
-    public function test_validate_exact_string_lenght()
+    public function test_validate_exact_string_lenght(): void
     {
         TestSegment::$rule = 'M|an|3';
 
@@ -116,18 +116,18 @@ class ValidatorTest extends TestCase
         $this->assertTrue($validator->isValid($this->buildMessage('123')));
 
         $this->assertFalse($validator->isValid($this->buildMessage('12')));
-        $failure = $validator->getFirstFailure();
+        $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
         $this->assertSame('12', $failure->getValue());
         $this->assertSame("String is not 3 characters long", $failure->getMessage());
 
         $this->assertFalse($validator->isValid($this->buildMessage($string . '4')));
-        $failure = $validator->getFirstFailure();
+        $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
         $this->assertSame($string . '4', $failure->getValue());
         $this->assertSame("String is not 3 characters long", $failure->getMessage());
     }
 
     /** @test */
-    public function test_ignore_optional_empty_components()
+    public function test_ignore_optional_empty_components(): void
     {
         TestSegment::$rule = 'O|an|3';
 
@@ -138,7 +138,7 @@ class ValidatorTest extends TestCase
     }
 
     /** @test */
-    public function test_iterate_over_failures()
+    public function test_iterate_over_failures(): void
     {
         TestSegment::$rule = 'M|n|1';
 

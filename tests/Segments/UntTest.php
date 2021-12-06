@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class UntTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_unt_segment(): void
     {
         $seg = Unt::fromAttributes('213', 'REF');
 

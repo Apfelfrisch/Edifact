@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class LinTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_lin_segment(): void
     {
         $seg = Lin::fromAttributes('123456', 'ARTICLE_NO_1', 'COD');
 

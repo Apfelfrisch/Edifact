@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact\Test\Segments;
 
-use Apfelfrisch\Edifact\UnaSegment;
 use Apfelfrisch\Edifact\SeglineParser;
 use Apfelfrisch\Edifact\Segments\Cav;
 use Apfelfrisch\Edifact\Test\TestCase;
@@ -12,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class CavTest extends TestCase
 {
     /** @test */
-    public function test_ajt_segment()
+    public function test_cav_segment(): void
     {
         $seg = Cav::fromAttributes('COD', 'RCD', 'VON', 'VTW', 'CLS');
 

@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class UcsTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_ucs_segment(): void
     {
         $seg = Ucs::fromAttributes('500', '12');
 

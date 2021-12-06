@@ -12,7 +12,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class QtyTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_qty_segment(): void
     {
         $seg = Qty::fromAttributes('QUL', '20.00', 'EUR');
 

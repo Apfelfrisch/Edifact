@@ -2,7 +2,6 @@
 
 namespace Apfelfrisch\Edifact\Test;
 
-use Apfelfrisch\Edifact\UnaSegment;
 use Apfelfrisch\Edifact\Test\TestCase;
 use Apfelfrisch\Edifact\SegmentFactory;
 use Apfelfrisch\Edifact\Segments\Generic;
@@ -10,8 +9,8 @@ use Apfelfrisch\Edifact\Exceptions\EdifactException;
 
 class SegmentFactoryTest extends TestCase
 {
-    private $segFactory;
-    private $segmentNamespace = '\Apfelfrisch\Edifact\Segments';
+    private SegmentFactory $segFactory;
+    private string $segmentNamespace = '\Apfelfrisch\Edifact\Segments';
 
     public function setUp(): void
     {
@@ -19,20 +18,22 @@ class SegmentFactoryTest extends TestCase
     }
 
     /** @test */
-    public function it_instanciates_the_segment_from_segment_string()
+    public function test_instanciate_the_segment_from_segment_string(): void
     {
-        $this->assertInstanceOf($this->segmentNamespace . '\Bgm', $this->segFactory->build('BGM+'));
+        /** @psalm-var class-string */
+        $segmentClass = $this->segmentNamespace . '\Bgm';
+        $this->assertInstanceOf($segmentClass, $this->segFactory->build('BGM+'));
     }
 
     /** @test **/
-    public function it_instanciates_the_dafault_seg_if_its_allowed_and_no_secific_segement_was_found()
+    public function test_instanciate_the_dafault_seg_if_its_allowed_and_no_specific_segement_was_found(): void
     {
         $this->segFactory = (new SegmentFactory)->addFallback(Generic::class);
         $this->assertInstanceOf(Generic::class, $this->segFactory->build('UKW'));
     }
 
     /** @test **/
-    public function it_throw_an_exception_if_no_default_seg_is_alowed_and_the_segment_is_unknowed()
+    public function test_throw_an_exception_if_no_default_seg_is_allowed_and_the_segment_is_unknowed(): void
     {
         $this->segFactory = new SegmentFactory();
 

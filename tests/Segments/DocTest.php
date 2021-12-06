@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class DocTest extends TestCase
 {
     /** @test */
-    public function test_ajt_segment()
+    public function test_doc_segment(): void
     {
         $seg = Doc::fromAttributes('COD', 'NUMBER_1');
 

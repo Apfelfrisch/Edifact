@@ -12,7 +12,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class UnbTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_unb_segment(): void
     {
         $seg = Unb::fromAttributes('1234', '8', 'sender', '500', 'receiver', '600', new DateTime, 'ref-no', 'usage-type', '1');
 

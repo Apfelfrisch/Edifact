@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class FtxTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_ftx_segment(): void
     {
         $seg = Ftx::fromAttributes('QAL', str_repeat('A', 2050), 'COD');
 

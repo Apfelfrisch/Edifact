@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class PtyTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_pty_segment(): void
     {
         $seg = Pty::fromAttributes('QUL', 'PRIO-500');
 

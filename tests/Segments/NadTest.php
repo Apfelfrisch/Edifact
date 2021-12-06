@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class NadTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_nad_segment(): void
     {
         $seg = Nad::fromAttributes(
             'ABC',

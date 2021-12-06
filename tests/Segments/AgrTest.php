@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class AgrTest extends TestCase
 {
     /** @test */
-    public function test_agr_segment()
+    public function test_agr_segment(): void
     {
         $seg = Agr::fromAttributes('QAL', 'TYP');
 

@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class EqdTest extends TestCase
 {
     /** @test */
-    public function test_segment()
+    public function test_eqd_segment(): void
     {
         $seg = Eqd::fromAttributes('QAL', '12345');
 

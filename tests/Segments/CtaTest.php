@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class CtaTest extends TestCase
 {
     /** @test */
-    public function test_ajt_segment()
+    public function test_cta_segment(): void
     {
         $seg = Cta::fromAttributes('TYP', 'NAME');
 

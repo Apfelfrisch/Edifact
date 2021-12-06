@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class TaxTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_tax_segment(): void
     {
         $seg = Tax::fromAttributes('QUL', 'TYP', 'RATE-ONE', 'CAT');
 

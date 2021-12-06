@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class UnhTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_unh_segment(): void
     {
         $seg = Unh::fromAttributes('REF', 'TYP', 'VNO', 'RNO', 'ORG', 'OCD');
 

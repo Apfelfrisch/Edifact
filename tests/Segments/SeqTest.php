@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class SeqTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_seq_segment(): void
     {
         $seg = Seq::fromAttributes('COD');
 

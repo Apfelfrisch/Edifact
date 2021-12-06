@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class UnsTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_uns_segment(): void
     {
         $seg = Uns::fromAttributes('S');
 

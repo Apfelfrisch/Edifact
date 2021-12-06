@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class CniTest extends TestCase
 {
     /** @test */
-    public function test_ajt_segment()
+    public function test_cni_segment(): void
     {
         $seg = Cni::fromAttributes('12345');
 

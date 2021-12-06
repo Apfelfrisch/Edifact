@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class CuxTest extends TestCase
 {
     /** @test */
-    public function test_ajt_segment()
+    public function test_cux_segment(): void
     {
         $seg = Cux::fromAttributes('TYP', 'EUR', 'QUL');
 

@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class ImdTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_imd_segment(): void
     {
         $seg = Imd::fromAttributes('COD', 'QAL');
 

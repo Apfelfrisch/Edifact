@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class AlcTest extends TestCase
 {
     /** @test */
-    public function test_ajt_segment()
+    public function test_alc_segment(): void
     {
         $seg = Alc::fromAttributes('QAL', 'COD');
 

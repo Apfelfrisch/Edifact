@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class PcdTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_pcd_segment(): void
     {
         $seg = Pcd::fromAttributes('30', '5');
 

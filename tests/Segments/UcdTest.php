@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class UcdTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_ucd_segment(): void
     {
         $seg = Ucd::fromAttributes('ECD', '66', '666');
 

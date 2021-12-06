@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\Fixtures\Segment;
 class AbstractSegmentTest extends TestCase
 {
     /** @test */
-    public function it_gives_its_segment_name()
+    public function test_provide_segment_name(): void
     {
         $segment = Segment::fromSegLine(new SeglineParser, 'A');
 
@@ -19,17 +19,17 @@ class AbstractSegmentTest extends TestCase
     }
 
     /** @test */
-    public function it_cast_itself_as_a_string()
+    public function test_string_casting(): void
     {
         $givenString = 'A+B+1:2:3:4:5+D+E';
 
         $segment = Segment::fromSegLine(new SeglineParser, $givenString);
 
-        $this->assertEquals($givenString, $segment->toString(new SeglineParser));
+        $this->assertEquals($givenString, $segment->toString());
     }
 
     /** @test */
-    public function it_cast_itself_as_an_array()
+    public function test_array_casting(): void
     {
         $givenString = 'A+B+1:2:3:4:5+D+E';
         $expectedArray = [
@@ -46,7 +46,7 @@ class AbstractSegmentTest extends TestCase
     }
 
     /** @test */
-    public function it_removes_his_loose_ends_when_it_is_castet_to_a_string()
+    public function test_remove_loose_ends(): void
     {
         $givenString = "A+B+1:2:::+D++";
         $expectedString = "A+B+1:2+D";
@@ -57,7 +57,7 @@ class AbstractSegmentTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_string_terminations()
+    public function test_handling_string_termination(): void
     {
         $givenString = "A+B?+";
 

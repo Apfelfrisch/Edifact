@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class PiaTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_pia_segment(): void
     {
         $seg = Pia::fromAttributes('500', 'ARTICLE_NO', 'COD');
 

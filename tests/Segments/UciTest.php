@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class UciTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_uci_segment(): void
     {
         $seg = Uci::fromAttributes('UNB-ref', 'sender', '500', 'receiver', '500', 'SCD', 'ECD', 'SEG', 'SPO', 'EPO');
 

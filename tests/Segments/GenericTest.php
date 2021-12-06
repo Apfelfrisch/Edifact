@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class GenericTest extends TestCase
 {
     /** @test */
-    public function test_segment()
+    public function test_generic_segment(): void
     {
         $seg = Generic::fromAttributes('TST', ['a', '1', '2'], ['b', '1']);
 

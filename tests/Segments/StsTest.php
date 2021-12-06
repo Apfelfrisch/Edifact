@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class StsTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_sts_segment(): void
     {
         $seg = Sts::fromAttributes('CAT', 'RES', 'COD', 'STA');
 

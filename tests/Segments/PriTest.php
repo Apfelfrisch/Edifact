@@ -12,7 +12,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class PriTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_pri_segment(): void
     {
         $seg = Pri::fromAttributes('QUL', '20.00', 'EUR');
 

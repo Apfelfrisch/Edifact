@@ -12,7 +12,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class MoaTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_moa_segment(): void
     {
         $seg = Moa::fromAttributes('QUL', 20.00);
 

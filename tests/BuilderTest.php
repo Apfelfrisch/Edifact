@@ -16,7 +16,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 class BuilderTest extends TestCase
 {
     /** @test */
-    public function test_setting_default_unaSegment()
+    public function test_setting_default_una(): void
     {
         $builder = new Builder;
         $builder->writeSegments(
@@ -25,12 +25,12 @@ class BuilderTest extends TestCase
 
         $message = $builder->get();
 
-        $this->assertStringStartsWith("UNA:+.? '", $message);
+        $this->assertStringStartsWith("UNA:+.? '", $message->toString());
         $this->assertEquals(new UnaSegment(), $message->getUnaSegment());
     }
 
     /** @test */
-    public function test_using_custom_delimter()
+    public function test_using_custom_una(): void
     {
         $builder = new Builder(new UnaSegment('|', '#', '.', '!', ' '));
         $builder->writeSegments(
@@ -39,7 +39,7 @@ class BuilderTest extends TestCase
 
         $message = $builder->get();
 
-        $this->assertStringStartsWith("UNA|#.! '", $message);
+        $this->assertStringStartsWith("UNA|#.! '", $message->toString());
         $this->assertEquals(new UnaSegment('|', '#', '.', '!'), $message->getUnaSegment());
         $this->assertSame(
             "UNA|#.! 'UNB#1|2#sender|500#receiver|400#210101|1201#referenz-no'UNZ#0#referenz-no'",
@@ -48,7 +48,7 @@ class BuilderTest extends TestCase
     }
 
     /** @test */
-    public function test_auto_write_unz_segement()
+    public function test_auto_write_unz_segement(): void
     {
         $builder = new Builder;
         $builder->writeSegments(
@@ -59,7 +59,7 @@ class BuilderTest extends TestCase
     }
 
     /** @test */
-    public function test_writing_to_a_file()
+    public function test_writing_to_a_file(): void
     {
         $builder = new Builder;
         $builder->writeSegments(
@@ -70,7 +70,7 @@ class BuilderTest extends TestCase
     }
 
     /** @test */
-    public function test_using_stream_filters()
+    public function test_using_stream_filters(): void
     {
         $builder = new Builder;
         $builder->addStreamFilter('string.toupper');
@@ -82,7 +82,7 @@ class BuilderTest extends TestCase
     }
 
     /** @test */
-    public function test_auto_write_unt_segement()
+    public function test_auto_write_unt_segement(): void
     {
         $builder = new Builder;
         $builder->writeSegments(
@@ -94,7 +94,7 @@ class BuilderTest extends TestCase
     }
 
     /** @test */
-    public function test_counting_messages()
+    public function test_counting_messages(): void
     {
         $builder = new Builder;
         $builder->writeSegments(
@@ -108,7 +108,7 @@ class BuilderTest extends TestCase
     }
 
     /** @test */
-    public function test_counting_unh_segments()
+    public function test_counting_unh_segments(): void
     {
         $builder = new Builder;
         $builder->writeSegments(

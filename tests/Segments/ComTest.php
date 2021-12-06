@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class ComTest extends TestCase
 {
     /** @test */
-    public function test_ajt_segment()
+    public function test_com_segment(): void
     {
         $seg = Com::fromAttributes('ID', 'TYP');
 

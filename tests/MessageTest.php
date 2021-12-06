@@ -12,42 +12,42 @@ use Apfelfrisch\Edifact\Test\TestCase;
 
 class MessageTest extends TestCase
 {
-    private $messageCore;
+    private Message $message;
 
     public function setUp(): void
     {
         $file = new Stream(__DIR__ . '/data/edifact.txt');
-        $this->messageCore = new Message($file);
+        $this->message = new Message($file);
     }
 
     /** @test */
-    public function it_instanciates_with_file_and_validator()
+    public function test_instanciate_with_file_and_validator(): void
     {
-        $this->assertInstanceOf(Message::class, $this->messageCore);
+        $this->assertInstanceOf(Message::class, $this->message);
     }
 
     /** @test */
-    public function it_instanciates_from_a_string()
+    public function test_instanciate_from_a_string(): void
     {
-        $messageCore = Message::fromString("UNH");
-        $this->assertInstanceOf(Message::class, $messageCore);
+        $message = Message::fromString("UNH");
+        $this->assertInstanceOf(Message::class, $message);
     }
 
     /** @test */
-    public function it_instanciates_from_a_filepath()
+    public function test_instanciate_from_a_filepath(): void
     {
-        $messageCore = Message::fromFilepath(__DIR__ . '/data/edifact.txt');
-        $this->assertInstanceOf(Message::class, $messageCore);
+        $message = Message::fromFilepath(__DIR__ . '/data/edifact.txt');
+        $this->assertInstanceOf(Message::class, $message);
     }
 
     /** @test */
-    public function it_can_cast_the_edifact_content_to_a_string()
+    public function test_string_casting(): void
     {
-        $this->assertEquals("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'RFF+Z13:17103'", (string)$this->messageCore);
+        $this->assertEquals("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'RFF+Z13:17103'", (string)$this->message);
     }
 
     /** @test */
-    public function it_can_cast_the_edifact_content_to_an_array()
+    public function test_array_casting(): void
     {
         $array = [
             [
@@ -60,68 +60,54 @@ class MessageTest extends TestCase
               "C506" => [1153 => "Z13", 1154 => "17103"],
             ]
         ];
-        $this->assertEquals($array, $this->messageCore->toArray());
+        $this->assertEquals($array, $this->message->toArray());
     }
 
     /** @test */
-    public function it_fetch_the_current_segement_from_stream()
+    public function test_fetching_the_current_segement(): void
     {
-        $messageCore = Message::fromString("UNH'UNB");
+        $message = Message::fromString("UNH'UNB");
 
-        $this->assertInstanceOf(Segments\Unh::class, $messageCore->getSegments()->getCurrent());
-        $this->assertInstanceOf(Segments\Unh::class, $messageCore->getSegments()->getCurrent());
+        $this->assertInstanceOf(Segments\Unh::class, $message->getSegments()->getCurrent());
+        $this->assertInstanceOf(Segments\Unh::class, $message->getSegments()->getCurrent());
     }
 
     /** @test */
-    public function it_parses_to_a_generic_segment_if_a_segment_is_unkown()
+    public function test_parsing_to_the_generic_segment_as_default_when_the_segment_is_unkown(): void
     {
-        $messageCore = Message::fromString("UKN");
+        $message = Message::fromString("UKN");
 
-        $this->assertInstanceOf(Segments\Generic::class, $messageCore->getSegments()->getCurrent());
+        $this->assertInstanceOf(Segments\Generic::class, $message->getSegments()->getCurrent());
     }
 
     /** @test */
-    public function it_throw_an_exception_if_no_generic_segment_is_set_and_a_segment_is_uknown()
+    public function test_throw_an_exception_if_no_fallback_was_set_and_the_segment_is_uknown(): void
     {
-        $messageCore = Message::fromString("UKN", SegmentFactory::withDefaultDegments(withFallback: false));
+        $message = Message::fromString("UKN", SegmentFactory::withDefaultDegments(withFallback: false));
 
         $this->expectException(EdifactException::class);
-        $messageCore->getAllSegments();
+        $message->getAllSegments();
     }
 
     /** @test */
-    public function it_iterates_over_the_stream()
+    public function test_iterates_over_the_stream(): void
     {
-        $messageCore = Message::fromString("UNH'UNB'");
-        $message = "";
-        foreach ($messageCore->getSegments() as $segment) {
-            $message .= $segment->toString() . $messageCore->getUnaSegment()->segmentTerminator();
+        $message = Message::fromString("UNH'UNB'");
+
+        $i = 0;
+        foreach ($message->getSegments() as $segment) {
+            $this->assertInstanceOf(SegInterface::class, $segment);
+            $i++;
         }
-        $this->assertEquals($message, (string)$messageCore);
+        $this->assertSame(2, $i);
     }
 
     /** @test */
-    public function it_fetch_a_specific_segement_from_stream()
+    public function test_finds_segments_by_class_name(): void
     {
-        $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UKN'UNT");
+        $message = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNT");
 
-        $this->assertInstanceOf(
-            Segments\Unb::class,
-            $messageCore->findFirstSegment(Segments\Unb::class)
-        );
-        $this->assertInstanceOf(
-            Segments\Generic::class,
-            $messageCore->findFirstSegment(Segments\Generic::class, fn(Segments\Generic $seg): bool => $seg->name() === 'UKN')
-        );
-        $this->assertNull($messageCore->findFirstSegment(Segments\Seq::class));
-    }
-
-    /** @test */
-    public function it_finds_segments_by_class_name()
-    {
-        $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNT");
-
-        $foundSegments = $messageCore->filterAllSegments(Segments\Unh::class);
+        $foundSegments = $message->filterAllSegments(Segments\Unh::class);
 
         $this->assertCount(2, $foundSegments);
         $this->assertInstanceOf(Segments\Unh::class, $foundSegments[0]);
@@ -129,11 +115,11 @@ class MessageTest extends TestCase
     }
 
     /** @test */
-    public function it_finds_segments_by_class_name_and_closure()
+    public function test_finds_segments_by_class_name_and_closure(): void
     {
-        $messageCore = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNH+O11111+ORDERS:D:09B:UN:1.1e'UNT");
+        $message = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNH+O11111+ORDERS:D:09B:UN:1.1e'UNT");
 
-        $foundSegments = $messageCore->filterAllSegments(Segments\Unh::class, fn(Segments\Unh $seg): bool =>
+        $foundSegments = $message->filterAllSegments(Segments\Unh::class, fn(Segments\Unh $seg): bool =>
             $seg->reference() === 'O160482A7C2'
         );
 
@@ -143,21 +129,21 @@ class MessageTest extends TestCase
     }
 
     /** @test */
-    public function it_uses_the_filters_from_configuration_class()
+    public function test_using_stream_filters(): void
     {
-        $messageCore = Message::fromString("FOO BAR");
-        $messageCore->addStreamFilter('string.tolower');
+        $message = Message::fromString("FOO BAR");
+        $message->addStreamFilter('string.tolower');
 
-        $this->assertEquals("foo bar", (string)$messageCore);
+        $this->assertEquals("foo bar", (string)$message);
     }
 
     /** @test */
-    public function it_can_return_the_delimter()
+    public function test_getting_the_una_segement(): void
     {
         $unaValues = [":+.? '", "abcdef"];
         foreach ($unaValues as $unaValue) {
-            $messageCore = Message::fromString("UNA" . $unaValue . "UNH+'");
-            $unaSegment = $messageCore->getUnaSegment();
+            $message = Message::fromString("UNA" . $unaValue . "UNH+'");
+            $unaSegment = $message->getUnaSegment();
             $this->assertEquals($unaValue,
                  $unaSegment->componentSeparator()
                . $unaSegment->elementSeparator()
@@ -170,7 +156,7 @@ class MessageTest extends TestCase
     }
 
     /** @test */
-    public function it_converts_decimal_seperator()
+    public function test_using_the_decimal_point_from_una(): void
     {
         $message = Message::fromString("UNA:+_? 'MOA+QUL:20_00'");
 
@@ -181,23 +167,23 @@ class MessageTest extends TestCase
     }
 
     /** @test */
-    public function it_unwraps_the_message_with_the_default_header_and_trailer()
+    public function test_unwrapping_the_message_with_the_default_header_and_trailer(): void
     {
-        $messageCore = Message::fromString("UNA:+.? 'UNH+1+ORDERS:D:96A:UN'UNT+2+1'UNH+2+ORDERS:D:96A:UN'UNT+2+2'");
+        $message = Message::fromString("UNA:+.? 'UNH+1+ORDERS:D:96A:UN'UNT+2+1'UNH+2+ORDERS:D:96A:UN'UNT+2+2'");
 
-        [$firstMessage, $secondMessage] = iterator_to_array($messageCore->unwrap());
+        [$firstMessage, $secondMessage] = iterator_to_array($message->unwrap());
 
         $this->assertSame("UNH+1+ORDERS:D:96A:UN'UNT+2+1'", $firstMessage->toString());
         $this->assertSame("UNH+2+ORDERS:D:96A:UN'UNT+2+2'", $secondMessage->toString());
     }
 
     /** @test */
-    public function it_provdes_all_segments()
+    public function test_providing_all_segments_as_an_array(): void
     {
-        $messageCore = Message::fromString("UNA:+.? 'UNH+1+ORDERS:D:96A:UN'UNT+2+1'UNH+2+ORDERS:D:96A:UN'UNT+2+2'");
+        $message = Message::fromString("UNA:+.? 'UNH+1+ORDERS:D:96A:UN'UNT+2+1'UNH+2+ORDERS:D:96A:UN'UNT+2+2'");
 
-        $this->assertCount(4, $messageCore->getAllSegments());
-        foreach ($messageCore->getAllSegments() as $segment) {
+        $this->assertCount(4, $message->getAllSegments());
+        foreach ($message->getAllSegments() as $segment) {
             $this->assertInstanceOf(SegInterface::class, $segment);
         }
     }

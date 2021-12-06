@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class LocTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_loc_segment(): void
     {
         $seg = Loc::fromAttributes('QUL', 'NO_1', '1');
 

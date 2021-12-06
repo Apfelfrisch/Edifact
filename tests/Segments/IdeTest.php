@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class IdeTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_ide_segment(): void
     {
         $seg = Ide::fromAttributes('QAL', 'ID50');
 

@@ -9,12 +9,12 @@ class StreamTest extends TestCase
 {
     private string $tempname;
 
-    private Stream $edifactFile;
+    private Stream $stream;
 
     public function setUp(): void
     {
         $this->tempname = tempnam(sys_get_temp_dir(), 'diac');
-        $this->edifactFile = new Stream($this->tempname, 'w+');
+        $this->stream = new Stream($this->tempname, 'w+');
     }
 
     public function tearDown(): void
@@ -24,149 +24,136 @@ class StreamTest extends TestCase
         }
     }
 
-    public function testCanInstantiateWithStreamIdentifier()
+    public function test_provide_segement_line(): void
     {
-        $this->assertInstanceOf(Stream::class, $this->edifactFile);
-    }
+        $stream = new Stream(__DIR__ . '/data/edifact.txt');
 
-    public function testCanGetEdifactSegments()
-    {
-        $edifactFile = new Stream(__DIR__ . '/data/edifact.txt');
-
-        while (! $edifactFile->eof()) {
-            $string[] = $edifactFile->getSegment();
+        $string = [];
+        while (! $stream->eof()) {
+            $string[] = $stream->getSegment();
         }
 
+        $this->assertCount(3, $string);
         $this->assertEquals('UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e', $string[0]);
         $this->assertEquals('RFF+Z13:17103', $string[1]);
     }
 
-    public function testEscapeMessage()
+    public function test_parsing_escaped_message(): void
     {
         $message = "SEG+Up?'Verd?''";
-        $this->edifactFile->writeAndRewind($message);
+        $this->stream->writeAndRewind($message);
 
-        while (! $this->edifactFile->eof()) {
-            $string[] = $this->edifactFile->getSegment();
+        $string = [];
+        while (! $this->stream->eof()) {
+            $string[] = $this->stream->getSegment();
         }
         $this->assertEquals("SEG+Up'Verd'", $string[0]);
     }
 
-    public function testToStringRetrievesFullContentsOfStream()
+    public function test_string_cast_provides_the_full_stream_content(): void
     {
         $message = 'foo bar';
-        $this->edifactFile->write($message);
-        $this->assertEquals($message, (string) $this->edifactFile);
+        $this->stream->write($message);
+        $this->assertEquals($message, (string) $this->stream);
     }
 
-    public function testStringSerializationReturnsEmptyStringWhenStreamIsNotReadable()
+    public function test_string_serialization_returns_empty_string_when_stream_is_not_readable(): void
     {
         $this->tempname = tempnam(sys_get_temp_dir(), 'diac');
         file_put_contents($this->tempname, 'FOO BAR');
-        $edifactFile = new Stream($this->tempname, 'w');
+        $stream = new Stream($this->tempname, 'w');
 
-        $this->assertEquals('', $edifactFile->__toString());
+        $this->assertEquals('', $stream->__toString());
     }
 
-    public function testSeekAndTellCurrentPositionInResource()
+    public function test_seek_and_tell(): void
     {
-        file_put_contents($this->tempname, 'FOO BAR');
-        $edifactFile = new Stream($this->tempname, 'r');
-        $edifactFile->seek(2);
+        $stream = Stream::fromString('FOO BAR');
+        $stream->seek(2);
 
-        $this->assertEquals(2, $edifactFile->tell());
+        $this->assertEquals(2, $stream->tell());
     }
 
-    public function testStat()
+    public function test_stat(): void
     {
-        $this->assertTrue(is_array($this->edifactFile->stat()));
+        $this->assertFalse(empty($this->stream->stat()));
     }
 
-    public function testEofReportsFalseWhenNotAtEndOfStream()
+    public function test_eof(): void
     {
-        file_put_contents($this->tempname, 'FOO BAR');
-        $edifactFile = new Stream($this->tempname, 'r');
-        $edifactFile->seek(2);
-        $this->assertFalse($edifactFile->eof());
+        $stream = Stream::fromString('FOO BAR');
+        $stream->seek(2);
+        $this->assertFalse($stream->eof());
+
+        $stream->seek(0, SEEK_END);
+        $stream->getChar();
+        $this->assertTrue($stream->eof());
     }
 
-    public function testEofReportsTrueWhenAtEndOfStream()
+    public function test_stream_is_empty(): void
     {
-        file_put_contents($this->tempname, 'FOO BAR');
-        $edifactFile = new Stream($this->tempname, 'r');
+        $stream = $this->stream;
 
-        $edifactFile->seek(0, SEEK_END);
-        $edifactFile->getChar();
-        $this->assertTrue($edifactFile->eof());
+        $this->assertTrue($stream->isEmpty());
+
+        $stream->write('A');
+        $position = $stream->tell();
+
+        $this->assertFalse($stream->isEmpty());
+        $this->assertSame($position, $stream->tell());
     }
 
-    public function testStreamIsEmpty()
-    {
-        $edifactFile = $this->edifactFile;
-
-        $this->assertTrue($edifactFile->isEmpty());
-
-        $edifactFile->write('A');
-        $position = $edifactFile->tell();
-
-        $this->assertFalse($edifactFile->isEmpty());
-        $this->assertSame($position, $edifactFile->tell());
-    }
-
-    public function testGettingChar()
+    public function test_getting_char(): void
     {
         $string = "UNA:+.? 'UNB?'UNT'";
-        file_put_contents($this->tempname, $string);
-        $edifactFile = new Stream($this->tempname, 'r');
+        $stream = Stream::fromString($string);
 
-        $edifactFile->seek(0);
+        $stream->seek(0);
         $i = 0;
         while (isset($string[$i])) {
-            $this->assertEquals($edifactFile->getChar(), $string[$i]);
+            $this->assertEquals($stream->getChar(), $string[$i]);
             $i++;
         }
     }
 
-    public function testRewindResetsToStartOfStream()
+    public function test_rewind_resets_to_start_of_stream(): void
     {
-        file_put_contents($this->tempname, 'FOO BAR');
-        $edifactFile = new Stream($this->tempname, 'r+');
-        $this->assertTrue($edifactFile->seek(2));
-        $edifactFile->rewind();
-        $this->assertEquals(0, $edifactFile->tell());
+        $stream = Stream::fromString('FOO BAR');
+        $this->assertTrue($stream->seek(2));
+        $stream->rewind();
+        $this->assertEquals(0, $stream->tell());
     }
 
-    public function testReadFilter()
+    public function test_read_filter(): void
     {
-        file_put_contents($this->tempname, 'foo bar');
-        $edifactFile = new Stream($this->tempname, 'r+');
+        $stream = Stream::fromString('foo bar');
 
-        $edifactFile->addReadFilter('string.toupper');
+        $stream->addReadFilter('string.toupper');
 
-        $this->assertEquals('FOO BAR', (string)$edifactFile);
-        $edifactFile->rewind();
-        $this->assertEquals('FOO BAR', $edifactFile->getContents());
-        $edifactFile->rewind();
-        $this->assertEquals('FOO BAR', $edifactFile->getSegment());
-        $edifactFile->rewind();
-        $this->assertEquals('FOO BAR', $edifactFile->read(1024));
-        $edifactFile->rewind();
-        $this->assertEquals('F', $edifactFile->getChar());
+        $this->assertEquals('FOO BAR', (string)$stream);
+        $stream->rewind();
+        $this->assertEquals('FOO BAR', $stream->getContents());
+        $stream->rewind();
+        $this->assertEquals('FOO BAR', $stream->getSegment());
+        $stream->rewind();
+        $this->assertEquals('FOO BAR', $stream->read(1024));
+        $stream->rewind();
+        $this->assertEquals('F', $stream->getChar());
     }
 
-    public function testWriteFilter()
+    public function test_write_filter(): void
     {
-        $edifactFile = new Stream('php://temp', 'w+');
-        $edifactFile->addWriteFilter('string.toupper', STREAM_FILTER_WRITE);
-        $edifactFile->write('foo bar');
-        $edifactFile->rewind();
-        $this->assertEquals('FOO BAR', $edifactFile->getContents());
+        $stream = new Stream('php://temp', 'w+');
+        $stream->addWriteFilter('string.toupper', STREAM_FILTER_WRITE);
+        $stream->write('foo bar');
+        $stream->rewind();
+        $this->assertEquals('FOO BAR', $stream->getContents());
     }
 
-    public function testUsingWriteFilterOverStaticConstructor()
+    public function test_using_write_filter_over_static_constructor(): void
     {
-        $edifactFile = Stream::fromString('foo bar', 'php://temp', ['string.toupper']);
-        $this->assertEquals('FOO BAR', $edifactFile->getContents());
+        $stream = Stream::fromString('foo bar', 'php://temp', ['string.toupper']);
+        $this->assertEquals('FOO BAR', $stream->getContents());
     }
 }
 

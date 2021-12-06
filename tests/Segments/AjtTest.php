@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class AjtTest extends TestCase
 {
     /** @test */
-    public function test_ajt_segment()
+    public function test_ajt_segment(): void
     {
         $seg = Ajt::fromAttributes('COD');
 

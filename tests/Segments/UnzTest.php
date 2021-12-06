@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class UnzTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_unz_segment(): void
     {
         $seg = Unz::fromAttributes('213', 'REF');
 

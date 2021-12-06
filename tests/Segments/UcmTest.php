@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class UcmTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_ucm_segment(): void
     {
         $seg = Ucm::fromAttributes('ref', 'TYP', 'VNO', 'RNO', 'ORG', 'OCD', 'ECD', 'SEG', 'SPO', 'DPO');
 

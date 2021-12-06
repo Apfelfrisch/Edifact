@@ -11,7 +11,7 @@ use Apfelfrisch\Edifact\Test\TestCase;
 final class RffTest extends TestCase
 {
     /** @test */
-    public function test_segment(): void
+    public function test_rff_segment(): void
     {
         $seg = Rff::fromAttributes('COD', 'ref-500-12');
 
