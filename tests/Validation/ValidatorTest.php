@@ -127,6 +127,17 @@ class ValidatorTest extends TestCase
     }
 
     /** @test */
+    public function test_ignore_optional_empty_components()
+    {
+        TestSegment::$rule = 'O|an|3';
+
+        $validator = new Validator;
+
+        $this->assertTrue($validator->isValid($this->buildMessage('')));
+        $this->assertFalse($validator->isValid($this->buildMessage('1234')));
+    }
+
+    /** @test */
     public function test_iterate_over_failures()
     {
         TestSegment::$rule = 'M|n|1';
