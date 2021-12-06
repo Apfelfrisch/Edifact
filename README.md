@@ -1,9 +1,15 @@
-# PHP - Edifact
+# PHP - EDIFACT
 
 ![Unit Test](https://github.com/Apfelfrisch/Edifact/actions/workflows/phpunit.yml/badge.svg)
 ![Static Analysis](https://github.com/Apfelfrisch/Edifact/actions/workflows/psalm.yml/badge.svg)
 
 Parse, build, serialize and validate UN/EDIFACT Messages.
+
+You will likely have to generate your own Segments. The ones provided with this package are only for testing / demo. 
+
+See https://github.com/php-edifact/edifact-mapping for XML Mappings.
+
+If you don't need validation and custom getter you can also parse to the [Generic Segment](#parse-to-the-generic-segment).
 
 ## Highlights
 * Parse and build UN/EDIFACT Messages in a memory efficient way
@@ -12,7 +18,7 @@ Parse, build, serialize and validate UN/EDIFACT Messages.
 
 ## Usage
 
-### Parse Edifact Messages
+### Parse EDIFACT Messages
 
 #### Parse from String
 ```php
@@ -33,9 +39,9 @@ $message = Message::fromFilepath('path/to/file.txt');
 use Apfelfrisch\Edifact\Segments\Nad;
 
 foreach ($message->getSegments() as $segment) {
-    if ($segment instanceof Nad) {
-        echo $segment->street(); // Musterstr.
-    }
+    if ($segment instanceof Nad) {
+        echo $segment->street(); // Musterstr.
+    }
 }
 ```
 
@@ -44,11 +50,11 @@ foreach ($message->getSegments() as $segment) {
 use Apfelfrisch\Edifact\Segments\Nad;
 
 foreach ($message->filterSegments(Nad::class) as $segment) {
-    echo $segment->name(); // NAD
+    echo $segment->name(); // NAD
 }
 
-$message->filterSegments(Nad::class, fn(Nad $seg): bool 
-    => $seg->street() === 'Musterstr.'
+$message->filterSegments(Nad::class, fn(Nad $seg): bool 
+    => $seg->street() === 'Musterstr.'
 );
 
 echo $message->findFirstSegment(Nad::class)->name(); // NAD
@@ -57,7 +63,7 @@ echo $message->findFirstSegment(Nad::class)->name(); // NAD
 #### Unwrap Messages
 ```php
 foreach ($message->unwrap() as $partialMessage) {
-    echo $partialMessage::class // \Apfelfrisch\Edifact\Message
+    echo $partialMessage::class // \Apfelfrisch\Edifact\Message
 }
 ```
 
@@ -77,9 +83,9 @@ $segmentFactory->addFallback(Generic::class);
 $message = Message::fromString("UNA:+.? 'NAD+DP++++Musterstr.::10+City++12345+DE", $segmentFactory);
 
 foreach ($message->getSegments() as $segment) {
-    if ($segment instanceof Generic) {
-        echo $segment->name(); // NAD.
-    }
+    if ($segment instanceof Generic) {
+        echo $segment->name(); // NAD.
+    }
 }
 ```
 
@@ -94,31 +100,31 @@ use Apfelfrisch\Edifact\Segments\AbstractSegment;
 
 class Seq extends AbstractSegment
 {
-    private static ?Elements $blueprint = null;
+    private static ?Elements $blueprint = null;
 
-    public static function blueprint(): Elements
-    {
-        if (self::$blueprint === null) {
-            self::$blueprint = (new Elements)
-                ->addValue('SEQ', 'SEQ', 'M|a|3')
-                ->addValue('1229', '1229', 'M|an|3');
-        }
+    public static function blueprint(): Elements
+    {
+        if (self::$blueprint === null) {
+            self::$blueprint = (new Elements)
+                ->addValue('SEQ', 'SEQ', 'M|a|3')
+                ->addValue('1229', '1229', 'M|an|3');
+        }
 
-        return self::$blueprint;
-    }
+        return self::$blueprint;
+    }
 
-    public static function fromAttributes(string $code): self
-    {
-        return new self((new Elements)
-            ->addValue('SEQ', 'SEQ', 'SEQ')
-            ->addValue('1229', '1229', $code)
-        );
-    }
+    public static function fromAttributes(string $code): self
+    {
+        return new self((new Elements)
+            ->addValue('SEQ', 'SEQ', 'SEQ')
+            ->addValue('1229', '1229', $code)
+        );
+    }
 
-    public function code(): ?string
-    {
-        return $this->elements->getValue('1229', '1229');
-    }
+    public function code(): ?string
+    {
+        return $this->elements->getValue('1229', '1229');
+    }
 }
 
 $segmentFactory = new SegmentFactory;
@@ -140,16 +146,16 @@ use Apfelfrisch\Edifact\Segments\Unh;
 $builder = new Builder;
 
 $builder->writeSegments(
-    Unb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'unb-ref'),
-    Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co')
+    Unb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'unb-ref'),
+    Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co')
 );
 
 $message = new Message($builder->get());
 ```
-UNA and the trailing Segments (UNT and UNZ) will be added automatically. If no UNA Segement is provided, it uses the default values [UNA:+.? ']. 
-For now the Spacecharacter and Decimalpoint will be ignored, you have to take care of it on Segment initialization.
+UNA and the trailing Segments (UNT and UNZ) will be added automatically. If no UNA Segment is provided, it uses the default values [UNA:+.? ']. 
+For now, the Space character and Decimal point will be ignored, you have to take care of it on Segment initialization.
 
-#### Build with custom Una
+#### Build with custom UNA
 
 ```php
 use Apfelfrisch\Edifact\Builder;
@@ -187,9 +193,9 @@ $message = Message::fromString("UNA:+.? 'SEQ+9999", $segmentFactory);
 $validator = new Validator;
 
 if(! $validator->isValid($message)) {
-    foreach ($validator->getFailures() as $failure) {
-        echo $failure instanceof Failure;
-    }
+    foreach ($validator->getFailures() as $failure) {
+        echo $failure instanceof Failure;
+    }
 }
 
 ```
