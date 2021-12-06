@@ -3,12 +3,12 @@
 ![Unit Test](https://github.com/Apfelfrisch/Edifact/actions/workflows/phpunit.yml/badge.svg)
 ![Static Analysis](https://github.com/Apfelfrisch/Edifact/actions/workflows/psalm.yml/badge.svg)
 
-A PHP library, wich provides a Framework to parse, build and serialize UN/EDIFACT messages.
+Parse, build, serialize and validate UN/EDIFACT Messages.
 
 ## Highlights
-* Parse and Write Files in a memory efficient and scalable way 
-* Parse each Segment to its specific Object
+* Parse and build UN/EDIFACT Messages in a memory efficient way
 * Define your own Segments
+* Validate the Message Segments
 
 ## Usage
 
@@ -28,7 +28,7 @@ use Apfelfrisch\Edifact\Message;
 $message = Message::fromFilepath('path/to/file.txt');
 ```
 
-#### Iterate over the Segments
+#### Iterate over Segments
 ```php
 use Apfelfrisch\Edifact\Segments\Nad;
 
@@ -39,7 +39,7 @@ foreach ($message->getSegments() as $segment) {
 }
 ```
 
-#### Filter the Segments
+#### Filter Segments
 ```php
 use Apfelfrisch\Edifact\Segments\Nad;
 
@@ -61,7 +61,7 @@ foreach ($message->unwrap() as $partialMessage) {
 }
 ```
 
-#### Add Readfilter to the Message
+#### Add Readfilter
 ```php
 $message->addStreamFilter('iso-to-utf8', 'convert.iconv.ISO-8859-1.UTF-8');
 ```
@@ -127,7 +127,7 @@ $segmentFactory->addSegment('SEQ', Seq::class);
 $message = Message::fromString("UNA:+.? 'SEQ+1", $segmentFactory);
 ```
 
-### Build an Edifact Message:
+### Build a Message:
 
 #### Build with default Una
 
@@ -176,7 +176,7 @@ $builder = new Builder;
 $builder->addStreamFilter('utf8-to-iso', 'convert.iconv.UTF-8.ISO-8859-1');
 ```
 
-### Validate Messages Segments
+### Validate Message Segments
 ```php
 use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Validation\Failure;
