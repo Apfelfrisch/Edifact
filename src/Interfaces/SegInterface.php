@@ -6,7 +6,6 @@ namespace Apfelfrisch\Edifact\Interfaces;
 
 use Apfelfrisch\Edifact\UnaSegment;
 use Apfelfrisch\Edifact\SeglineParser;
-use Iterator;
 
 interface SegInterface
 {
