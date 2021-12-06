@@ -155,7 +155,7 @@ $message = new Message($builder->get());
 UNA and the trailing Segments (UNT and UNZ) will be added automatically. If no UNA Segment is provided, it uses the default values [UNA:+.? ']. 
 For now, the Space character and Decimal point will be ignored, you have to take care of it on Segment initialization.
 
-#### Build with custom UNA
+#### Build with custom Una
 
 ```php
 use Apfelfrisch\Edifact\Builder;
