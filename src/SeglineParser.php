@@ -24,12 +24,13 @@ final class SeglineParser
     {
         $elements = new Elements;
 
-        $elementKeys = array_keys($blueprint->toArray());
+        $blueprintArray = $blueprint->toArray();
+        $elementKeys = array_keys($blueprintArray);
         foreach ($this->explodeString($segline, $this->unaSegment->elementSeparator()) as $elementPosition => $elementsArray) {
             $components = $this->explodeString($elementsArray, $this->unaSegment->componentSeparator());
 
             if (null !== $elementKey = $elementKeys[$elementPosition] ?? null) {
-                $componentKeys = array_keys($blueprint->toArray()[$elementKey]);
+                $componentKeys = array_keys($blueprintArray[$elementKey]);
                 foreach ($components as $componentPosition => $value) {
                     if (null !== $componentKey = $componentKeys[$componentPosition] ?? null) {
                         $elements->addValue($elementKey, $componentKey, $value);

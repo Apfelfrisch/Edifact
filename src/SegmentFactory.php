@@ -28,10 +28,9 @@ final class SegmentFactory
         $this->parser = new SeglineParser($this->unaSegment);
     }
 
-    public function setUnaSegment(UnaSegment $unaSegment): void
+    public static function setDefault(self $defaultFactory): void
     {
-        $this->unaSegment = $unaSegment;
-        $this->parser = new SeglineParser($this->unaSegment);
+        self::$defaultFactory = $defaultFactory;
     }
 
     public static function withDefaultDegments(bool $withFallback = true): self
@@ -56,13 +55,19 @@ final class SegmentFactory
         return $instance;
     }
 
+    public function setUnaSegment(UnaSegment $unaSegment): void
+    {
+        $this->unaSegment = $unaSegment;
+        $this->parser = new SeglineParser($this->unaSegment);
+    }
+
     /**
      * @psalm-param $segmentClass class-string<SegInterface>
      */
     public function addSegment(string $name, string $segmentClass): self
     {
         if (is_subclass_of($segmentClass, SegInterface::class)) {
-            $this->segmentClasses[strtoupper($name)] = $segmentClass;
+            $this->segmentClasses[substr(strtoupper($name), 0, 3)] = $segmentClass;
         }
         return $this;
     }

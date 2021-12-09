@@ -13,6 +13,8 @@ final class Failure
     public const VALUE_LENGTH_INVALID = 'valueLengthInvalid';
     public const UNKOWN_ELEMENT = 'unkownElement';
     public const UNKOWN_COMPONENT = 'unkownComponent';
+    public const MISSING_ELEMENT = 'missingElement';
+    public const MISSING_COMPONENT = 'missingComponent';
 
     public function __construct(
         private string $type,
@@ -37,6 +39,11 @@ final class Failure
         $this->unhCounter = $unhCounter;
 
         return $this;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
     }
 
     public function getSegmentName(): string
