@@ -7,7 +7,7 @@ Parse, build, serialize and validate UN/EDIFACT Messages.
 
 You will likely have to generate your own Segments. The ones provided with this package are only for testing / demo. 
 
-See [php-edifact/edifact-mapping](https://github.com/php-edifact/edifact-mapping) for XML Mappings. I have done a [protype](https://github.com/Apfelfrisch/ediseg-generator) for autogeneration, wich should give you a good starting point.
+See [php-edifact/edifact-mapping](https://github.com/php-edifact/edifact-mapping) for XML Mappings. I have done a [protype](https://github.com/Apfelfrisch/ediseg-generator) for autogeneration, it should give you a good starting point.
 
 If you don't need validation or Segement getter you can also parse to the [Generic Segment](#parse-to-the-generic-segment).
 
@@ -91,47 +91,25 @@ foreach ($message->getSegments() as $segment) {
 
 #### Parse to your own Segments
 
+You can inject the Builder in the Message Object like so:
+
 ```php
-namespace My\Namespace;
-
-use Apfelfrisch\Edifact\Elements;
 use Apfelfrisch\Edifact\SegmentFactory;
-use Apfelfrisch\Edifact\Segments\AbstractSegment;
-
-class Seq extends AbstractSegment
-{
-    private static ?Elements $blueprint = null;
-
-    public static function blueprint(): Elements
-    {
-        if (self::$blueprint === null) {
-            self::$blueprint = (new Elements)
-                ->addValue('SEQ', 'SEQ', 'M|a|3')
-                ->addValue('1229', '1229', 'M|an|3');
-        }
-
-        return self::$blueprint;
-    }
-
-    public static function fromAttributes(string $code): self
-    {
-        return new self((new Elements)
-            ->addValue('SEQ', 'SEQ', 'SEQ')
-            ->addValue('1229', '1229', $code)
-        );
-    }
-
-    public function code(): ?string
-    {
-        return $this->elements->getValue('1229', '1229');
-    }
-}
 
 $segmentFactory = new SegmentFactory;
-$segmentFactory->addSegment('SEQ', Seq::class);
+$segmentFactory->addSegment('SEQ', \My\Namespace\Segments\Seq::class);
 
 $message = Message::fromString("UNA:+.? 'SEQ+1", $segmentFactory);
 ```
+
+Or you set the hydrated Factory as default:
+
+```php
+use Apfelfrisch\Edifact\SegmentFactory;
+
+SegmentFactory::setDefault($segmentFactory);
+```
+
 
 ### Build a Message:
 
