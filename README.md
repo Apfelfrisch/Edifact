@@ -9,7 +9,7 @@ You will likely have to generate your own Segments. The ones provided with this 
 
 See [php-edifact/edifact-mapping](https://github.com/php-edifact/edifact-mapping) for XML Mappings. I have done a [protype](https://github.com/Apfelfrisch/ediseg-generator) for autogeneration, wich should give you a good starting point.
 
-If you don't need validation and custom getter you can also parse to the [Generic Segment](#parse-to-the-generic-segment).
+If you don't need validation or Segement getter you can also parse to the [Generic Segment](#parse-to-the-generic-segment).
 
 ## Highlights
 * Parse and build UN/EDIFACT Messages in a memory efficient way
