@@ -20,6 +20,38 @@ If you don't need validation or Segement getter you can also parse to the [Gener
 
 ### Parse EDIFACT Messages
 
+#### Load Segements Classes
+
+First you have to load your Segments withe the Factory. After that you mark the Factory as default.
+```php
+use Apfelfrisch\Edifact\SegmentFactory;
+
+$segmentFactory = new SegmentFactory;
+$segmentFactory->addSegment('SEQ', \My\Namespace\Segments\Seq::class);
+
+SegmentFactory::setDefault($segmentFactory);
+
+```
+Or you inject the Builder in the Message Object:
+
+```php
+use Apfelfrisch\Edifact\SegmentFactory;
+
+$message = Message::fromString("UNA:+.? 'SEQ+1", $segmentFactory);
+```
+
+If you don't need validation or Segment getter you can also parse to the Generic Sgement
+
+```php
+use Apfelfrisch\Edifact\Message;
+use Apfelfrisch\Edifact\Segments\Generic;
+
+$segmentFactory = new SegmentFactory;
+$segmentFactory->addFallback(Generic::class);
+SegmentFactory::setDefault($segmentFactory);
+
+```
+
 #### Parse from String
 ```php
 use Apfelfrisch\Edifact\Message;
@@ -70,44 +102,6 @@ foreach ($message->unwrap() as $partialMessage) {
 #### Add Readfilter
 ```php
 $message->addStreamFilter('iso-to-utf8', 'convert.iconv.ISO-8859-1.UTF-8');
-```
-
-#### Parse to the generic Segment
-```php
-use Apfelfrisch\Edifact\Message;
-use Apfelfrisch\Edifact\Segments\Generic;
-
-$segmentFactory = new SegmentFactory;
-$segmentFactory->addFallback(Generic::class);
-
-$message = Message::fromString("UNA:+.? 'NAD+DP++++Musterstr.::10+City++12345+DE", $segmentFactory);
-
-foreach ($message->getSegments() as $segment) {
-    if ($segment instanceof Generic) {
-        echo $segment->name(); // NAD.
-    }
-}
-```
-
-#### Parse to your own Segments
-
-You can inject the Builder in the Message Object like so:
-
-```php
-use Apfelfrisch\Edifact\SegmentFactory;
-
-$segmentFactory = new SegmentFactory;
-$segmentFactory->addSegment('SEQ', \My\Namespace\Segments\Seq::class);
-
-$message = Message::fromString("UNA:+.? 'SEQ+1", $segmentFactory);
-```
-
-Or you set the hydrated Factory as default:
-
-```php
-use Apfelfrisch\Edifact\SegmentFactory;
-
-SegmentFactory::setDefault($segmentFactory);
 ```
 
 
