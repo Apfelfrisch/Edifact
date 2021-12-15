@@ -5,9 +5,7 @@
 
 Parse, build, serialize and validate UN/EDIFACT Messages in a memory efficient way.
 
-You will likely have to generate your own Segments, see [php-edifact/edifact-mapping](https://github.com/php-edifact/edifact-mapping) for XML Mappings. 
-
-I have done a [protype](https://github.com/Apfelfrisch/ediseg-generator) for autogeneration, it should give you a good starting point.
+You will likely have to generate your own Segments, see [php-edifact/edifact-mapping](https://github.com/php-edifact/edifact-mapping) for XML Mappings. I have done a [protype](https://github.com/Apfelfrisch/ediseg-generator) for autogeneration, it should give you a good starting point.
 
 If you don't need validation or Segment getter you can also parse to the [Generic Segment](#parse-to-the-generic-segment).
 
@@ -17,17 +15,19 @@ If you don't need validation or Segment getter you can also parse to the [Generi
 
 #### Load Segment Classes
 
-First you have to load your Segments with the Factory. After that you mark the Factory as default.
+You can add your Segments to the Factory like so:
 ```php
 use Apfelfrisch\Edifact\Segment\SegmentFactory;
 
 $segmentFactory = new SegmentFactory;
 $segmentFactory->addSegment('SEQ', \My\Namespace\Segments\Seq::class);
-$segmentFactory->markAsDefault();
 
 ```
-Or you inject the Factory in the Message Object:
-
+After that you can either mark the Factory as default:
+```php
+$segmentFactory->markAsDefault();
+```
+or you inject the Factory in the Message:
 ```php
 use Apfelfrisch\Edifact\Segment\SegmentFactory;
 
