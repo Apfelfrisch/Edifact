@@ -6,8 +6,8 @@ namespace Apfelfrisch\Edifact\Validation;
 
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use Respect\Validation\Rules\Alpha;
-use Respect\Validation\Rules\Digit;
 use Respect\Validation\Rules\Length;
+use Respect\Validation\Rules\Number;
 use Throwable;
 
 final class ValueValidator
@@ -67,7 +67,7 @@ final class ValueValidator
 
         $failures = [];
 
-        if ($type === self::ELEMENT_TYPE_NUMERIC && ! (new Digit)->validate($value)) {
+        if ($type === self::ELEMENT_TYPE_NUMERIC && ! (new Number)->validate($value)) {
             $failures[Failure::VALUE_NOT_DIGIT] = $this->buildMessage(Failure::VALUE_NOT_DIGIT);
         }
 

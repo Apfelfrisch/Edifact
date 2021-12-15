@@ -53,7 +53,7 @@ class ValidatorTest extends TestCase
     public function test_validate_digit_values(): void
     {
         ValidationSegment::$ruleOne = 'M|n|..11';
-        $digits = implode(range(0, 9));
+        $digits = implode(range(0, 7)) . '.1';
 
         $validator = new Validator;
 
