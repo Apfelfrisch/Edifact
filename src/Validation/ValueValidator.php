@@ -60,6 +60,8 @@ final class ValueValidator
         if ($this->missingElementPosition !== null) {
             if ($this->missingElementPosition === $elementPosition) {
                 return [Failure::MISSING_COMPONENT => $this->buildMessage(Failure::MISSING_COMPONENT)];
+            } else {
+                $this->missingElementPosition = null;
             }
         }
 
