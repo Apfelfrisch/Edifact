@@ -77,15 +77,17 @@ foreach ($message->getSegments() as $segment) {
 
 #### Filter Segments
 ```php
-foreach ($message->filterSegments(Nad::class) as $segment) {
+use My\Namespace\Segments\MyNad;
+
+foreach ($message->filterSegments(MyNad::class) as $segment) {
     echo $segment->name(); // NAD
 }
 
-$message->filterSegments(Nad::class, fn(Nad $seg): bool 
+$message->filterSegments(MyNad::class, fn(Nad $seg): bool 
     => $seg->street() === 'Musterstr.'
 );
 
-echo $message->findFirstSegment(Nad::class)->name(); // NAD
+echo $message->findFirstSegment(MyNad::class)->name(); // NAD
 ```
 
 #### Unwrap Messages
@@ -108,8 +110,8 @@ $message->addStreamFilter('iso-to-utf8', 'convert.iconv.ISO-8859-1.UTF-8');
 ```php
 use Apfelfrisch\Edifact\Builder;
 use Apfelfrisch\Edifact\Message;
-use My\Segment\MyUnb;
-use My\Segment\MyUnh;
+use My\Namespace\Segments\MyUnb;
+use My\Namespace\Segments\MyUnh;
 
 $builder = new Builder;
 
