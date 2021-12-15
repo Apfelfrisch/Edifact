@@ -3,26 +3,21 @@
 ![Unit Test](https://github.com/Apfelfrisch/Edifact/actions/workflows/phpunit.yml/badge.svg)
 ![Static Analysis](https://github.com/Apfelfrisch/Edifact/actions/workflows/psalm.yml/badge.svg)
 
-Parse, build, serialize and validate UN/EDIFACT Messages.
+Parse, build, serialize and validate UN/EDIFACT Messages in a memory efficient way.
 
 You will likely have to generate your own Segments, see [php-edifact/edifact-mapping](https://github.com/php-edifact/edifact-mapping) for XML Mappings. 
 
 I have done a [protype](https://github.com/Apfelfrisch/ediseg-generator) for autogeneration, it should give you a good starting point.
 
-If you don't need validation or Segement getter you can also parse to the [Generic Segment](#parse-to-the-generic-segment).
-
-## Highlights
-* Parse and build UN/EDIFACT Messages in a memory efficient way
-* Define your own Segments
-* Validate the Message Segments
+If you don't need validation or Segment getter you can also parse to the [Generic Segment](#parse-to-the-generic-segment).
 
 ## Usage
 
 ### Parse EDIFACT Messages
 
-#### Load Segements Classes
+#### Load Segment Classes
 
-First you have to load your Segments withe the Factory. After that you mark the Factory as default.
+First you have to load your Segments with the Factory. After that you mark the Factory as default.
 ```php
 use Apfelfrisch\Edifact\Segment\SegmentFactory;
 
@@ -31,7 +26,7 @@ $segmentFactory->addSegment('SEQ', \My\Namespace\Segments\Seq::class);
 $segmentFactory->markAsDefault();
 
 ```
-Or you inject the Builder in the Message Object:
+Or you inject the Factory in the Message Object:
 
 ```php
 use Apfelfrisch\Edifact\Segment\SegmentFactory;
@@ -39,7 +34,7 @@ use Apfelfrisch\Edifact\Segment\SegmentFactory;
 $message = Message::fromString("UNA:+.? 'SEQ+1", $segmentFactory);
 ```
 
-If you don't need validation or Segment getter you can also parse to the Generic Sgement
+If you don't need validation or Segment getter you can also parse to the Generic Segement
 
 ```php
 use Apfelfrisch\Edifact\Segments\Generic;
@@ -47,7 +42,7 @@ use Apfelfrisch\Edifact\Segment\SegmentFactory;
 
 $segmentFactory = new SegmentFactory;
 $segmentFactory->addFallback(Generic::class);
-SegmentFactory::setDefault($segmentFactory);
+$segmentFactory->markAsDefault();
 
 ```
 
@@ -70,9 +65,9 @@ $message = Message::fromFilepath('path/to/file.txt');
 use Apfelfrisch\Edifact\Segments\SegmentInterface;
 
 foreach ($message->getSegments() as $segment) {
-    if ($segment instanceof SegmentInterface) {
-        echo $segment->name();
-    }
+    if ($segment instanceof SegmentInterface) {
+        echo $segment->name();
+    }
 }
 ```
 
@@ -81,11 +76,11 @@ foreach ($message->getSegments() as $segment) {
 use My\Namespace\Segments\MyNad;
 
 foreach ($message->filterSegments(MyNad::class) as $segment) {
-    echo $segment->name(); // NAD
+    echo $segment->name(); // NAD
 }
 
-$message->filterSegments(MyNad::class, fn(Nad $seg): bool 
-    => $seg->street() === 'Musterstr.'
+$message->filterSegments(MyNad::class, fn(Nad $seg): bool 
+    => $seg->street() === 'Musterstr.'
 );
 
 echo $message->findFirstSegment(MyNad::class)->name(); // NAD
@@ -117,13 +112,13 @@ use My\Namespace\Segments\MyUnh;
 $builder = new Builder;
 
 $builder->writeSegments(
-    MyUnb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'unb-ref'),
-    MyUnh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co')
+    MyUnb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'unb-ref'),
+    MyUnh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co')
 );
 
 $message = new Message($builder->get());
 ```
-UNA and the trailing Segments (UNT and UNZ) will be added automatically. If no UNA Segment is provided, it uses the default values [UNA:+.? ']. 
+UNA and the trailing Segments (UNT and UNZ) will be added automatically. If no UNA Segment is provided, it uses the default values [UNA:+.? ']. 
 For now, the Space character and Decimal point will be ignored, you have to take care of it on Segment initialization.
 
 #### Build with custom Una
@@ -163,9 +158,9 @@ $message = Message::fromString("UNA:+.? 'SEQ+9999", $segmentFactory);
 $validator = new Validator;
 
 if(! $validator->isValid($message)) {
-    foreach ($validator->getFailures() as $failure) {
-        echo $failure instanceof Failure;
-    }
+    foreach ($validator->getFailures() as $failure) {
+        echo $failure instanceof Failure;
+    }
 }
 
 ```
