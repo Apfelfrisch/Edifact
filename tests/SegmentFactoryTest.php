@@ -4,7 +4,7 @@ namespace Apfelfrisch\Edifact\Test;
 
 use Apfelfrisch\Edifact\Test\TestCase;
 use Apfelfrisch\Edifact\SegmentFactory;
-use Apfelfrisch\Edifact\GenericSegment;
+use Apfelfrisch\Edifact\Segments\GenericSegment;
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use Apfelfrisch\Edifact\Test\Fixtures\Unh;
 

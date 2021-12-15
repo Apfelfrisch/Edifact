@@ -3,7 +3,7 @@
 namespace Apfelfrisch\Edifact\Test\Fixtures;
 
 use Apfelfrisch\Edifact\Elements;
-use Apfelfrisch\Edifact\AbstractSegment;
+use Apfelfrisch\Edifact\Segments\AbstractSegment;
 
 class Segment extends AbstractSegment
 {

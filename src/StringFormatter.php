@@ -6,6 +6,7 @@ namespace Apfelfrisch\Edifact;
 
 use Apfelfrisch\Edifact\Interfaces\FormatterInterface;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
+use Apfelfrisch\Edifact\Segments\UnaSegment;
 
 final class StringFormatter implements FormatterInterface
 {

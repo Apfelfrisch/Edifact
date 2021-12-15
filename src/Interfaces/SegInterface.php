@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact\Interfaces;
 
-use Apfelfrisch\Edifact\UnaSegment;
+use Apfelfrisch\Edifact\Segments\UnaSegment;
 use Apfelfrisch\Edifact\SeglineParser;
 
 interface SegInterface

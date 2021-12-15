@@ -6,6 +6,7 @@ namespace Apfelfrisch\Edifact;
 
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
 use Apfelfrisch\Edifact\SegmentFactory;
+use Apfelfrisch\Edifact\Segments\UnaSegment;
 use Apfelfrisch\Edifact\Stream;
 use Closure;
 use Generator;

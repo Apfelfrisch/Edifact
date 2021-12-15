@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Apfelfrisch\Edifact;
 
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
+use Apfelfrisch\Edifact\Segments\UnaSegment;
 use Iterator;
 
 final class StreamIterator implements Iterator

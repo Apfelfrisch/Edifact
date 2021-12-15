@@ -4,7 +4,8 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact;
 
-use Apfelfrisch\Edifact\UnaSegment;
+use Apfelfrisch\Edifact\Segments\GenericSegment;
+use Apfelfrisch\Edifact\Segments\UnaSegment;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
 use Apfelfrisch\Edifact\Segments\Unt;
 use Apfelfrisch\Edifact\Segments\Unz;

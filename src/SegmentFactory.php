@@ -6,7 +6,8 @@ namespace Apfelfrisch\Edifact;
 
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
-use Apfelfrisch\Edifact\GenericSegment;
+use Apfelfrisch\Edifact\Segments\GenericSegment;
+use Apfelfrisch\Edifact\Segments\UnaSegment;
 
 final class SegmentFactory
 {

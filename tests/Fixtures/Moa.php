@@ -2,7 +2,7 @@
 
 namespace Apfelfrisch\Edifact\Test\Fixtures;
 
-use Apfelfrisch\Edifact\AbstractSegment;
+use Apfelfrisch\Edifact\Segments\AbstractSegment;
 use Apfelfrisch\Edifact\Elements;
 
 class Moa extends AbstractSegment

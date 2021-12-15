@@ -2,6 +2,8 @@
 
 namespace Apfelfrisch\Edifact;
 
+use Apfelfrisch\Edifact\Segments\UnaSegment;
+
 final class SeglineParser
 {
     private const SEG_UNKOWN_KEY_PREFIX = 'unknown';

@@ -1,9 +1,9 @@
 <?php
 
-namespace Apfelfrisch\Edifact;
+namespace Apfelfrisch\Edifact\Segments;
 
 use Apfelfrisch\Edifact\Elements;
-use Apfelfrisch\Edifact\UnaSegment;
+use Apfelfrisch\Edifact\Segments\UnaSegment;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
 use Apfelfrisch\Edifact\Interfaces\ValidateableInterface;
 use Apfelfrisch\Edifact\Validation\SegmentValidator;

@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact;
 
-use Apfelfrisch\Edifact\UnaSegment;
+use Apfelfrisch\Edifact\Segments\UnaSegment;
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use RuntimeException;
 use SplFileInfo;

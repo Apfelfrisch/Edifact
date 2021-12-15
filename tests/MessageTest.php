@@ -3,7 +3,7 @@
 namespace Apfelfrisch\Edifact\Test;
 
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
-use Apfelfrisch\Edifact\GenericSegment;
+use Apfelfrisch\Edifact\Segments\GenericSegment;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
 use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\SegmentFactory;
