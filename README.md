@@ -5,7 +5,9 @@
 
 Parse, build, serialize and validate UN/EDIFACT Messages.
 
-You will likely have to generate your own Segments. See [php-edifact/edifact-mapping](https://github.com/php-edifact/edifact-mapping) for XML Mappings. I have done a [protype](https://github.com/Apfelfrisch/ediseg-generator) for autogeneration, it should give you a good starting point.
+You will likely have to generate your own Segments, see [php-edifact/edifact-mapping](https://github.com/php-edifact/edifact-mapping) for XML Mappings. 
+
+I have done a [protype](https://github.com/Apfelfrisch/ediseg-generator) for autogeneration, it should give you a good starting point.
 
 If you don't need validation or Segement getter you can also parse to the [Generic Segment](#parse-to-the-generic-segment).
 
@@ -26,8 +28,7 @@ use Apfelfrisch\Edifact\Segment\SegmentFactory;
 
 $segmentFactory = new SegmentFactory;
 $segmentFactory->addSegment('SEQ', \My\Namespace\Segments\Seq::class);
-
-SegmentFactory::setDefault($segmentFactory);
+$segmentFactory->markAsDefault();
 
 ```
 Or you inject the Builder in the Message Object:
@@ -129,7 +130,7 @@ For now, the Space character and Decimal point will be ignored, you have to take
 
 ```php
 use Apfelfrisch\Edifact\Builder;
-use Apfelfrisch\Edifact\Segemtn\UnaSegment;
+use Apfelfrisch\Edifact\Segment\UnaSegment;
 
 $builder = new Builder(new UnaSegment('|', '#', '.', '!', ' ', '"'));
 ```
@@ -138,7 +139,7 @@ $builder = new Builder(new UnaSegment('|', '#', '.', '!', ' ', '"'));
 
 ```php
 use Apfelfrisch\Edifact\Builder;
-use Apfelfrisch\Edifact\Segemtn\UnaSegment;
+use Apfelfrisch\Edifact\Segment\UnaSegment;
 
 $builder = new Builder(new UnaSegment, 'path/to/file.txt');
 ```

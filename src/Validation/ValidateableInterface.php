@@ -7,7 +7,7 @@ namespace Apfelfrisch\Edifact\Validation;
 use Apfelfrisch\Edifact\Validation\SegmentValidator;
 use Iterator;
 
-interface alidateableInterface
+interface ValidateableInterface
 {
     /** @psalm-return Iterator<\Apfelfrisch\Edifact\Validation\Failure> */
     public function validate(SegmentValidator $segmentValidator): Iterator;
