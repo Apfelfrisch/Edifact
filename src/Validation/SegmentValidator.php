@@ -2,180 +2,169 @@
 
 namespace Apfelfrisch\Edifact\Validation;
 
-use Apfelfrisch\Edifact\Elements;
+use Apfelfrisch\Edifact\Segment\Elements;
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use Iterator;
-use Respect\Validation\Rules\Alpha;
-use Respect\Validation\Rules\Digit;
-use Respect\Validation\Rules\Length;
-use Throwable;
 
 class SegmentValidator
 {
-    public const ELEMENT_TYPE_ALPHA = 'a';
-    public const ELEMENT_TYPE_NUMERIC = 'n';
-    public const ELEMENT_TYPE_ALPHA_NUMERIC = 'an';
-    public const ELEMENT_NEEDED = 'M';
-    public const ELEMENT_OPTIONAL = 'O';
-
     /** @psalm-var array<string, string> */
     private array $messages = [
-        Failure::VALUE_NOT_ALPHA => 'String must contain only alphabetic characters',
-        Failure::VALUE_NOT_DIGIT => 'String must contain only digits',
-        Failure::VALUE_TOO_LONG => 'String is more than %max% characters long',
-        Failure::VALUE_TOO_SHORT => 'String is less than %min% characters long',
-        Failure::VALUE_LENGTH_INVALID => 'String is not %len% characters long',
         Failure::UNKOWN_ELEMENT => 'The input Element is unkown',
         Failure::UNKOWN_COMPONENT => 'The input Component is unkown',
     ];
 
+    private ValueValidator $valueValidator;
+
+    private string $segname = '';
+
+    private int $elementPosition = -1;
+
+    private int $componentPosition = -1;
+
+    public function __construct()
+    {
+        $this->valueValidator = new ValueValidator;
+    }
+
     /** @psalm-return Iterator<Failure> */
     public function validate(Elements $blueprint, Elements $data): Iterator
     {
-        $blueprintArray = $blueprint->toArray();
+        $this->segname = $data->getName();
+        $this->elementPosition = -1;
 
-        $elementPosition = -1;
+        $blueprintElementKeys = $blueprint->getElementKeys();
+
         foreach ($data->toArray() as $elementKey => $components) {
-            $elementPosition++;
-            $componentPosition = -1;
+            $this->elementPosition++;
+            $this->componentPosition = -1;
+
             foreach ($components as $componentKey => $value) {
-                $componentPosition++;
+                $this->componentPosition++;
 
-                if (! array_key_exists($elementKey, $blueprintArray)) {
-                    yield new Failure(
-                        Failure::UNKOWN_ELEMENT,
-                        $data->getName(),
-                        $elementPosition,
-                        $componentPosition,
-                        $value,
-                        $this->buildMessage(Failure::UNKOWN_ELEMENT)
-                    );
-                    continue;
+                foreach ($this->validateUnkownParts($blueprint, $elementKey, $componentKey, $value) as $failure) {
+                    yield $failure;
                 }
 
-                if (! array_key_exists($componentKey, $blueprintArray[$elementKey])) {
-                    yield new Failure(
-                        Failure::UNKOWN_COMPONENT,
-                        $data->getName(),
-                        $elementPosition,
-                        $componentPosition,
-                        $value,
-                        $this->buildMessage(Failure::UNKOWN_COMPONENT)
-                    );
-                    continue;
-                }
-
-                /** @var string $rules */
-                if (null === $rules = $blueprintArray[$elementKey][$componentKey]) {
-                    continue;
-                }
-
-                [$necessaryState, $type, $minLenght, $maxLength] = $this->explodeRules($rules);
-
-                if ($necessaryState === self::ELEMENT_OPTIONAL && ($value === null || $value === '')) {
-                    continue;
-                }
-
-                if ($type === self::ELEMENT_TYPE_NUMERIC && ! (new Digit)->validate($value)) {
-                    yield new Failure(
-                        Failure::VALUE_NOT_DIGIT,
-                        $data->getName(),
-                        $elementPosition,
-                        $componentPosition,
-                        $value,
-                        $this->buildMessage(Failure::VALUE_NOT_DIGIT)
-                    );
-                }
-
-                if ($type === self::ELEMENT_TYPE_ALPHA && ! (new Alpha)->validate((string)$value)) {
-                    yield new Failure(
-                        Failure::VALUE_NOT_ALPHA ,
-                        $data->getName(),
-                        $elementPosition,
-                        $componentPosition,
-                        $value,
-                        $this->buildMessage(Failure::VALUE_NOT_ALPHA)
-                    );
-                }
-
-                if ($minLenght !== $maxLength && ! (new Length($minLenght))->validate((string)$value)) {
-                    yield new Failure(
-                        Failure::VALUE_TOO_SHORT,
-                        $data->getName(),
-                        $elementPosition,
-                        $componentPosition,
-                        $value,
-                        $this->buildStringTooShortMessage($minLenght)
-                    );
-                    continue;
-                }
-
-                if (! (new Length($minLenght, $maxLength))->validate((string)$value)) {
-                    if ($minLenght === $maxLength) {
-                        yield new Failure(
-                            Failure::VALUE_LENGTH_INVALID,
-                            $data->getName(),
-                            $elementPosition,
-                            $componentPosition,
-                            $value,
-                            $this->buildInvalidStringLengtMessage($maxLength)
-                        );
-                        continue;
+                if (null !== $rules = $blueprint->getValue($elementKey, $componentKey)) {
+                    foreach ($this->validateValue($value, $rules, $elementKey, $componentKey) as $failure) {
+                        yield $failure;
                     }
-                    yield new Failure(
-                        Failure::VALUE_TOO_LONG,
-                        $data->getName(),
-                        $elementPosition,
-                        $componentPosition,
-                        $value,
-                        $this->buildStringTooLongMessage($maxLength)
-                    );
                 }
+            }
+
+            foreach ($this->validateMissingComponents($blueprint, $blueprintElementKeys) as $failure) {
+                yield $failure;
+            }
+        }
+
+        foreach($this->validateMissingElements($blueprint, $blueprintElementKeys) as $failure) {
+            yield $failure;
+        }
+    }
+
+    /**
+     * @psalm-return Iterator<Failure>
+     */
+    private function validateValue(string|null $value, string $rules, string $elementKey, string $componentKey): Iterator
+    {
+        $failures = $this->valueValidator->validate($value, $rules, (string)$this->elementPosition);
+
+        foreach ($failures as $failureType => $message) {
+            $message = match($failureType) {
+                Failure::MISSING_COMPONENT => str_replace('%', "$elementKey:$componentKey", $message),
+                Failure::VALUE_TOO_SHORT => str_replace('%', "$elementKey:$componentKey", $message),
+                default => $message,
+            };
+
+            yield new Failure(
+                $failureType,
+                $this->segname,
+                $this->elementPosition,
+                $this->componentPosition,
+                $value,
+                $message
+            );
+        }
+    }
+
+    /**
+     * @psalm-return Iterator<Failure>
+     */
+    private function validateUnkownParts(Elements $blueprint, string $elementKey, string $componentKey, string|null $value): Iterator
+    {
+        if (($element = $blueprint->getElement($elementKey)) === []) {
+            yield new Failure(
+                Failure::UNKOWN_ELEMENT,
+                $this->segname,
+                $this->elementPosition,
+                $this->componentPosition,
+                $value,
+                $this->buildMessage(Failure::UNKOWN_ELEMENT)
+            );
+        } elseif (! array_key_exists($componentKey, $element)) {
+            yield new Failure(
+                Failure::UNKOWN_COMPONENT,
+                $this->segname,
+                $this->elementPosition,
+                $this->componentPosition,
+                $value,
+                $this->buildMessage(Failure::UNKOWN_COMPONENT)
+            );
+        }
+    }
+
+    /**
+     * @psalm-param list<string> $blueprintElementKeys
+     *
+     * @psalm-return Iterator<Failure>
+     */
+    private function validateMissingComponents(Elements $blueprint, array $blueprintElementKeys): Iterator
+    {
+        if (null === $blueprintElementKey = $blueprintElementKeys[$this->elementPosition] ?? null) {
+            return;
+        }
+
+        $blueprintComponentKeys = $blueprint->getComponentKeys($blueprintElementKey);
+        $blueprintComponentPosition = $this->componentPosition + 1;
+        while($blueprintComponentKey = $blueprintComponentKeys[$blueprintComponentPosition] ?? null) {
+            $blueprintComponentPosition++;
+            /** @var string $rules */
+            if (null === $rules = $blueprint->getValue($blueprintElementKey, $blueprintComponentKey)) {
+                continue;
+            }
+
+            foreach ($this->validateValue(null, $rules, $blueprintElementKey, $blueprintComponentKey) as $failure) {
+                yield $failure;
             }
         }
     }
 
     /**
-     * @psalm-return array{string, string, int, int}
-     */
-    private function explodeRules(string $rules): array
+     * @psalm-param list<string> $blueprintElementKeys
+     *
+     * @psalm-return Iterator<Failure>
+     **/
+    private function validateMissingElements(Elements $blueprint, array $blueprintElementKeys): Iterator
     {
-        try {
-            $rulesArray = explode('|', $rules);
+        $blueprintElementPosition = $this->elementPosition + 1;
 
-            if (substr($rulesArray[2], 0, 2) === '..') {
-                return [
-                    $rulesArray[0],
-                    $rulesArray[1],
-                    1,
-                    (int)substr($rulesArray[2], 2)
-                ];
+        while ($blueprintElementKey = $blueprintElementKeys[$blueprintElementPosition] ?? null) {
+            $blueprintElementPosition++;
+            $blueprintComponentKeys = $blueprint->getComponentKeys($blueprintElementKey);
+
+            foreach ($blueprintComponentKeys as $blueprintComponentKey) {
+
+                /** @var string $rules */
+                if (null === $rules = $blueprint->getValue($blueprintElementKey, $blueprintComponentKey)) {
+                    continue;
+                }
+
+                foreach ($this->validateValue(null, $rules, $blueprintElementKey, $blueprintComponentKey) as $failure) {
+                    yield $failure;
+                }
             }
-
-            return [
-                $rulesArray[0],
-                $rulesArray[1],
-                (int)$rulesArray[2],
-                (int)$rulesArray[2]
-            ];
-        } catch (Throwable) {
-            throw new EdifactException("Invalid Validation Rule [$rules]");
         }
-    }
-
-    private function buildStringTooShortMessage(int $stringLength): string
-    {
-        return str_replace('%min%', (string) $stringLength, $this->buildMessage(Failure::VALUE_TOO_SHORT));
-    }
-
-    private function buildStringTooLongMessage(int $stringLength): string
-    {
-        return str_replace('%max%', (string) $stringLength, $this->buildMessage(Failure::VALUE_TOO_LONG));
-    }
-
-    private function buildInvalidStringLengtMessage(int $stringLength): string
-    {
-        return str_replace('%len%', (string) $stringLength, $this->buildMessage(Failure::VALUE_LENGTH_INVALID));
     }
 
     private function buildMessage(string $key): string

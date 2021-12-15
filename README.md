@@ -5,11 +5,11 @@
 
 Parse, build, serialize and validate UN/EDIFACT Messages.
 
-You will likely have to generate your own Segments. The ones provided with this package are only for testing / demo. 
+You will likely have to generate your own Segments, see [php-edifact/edifact-mapping](https://github.com/php-edifact/edifact-mapping) for XML Mappings. 
 
-See https://github.com/php-edifact/edifact-mapping for XML Mappings.
+I have done a [protype](https://github.com/Apfelfrisch/ediseg-generator) for autogeneration, it should give you a good starting point.
 
-If you don't need validation and custom getter you can also parse to the [Generic Segment](#parse-to-the-generic-segment).
+If you don't need validation or Segement getter you can also parse to the [Generic Segment](#parse-to-the-generic-segment).
 
 ## Highlights
 * Parse and build UN/EDIFACT Messages in a memory efficient way
@@ -19,6 +19,37 @@ If you don't need validation and custom getter you can also parse to the [Generi
 ## Usage
 
 ### Parse EDIFACT Messages
+
+#### Load Segements Classes
+
+First you have to load your Segments withe the Factory. After that you mark the Factory as default.
+```php
+use Apfelfrisch\Edifact\Segment\SegmentFactory;
+
+$segmentFactory = new SegmentFactory;
+$segmentFactory->addSegment('SEQ', \My\Namespace\Segments\Seq::class);
+$segmentFactory->markAsDefault();
+
+```
+Or you inject the Builder in the Message Object:
+
+```php
+use Apfelfrisch\Edifact\Segment\SegmentFactory;
+
+$message = Message::fromString("UNA:+.? 'SEQ+1", $segmentFactory);
+```
+
+If you don't need validation or Segment getter you can also parse to the Generic Sgement
+
+```php
+use Apfelfrisch\Edifact\Segments\Generic;
+use Apfelfrisch\Edifact\Segment\SegmentFactory;
+
+$segmentFactory = new SegmentFactory;
+$segmentFactory->addFallback(Generic::class);
+SegmentFactory::setDefault($segmentFactory);
+
+```
 
 #### Parse from String
 ```php
@@ -36,28 +67,28 @@ $message = Message::fromFilepath('path/to/file.txt');
 
 #### Iterate over Segments
 ```php
-use Apfelfrisch\Edifact\Segments\Nad;
+use Apfelfrisch\Edifact\Segments\SegmentInterface;
 
 foreach ($message->getSegments() as $segment) {
-    if ($segment instanceof Nad) {
-        echo $segment->street(); // Musterstr.
+    if ($segment instanceof SegmentInterface) {
+        echo $segment->name();
     }
 }
 ```
 
 #### Filter Segments
 ```php
-use Apfelfrisch\Edifact\Segments\Nad;
+use My\Namespace\Segments\MyNad;
 
-foreach ($message->filterSegments(Nad::class) as $segment) {
+foreach ($message->filterSegments(MyNad::class) as $segment) {
     echo $segment->name(); // NAD
 }
 
-$message->filterSegments(Nad::class, fn(Nad $seg): bool 
+$message->filterSegments(MyNad::class, fn(Nad $seg): bool 
     => $seg->street() === 'Musterstr.'
 );
 
-echo $message->findFirstSegment(Nad::class)->name(); // NAD
+echo $message->findFirstSegment(MyNad::class)->name(); // NAD
 ```
 
 #### Unwrap Messages
@@ -72,66 +103,6 @@ foreach ($message->unwrap() as $partialMessage) {
 $message->addStreamFilter('iso-to-utf8', 'convert.iconv.ISO-8859-1.UTF-8');
 ```
 
-#### Parse to the generic Segment
-```php
-use Apfelfrisch\Edifact\Message;
-use Apfelfrisch\Edifact\Segments\Generic;
-
-$segmentFactory = new SegmentFactory;
-$segmentFactory->addFallback(Generic::class);
-
-$message = Message::fromString("UNA:+.? 'NAD+DP++++Musterstr.::10+City++12345+DE", $segmentFactory);
-
-foreach ($message->getSegments() as $segment) {
-    if ($segment instanceof Generic) {
-        echo $segment->name(); // NAD.
-    }
-}
-```
-
-#### Parse to your own Segments
-
-```php
-namespace My\Namespace;
-
-use Apfelfrisch\Edifact\Elements;
-use Apfelfrisch\Edifact\SegmentFactory;
-use Apfelfrisch\Edifact\Segments\AbstractSegment;
-
-class Seq extends AbstractSegment
-{
-    private static ?Elements $blueprint = null;
-
-    public static function blueprint(): Elements
-    {
-        if (self::$blueprint === null) {
-            self::$blueprint = (new Elements)
-                ->addValue('SEQ', 'SEQ', 'M|a|3')
-                ->addValue('1229', '1229', 'M|an|3');
-        }
-
-        return self::$blueprint;
-    }
-
-    public static function fromAttributes(string $code): self
-    {
-        return new self((new Elements)
-            ->addValue('SEQ', 'SEQ', 'SEQ')
-            ->addValue('1229', '1229', $code)
-        );
-    }
-
-    public function code(): ?string
-    {
-        return $this->elements->getValue('1229', '1229');
-    }
-}
-
-$segmentFactory = new SegmentFactory;
-$segmentFactory->addSegment('SEQ', Seq::class);
-
-$message = Message::fromString("UNA:+.? 'SEQ+1", $segmentFactory);
-```
 
 ### Build a Message:
 
@@ -140,14 +111,14 @@ $message = Message::fromString("UNA:+.? 'SEQ+1", $segmentFactory);
 ```php
 use Apfelfrisch\Edifact\Builder;
 use Apfelfrisch\Edifact\Message;
-use Apfelfrisch\Edifact\Segments\Unb;
-use Apfelfrisch\Edifact\Segments\Unh;
+use My\Namespace\Segments\MyUnb;
+use My\Namespace\Segments\MyUnh;
 
 $builder = new Builder;
 
 $builder->writeSegments(
-    Unb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'unb-ref'),
-    Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co')
+    MyUnb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'unb-ref'),
+    MyUnh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co')
 );
 
 $message = new Message($builder->get());
@@ -159,7 +130,7 @@ For now, the Space character and Decimal point will be ignored, you have to take
 
 ```php
 use Apfelfrisch\Edifact\Builder;
-use Apfelfrisch\Edifact\UnaSegment;
+use Apfelfrisch\Edifact\Segment\UnaSegment;
 
 $builder = new Builder(new UnaSegment('|', '#', '.', '!', ' ', '"'));
 ```
@@ -168,7 +139,7 @@ $builder = new Builder(new UnaSegment('|', '#', '.', '!', ' ', '"'));
 
 ```php
 use Apfelfrisch\Edifact\Builder;
-use Apfelfrisch\Edifact\UnaSegment;
+use Apfelfrisch\Edifact\Segment\UnaSegment;
 
 $builder = new Builder(new UnaSegment, 'path/to/file.txt');
 ```
@@ -176,7 +147,6 @@ $builder = new Builder(new UnaSegment, 'path/to/file.txt');
 #### Add Writefilter to the Builder
 ```php
 use Apfelfrisch\Edifact\Builder;
-use Apfelfrisch\Edifact\Segments\Unb;
 
 $builder = new Builder;
 $builder->addStreamFilter('utf8-to-iso', 'convert.iconv.UTF-8.ISO-8859-1');

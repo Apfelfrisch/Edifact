@@ -3,9 +3,9 @@
 namespace Apfelfrisch\Edifact\Validation;
 
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
-use Apfelfrisch\Edifact\Interfaces\ValidateableInterface;
+use Apfelfrisch\Edifact\Validation\ValidateableInterface;
 use Apfelfrisch\Edifact\Message;
-use Apfelfrisch\Edifact\SegmentCounter;
+use Apfelfrisch\Edifact\Segment\SegmentCounter;
 use EmptyIterator;
 use Iterator;
 
@@ -18,7 +18,6 @@ class Validator
 
     public function __construct()
     {
-        $this->failures = new EmptyIterator;
         $this->counter = new SegmentCounter;
         $this->segmentValidator = new SegmentValidator();
     }
