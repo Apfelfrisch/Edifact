@@ -6,7 +6,7 @@ namespace Apfelfrisch\Edifact;
 
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
-use Apfelfrisch\Edifact\Segments\Generic;
+use Apfelfrisch\Edifact\GenericSegment;
 
 final class SegmentFactory
 {
@@ -33,23 +33,16 @@ final class SegmentFactory
         self::$defaultFactory = $defaultFactory;
     }
 
-    public static function withDefaultDegments(bool $withFallback = true): self
+    public static function fromDefault(bool $withFallback = true): self
     {
         if (self::$defaultFactory === null) {
-            $defaultPath = __DIR__ . '/Segments/';
-
             self::$defaultFactory = new self;
-
-            foreach (glob($defaultPath."???.php") as $segmentClassFile) {
-                $classBasename = basename($segmentClassFile, '.php');
-                self::$defaultFactory->addSegment($classBasename, '\\Apfelfrisch\\Edifact\\Segments\\' . $classBasename);
-            }
         }
 
         $instance = clone(self::$defaultFactory);
 
         if ($withFallback) {
-            $instance->addFallback(Generic::class);
+            $instance->addFallback(GenericSegment::class);
         }
 
         return $instance;
@@ -80,6 +73,11 @@ final class SegmentFactory
         $this->fallback = $fallback;
 
         return $this;
+    }
+
+    public function markAsDefault(): void
+    {
+        self::setDefault($this);
     }
 
     public function build(string $segline): SegInterface

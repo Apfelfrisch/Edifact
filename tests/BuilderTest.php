@@ -2,15 +2,10 @@
 
 namespace Apfelfrisch\Edifact\Test\Message;
 
+use Apfelfrisch\Edifact\GenericSegment;
 use Apfelfrisch\Edifact\Message;
-use DateTime;
 use Apfelfrisch\Edifact\Builder;
 use Apfelfrisch\Edifact\UnaSegment;
-use Apfelfrisch\Edifact\Segments\Ajt;
-use Apfelfrisch\Edifact\Segments\Seq;
-use Apfelfrisch\Edifact\Segments\Unb;
-use Apfelfrisch\Edifact\Segments\Unh;
-use Apfelfrisch\Edifact\Segments\Unt;
 use Apfelfrisch\Edifact\Test\TestCase;
 
 class BuilderTest extends TestCase
@@ -20,7 +15,7 @@ class BuilderTest extends TestCase
     {
         $builder = new Builder;
         $builder->writeSegments(
-            Unb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'referenz-no')
+            GenericSegment::fromAttributes('UNB', ['1', '2', '3', '4', '5']),
         );
 
         $message = $builder->get();
@@ -34,7 +29,7 @@ class BuilderTest extends TestCase
     {
         $builder = new Builder(new UnaSegment('|', '#', '.', '!', ' '));
         $builder->writeSegments(
-            Unb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'referenz-no')
+            GenericSegment::fromAttributes('UNB', ['1', '2'], ['sender', '500'], ['receiver', '400'], ['210101', '1201'], ['referenz-no']),
         );
 
         $message = $builder->get();
@@ -52,7 +47,7 @@ class BuilderTest extends TestCase
     {
         $builder = new Builder;
         $builder->writeSegments(
-            Unb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'referenz-no')
+            GenericSegment::fromAttributes('UNB', ['1', '2'], ['sender', '500'], ['receiver', '400'], ['210101', '1201'], ['referenz-no']),
         );
 
         $this->assertStringEndsWith("UNZ+0+referenz-no'", (string)$builder->get());
@@ -63,7 +58,7 @@ class BuilderTest extends TestCase
     {
         $builder = new Builder;
         $builder->writeSegments(
-            Ajt::fromAttributes('COD'),
+            GenericSegment::fromAttributes('AJT', ['COD']),
         );
 
         $this->assertSame("UNA:+.? 'AJT+COD'", (string)$builder->get());
@@ -75,7 +70,7 @@ class BuilderTest extends TestCase
         $builder = new Builder;
         $builder->addStreamFilter('string.toupper');
         $builder->writeSegments(
-            Ajt::fromAttributes('cod'),
+            GenericSegment::fromAttributes('AJT', ['cod']),
         );
 
         $this->assertSame("UNA:+.? 'AJT+COD'", (string)$builder->get());
@@ -86,8 +81,8 @@ class BuilderTest extends TestCase
     {
         $builder = new Builder;
         $builder->writeSegments(
-            Unb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'unb-ref'),
-            Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co')
+            GenericSegment::fromAttributes('UNB', ['1', '2'], ['sender', '500'], ['receiver', '400'], ['210101', '1201'], ['unb-ref']),
+            GenericSegment::fromAttributes('UNH', ['unh-ref'], ['type', 'v-no', 'r-no', 'o-no', 'o-co']),
         );
 
         $this->assertStringEndsWith("UNT+2+unh-ref'UNZ+1+unb-ref'", (string)$builder->get());
@@ -98,10 +93,10 @@ class BuilderTest extends TestCase
     {
         $builder = new Builder;
         $builder->writeSegments(
-            Unb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'unb-ref'),
-            Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co'),
-            Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co'),
-            Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co'),
+            GenericSegment::fromAttributes('UNB', ['1', '2'], ['sender', '500'], ['receiver', '400'], ['210101', '1201'], ['unb-ref']),
+            GenericSegment::fromAttributes('UNH', ['unh-ref'], ['type', 'v-no', 'r-no', 'o-no', 'o-co']),
+            GenericSegment::fromAttributes('UNH', ['unh-ref'], ['type', 'v-no', 'r-no', 'o-no', 'o-co']),
+            GenericSegment::fromAttributes('UNH', ['unh-ref'], ['type', 'v-no', 'r-no', 'o-no', 'o-co']),
         );
 
         $this->assertStringEndsWith("UNZ+3+unb-ref'", (string)$builder->get());
@@ -112,24 +107,24 @@ class BuilderTest extends TestCase
     {
         $builder = new Builder;
         $builder->writeSegments(
-            Unb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'unb-ref'),
-            Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co'),
-            Seq::fromAttributes('COD'),
-            Seq::fromAttributes('COD'),
-            Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co'),
-            Seq::fromAttributes('COD'),
-            Seq::fromAttributes('COD'),
-            Seq::fromAttributes('COD'),
-            Seq::fromAttributes('COD'),
-            Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co'),
+            GenericSegment::fromAttributes('UNB', ['1', '2'], ['sender', '500'], ['receiver', '400'], ['210101', '1201'], ['unb-ref']),
+            GenericSegment::fromAttributes('UNH', ['unh-ref'], ['type', 'v-no', 'r-no', 'o-no', 'o-co']),
+            GenericSegment::fromAttributes('SEQ', ['COD']),
+            GenericSegment::fromAttributes('SEQ', ['COD']),
+            GenericSegment::fromAttributes('UNH', ['unh-ref'], ['type', 'v-no', 'r-no', 'o-no', 'o-co']),
+            GenericSegment::fromAttributes('SEQ', ['COD']),
+            GenericSegment::fromAttributes('SEQ', ['COD']),
+            GenericSegment::fromAttributes('SEQ', ['COD']),
+            GenericSegment::fromAttributes('SEQ', ['COD']),
+            GenericSegment::fromAttributes('UNH', ['unh-ref'], ['type', 'v-no', 'r-no', 'o-no', 'o-co']),
         );
 
         $message = new Message($builder->get());
 
-        $unts = $message->filterAllSegments(Unt::class);
+        $unts = $message->filterAllSegments(GenericSegment::class, fn(GenericSegment $seg) => $seg->name() === 'UNT');
 
-        $this->assertSame('4', $unts[0]->segCount());
-        $this->assertSame('6', $unts[1]->segCount());
-        $this->assertSame('2', $unts[2]->segCount());
+        $this->assertSame('4', $unts[0]->getValue('1', '0'));
+        $this->assertSame('6', $unts[1]->getValue('1', '0'));
+        $this->assertSame('2', $unts[2]->getValue('1', '0'));
     }
 }

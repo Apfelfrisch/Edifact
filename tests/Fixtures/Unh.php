@@ -1,7 +1,8 @@
 <?php
 
-namespace Apfelfrisch\Edifact\Segments;
+namespace Apfelfrisch\Edifact\Test\Fixtures;
 
+use Apfelfrisch\Edifact\AbstractSegment;
 use Apfelfrisch\Edifact\Elements;
 
 class Unh extends AbstractSegment
@@ -13,12 +14,12 @@ class Unh extends AbstractSegment
         if (self::$blueprint === null) {
             self::$blueprint = (new Elements)
                 ->addValue('UNH', 'UNH', 'M|an|3')
-                ->addValue('0062', '0062', 'M|an|..14')
-                ->addValue('S009', '0065', 'M|an|..6')
-                ->addValue('S009', '0052', 'M|an|..3')
-                ->addValue('S009', '0054', 'M|an|..3')
-                ->addValue('S009', '0051', 'M|an|..2')
-                ->addValue('S009', '0057', 'M|an|..6');
+                ->addValue('0062', '0062', 'M|an|14')
+                ->addValue('S009', '0065', 'M|an|6')
+                ->addValue('S009', '0052', 'M|an|3')
+                ->addValue('S009', '0054', 'M|an|3')
+                ->addValue('S009', '0051', 'M|an|2')
+                ->addValue('S009', '0057', 'M|an|6');
         }
 
         return self::$blueprint;

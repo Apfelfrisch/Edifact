@@ -21,7 +21,7 @@ class Message
     public function __construct(Stream $stream, ?SegmentFactory $segmentFactory = null)
     {
         $this->stream = $stream;
-        $this->segmentFactory = $segmentFactory ?? SegmentFactory::withDefaultDegments();
+        $this->segmentFactory = $segmentFactory ?? SegmentFactory::fromDefault();
         $this->segmentFactory->setUnaSegment($this->stream->getUnaSegment());
         $this->segmentIterator = new StreamIterator($this->stream, $this->segmentFactory);
     }

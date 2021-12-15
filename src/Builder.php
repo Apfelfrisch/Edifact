@@ -63,7 +63,9 @@ class Builder
             if ($segment->name() === 'UNH') {
                 if ($this->unhRef !== null) {
                     $unhCount = $this->counter->unhCount() + 1;
-                    $this->writeSegment(Unt::fromAttributes((string)$unhCount, $this->unhRef));
+                    $this->writeSegment(
+                        GenericSegment::fromAttributes('UNT', [(string)$unhCount], [$this->unhRef])
+                    );
                 }
 
                 $this->unhRef = $segment->getValueFromPosition(1, 0) ?? '';
@@ -87,11 +89,15 @@ class Builder
         if (! $this->messageIsEmpty()) {
             if ($this->unhRef !== null) {
                 $unhCount = $this->counter->unhCount() + 1;
-                $this->writeSegment(Unt::fromAttributes((string)$unhCount, $this->unhRef));
+                $this->writeSegment(
+                    GenericSegment::fromAttributes('UNT', [(string)$unhCount], [$this->unhRef])
+                );
                 $this->unhRef = null;
             }
             if ($this->unbRef !== null) {
-                $this->writeSegment(Unz::fromAttributes((string)$this->counter->messageCount(), $this->unbRef));
+                $this->writeSegment(
+                    GenericSegment::fromAttributes('UNZ', [(string)$this->counter->messageCount()], [$this->unbRef])
+                );
                 $this->unbRef = null;
             }
         }

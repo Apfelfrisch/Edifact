@@ -25,7 +25,9 @@ final class Elements
 
     public function getValueFromPosition(int $elementPosition, int $valuePosition): ?string
     {
-        return array_values(array_values($this->elements)[$elementPosition])[$valuePosition] ?? null;
+        $components = array_values($this->elements)[$elementPosition] ?? [];
+
+        return array_values($components)[$valuePosition] ?? null;
     }
 
     public function getValue(string $elementKey, string $componentKey): ?string

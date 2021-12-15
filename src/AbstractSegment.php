@@ -1,6 +1,6 @@
 <?php
 
-namespace Apfelfrisch\Edifact\Segments;
+namespace Apfelfrisch\Edifact;
 
 use Apfelfrisch\Edifact\Elements;
 use Apfelfrisch\Edifact\UnaSegment;

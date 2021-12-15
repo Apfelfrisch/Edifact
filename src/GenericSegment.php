@@ -1,6 +1,6 @@
 <?php
 
-namespace Apfelfrisch\Edifact\Segments;
+namespace Apfelfrisch\Edifact;
 
 use Apfelfrisch\Edifact\Elements;
 use Apfelfrisch\Edifact\Interfaces\SegInterface;
@@ -8,7 +8,7 @@ use Apfelfrisch\Edifact\StringFormatter;
 use Apfelfrisch\Edifact\SeglineParser;
 use Apfelfrisch\Edifact\UnaSegment;
 
-class Generic implements SegInterface
+class GenericSegment implements SegInterface
 {
     private Elements $elements;
 

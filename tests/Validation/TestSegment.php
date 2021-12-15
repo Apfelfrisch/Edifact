@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace Apfelfrisch\Edifact\Test\Validation;
 
 use Apfelfrisch\Edifact\Elements;
-use Apfelfrisch\Edifact\Segments\AbstractSegment;
+use Apfelfrisch\Edifact\AbstractSegment;
 
 final class TestSegment extends AbstractSegment
 {
