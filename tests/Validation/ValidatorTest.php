@@ -160,7 +160,7 @@ class ValidatorTest extends TestCase
 
         $this->assertFalse($validator->isValid($message));
         $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
-        $this->assertSame(Failure::MISSING_ELEMENT, $failure->getType());
+        $this->assertSame(Failure::MISSING_COMPONENT, $failure->getType());
     }
 
     /** @test */

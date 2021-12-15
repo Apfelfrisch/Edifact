@@ -42,6 +42,22 @@ final class Elements
     }
 
     /**
+     * @psalm-return list<string>
+     */
+    public function getElementKeys(): array
+    {
+        return array_keys($this->toArray());
+    }
+
+    /**
+     * @psalm-return list<string>
+     */
+    public function getComponentKeys(string $elementKey): array
+    {
+        return array_keys($this->getElement($elementKey));
+    }
+
+    /**
      * @psalm-return array<string, array<string, string|null>>
      */
     public function toArray(): array

@@ -18,7 +18,6 @@ class Validator
 
     public function __construct()
     {
-        $this->failures = new EmptyIterator;
         $this->counter = new SegmentCounter;
         $this->segmentValidator = new SegmentValidator();
     }
