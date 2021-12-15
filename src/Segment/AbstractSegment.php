@@ -1,17 +1,14 @@
 <?php
 
-namespace Apfelfrisch\Edifact\Segments;
+namespace Apfelfrisch\Edifact\Segment;
 
-use Apfelfrisch\Edifact\Elements;
-use Apfelfrisch\Edifact\Segments\UnaSegment;
-use Apfelfrisch\Edifact\Interfaces\SegInterface;
-use Apfelfrisch\Edifact\Interfaces\ValidateableInterface;
+use Apfelfrisch\Edifact\Segment\SegmentInterface;
+use Apfelfrisch\Edifact\Validation\alidateableInterface;
 use Apfelfrisch\Edifact\Validation\SegmentValidator;
-use Apfelfrisch\Edifact\SeglineParser;
-use Apfelfrisch\Edifact\StringFormatter;
+use Apfelfrisch\Edifact\Formatter\StringFormatter;
 use Iterator;
 
-abstract class AbstractSegment implements SegInterface, ValidateableInterface
+abstract class AbstractSegment implements SegmentInterface, alidateableInterface
 {
     public const SPACE_CHARACTER = ' ';
 

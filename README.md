@@ -24,7 +24,7 @@ If you don't need validation or Segement getter you can also parse to the [Gener
 
 First you have to load your Segments withe the Factory. After that you mark the Factory as default.
 ```php
-use Apfelfrisch\Edifact\SegmentFactory;
+use Apfelfrisch\Edifact\Segment\SegmentFactory;
 
 $segmentFactory = new SegmentFactory;
 $segmentFactory->addSegment('SEQ', \My\Namespace\Segments\Seq::class);
@@ -35,7 +35,7 @@ SegmentFactory::setDefault($segmentFactory);
 Or you inject the Builder in the Message Object:
 
 ```php
-use Apfelfrisch\Edifact\SegmentFactory;
+use Apfelfrisch\Edifact\Segment\SegmentFactory;
 
 $message = Message::fromString("UNA:+.? 'SEQ+1", $segmentFactory);
 ```
@@ -43,8 +43,8 @@ $message = Message::fromString("UNA:+.? 'SEQ+1", $segmentFactory);
 If you don't need validation or Segment getter you can also parse to the Generic Sgement
 
 ```php
-use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Segments\Generic;
+use Apfelfrisch\Edifact\Segment\SegmentFactory;
 
 $segmentFactory = new SegmentFactory;
 $segmentFactory->addFallback(Generic::class);
@@ -68,19 +68,17 @@ $message = Message::fromFilepath('path/to/file.txt');
 
 #### Iterate over Segments
 ```php
-use Apfelfrisch\Edifact\Segments\Nad;
+use Apfelfrisch\Edifact\Segments\SegmentInterface;
 
 foreach ($message->getSegments() as $segment) {
-    if ($segment instanceof Nad) {
-        echo $segment->street(); // Musterstr.
+    if ($segment instanceof SegmentInterface) {
+        echo $segment->name();
     }
 }
 ```
 
 #### Filter Segments
 ```php
-use Apfelfrisch\Edifact\Segments\Nad;
-
 foreach ($message->filterSegments(Nad::class) as $segment) {
     echo $segment->name(); // NAD
 }
@@ -112,14 +110,14 @@ $message->addStreamFilter('iso-to-utf8', 'convert.iconv.ISO-8859-1.UTF-8');
 ```php
 use Apfelfrisch\Edifact\Builder;
 use Apfelfrisch\Edifact\Message;
-use Apfelfrisch\Edifact\Segments\Unb;
-use Apfelfrisch\Edifact\Segments\Unh;
+use My\Segment\MyUnb;
+use My\Segment\MyUnh;
 
 $builder = new Builder;
 
 $builder->writeSegments(
-    Unb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'unb-ref'),
-    Unh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co')
+    MyUnb::fromAttributes('1', '2', 'sender', '500', 'receiver', '400', new DateTime('2021-01-01 12:01:01'), 'unb-ref'),
+    MyUnh::fromAttributes('unh-ref', 'type', 'v-no', 'r-no', 'o-no', 'o-co')
 );
 
 $message = new Message($builder->get());
@@ -131,7 +129,7 @@ For now, the Space character and Decimal point will be ignored, you have to take
 
 ```php
 use Apfelfrisch\Edifact\Builder;
-use Apfelfrisch\Edifact\UnaSegment;
+use Apfelfrisch\Edifact\Segemtn\UnaSegment;
 
 $builder = new Builder(new UnaSegment('|', '#', '.', '!', ' ', '"'));
 ```
@@ -140,7 +138,7 @@ $builder = new Builder(new UnaSegment('|', '#', '.', '!', ' ', '"'));
 
 ```php
 use Apfelfrisch\Edifact\Builder;
-use Apfelfrisch\Edifact\UnaSegment;
+use Apfelfrisch\Edifact\Segemtn\UnaSegment;
 
 $builder = new Builder(new UnaSegment, 'path/to/file.txt');
 ```
@@ -148,7 +146,6 @@ $builder = new Builder(new UnaSegment, 'path/to/file.txt');
 #### Add Writefilter to the Builder
 ```php
 use Apfelfrisch\Edifact\Builder;
-use Apfelfrisch\Edifact\Segments\Unb;
 
 $builder = new Builder;
 $builder->addStreamFilter('utf8-to-iso', 'convert.iconv.UTF-8.ISO-8859-1');

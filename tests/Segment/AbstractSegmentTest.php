@@ -4,16 +4,16 @@ declare(strict_types = 1);
 
 namespace Code\Php\Edifact\tests\Message\Segments;
 
-use Apfelfrisch\Edifact\SeglineParser;
+use Apfelfrisch\Edifact\Segment\SeglineParser;
 use Apfelfrisch\Edifact\Test\TestCase;
-use Apfelfrisch\Edifact\Test\Fixtures\Segment;
+use Apfelfrisch\Edifact\Test\Fixtures\AbstractSegmentTestSegment;
 
 class AbstractSegmentTest extends TestCase
 {
     /** @test */
     public function test_provide_segment_name(): void
     {
-        $segment = Segment::fromSegLine(new SeglineParser, 'A');
+        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser, 'A');
 
         $this->assertEquals('A', $segment->name());
     }
@@ -23,7 +23,7 @@ class AbstractSegmentTest extends TestCase
     {
         $givenString = 'A+B+1:2:3:4:5+D+E';
 
-        $segment = Segment::fromSegLine(new SeglineParser, $givenString);
+        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser, $givenString);
 
         $this->assertEquals($givenString, $segment->toString());
     }
@@ -40,7 +40,7 @@ class AbstractSegmentTest extends TestCase
             "E" => ["E" => "E",],
         ];
 
-        $segment = Segment::fromSegLine(new SeglineParser, $givenString);
+        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser, $givenString);
 
         $this->assertEquals($expectedArray, $segment->toArray());
     }
@@ -51,7 +51,7 @@ class AbstractSegmentTest extends TestCase
         $givenString = "A+B+1:2:::+D++";
         $expectedString = "A+B+1:2+D";
 
-        $segment = Segment::fromSegLine(new SeglineParser, $givenString);
+        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser, $givenString);
 
         $this->assertEquals($expectedString, $segment->toString());
     }
@@ -61,7 +61,7 @@ class AbstractSegmentTest extends TestCase
     {
         $givenString = "A+?:?+";
 
-        $segment = Segment::fromSegLine(new SeglineParser, $givenString);
+        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser, $givenString);
 
         $this->assertEquals(':+', $segment->dummyMethod());
         $this->assertEquals($givenString, $segment->toString());

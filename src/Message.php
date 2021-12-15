@@ -4,10 +4,11 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact;
 
-use Apfelfrisch\Edifact\Interfaces\SegInterface;
-use Apfelfrisch\Edifact\SegmentFactory;
-use Apfelfrisch\Edifact\Segments\UnaSegment;
-use Apfelfrisch\Edifact\Stream;
+use Apfelfrisch\Edifact\Segment\SegmentInterface;
+use Apfelfrisch\Edifact\Segment\SegmentFactory;
+use Apfelfrisch\Edifact\Segment\UnaSegment;
+use Apfelfrisch\Edifact\Stream\Stream;
+use Apfelfrisch\Edifact\Stream\StreamIterator;
 use Closure;
 use Generator;
 
@@ -63,7 +64,7 @@ class Message
     }
 
     /**
-     * @psalm-return list<SegInterface>
+     * @psalm-return list<SegmentInterface>
      */
     public function getAllSegments(): array
     {
@@ -71,7 +72,7 @@ class Message
     }
 
     /**
-     * @template T of SegInterface
+     * @template T of SegmentInterface
      * @psalm-param class-string<T> $segmentClass
      * @psalm-suppress InvalidReturnType
      * @psalm-return Generator<int, T, mixed, void>
@@ -89,7 +90,7 @@ class Message
     }
 
     /**
-     * @template T of SegInterface
+     * @template T of SegmentInterface
      * @psalm-param class-string<T> $segmentClass
      * @psalm-return list<T>
      */
@@ -99,11 +100,11 @@ class Message
     }
 
     /**
-     * @template T of SegInterface
+     * @template T of SegmentInterface
      * @psalm-param class-string<T> $segmentClass
      * @psalm-return T|null
      */
-    public function findFirstSegment(string $segmentClass, ?Closure $closure = null): ?SegInterface
+    public function findFirstSegment(string $segmentClass, ?Closure $closure = null): ?SegmentInterface
     {
         foreach ($this->filterSegments($segmentClass, $closure) as $segment) {
             return $segment;
@@ -155,7 +156,7 @@ class Message
      */
     public function toArray(): array
     {
-        return array_map(function(SegInterface $segment): array {
+        return array_map(function(SegmentInterface $segment): array {
             return $segment->toArray();
         }, $this->getAllSegments());
     }

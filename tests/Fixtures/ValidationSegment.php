@@ -2,12 +2,12 @@
 
 declare(strict_types = 1);
 
-namespace Apfelfrisch\Edifact\Test\Validation;
+namespace Apfelfrisch\Edifact\Test\Fixtures;
 
-use Apfelfrisch\Edifact\Elements;
-use Apfelfrisch\Edifact\Segments\AbstractSegment;
+use Apfelfrisch\Edifact\Segment\AbstractSegment;
+use Apfelfrisch\Edifact\Segment\Elements;
 
-final class TestSegment extends AbstractSegment
+final class ValidationSegment extends AbstractSegment
 {
     public static string|null $ruleOne;
     public static string|null $ruleTwo = 'O|a|3';

@@ -2,10 +2,11 @@
 
 declare(strict_types = 1);
 
-namespace Apfelfrisch\Edifact;
+namespace Apfelfrisch\Edifact\Stream;
 
-use Apfelfrisch\Edifact\Interfaces\SegInterface;
-use Apfelfrisch\Edifact\Segments\UnaSegment;
+use Apfelfrisch\Edifact\Segment\SegmentInterface;
+use Apfelfrisch\Edifact\Segment\SegmentFactory;
+use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Iterator;
 
 final class StreamIterator implements Iterator
@@ -20,7 +21,7 @@ final class StreamIterator implements Iterator
         $stream->rewind();
     }
 
-    public function getFirst(): ?SegInterface
+    public function getFirst(): ?SegmentInterface
     {
         $this->rewind();
 
@@ -31,7 +32,7 @@ final class StreamIterator implements Iterator
         return $this->current();
     }
 
-    public function getCurrent(): ?SegInterface
+    public function getCurrent(): ?SegmentInterface
     {
         if (! $this->valid()) {
             return null;
@@ -41,7 +42,7 @@ final class StreamIterator implements Iterator
     }
 
     /**
-     * @psalm-return list<SegInterface>
+     * @psalm-return list<SegmentInterface>
      */
     public function getAll(): array
     {
@@ -53,7 +54,7 @@ final class StreamIterator implements Iterator
         return (string)$this->segline;
     }
 
-    public function current(): SegInterface
+    public function current(): SegmentInterface
     {
         return $this->getSegmentObject($this->currentSegline());
     }
@@ -85,7 +86,7 @@ final class StreamIterator implements Iterator
         return $this->segline !== null;
     }
 
-    private function getSegmentObject(string $segLine): SegInterface
+    private function getSegmentObject(string $segLine): SegmentInterface
     {
         return $this->segmentFactory->build($segLine);
     }

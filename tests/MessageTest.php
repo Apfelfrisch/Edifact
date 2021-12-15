@@ -3,12 +3,12 @@
 namespace Apfelfrisch\Edifact\Test;
 
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
-use Apfelfrisch\Edifact\Segments\GenericSegment;
-use Apfelfrisch\Edifact\Interfaces\SegInterface;
+use Apfelfrisch\Edifact\Segment\GenericSegment;
+use Apfelfrisch\Edifact\Segment\SegmentInterface;
 use Apfelfrisch\Edifact\Message;
-use Apfelfrisch\Edifact\SegmentFactory;
+use Apfelfrisch\Edifact\Segment\SegmentFactory;
 use Apfelfrisch\Edifact\Segments;
-use Apfelfrisch\Edifact\Stream;
+use Apfelfrisch\Edifact\Stream\Stream;
 use Apfelfrisch\Edifact\Test\Fixtures\Moa;
 use Apfelfrisch\Edifact\Test\Fixtures\Rff;
 use Apfelfrisch\Edifact\Test\Fixtures\Unh;
@@ -107,7 +107,7 @@ class MessageTest extends TestCase
 
         $i = 0;
         foreach ($message->getSegments() as $segment) {
-            $this->assertInstanceOf(SegInterface::class, $segment);
+            $this->assertInstanceOf(SegmentInterface::class, $segment);
             $i++;
         }
         $this->assertSame(2, $i);
@@ -195,7 +195,7 @@ class MessageTest extends TestCase
 
         $this->assertCount(4, $message->getAllSegments());
         foreach ($message->getAllSegments() as $segment) {
-            $this->assertInstanceOf(SegInterface::class, $segment);
+            $this->assertInstanceOf(SegmentInterface::class, $segment);
         }
     }
 
@@ -204,12 +204,12 @@ class MessageTest extends TestCase
     {
         $message = Message::fromString("UNH+?:?+?''");
 
-        $this->assertInstanceOf(SegInterface::class, $segment = $message->findFirstSegment(Unh::class));
+        $this->assertInstanceOf(SegmentInterface::class, $segment = $message->findFirstSegment(Unh::class));
         $this->assertSame(":+'", $segment->getValueFromPosition(1, 0));
 
         $message = Message::fromString("UNA|-.! _UNH-!|!-!__");
 
-        $this->assertInstanceOf(SegInterface::class, $segment = $message->findFirstSegment(Unh::class));
+        $this->assertInstanceOf(SegmentInterface::class, $segment = $message->findFirstSegment(Unh::class));
         $this->assertSame("|-_", $segment->getValueFromPosition(1, 0));
     }
 }

@@ -2,12 +2,12 @@
 
 declare(strict_types = 1);
 
-namespace Apfelfrisch\Edifact\Interfaces;
+namespace Apfelfrisch\Edifact\Segment;
 
-use Apfelfrisch\Edifact\Segments\UnaSegment;
-use Apfelfrisch\Edifact\SeglineParser;
+use Apfelfrisch\Edifact\Segment\UnaSegment;
+use Apfelfrisch\Edifact\Segment\SeglineParser;
 
-interface SegInterface
+interface SegmentInterface
 {
     public static function fromSegLine(SeglineParser $parser, string $segLine): self|static;
 

@@ -1,14 +1,11 @@
 <?php
 
-namespace Apfelfrisch\Edifact\Segments;
+namespace Apfelfrisch\Edifact\Segment;
 
-use Apfelfrisch\Edifact\Elements;
-use Apfelfrisch\Edifact\Interfaces\SegInterface;
-use Apfelfrisch\Edifact\StringFormatter;
-use Apfelfrisch\Edifact\SeglineParser;
-use Apfelfrisch\Edifact\Segments\UnaSegment;
+use Apfelfrisch\Edifact\Segment\SegmentInterface;
+use Apfelfrisch\Edifact\Formatter\StringFormatter;
 
-class GenericSegment implements SegInterface
+class GenericSegment implements SegmentInterface
 {
     private Elements $elements;
 

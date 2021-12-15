@@ -3,7 +3,8 @@
 namespace Apfelfrisch\Edifact\Test\Validation;
 
 use Apfelfrisch\Edifact\Message;
-use Apfelfrisch\Edifact\SegmentFactory;
+use Apfelfrisch\Edifact\Segment\SegmentFactory;
+use Apfelfrisch\Edifact\Test\Fixtures\ValidationSegment;
 use Apfelfrisch\Edifact\Test\TestCase;
 use Apfelfrisch\Edifact\Validation\Failure;
 use Apfelfrisch\Edifact\Validation\Validator;
@@ -12,14 +13,14 @@ class ValidatorTest extends TestCase
 {
     public function setUp(): void
     {
-        TestSegment::$ruleOne = null;
-        TestSegment::$ruleTwo = null;
+        ValidationSegment::$ruleOne = null;
+        ValidationSegment::$ruleTwo = null;
     }
 
     /** @test */
     public function test_validate_unkown_elements(): void
     {
-        TestSegment::$ruleOne = 'M|n|1';
+        ValidationSegment::$ruleOne = 'M|n|1';
 
         $validator = new Validator;
 
@@ -34,7 +35,7 @@ class ValidatorTest extends TestCase
     /** @test */
     public function test_validate_unkown_components(): void
     {
-        TestSegment::$ruleOne = 'M|n|1';
+        ValidationSegment::$ruleOne = 'M|n|1';
 
         $validator = new Validator;
 
@@ -51,7 +52,7 @@ class ValidatorTest extends TestCase
     /** @test */
     public function test_validate_digit_values(): void
     {
-        TestSegment::$ruleOne = 'M|n|..11';
+        ValidationSegment::$ruleOne = 'M|n|..11';
         $digits = implode(range(0, 9));
 
         $validator = new Validator;
@@ -69,7 +70,7 @@ class ValidatorTest extends TestCase
     /** @test */
     public function test_validate_alpha_values(): void
     {
-        TestSegment::$ruleOne = 'M|a|..53';
+        ValidationSegment::$ruleOne = 'M|a|..53';
         $alphaValues = implode(array_merge(range('a', 'z'), range('A', 'Z')));
 
         $validator = new Validator;
@@ -84,7 +85,7 @@ class ValidatorTest extends TestCase
     /** @test */
     public function test_validate_max_lenght(): void
     {
-        TestSegment::$ruleOne = 'M|an|..2';
+        ValidationSegment::$ruleOne = 'M|an|..2';
 
         $validator = new Validator;
 
@@ -99,7 +100,7 @@ class ValidatorTest extends TestCase
     /** @test */
     public function test_validate_needed_component(): void
     {
-        TestSegment::$ruleOne = 'M|an|..2';
+        ValidationSegment::$ruleOne = 'M|an|..2';
 
         $validator = new Validator;
 
@@ -114,7 +115,7 @@ class ValidatorTest extends TestCase
     /** @test */
     public function test_validate_exact_string_lenght(): void
     {
-        TestSegment::$ruleOne = 'M|an|3';
+        ValidationSegment::$ruleOne = 'M|an|3';
 
         $string = '123';
 
@@ -138,9 +139,9 @@ class ValidatorTest extends TestCase
     {
         $validator = new Validator;
 
-        TestSegment::$ruleOne = 'O|an|3';
+        ValidationSegment::$ruleOne = 'O|an|3';
         $segmentFactory = new SegmentFactory;
-        $segmentFactory->addSegment('TST', TestSegment::class);
+        $segmentFactory->addSegment('TST', ValidationSegment::class);
 
         $message = Message::fromString('TST', $segmentFactory);
 
@@ -152,9 +153,9 @@ class ValidatorTest extends TestCase
     {
         $validator = new Validator;
 
-        TestSegment::$ruleOne = 'M|an|3';
+        ValidationSegment::$ruleOne = 'M|an|3';
         $segmentFactory = new SegmentFactory;
-        $segmentFactory->addSegment('TST', TestSegment::class);
+        $segmentFactory->addSegment('TST', ValidationSegment::class);
 
         $message = Message::fromString('TST', $segmentFactory);
 
@@ -168,11 +169,11 @@ class ValidatorTest extends TestCase
     {
         $validator = new Validator;
 
-        TestSegment::$ruleOne = 'M|an|3';
-        TestSegment::$ruleTwo = 'O|an|3';
+        ValidationSegment::$ruleOne = 'M|an|3';
+        ValidationSegment::$ruleTwo = 'O|an|3';
 
         $segmentFactory = new SegmentFactory;
-        $segmentFactory->addSegment('TST', TestSegment::class);
+        $segmentFactory->addSegment('TST', ValidationSegment::class);
 
         $message = Message::fromString('TST+ABC', $segmentFactory);
 
@@ -184,11 +185,11 @@ class ValidatorTest extends TestCase
     {
         $validator = new Validator;
 
-        TestSegment::$ruleOne = 'M|an|3';
-        TestSegment::$ruleTwo = 'M|an|3';
+        ValidationSegment::$ruleOne = 'M|an|3';
+        ValidationSegment::$ruleTwo = 'M|an|3';
 
         $segmentFactory = new SegmentFactory;
-        $segmentFactory->addSegment('TST', TestSegment::class);
+        $segmentFactory->addSegment('TST', ValidationSegment::class);
 
         $message = Message::fromString('TST+ABC', $segmentFactory);
 
@@ -202,11 +203,11 @@ class ValidatorTest extends TestCase
     {
         $validator = new Validator;
 
-        TestSegment::$ruleOne = 'D|an|3';
-        TestSegment::$ruleTwo = 'O|an|3';
+        ValidationSegment::$ruleOne = 'D|an|3';
+        ValidationSegment::$ruleTwo = 'O|an|3';
 
         $segmentFactory = new SegmentFactory;
-        $segmentFactory->addSegment('TST', TestSegment::class);
+        $segmentFactory->addSegment('TST', ValidationSegment::class);
 
         $message = Message::fromString('TST', $segmentFactory);
 
@@ -218,11 +219,11 @@ class ValidatorTest extends TestCase
     {
         $validator = new Validator;
 
-        TestSegment::$ruleOne = 'D|an|3';
-        TestSegment::$ruleTwo = 'O|an|3';
+        ValidationSegment::$ruleOne = 'D|an|3';
+        ValidationSegment::$ruleTwo = 'O|an|3';
 
         $segmentFactory = new SegmentFactory;
-        $segmentFactory->addSegment('TST', TestSegment::class);
+        $segmentFactory->addSegment('TST', ValidationSegment::class);
 
         $message = Message::fromString('TST+:ABC', $segmentFactory);
 
@@ -234,7 +235,7 @@ class ValidatorTest extends TestCase
     /** @test */
     public function test_ignore_optional_empty_components(): void
     {
-        TestSegment::$ruleOne = 'O|an|3';
+        ValidationSegment::$ruleOne = 'O|an|3';
 
         $validator = new Validator;
 
@@ -245,7 +246,7 @@ class ValidatorTest extends TestCase
     /** @test */
     public function test_iterate_over_failures(): void
     {
-        TestSegment::$ruleOne = 'M|n|1';
+        ValidationSegment::$ruleOne = 'M|n|1';
 
         $validator = new Validator;
 
@@ -263,7 +264,7 @@ class ValidatorTest extends TestCase
     private function buildMessage(string $string): Message
     {
         $segmentFactory = new SegmentFactory;
-        $segmentFactory->addSegment('TST', TestSegment::class);
+        $segmentFactory->addSegment('TST', ValidationSegment::class);
 
         return Message::fromString('TST+' . $string, $segmentFactory);
     }

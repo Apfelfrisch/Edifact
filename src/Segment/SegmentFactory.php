@@ -2,19 +2,17 @@
 
 declare(strict_types = 1);
 
-namespace Apfelfrisch\Edifact;
+namespace Apfelfrisch\Edifact\Segment;
 
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
-use Apfelfrisch\Edifact\Interfaces\SegInterface;
-use Apfelfrisch\Edifact\Segments\GenericSegment;
-use Apfelfrisch\Edifact\Segments\UnaSegment;
+use Apfelfrisch\Edifact\Segment\SegmentInterface;
 
 final class SegmentFactory
 {
-    /** @psalm-var array<string, class-string<SegInterface>> */
+    /** @psalm-var array<string, class-string<SegmentInterface>> */
     private array $segmentClasses = [];
 
-    /** @psalm-var class-string<SegInterface>|null */
+    /** @psalm-var class-string<SegmentInterface>|null */
     private ?string $fallback = null;
 
     private static ?self $defaultFactory = null;
@@ -56,18 +54,18 @@ final class SegmentFactory
     }
 
     /**
-     * @psalm-param $segmentClass class-string<SegInterface>
+     * @psalm-param $segmentClass class-string<SegmentInterface>
      */
     public function addSegment(string $name, string $segmentClass): self
     {
-        if (is_subclass_of($segmentClass, SegInterface::class)) {
+        if (is_subclass_of($segmentClass, SegmentInterface::class)) {
             $this->segmentClasses[substr(strtoupper($name), 0, 3)] = $segmentClass;
         }
         return $this;
     }
 
     /**
-     * @psalm-param class-string<SegInterface> $fallback
+     * @psalm-param class-string<SegmentInterface> $fallback
      */
     public function addFallback(string $fallback): self
     {
@@ -81,9 +79,9 @@ final class SegmentFactory
         self::setDefault($this);
     }
 
-    public function build(string $segline): SegInterface
+    public function build(string $segline): SegmentInterface
     {
-        /** @psalm-var class-string<SegInterface> */
+        /** @psalm-var class-string<SegmentInterface> */
         $segmentClass = $this->getClassname(substr($segline, 0, 3));
 
         $segment = $segmentClass::fromSegLine($this->parser, $segline);
@@ -92,7 +90,7 @@ final class SegmentFactory
     }
 
     /*
-     * @psalm-return class-string<SegInterface>
+     * @psalm-return class-string<SegmentInterface>
      */
     public function getClassname(string $segmentName): string
     {

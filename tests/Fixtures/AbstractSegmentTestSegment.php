@@ -2,10 +2,10 @@
 
 namespace Apfelfrisch\Edifact\Test\Fixtures;
 
-use Apfelfrisch\Edifact\Elements;
-use Apfelfrisch\Edifact\Segments\AbstractSegment;
+use Apfelfrisch\Edifact\Segment\AbstractSegment;
+use Apfelfrisch\Edifact\Segment\Elements;
 
-class Segment extends AbstractSegment
+class AbstractSegmentTestSegment extends AbstractSegment
 {
     private static ?Elements $blueprint = null;
 

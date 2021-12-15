@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Apfelfrisch\Edifact;
+namespace Apfelfrisch\Edifact\Segment;
 
 final class Elements
 {

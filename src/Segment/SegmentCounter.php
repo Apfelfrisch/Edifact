@@ -2,16 +2,16 @@
 
 declare(strict_types = 1);
 
-namespace Apfelfrisch\Edifact;
+namespace Apfelfrisch\Edifact\Segment;
 
-use Apfelfrisch\Edifact\Interfaces\SegInterface;
+use Apfelfrisch\Edifact\Segment\SegmentInterface;
 
 final class SegmentCounter
 {
     private int $unhCounter = 0;
     private int $messageCounter = 0;
 
-    public function count(SegInterface $segment): void
+    public function count(SegmentInterface $segment): void
     {
         if ($segment->name() === 'UNB') {
             return;

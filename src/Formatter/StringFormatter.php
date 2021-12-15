@@ -2,11 +2,11 @@
 
 declare(strict_types = 1);
 
-namespace Apfelfrisch\Edifact;
+namespace Apfelfrisch\Edifact\Formatter;
 
-use Apfelfrisch\Edifact\Interfaces\FormatterInterface;
-use Apfelfrisch\Edifact\Interfaces\SegInterface;
-use Apfelfrisch\Edifact\Segments\UnaSegment;
+use Apfelfrisch\Edifact\Formatter\FormatterInterface;
+use Apfelfrisch\Edifact\Segment\SegmentInterface;
+use Apfelfrisch\Edifact\Segment\UnaSegment;
 
 final class StringFormatter implements FormatterInterface
 {
@@ -23,7 +23,7 @@ final class StringFormatter implements FormatterInterface
         return $this;
     }
 
-    public function format(SegInterface ...$segments): string
+    public function format(SegmentInterface ...$segments): string
     {
         $string = '';
 

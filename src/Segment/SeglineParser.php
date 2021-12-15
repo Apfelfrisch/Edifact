@@ -1,8 +1,6 @@
 <?php
 
-namespace Apfelfrisch\Edifact;
-
-use Apfelfrisch\Edifact\Segments\UnaSegment;
+namespace Apfelfrisch\Edifact\Segment;
 
 final class SeglineParser
 {

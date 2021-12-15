@@ -1,10 +1,10 @@
 <?php
 
-namespace Apfelfrisch\Edifact\Test;
+namespace Apfelfrisch\Edifact\Test\Segment;
 
 use Apfelfrisch\Edifact\Test\TestCase;
-use Apfelfrisch\Edifact\SegmentFactory;
-use Apfelfrisch\Edifact\Segments\GenericSegment;
+use Apfelfrisch\Edifact\Segment\SegmentFactory;
+use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use Apfelfrisch\Edifact\Test\Fixtures\Unh;
 

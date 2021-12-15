@@ -2,8 +2,8 @@
 
 namespace Apfelfrisch\Edifact\Test\Fixtures;
 
-use Apfelfrisch\Edifact\Segments\AbstractSegment;
-use Apfelfrisch\Edifact\Elements;
+use Apfelfrisch\Edifact\Segment\AbstractSegment;
+use Apfelfrisch\Edifact\Segment\Elements;
 
 class Unh extends AbstractSegment
 {

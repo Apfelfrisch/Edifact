@@ -1,8 +1,8 @@
 <?php
 
-namespace Apfelfrisch\Edifact\Test;
+namespace Apfelfrisch\Edifact\Test\Stream;
 
-use Apfelfrisch\Edifact\Stream;
+use Apfelfrisch\Edifact\Stream\Stream;
 use Apfelfrisch\Edifact\Test\TestCase;
 
 class StreamTest extends TestCase
@@ -26,7 +26,7 @@ class StreamTest extends TestCase
 
     public function test_provide_segement_line(): void
     {
-        $stream = new Stream(__DIR__ . '/data/edifact.txt');
+        $stream = new Stream(__DIR__ . '/../data/edifact.txt');
 
         $string = [];
         while (! $stream->eof()) {

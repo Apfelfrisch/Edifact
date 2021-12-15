@@ -2,9 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace Apfelfrisch\Edifact\Segments;
+namespace Apfelfrisch\Edifact\Segment;
 
-use Apfelfrisch\Edifact\Stream;
+use Apfelfrisch\Edifact\Stream\Stream;
 
 final class UnaSegment
 {

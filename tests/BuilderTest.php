@@ -2,10 +2,10 @@
 
 namespace Apfelfrisch\Edifact\Test\Message;
 
-use Apfelfrisch\Edifact\Segments\GenericSegment;
+use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Builder;
-use Apfelfrisch\Edifact\Segments\UnaSegment;
+use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Apfelfrisch\Edifact\Test\TestCase;
 
 class BuilderTest extends TestCase

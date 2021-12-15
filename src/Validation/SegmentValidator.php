@@ -2,7 +2,7 @@
 
 namespace Apfelfrisch\Edifact\Validation;
 
-use Apfelfrisch\Edifact\Elements;
+use Apfelfrisch\Edifact\Segment\Elements;
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use Iterator;
 

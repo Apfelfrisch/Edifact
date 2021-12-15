@@ -2,9 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace Apfelfrisch\Edifact;
+namespace Apfelfrisch\Edifact\Stream;
 
-use Apfelfrisch\Edifact\Segments\UnaSegment;
+use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use RuntimeException;
 use SplFileInfo;
