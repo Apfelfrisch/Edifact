@@ -119,7 +119,6 @@ $builder->writeSegments(
 $message = new Message($builder->get());
 ```
 UNA and the trailing Segments (UNT and UNZ) will be added automatically. If no UNA Segment is provided, it uses the default values [UNA:+.? ']. 
-For now, the Space character and Decimal point will be ignored, you have to take care of it on Segment initialization.
 
 #### Build with custom Una
 
@@ -129,6 +128,8 @@ use Apfelfrisch\Edifact\Segment\UnaSegment;
 
 $builder = new Builder(new UnaSegment('|', '#', '.', '!', ' ', '"'));
 ```
+For now, the Space character and Decimal point will be ignored, you have to take care of it on Segment initialization.
+
 
 #### Write directly into File
 
