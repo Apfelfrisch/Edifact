@@ -7,7 +7,7 @@ Parse, build, serialize and validate UN/EDIFACT Messages in a memory efficient w
 
 You will likely have to generate your own Segments, see [php-edifact/edifact-mapping](https://github.com/php-edifact/edifact-mapping) for XML Mappings. I have done a [protype](https://github.com/Apfelfrisch/ediseg-generator) for autogeneration, it should give you a good starting point.
 
-If you don't need validation or Segment getter you can also parse to the [Generic Segment](#parse-to-the-generic-segment).
+If you don't need validation or Segment getter you can also parse to the generic Segment.
 
 ## Usage
 
@@ -34,7 +34,7 @@ use Apfelfrisch\Edifact\Segment\SegmentFactory;
 $message = Message::fromString("UNA:+.? 'SEQ+1", $segmentFactory);
 ```
 
-If you don't need validation or Segment getter you can also parse to the Generic Segement
+If you don't need validation or Segment getter you can also parse to the generic Segement
 
 ```php
 use Apfelfrisch\Edifact\Segments\Generic;
