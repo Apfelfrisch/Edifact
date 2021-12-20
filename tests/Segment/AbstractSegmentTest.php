@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Code\Php\Edifact\tests\Message\Segments;
 
 use Apfelfrisch\Edifact\Segment\SeglineParser;
+use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Apfelfrisch\Edifact\Test\TestCase;
 use Apfelfrisch\Edifact\Test\Fixtures\AbstractSegmentTestSegment;
 
@@ -65,5 +66,31 @@ class AbstractSegmentTest extends TestCase
 
         $this->assertEquals(':+', $segment->dummyMethod());
         $this->assertEquals($givenString, $segment->toString());
+    }
+
+    /** @test */
+    public function test_replace_space_character(): void
+    {
+        $givenString = "A+test_replace_space_char";
+
+        $segment = AbstractSegmentTestSegment::fromSegLine(
+            new SeglineParser(new UnaSegment(':', '+', '.', '?', '_')),
+            $givenString
+        );
+
+        $this->assertEquals('test replace space char', $segment->replaceSpaceCharacter($segment->getValueFromPosition(1, 0)));
+    }
+
+    /** @test */
+    public function test_replace_decimal_point(): void
+    {
+        $givenString = "A+1,23";
+
+        $segment = AbstractSegmentTestSegment::fromSegLine(
+            new SeglineParser(new UnaSegment(':', '+', ',')),
+            $givenString
+        );
+
+        $this->assertEquals('1.23', $segment->replaceDecimalPoint($segment->getValueFromPosition(1, 0)));
     }
 }

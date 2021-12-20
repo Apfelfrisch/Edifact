@@ -2,7 +2,9 @@
 
 namespace Apfelfrisch\Edifact\Test\Validation;
 
+use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use Apfelfrisch\Edifact\Message;
+use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Segment\SegmentFactory;
 use Apfelfrisch\Edifact\Test\Fixtures\ValidationSegment;
 use Apfelfrisch\Edifact\Test\TestCase;
@@ -15,6 +17,29 @@ class ValidatorTest extends TestCase
     {
         ValidationSegment::$ruleOne = null;
         ValidationSegment::$ruleTwo = null;
+    }
+
+    /** @test */
+    public function test_throwing_exception_when_get_failures_was_called_before_is_valid(): void
+    {
+        $validator = new Validator;
+
+        $this->expectException(EdifactException::class);
+        $this->expectExceptionMessage('No Message was validated, call [Apfelfrisch\Edifact\Validation\Validator::isValid] first');
+        $validator->getFailures();
+    }
+
+    /** @test */
+    public function test_throw_exception_when_validating_a_segment_wich_not_implements_the_validateable_interface(): void
+    {
+        $validator = new Validator;
+
+        $segmentFactory = new SegmentFactory;
+        $segmentFactory->addFallback(GenericSegment::class);
+
+        $this->expectException(EdifactException::class);
+        $this->expectExceptionMessage('[Apfelfrisch\Edifact\Segment\GenericSegment] not validateable');
+        $validator->isValid(Message::fromString('TST+1', $segmentFactory));
     }
 
     /** @test */
@@ -65,6 +90,8 @@ class ValidatorTest extends TestCase
         $this->assertSame(0, $failure->getComponentPosition());
         $this->assertSame($digits . 'A', $failure->getValue());
         $this->assertSame('String must contain only digits', $failure->getMessage());
+        $this->assertSame(0, $failure->getMessageCounter());
+        $this->assertSame(0, $failure->getUnhCounter());
     }
 
     /** @test */
