@@ -89,6 +89,9 @@ final class Stream extends SplFileInfo
         return $this->toString();
     }
 
+    /**
+     * @deprecated
+     */
     public function setUnaSegment(UnaSegment $unaSegment): void
     {
         if (! $this->isEmpty()) {

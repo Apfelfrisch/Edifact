@@ -79,8 +79,8 @@ class MessageTest extends TestCase
     {
         $message = Message::fromString("UNH'UNB");
 
-        $this->assertInstanceOf(Unh::class, $message->getSegments()->getCurrent());
-        $this->assertInstanceOf(Unh::class, $message->getSegments()->getCurrent());
+        $this->assertInstanceOf(Unh::class, $message->getSegments()->current());
+        $this->assertInstanceOf(Unh::class, $message->getSegments()->current());
     }
 
     /** @test */
@@ -88,7 +88,7 @@ class MessageTest extends TestCase
     {
         $message = Message::fromString("UKN");
 
-        $this->assertInstanceOf(GenericSegment::class, $message->getSegments()->getCurrent());
+        $this->assertInstanceOf(GenericSegment::class, $message->getSegments()->current());
     }
 
     /** @test */

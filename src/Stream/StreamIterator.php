@@ -4,8 +4,9 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact\Stream;
 
-use Apfelfrisch\Edifact\Segment\SegmentInterface;
+use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use Apfelfrisch\Edifact\Segment\SegmentFactory;
+use Apfelfrisch\Edifact\Segment\SegmentInterface;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Iterator;
 
@@ -21,6 +22,9 @@ final class StreamIterator implements Iterator
         $stream->rewind();
     }
 
+    /**
+     * @deprecated
+     */
     public function getFirst(): ?SegmentInterface
     {
         $this->rewind();
@@ -32,6 +36,9 @@ final class StreamIterator implements Iterator
         return $this->current();
     }
 
+    /**
+     * @deprecated
+     */
     public function getCurrent(): ?SegmentInterface
     {
         if (! $this->valid()) {
@@ -56,6 +63,10 @@ final class StreamIterator implements Iterator
 
     public function current(): SegmentInterface
     {
+        if (! $this->valid()) {
+            return throw new EdifactException("No Segment available.");
+        }
+
         return $this->getSegmentObject($this->currentSegline());
     }
 
