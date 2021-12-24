@@ -7,7 +7,6 @@ use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Segment\SegmentInterface;
 use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Segment\SegmentFactory;
-use Apfelfrisch\Edifact\Segments;
 use Apfelfrisch\Edifact\Stream\Stream;
 use Apfelfrisch\Edifact\Test\Fixtures\Moa;
 use Apfelfrisch\Edifact\Test\Fixtures\Rff;
@@ -24,6 +23,7 @@ class MessageTest extends TestCase
             ->addSegment('UNH', Unh::class)
             ->addSegment('RFF', Rff::class)
             ->addSegment('MOA', Moa::class)
+            ->addFallback(GenericSegment::class)
             ->markAsDefault();
 
         $file = new Stream(__DIR__ . '/data/edifact.txt');
@@ -94,7 +94,7 @@ class MessageTest extends TestCase
     /** @test */
     public function test_throw_an_exception_if_no_fallback_was_set_and_the_segment_is_uknown(): void
     {
-        $message = Message::fromString("UKN", SegmentFactory::fromDefault(withFallback: false));
+        $message = Message::fromString("UKN", new SegmentFactory);
 
         $this->expectException(EdifactException::class);
         $message->getAllSegments();

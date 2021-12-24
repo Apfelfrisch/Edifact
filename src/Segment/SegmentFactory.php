@@ -32,19 +32,13 @@ final class SegmentFactory
         self::$defaultFactory = $defaultFactory;
     }
 
-    public static function fromDefault(bool $withFallback = true): self
+    public static function fromDefault(): self
     {
         if (self::$defaultFactory === null) {
             self::$defaultFactory = new self;
         }
 
-        $instance = clone(self::$defaultFactory);
-
-        if ($withFallback) {
-            $instance->addFallback(GenericSegment::class);
-        }
-
-        return $instance;
+        return clone(self::$defaultFactory);
     }
 
     public function setUnaSegment(UnaSegment $unaSegment): void

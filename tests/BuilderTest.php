@@ -5,6 +5,7 @@ namespace Apfelfrisch\Edifact\Test\Message;
 use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Builder;
+use Apfelfrisch\Edifact\Segment\SegmentFactory;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Apfelfrisch\Edifact\Test\TestCase;
 
@@ -119,7 +120,7 @@ class BuilderTest extends TestCase
             GenericSegment::fromAttributes('UNH', ['unh-ref'], ['type', 'v-no', 'r-no', 'o-no', 'o-co']),
         );
 
-        $message = new Message($builder->get());
+        $message = new Message($builder->get(), (new SegmentFactory)->addFallback(GenericSegment::class));
 
         $unts = $message->filterAllSegments(GenericSegment::class, fn(GenericSegment $seg) => $seg->name() === 'UNT');
 

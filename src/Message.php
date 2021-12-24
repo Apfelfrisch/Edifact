@@ -28,9 +28,9 @@ class Message
         $this->segmentIterator = new StreamIterator($this->stream, $this->segmentFactory);
     }
 
-    public static function fromFilepath(string $string, ?SegmentFactory $segmentFactory = null): self
+    public static function fromFilepath(string $filepath, ?SegmentFactory $segmentFactory = null): self
     {
-        $stream = new Stream($string);
+        $stream = new Stream($filepath);
 
         return new self($stream, $segmentFactory);
     }
