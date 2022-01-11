@@ -30,7 +30,7 @@ final class Elements
         return array_values($components)[$valuePosition] ?? null;
     }
 
-    public function getValue(string $elementKey, string $componentKey): ?string
+    public function getValue(string|int $elementKey, string|int $componentKey): ?string
     {
         return $this->elements[$elementKey][$componentKey] ?? null;
     }
@@ -38,7 +38,7 @@ final class Elements
     /**
      * @psalm-return array<string, string|null>
      */
-    public function getElement(string $elementKey): array
+    public function getElement(string|int $elementKey): array
     {
         return $this->elements[$elementKey] ?? [];
     }
@@ -54,7 +54,7 @@ final class Elements
     /**
      * @psalm-return list<string>
      */
-    public function getComponentKeys(string $elementKey): array
+    public function getComponentKeys(string|int $elementKey): array
     {
         return array_keys($this->getElement($elementKey));
     }

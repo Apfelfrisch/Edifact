@@ -57,6 +57,16 @@ final class UnaSegment
         return self::$defaultUnaSegment;
     }
 
+    public function usesPhpDecimalPoint(): bool
+    {
+        return $this->decimalPoint() === '.';
+    }
+
+    public function usesPhpSpaceCharacter(): bool
+    {
+        return $this->spaceCharacter() === ' ';
+    }
+
     public function componentSeparator(): string
     {
         return $this->componentSeparator;

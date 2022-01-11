@@ -15,9 +15,11 @@ interface SegmentInterface
 
     public function name(): string;
 
-    public function getValue(string $elementKey, string $componentKey): ?string;
+    public function getValue(string|int $elementKey, string|int $componentKey): ?string;
 
     public function getValueFromPosition(int $elementPosition, int $valuePosition): ?string;
+
+    public function isValuNumeric(string|int $elementKey, string|int $componentKey): bool;
 
     /** @psalm-return array<string, array<string, string|null>> */
     public function toArray(): array;
