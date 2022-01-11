@@ -10,10 +10,6 @@ use Iterator;
 
 abstract class AbstractSegment implements SegmentInterface, ValidateableInterface
 {
-    public const SPACE_CHARACTER = ' ';
-
-    public const DECIMAL_POINT = '.';
-
     protected ?UnaSegment $unaSegment = null;
 
     protected Elements $elements;
@@ -63,11 +59,11 @@ abstract class AbstractSegment implements SegmentInterface, ValidateableInterfac
         }
 
         if (! $this->getUnaSegment()->usesPhpSpaceCharacter()) {
-            $value = str_replace($this->getUnaSegment()->spaceCharacter(), ' ', $value);
+            $value = str_replace($this->getUnaSegment()->spaceCharacter(), UnaSegment::PHP_SPACE, $value);
         }
 
         if (! $this->getUnaSegment()->usesPhpDecimalPoint()) {
-            $value = str_replace($this->getUnaSegment()->decimalPoint(), '.', $value);
+            $value = str_replace($this->getUnaSegment()->decimalPoint(), UnaSegment::PHP_DECIMAL, $value);
         }
 
         return $value;
@@ -80,21 +76,21 @@ abstract class AbstractSegment implements SegmentInterface, ValidateableInterfac
         return $value !== null && strpos($value, '|n|') !== false;
     }
 
-    /** @deprected */
+    /** @deprecated */
     public function replaceDecimalPoint(?string $value): ?string
     {
-        if ($this->getUnaSegment()->decimalPoint() !== self::DECIMAL_POINT && $value !== null) {
-            return str_replace($this->getUnaSegment()->decimalPoint(), self::DECIMAL_POINT, $value);
+        if ($this->getUnaSegment()->decimalPoint() !== UnaSegment::PHP_DECIMAL && $value !== null) {
+            return str_replace($this->getUnaSegment()->decimalPoint(), UnaSegment::PHP_DECIMAL, $value);
         }
 
         return $value;
     }
 
-    /** @deprected */
+    /** @deprecated */
     public function replaceSpaceCharacter(?string $value): ?string
     {
-        if ($this->getUnaSegment()->spaceCharacter() !== self::SPACE_CHARACTER && $value !== null) {
-            return str_replace($this->getUnaSegment()->spaceCharacter(), self::SPACE_CHARACTER, $value);
+        if ($this->getUnaSegment()->spaceCharacter() !== UnaSegment::PHP_SPACE && $value !== null) {
+            return str_replace($this->getUnaSegment()->spaceCharacter(), UnaSegment::PHP_SPACE, $value);
         }
 
         return $value;

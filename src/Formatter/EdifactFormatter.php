@@ -57,11 +57,11 @@ final class EdifactFormatter implements FormatterInterface
         }
 
         if (! $this->unaSegment->usesPhpDecimalPoint() && ! $segment instanceof GenericSegment && $segment->isValuNumeric($elementKey, $componentKey)) {
-            return str_replace('.', $this->unaSegment->decimalPoint(), $value);
+            return str_replace(UnaSegment::PHP_DECIMAL, $this->unaSegment->decimalPoint(), $value);
         }
 
         if (! $this->unaSegment->usesPhpSpaceCharacter()) {
-            $value = str_replace(' ', $this->unaSegment->spaceCharacter(), $value);
+            $value = str_replace(UnaSegment::PHP_SPACE, $this->unaSegment->spaceCharacter(), $value);
         }
 
         return $this->escapeString($value) . $this->unaSegment->componentSeparator();

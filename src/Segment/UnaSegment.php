@@ -8,9 +8,14 @@ use Apfelfrisch\Edifact\Stream\Stream;
 
 final class UnaSegment
 {
+    public const UNA = 'UNA';
+
+    public const PHP_SPACE = ' ';
+
+    public const PHP_DECIMAL = '.';
+
     private static ?self $defaultUnaSegment = null;
 
-    public const UNA = 'UNA';
 
     public function __construct(
         private string $componentSeparator = ':',
@@ -59,12 +64,12 @@ final class UnaSegment
 
     public function usesPhpDecimalPoint(): bool
     {
-        return $this->decimalPoint() === '.';
+        return $this->decimalPoint() === self::PHP_DECIMAL;
     }
 
     public function usesPhpSpaceCharacter(): bool
     {
-        return $this->spaceCharacter() === ' ';
+        return $this->spaceCharacter() === self::PHP_SPACE;
     }
 
     public function componentSeparator(): string

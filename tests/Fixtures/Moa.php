@@ -40,6 +40,6 @@ class Moa extends AbstractSegment
 
     public function amount(): ?string
     {
-        return (string)$this->getValue('C516', '5004');
+        return $this->getValue('C516', '5004');
     }
 }

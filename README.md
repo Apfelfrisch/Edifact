@@ -126,10 +126,9 @@ UNA and the trailing Segments (UNT and UNZ) will be added automatically. If no U
 use Apfelfrisch\Edifact\Builder;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 
-$builder = new Builder(new UnaSegment('|', '#', '.', '!', ' ', '"'));
+$builder = new Builder(new UnaSegment('|', '#', ',', '!', '_', '"'));
 ```
-For now, the Space character and Decimal point will be ignored, you have to take care of it on Segment initialization.
-
+If you replace the decimal seperator, be sure that the blueprint marks the value as numeric.
 
 #### Write directly into File
 
