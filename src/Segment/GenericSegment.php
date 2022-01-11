@@ -54,12 +54,12 @@ class GenericSegment implements SegmentInterface
         return $this->elements->getValueFromPosition($elementPosition, $valuePosition);
     }
 
-    public function getValue(string|int $elementKey, string|int $componentKey): ?string
+    public function getValue(string $elementKey, string $componentKey): ?string
     {
         return $this->elements->getValue($elementKey, $componentKey);
     }
 
-    public function isValuNumeric(string|int $elementKey, string|int $componentKey): bool
+    public function isValuNumeric(string $elementKey, string $componentKey): bool
     {
         return false;
     }

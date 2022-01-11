@@ -37,7 +37,8 @@ final class EdifactFormatter implements FormatterInterface
             $segmentString = '';
             foreach($segment->toArray() as $elementKey => $element) {
                 foreach ($element as $componentKey => $value) {
-                    $segmentString .= $this->buildComponent($value, $segment, $elementKey, $componentKey);
+                    /** @psalm-suppress RedundantCastGivenDocblockType: Php autocasts to integer */
+                    $segmentString .= $this->buildComponent($value, $segment, (string)$elementKey, (string)$componentKey);
                 }
 
                 $segmentString = $this->trimEmpty(
@@ -50,7 +51,7 @@ final class EdifactFormatter implements FormatterInterface
         return $string;
     }
 
-    private function buildComponent(string|null $value, SegmentInterface $segment, string|int $elementKey, string|int $componentKey): string
+    private function buildComponent(string|null $value, SegmentInterface $segment, string $elementKey, string $componentKey): string
     {
         if ($value === null) {
             return $this->unaSegment->componentSeparator();
