@@ -5,15 +5,11 @@ namespace Apfelfrisch\Edifact\Segment;
 use Apfelfrisch\Edifact\Segment\SegmentInterface;
 use Apfelfrisch\Edifact\Validation\ValidateableInterface;
 use Apfelfrisch\Edifact\Validation\SegmentValidator;
-use Apfelfrisch\Edifact\Formatter\StringFormatter;
+use Apfelfrisch\Edifact\Formatter\EdifactFormatter;
 use Iterator;
 
 abstract class AbstractSegment implements SegmentInterface, ValidateableInterface
 {
-    public const SPACE_CHARACTER = ' ';
-
-    public const DECIMAL_POINT = '.';
-
     protected ?UnaSegment $unaSegment = null;
 
     protected Elements $elements;
@@ -51,22 +47,50 @@ abstract class AbstractSegment implements SegmentInterface, ValidateableInterfac
 
     public function getValue(string $elementKey, string $componentKey): ?string
     {
-        return $this->elements->getValue($elementKey, $componentKey);
-    }
+        if (
+            $this->getUnaSegment()->usesPhpSpaceCharacter()
+            && ($this->getUnaSegment()->usesPhpDecimalPoint() || ! $this->isValueNumeric($elementKey, $componentKey))
+        ) {
+            return $this->elements->getValue($elementKey, $componentKey);
+        }
 
-    public function replaceDecimalPoint(?string $value): ?string
-    {
-        if ($this->getUnaSegment()->decimalPoint() !== self::DECIMAL_POINT && $value !== null) {
-            return str_replace($this->getUnaSegment()->decimalPoint(), self::DECIMAL_POINT, $value);
+        if (null === $value = $this->elements->getValue($elementKey, $componentKey)) {
+            return $value;
+        }
+
+        if (! $this->getUnaSegment()->usesPhpSpaceCharacter()) {
+            $value = str_replace($this->getUnaSegment()->spaceCharacter(), UnaSegment::PHP_SPACE, $value);
+        }
+
+        if (! $this->getUnaSegment()->usesPhpDecimalPoint()) {
+            $value = str_replace($this->getUnaSegment()->decimalPoint(), UnaSegment::PHP_DECIMAL, $value);
         }
 
         return $value;
     }
 
+    public function isValueNumeric(string $elementKey, string $componentKey): bool
+    {
+        $value = static::blueprint()->getValue($elementKey, $componentKey);
+
+        return $value !== null && strpos($value, '|n|') !== false;
+    }
+
+    /** @deprecated */
+    public function replaceDecimalPoint(?string $value): ?string
+    {
+        if ($this->getUnaSegment()->decimalPoint() !== UnaSegment::PHP_DECIMAL && $value !== null) {
+            return str_replace($this->getUnaSegment()->decimalPoint(), UnaSegment::PHP_DECIMAL, $value);
+        }
+
+        return $value;
+    }
+
+    /** @deprecated */
     public function replaceSpaceCharacter(?string $value): ?string
     {
-        if ($this->getUnaSegment()->spaceCharacter() !== self::SPACE_CHARACTER && $value !== null) {
-            return str_replace($this->getUnaSegment()->spaceCharacter(), self::SPACE_CHARACTER, $value);
+        if ($this->getUnaSegment()->spaceCharacter() !== UnaSegment::PHP_SPACE && $value !== null) {
+            return str_replace($this->getUnaSegment()->spaceCharacter(), UnaSegment::PHP_SPACE, $value);
         }
 
         return $value;
@@ -87,7 +111,7 @@ abstract class AbstractSegment implements SegmentInterface, ValidateableInterfac
 
     public function toString(): string
     {
-        return substr((new StringFormatter($this->getUnaSegment()))->format($this), 0, -1);
+        return substr((new EdifactFormatter($this->getUnaSegment()))->format($this), 0, -1);
     }
 
     private function getUnaSegment(): UnaSegment

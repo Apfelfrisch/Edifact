@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact;
 
-use Apfelfrisch\Edifact\Formatter\StringFormatter;
+use Apfelfrisch\Edifact\Formatter\EdifactFormatter;
 use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Segment\SegmentCounter;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
@@ -20,7 +20,7 @@ class Builder
 
     private Stream $stream;
     private string $filepath;
-    private StringFormatter $stringFormatter;
+    private EdifactFormatter $stringFormatter;
     private SegmentCounter $counter;
 
     public function __construct(UnaSegment $unaSegment = null, string $filepath = 'php://temp')
@@ -29,7 +29,7 @@ class Builder
 
         $this->stream = new Stream($this->filepath, 'w', $unaSegment);
         $this->counter = new SegmentCounter;
-        $this->stringFormatter = new StringFormatter($this->stream->getUnaSegment());
+        $this->stringFormatter = new EdifactFormatter($this->stream->getUnaSegment());
         $this->stringFormatter->prefixUna();
     }
 

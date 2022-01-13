@@ -8,7 +8,7 @@ use Apfelfrisch\Edifact\Formatter\FormatterInterface;
 use Apfelfrisch\Edifact\Segment\SegmentInterface;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 
-final class StringFormatter implements FormatterInterface
+final class EdifactFormatter implements FormatterInterface
 {
     private bool $prefixUna = false;
 
@@ -34,11 +34,10 @@ final class StringFormatter implements FormatterInterface
 
         foreach ($segments as $segment) {
             $segmentString = '';
-            foreach($segment->toArray() as $element) {
-                foreach ($element as $value) {
-                    $segmentString .= $value === null
-                        ? $this->unaSegment->componentSeparator()
-                        : $this->escapeString($value) . $this->unaSegment->componentSeparator();
+            foreach($segment->toArray() as $elementKey => $element) {
+                foreach ($element as $componentKey => $value) {
+                    /** @psalm-suppress RedundantCastGivenDocblockType: Php autocasts to integer */
+                    $segmentString .= $this->buildComponent($value, $segment, (string)$elementKey, (string)$componentKey);
                 }
 
                 $segmentString = $this->trimEmpty(
@@ -49,6 +48,23 @@ final class StringFormatter implements FormatterInterface
         }
 
         return $string;
+    }
+
+    private function buildComponent(string|null $value, SegmentInterface $segment, string $elementKey, string $componentKey): string
+    {
+        if ($value === null) {
+            return $this->unaSegment->componentSeparator();
+        }
+
+        if (! $this->unaSegment->usesPhpDecimalPoint() && $segment->isValueNumeric($elementKey, $componentKey)) {
+            return str_replace(UnaSegment::PHP_DECIMAL, $this->unaSegment->decimalPoint(), $value);
+        }
+
+        if (! $this->unaSegment->usesPhpSpaceCharacter()) {
+            $value = str_replace(UnaSegment::PHP_SPACE, $this->unaSegment->spaceCharacter(), $value);
+        }
+
+        return $this->escapeString($value) . $this->unaSegment->componentSeparator();
     }
 
     private function escapeString(string $string): string

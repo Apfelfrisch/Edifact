@@ -7,6 +7,7 @@ use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Builder;
 use Apfelfrisch\Edifact\Segment\SegmentFactory;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
+use Apfelfrisch\Edifact\Test\Fixtures\Moa;
 use Apfelfrisch\Edifact\Test\TestCase;
 
 class BuilderTest extends TestCase
@@ -28,17 +29,18 @@ class BuilderTest extends TestCase
     /** @test */
     public function test_using_custom_una(): void
     {
-        $builder = new Builder(new UnaSegment('|', '#', '.', '!', ' '));
+        $builder = new Builder(new UnaSegment('|', '#', ',', '!', '_'));
         $builder->writeSegments(
-            GenericSegment::fromAttributes('UNB', ['1', '2'], ['sender', '500'], ['receiver', '400'], ['210101', '1201'], ['referenz-no']),
+            GenericSegment::fromAttributes('UNB', ['1', '2'], ['sender', '500'], ['receiver', '400'], ['210101', '1201'], ['referenz no']),
+            Moa::fromAttributes('110', 1.2),
         );
 
         $message = $builder->get();
 
-        $this->assertStringStartsWith("UNA|#.! '", $message->toString());
-        $this->assertEquals(new UnaSegment('|', '#', '.', '!'), $message->getUnaSegment());
+        $this->assertStringStartsWith("UNA|#,!_'", $message->toString());
+        $this->assertEquals(new UnaSegment('|', '#', ',', '!', '_'), $message->getUnaSegment());
         $this->assertSame(
-            "UNA|#.! 'UNB#1|2#sender|500#receiver|400#210101|1201#referenz-no'UNZ#0#referenz-no'",
+            "UNA|#,!_'UNB#1|2#sender|500#receiver|400#210101|1201#referenz_no'MOA#110|1,20'UNZ#0#referenz_no'",
             $message->toString()
         );
     }

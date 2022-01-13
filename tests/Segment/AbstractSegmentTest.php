@@ -78,6 +78,7 @@ class AbstractSegmentTest extends TestCase
             $givenString
         );
 
+        /** @psalm-suppress DeprecatedMethod */
         $this->assertEquals('test replace space char', $segment->replaceSpaceCharacter($segment->getValueFromPosition(1, 0)));
     }
 
@@ -91,6 +92,7 @@ class AbstractSegmentTest extends TestCase
             $givenString
         );
 
+        /** @psalm-suppress DeprecatedMethod */
         $this->assertEquals('1.23', $segment->replaceDecimalPoint($segment->getValueFromPosition(1, 0)));
     }
 }

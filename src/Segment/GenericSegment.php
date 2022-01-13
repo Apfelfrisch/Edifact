@@ -3,7 +3,7 @@
 namespace Apfelfrisch\Edifact\Segment;
 
 use Apfelfrisch\Edifact\Segment\SegmentInterface;
-use Apfelfrisch\Edifact\Formatter\StringFormatter;
+use Apfelfrisch\Edifact\Formatter\EdifactFormatter;
 
 class GenericSegment implements SegmentInterface
 {
@@ -59,6 +59,11 @@ class GenericSegment implements SegmentInterface
         return $this->elements->getValue($elementKey, $componentKey);
     }
 
+    public function isValueNumeric(string $elementKey, string $componentKey): bool
+    {
+        return false;
+    }
+
     public function name(): string
     {
         return $this->elements->getName();
@@ -74,7 +79,7 @@ class GenericSegment implements SegmentInterface
 
     public function toString(): string
     {
-        return substr((new StringFormatter($this->getUnaSegment()))->format($this), 0, -1);
+        return substr((new EdifactFormatter($this->getUnaSegment()))->format($this), 0, -1);
     }
 
     private function getUnaSegment(): UnaSegment
