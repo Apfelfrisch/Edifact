@@ -42,7 +42,15 @@ abstract class AbstractSegment implements SegmentInterface, ValidateableInterfac
 
     public function getValueFromPosition(int $elementPosition, int $valuePosition): ?string
     {
-        return $this->elements->getValueFromPosition($elementPosition, $valuePosition);
+        if (null === $elementKey = $this->elements->getElementKeyFromPosition($elementPosition)) {
+            return null;
+        }
+
+        if (null === $componentKey = $this->elements->getComponentKeyFromPosition($elementKey, $valuePosition)) {
+            return null;
+        }
+
+        return $this->getValue($elementKey, $componentKey);
     }
 
     public function getValue(string $elementKey, string $componentKey): ?string

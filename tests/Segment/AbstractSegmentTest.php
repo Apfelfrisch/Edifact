@@ -78,21 +78,21 @@ class AbstractSegmentTest extends TestCase
             $givenString
         );
 
-        /** @psalm-suppress DeprecatedMethod */
-        $this->assertEquals('test replace space char', $segment->replaceSpaceCharacter($segment->getValueFromPosition(1, 0)));
+        $this->assertEquals('test replace space char', $segment->getValue('B', 'B'));
+        $this->assertEquals('test replace space char', $segment->getValueFromPosition(1, 0));
     }
 
     /** @test */
     public function test_replace_decimal_point(): void
     {
-        $givenString = "A+1,23";
+        $givenString = "A++1,23";
 
         $segment = AbstractSegmentTestSegment::fromSegLine(
             new SeglineParser(new UnaSegment(':', '+', ',')),
             $givenString
         );
 
-        /** @psalm-suppress DeprecatedMethod */
-        $this->assertEquals('1.23', $segment->replaceDecimalPoint($segment->getValueFromPosition(1, 0)));
+        $this->assertEquals('1.23', $segment->getValue('C', '1'));
+        $this->assertEquals('1.23', $segment->getValueFromPosition(2, 0));
     }
 }

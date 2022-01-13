@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types = 1);
-
 namespace Apfelfrisch\Edifact\Segment;
 
 final class Elements
@@ -51,12 +49,22 @@ final class Elements
         return array_keys($this->toArray());
     }
 
+    public function getElementKeyFromPosition(int $elementPosition): string|null
+    {
+        return $this->getElementKeys()[$elementPosition] ?? null;
+    }
+
     /**
      * @psalm-return list<string>
      */
     public function getComponentKeys(string $elementKey): array
     {
         return array_keys($this->getElement($elementKey));
+    }
+
+    public function getComponentKeyFromPosition(string $elementKey, int $valuePosition): string|null
+    {
+        return $this->getComponentKeys($elementKey)[$valuePosition] ?? null;
     }
 
     /**

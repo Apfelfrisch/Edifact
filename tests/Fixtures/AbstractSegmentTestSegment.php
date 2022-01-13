@@ -15,7 +15,7 @@ class AbstractSegmentTestSegment extends AbstractSegment
             self::$blueprint = (new Elements)
                 ->addValue('A', 'A', 'M|an|3')
                 ->addValue('B', 'B', 'O|an|3')
-                ->addValue('C', '1', 'M|an|3')
+                ->addValue('C', '1', 'M|n|3')
                 ->addValue('C', '2', 'M|an|3')
                 ->addValue('C', '3', 'O|an|3')
                 ->addValue('C', '4', 'M|an|3')
