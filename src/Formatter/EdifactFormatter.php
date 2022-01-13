@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace Apfelfrisch\Edifact\Formatter;
 
 use Apfelfrisch\Edifact\Formatter\FormatterInterface;
-use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Segment\SegmentInterface;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 
@@ -57,7 +56,7 @@ final class EdifactFormatter implements FormatterInterface
             return $this->unaSegment->componentSeparator();
         }
 
-        if (! $this->unaSegment->usesPhpDecimalPoint() && ! $segment instanceof GenericSegment && $segment->isValuNumeric($elementKey, $componentKey)) {
+        if (! $this->unaSegment->usesPhpDecimalPoint() && $segment->isValueNumeric($elementKey, $componentKey)) {
             return str_replace(UnaSegment::PHP_DECIMAL, $this->unaSegment->decimalPoint(), $value);
         }
 

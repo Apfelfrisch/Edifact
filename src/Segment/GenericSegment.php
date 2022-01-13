@@ -59,7 +59,7 @@ class GenericSegment implements SegmentInterface
         return $this->elements->getValue($elementKey, $componentKey);
     }
 
-    public function isValuNumeric(string $elementKey, string $componentKey): bool
+    public function isValueNumeric(string $elementKey, string $componentKey): bool
     {
         return false;
     }

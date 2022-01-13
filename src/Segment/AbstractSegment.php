@@ -49,7 +49,7 @@ abstract class AbstractSegment implements SegmentInterface, ValidateableInterfac
     {
         if (
             $this->getUnaSegment()->usesPhpSpaceCharacter()
-            && ($this->getUnaSegment()->usesPhpDecimalPoint() || ! $this->isValuNumeric($elementKey, $componentKey))
+            && ($this->getUnaSegment()->usesPhpDecimalPoint() || ! $this->isValueNumeric($elementKey, $componentKey))
         ) {
             return $this->elements->getValue($elementKey, $componentKey);
         }
@@ -69,7 +69,7 @@ abstract class AbstractSegment implements SegmentInterface, ValidateableInterfac
         return $value;
     }
 
-    public function isValuNumeric(string $elementKey, string $componentKey): bool
+    public function isValueNumeric(string $elementKey, string $componentKey): bool
     {
         $value = static::blueprint()->getValue($elementKey, $componentKey);
 
