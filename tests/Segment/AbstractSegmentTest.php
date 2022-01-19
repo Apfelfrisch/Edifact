@@ -60,11 +60,12 @@ class AbstractSegmentTest extends TestCase
     /** @test */
     public function test_escaping_string(): void
     {
-        $givenString = "A+?:?+";
+        $givenString = "A+???:?+";
 
         $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser, $givenString);
 
-        $this->assertEquals(':+', $segment->dummyMethod());
+        $this->assertEquals('?:+', $segment->getValue('B', 'B'));
+        $this->assertEquals('?:+', $segment->getValueFromPosition(1, 0));
         $this->assertEquals($givenString, $segment->toString());
     }
 
@@ -80,6 +81,7 @@ class AbstractSegmentTest extends TestCase
 
         $this->assertEquals('test replace space char', $segment->getValue('B', 'B'));
         $this->assertEquals('test replace space char', $segment->getValueFromPosition(1, 0));
+        $this->assertEquals($givenString, $segment->toString());
     }
 
     /** @test */
@@ -94,5 +96,6 @@ class AbstractSegmentTest extends TestCase
 
         $this->assertEquals('1.23', $segment->getValue('C', '1'));
         $this->assertEquals('1.23', $segment->getValueFromPosition(2, 0));
+        $this->assertEquals($givenString, $segment->toString());
     }
 }

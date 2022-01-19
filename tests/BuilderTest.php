@@ -46,6 +46,19 @@ class BuilderTest extends TestCase
     }
 
     /** @test */
+    public function test_terminate_strings(): void
+    {
+        $builder = new Builder();
+        $builder->writeSegments(
+            GenericSegment::fromAttributes('FTX', ['Foo?', 'Bar']),
+        );
+
+        $message = $builder->get();
+
+        $this->assertSame("UNA:+.? 'FTX+Foo??:Bar'", $message->toString());
+    }
+
+    /** @test */
     public function test_auto_write_unz_segement(): void
     {
         $builder = new Builder;
