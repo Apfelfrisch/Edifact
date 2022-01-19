@@ -71,11 +71,13 @@ final class EdifactFormatter implements FormatterInterface
     {
         return str_replace(
             [
+                $this->unaSegment->escapeCharacter(),
                 $this->unaSegment->componentSeparator(),
                 $this->unaSegment->elementSeparator(),
                 '\\n'
             ],
             [
+                $this->unaSegment->escapeCharacter() . $this->unaSegment->escapeCharacter(),
                 $this->unaSegment->escapeCharacter() . $this->unaSegment->componentSeparator(),
                 $this->unaSegment->escapeCharacter() . $this->unaSegment->elementSeparator(),
                 ''

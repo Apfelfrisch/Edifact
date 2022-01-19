@@ -42,39 +42,12 @@ abstract class AbstractSegment implements SegmentInterface, ValidateableInterfac
 
     public function getValueFromPosition(int $elementPosition, int $valuePosition): ?string
     {
-        if (null === $elementKey = $this->elements->getElementKeyFromPosition($elementPosition)) {
-            return null;
-        }
-
-        if (null === $componentKey = $this->elements->getComponentKeyFromPosition($elementKey, $valuePosition)) {
-            return null;
-        }
-
-        return $this->getValue($elementKey, $componentKey);
+        return $this->elements->getValueFromPosition($elementPosition, $valuePosition);
     }
 
     public function getValue(string $elementKey, string $componentKey): ?string
     {
-        if (
-            $this->getUnaSegment()->usesPhpSpaceCharacter()
-            && ($this->getUnaSegment()->usesPhpDecimalPoint() || ! $this->isValueNumeric($elementKey, $componentKey))
-        ) {
-            return $this->elements->getValue($elementKey, $componentKey);
-        }
-
-        if (null === $value = $this->elements->getValue($elementKey, $componentKey)) {
-            return $value;
-        }
-
-        if (! $this->getUnaSegment()->usesPhpSpaceCharacter()) {
-            $value = str_replace($this->getUnaSegment()->spaceCharacter(), UnaSegment::PHP_SPACE, $value);
-        }
-
-        if (! $this->getUnaSegment()->usesPhpDecimalPoint()) {
-            $value = str_replace($this->getUnaSegment()->decimalPoint(), UnaSegment::PHP_DECIMAL, $value);
-        }
-
-        return $value;
+        return $this->elements->getValue($elementKey, $componentKey);
     }
 
     public function isValueNumeric(string $elementKey, string $componentKey): bool
@@ -82,26 +55,6 @@ abstract class AbstractSegment implements SegmentInterface, ValidateableInterfac
         $value = static::blueprint()->getValue($elementKey, $componentKey);
 
         return $value !== null && strpos($value, '|n|') !== false;
-    }
-
-    /** @deprecated */
-    public function replaceDecimalPoint(?string $value): ?string
-    {
-        if ($this->getUnaSegment()->decimalPoint() !== UnaSegment::PHP_DECIMAL && $value !== null) {
-            return str_replace($this->getUnaSegment()->decimalPoint(), UnaSegment::PHP_DECIMAL, $value);
-        }
-
-        return $value;
-    }
-
-    /** @deprecated */
-    public function replaceSpaceCharacter(?string $value): ?string
-    {
-        if ($this->getUnaSegment()->spaceCharacter() !== UnaSegment::PHP_SPACE && $value !== null) {
-            return str_replace($this->getUnaSegment()->spaceCharacter(), UnaSegment::PHP_SPACE, $value);
-        }
-
-        return $value;
     }
 
     public function name(): string

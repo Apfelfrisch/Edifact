@@ -6,8 +6,6 @@ final class SeglineParser
 {
     private const SEG_UNKOWN_KEY_PREFIX = 'unknown';
 
-    private const PLACE_HOLDER = '«>~<«';
-
     private UnaSegment $unaSegment;
 
     public function __construct(?UnaSegment $unaSegment = null)
@@ -33,17 +31,25 @@ final class SeglineParser
                 $componentKeys = array_keys($blueprintArray[$elementKey]);
                 foreach ($components as $componentPosition => $value) {
                     if (null !== $componentKey = $componentKeys[$componentPosition] ?? null) {
-                        $elements->addValue($elementKey, $componentKey, $value);
+                        $elements->addValue(
+                            $elementKey,
+                            $componentKey,
+                            $this->prepareValue($value, $this->isNumeric($blueprintArray[$elementKey][$componentKey]))
+                        );
                         continue;
                     }
 
-                    $elements->addValue($elementKey, self::SEG_UNKOWN_KEY_PREFIX . "-$componentPosition", $value);
+                    $elements->addValue($elementKey, self::SEG_UNKOWN_KEY_PREFIX . "-$componentPosition", $this->prepareValue($value));
                 }
                 continue;
             }
 
             foreach ($components as $componentPosition => $value) {
-                $elements->addValue(self::SEG_UNKOWN_KEY_PREFIX . "-$elementPosition", self::SEG_UNKOWN_KEY_PREFIX . "-$componentPosition", $value);
+                $elements->addValue(
+                    self::SEG_UNKOWN_KEY_PREFIX . "-$elementPosition",
+                    self::SEG_UNKOWN_KEY_PREFIX . "-$componentPosition",
+                    $this->prepareValue($value)
+                );
             }
         }
 
@@ -62,13 +68,37 @@ final class SeglineParser
 
             $j = 0;
             foreach ($components as $component) {
-                $elements->addValue((string)$i, (string)$j, $component);
+                $elements->addValue((string)$i, (string)$j, $this->prepareValue($component));
                 $j++;
             }
             $i++;
         }
 
         return $elements;
+    }
+
+    private function isNumeric(string|null $value): bool
+    {
+        return $value !== null && strpos($value, '|n|') !== false;
+    }
+
+    private function prepareValue(string $value, bool $isNumeric = false): string
+    {
+        if ($isNumeric && ! $this->getUnaSegment()->usesPhpDecimalPoint()) {
+            return str_replace($this->getUnaSegment()->decimalPoint(), UnaSegment::PHP_DECIMAL, $value);
+        }
+
+        $value = str_replace(
+            $this->unaSegment->escapeCharacter().$this->unaSegment->escapeCharacter(),
+            $this->unaSegment->escapeCharacter(),
+            $value
+        );
+
+        if (! $this->unaSegment->usesPhpSpaceCharacter()) {
+            $value = str_replace($this->unaSegment->spaceCharacter(), UnaSegment::PHP_SPACE, $value);
+        }
+
+        return $value;
     }
 
     /**
@@ -78,17 +108,48 @@ final class SeglineParser
     {
         $string = str_replace(["\r", "\n"], '', $string);
 
-        if ($foundEscapeCharacter = str_contains($string, $this->unaSegment->escapeCharacter() . $pattern)) {
-            $string = str_replace($this->unaSegment->escapeCharacter() . $pattern, self::PLACE_HOLDER, $string);
+        if (str_contains($string, $this->unaSegment->escapeCharacter() . $pattern)) {
+            return $this->safeExplodeString($string, $pattern);
         }
 
-        $explodedString = explode($pattern, $string);
+        return explode($pattern, $string);
+    }
 
-        if ($foundEscapeCharacter) {
-            $explodedString = array_map(
-                fn(string $string): string => str_replace(self::PLACE_HOLDER, $pattern, $string),
-                $explodedString
-            );
+    /**
+     * @return array<int, string>
+     */
+    private function safeExplodeString(string $string, string $pattern): array
+    {
+        $escapeChar = false;
+        $partialString = '';
+        $explodedString = [];
+
+        foreach (mb_str_split($string) as $char) {
+            if ($escapeChar === true) {
+                if ($char !== $pattern) {
+                    $partialString .= $this->unaSegment->escapeCharacter();
+                }
+                $partialString .= $char;
+                $escapeChar = false;
+                continue;
+            }
+
+            if ($char === $this->unaSegment->escapeCharacter()) {
+                $escapeChar = true;
+                continue;
+            }
+
+            if ($char === $pattern) {
+                $explodedString[] = $partialString;
+                $partialString = '';
+                continue;
+            }
+
+            $partialString .= $char;
+        }
+
+        if ($partialString !== '') {
+            $explodedString[] = $partialString;
         }
 
         return $explodedString;
