@@ -6,7 +6,7 @@ final class SeglineParser
 {
     private const SEG_UNKOWN_KEY_PREFIX = 'unknown';
 
-    private const PLACE_HOLDER = '«>~<«';
+    private const PLACE_HOLDER = '>§<';
 
     private UnaSegment $unaSegment;
 
@@ -78,19 +78,47 @@ final class SeglineParser
     {
         $string = str_replace(["\r", "\n"], '', $string);
 
-        if ($foundEscapeCharacter = str_contains($string, $this->unaSegment->escapeCharacter() . $pattern)) {
-            $string = str_replace($this->unaSegment->escapeCharacter() . $pattern, self::PLACE_HOLDER, $string);
+        if (str_contains($string, $this->unaSegment->escapeCharacter() . $pattern)) {
+            return $this->safeExplodeString($string, $pattern);
         }
 
-        $explodedString = explode($pattern, $string);
+        return explode($pattern, $string);
+    }
 
-        if ($foundEscapeCharacter) {
-            $explodedString = array_map(
-                fn(string $string): string => str_replace(self::PLACE_HOLDER, $pattern, $string),
-                $explodedString
-            );
+    private function safeExplodeString(string $string, string $pattern): array
+    {
+        $escapeChar = false;
+        $array = [];
+        $partialString = '';
+        foreach (mb_str_split($string) as $char) {
+            if ($escapeChar === true) {
+                if ($char === $pattern) {
+                    $partialString .= $char;
+                } else {
+                    $partialString .= $this->unaSegment->escapeCharacter() . $char;
+                }
+                $escapeChar = false;
+                continue;
+            }
+
+            if ($char === $this->unaSegment->escapeCharacter()) {
+                $escapeChar = true;
+                continue;
+            }
+
+            if ($char === $pattern) {
+                $array[] = $partialString;
+                $partialString = '';
+                continue;
+            }
+
+            $partialString .= $char;
         }
 
-        return $explodedString;
+        if ($partialString !== '') {
+            $array[] = $partialString;
+        }
+
+        return $array;
     }
 }
