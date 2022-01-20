@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace Apfelfrisch\Edifact\Stream;
 
 use Apfelfrisch\Edifact\Segment\UnaSegment;
-use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use RuntimeException;
 use SplFileInfo;
 use Throwable;
@@ -87,18 +86,6 @@ final class Stream extends SplFileInfo
     public function __toString(): string
     {
         return $this->toString();
-    }
-
-    /**
-     * @deprecated
-     */
-    public function setUnaSegment(UnaSegment $unaSegment): void
-    {
-        if (! $this->isEmpty()) {
-            throw new EdifactException("UnaSegment can only be set on an empty file.");
-        }
-
-        $this->unaSegment = $unaSegment;
     }
 
     public function addReadFilter(string $filter, mixed $params = null): self

@@ -20,11 +20,17 @@ final class SeglineParser
 
     public function parseToBlueprint(string $segline, Elements $blueprint): Elements
     {
-        $elements = new Elements;
-
         $blueprintArray = $blueprint->toArray();
         $elementKeys = array_keys($blueprintArray);
-        foreach ($this->explodeString($segline, $this->unaSegment->elementSeparator()) as $elementPosition => $elementsArray) {
+
+        $elementArray = $this->explodeString(
+            str_replace(["\r", "\n"], '', $segline),
+            $this->unaSegment->elementSeparator()
+        );
+
+        $elements = new Elements;
+
+        foreach ($elementArray as $elementPosition => $elementsArray) {
             $components = $this->explodeString($elementsArray, $this->unaSegment->componentSeparator());
 
             if (null !== $elementKey = $elementKeys[$elementPosition] ?? null) {
@@ -58,12 +64,15 @@ final class SeglineParser
 
     public function parse(string $segline): Elements
     {
-        $segLineElements = $this->explodeString($segline, $this->unaSegment->elementSeparator());
+        $elementArray = $this->explodeString(
+            str_replace(["\r", "\n"], '', $segline),
+            $this->unaSegment->elementSeparator()
+        );
 
         $elements = new Elements;
 
         $i = 0;
-        foreach ($segLineElements as $element) {
+        foreach ($elementArray as $element) {
             $components = $this->explodeString($element, $this->unaSegment->componentSeparator());
 
             $j = 0;
@@ -106,8 +115,6 @@ final class SeglineParser
      */
     private function explodeString(string $string, string $pattern): array
     {
-        $string = str_replace(["\r", "\n"], '', $string);
-
         if (str_contains($string, $this->unaSegment->escapeCharacter() . $pattern)) {
             return $this->safeExplodeString($string, $pattern);
         }
