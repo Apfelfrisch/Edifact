@@ -25,11 +25,6 @@ final class SeglineParserTest extends TestCase
      */
     public function seglineStringProvider(): iterable
     {
-        yield 'simple-terminate' => [
-            'string' => 'A+?:?+',
-            'result' => '[["A"],[":+"]]'
-        ];
-
         yield 'simple-terminate-control-chars' => [
             'string' => 'A+?:?+',
             'result' => '[["A"],[":+"]]'
