@@ -70,6 +70,7 @@ abstract class AbstractSegment implements SegmentInterface, ValidateableInterfac
         return $this->elements->toArray();
     }
 
+    /** @deprecated */
     public function toString(): string
     {
         return substr((new EdifactFormatter($this->getUnaSegment()))->format($this), 0, -1);
