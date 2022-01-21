@@ -28,10 +28,12 @@ class AbstractSegmentTestSegment extends AbstractSegment
         return self::$blueprint;
     }
 
-    public static function fromAttributes(string $attribute): self
+    public static function fromAttributes(string $a, string|null $b = null, string|null $c = null): self
     {
         return new self(
-            (new Elements)->addValue('A', 'A', $attribute)
+            (new Elements)->addValue('A', 'A', $a)
+                ->addValue('B', 'B', $b)
+                ->addValue('C', '1', $c)
         );
     }
 

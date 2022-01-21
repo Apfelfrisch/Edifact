@@ -4,14 +4,11 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact\Segment;
 
-use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Apfelfrisch\Edifact\Segment\SeglineParser;
 
 interface SegmentInterface
 {
     public static function fromSegLine(SeglineParser $parser, string $segLine): self|static;
-
-    public function setUnaSegment(UnaSegment $unaSegment): void;
 
     public function name(): string;
 

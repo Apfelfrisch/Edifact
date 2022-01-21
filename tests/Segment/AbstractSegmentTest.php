@@ -20,16 +20,6 @@ class AbstractSegmentTest extends TestCase
     }
 
     /** @test */
-    public function test_string_casting(): void
-    {
-        $givenString = 'A+B+1:2:3:4:5+D+E';
-
-        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser, $givenString);
-
-        $this->assertEquals($givenString, $segment->toString());
-    }
-
-    /** @test */
     public function test_array_casting(): void
     {
         $givenString = 'A+B+1:2:3:4:5+D+E';
@@ -47,17 +37,6 @@ class AbstractSegmentTest extends TestCase
     }
 
     /** @test */
-    public function test_remove_loose_ends(): void
-    {
-        $givenString = "A+B+1:2:::+D++";
-        $expectedString = "A+B+1:2+D";
-
-        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser, $givenString);
-
-        $this->assertEquals($expectedString, $segment->toString());
-    }
-
-    /** @test */
     public function test_escaping_string(): void
     {
         $givenString = "A+???:?+";
@@ -66,7 +45,6 @@ class AbstractSegmentTest extends TestCase
 
         $this->assertEquals('?:+', $segment->getValue('B', 'B'));
         $this->assertEquals('?:+', $segment->getValueFromPosition(1, 0));
-        $this->assertEquals($givenString, $segment->toString());
     }
 
     /** @test */
@@ -81,7 +59,6 @@ class AbstractSegmentTest extends TestCase
 
         $this->assertEquals('test replace space char', $segment->getValue('B', 'B'));
         $this->assertEquals('test replace space char', $segment->getValueFromPosition(1, 0));
-        $this->assertEquals($givenString, $segment->toString());
     }
 
     /** @test */
@@ -96,6 +73,5 @@ class AbstractSegmentTest extends TestCase
 
         $this->assertEquals('1.23', $segment->getValue('C', '1'));
         $this->assertEquals('1.23', $segment->getValueFromPosition(2, 0));
-        $this->assertEquals($givenString, $segment->toString());
     }
 }
