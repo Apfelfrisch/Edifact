@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact\Stream;
 
+use Apfelfrisch\Edifact\Exceptions\InvalidStreamException;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 use RuntimeException;
 use SplFileInfo;
@@ -32,7 +33,7 @@ final class Stream extends SplFileInfo
         } catch (Throwable) { }
 
         if (! is_resource($resource)) {
-            throw new RuntimeException(__METHOD__ . "({$filename}): failed to open stream: No such file or directory");
+            throw InvalidStreamException::readError($filename);
         }
 
         $this->resource = $resource;
@@ -196,7 +197,7 @@ final class Stream extends SplFileInfo
         $res = @stream_filter_append($this->resource, $filtername, $direction, $params);
 
         if (! is_resource($res)) {
-            throw new RuntimeException('unable to locate filter `'.$filtername.'`');
+            throw InvalidStreamException::filterError($filtername);
         }
 
         /** @psalm-suppress MixedArrayAssignment */

@@ -2,7 +2,7 @@
 
 namespace Apfelfrisch\Edifact\Test;
 
-use Apfelfrisch\Edifact\Exceptions\EdifactException;
+use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
 use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Segment\SegmentInterface;
 use Apfelfrisch\Edifact\Message;
@@ -96,7 +96,7 @@ class MessageTest extends TestCase
     {
         $message = Message::fromString("UKN", new SegmentFactory);
 
-        $this->expectException(EdifactException::class);
+        $this->expectException(InvalidEdifactContentException::class);
         $message->getAllSegments();
     }
 

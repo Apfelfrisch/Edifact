@@ -2,8 +2,8 @@
 
 namespace Apfelfrisch\Edifact\Validation;
 
+use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
 use Apfelfrisch\Edifact\Segment\Elements;
-use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use Iterator;
 
 class SegmentValidator
@@ -169,6 +169,6 @@ class SegmentValidator
 
     private function buildMessage(string $key): string
     {
-        return $this->messages[$key] ?? throw new EdifactException("Unkown message key [$key]");
+        return $this->messages[$key] ?? throw InvalidEdifactContentException::messageUnknown($key);
     }
 }

@@ -4,7 +4,8 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact\Validation;
 
-use Apfelfrisch\Edifact\Exceptions\EdifactException;
+use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
+use Apfelfrisch\Edifact\Exceptions\ValidationException;
 use Respect\Validation\Rules\Alpha;
 use Respect\Validation\Rules\Length;
 use Respect\Validation\Rules\Number;
@@ -118,13 +119,13 @@ final class ValueValidator
                 (int)$rulesArray[2]
             ];
         } catch (Throwable) {
-            throw new EdifactException("Invalid Validation Rule [$rules]");
+            throw ValidationException::invalidRule("Invalid Validation Rule [$rules]");
         }
     }
 
     private function buildMessage(string $key, string $replacement = null): string
     {
-        $message = $this->messages[$key] ?? throw new EdifactException("Unkown message key [$key]");
+        $message = $this->messages[$key] ?? throw InvalidEdifactContentException::messageUnknown("Unkown message key [$key]");
 
         if ($replacement !== null) {
             $message = str_replace('%', $replacement, $message);

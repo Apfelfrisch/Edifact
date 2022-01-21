@@ -2,7 +2,7 @@
 
 namespace Apfelfrisch\Edifact\Test\Validation;
 
-use Apfelfrisch\Edifact\Exceptions\EdifactException;
+use Apfelfrisch\Edifact\Exceptions\ValidationException;
 use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Segment\SegmentFactory;
@@ -24,7 +24,7 @@ class ValidatorTest extends TestCase
     {
         $validator = new Validator;
 
-        $this->expectException(EdifactException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('No Message was validated, call [Apfelfrisch\Edifact\Validation\Validator::isValid] first');
         $validator->getFailures();
     }
@@ -37,7 +37,7 @@ class ValidatorTest extends TestCase
         $segmentFactory = new SegmentFactory;
         $segmentFactory->addFallback(GenericSegment::class);
 
-        $this->expectException(EdifactException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('[Apfelfrisch\Edifact\Segment\GenericSegment] not validateable');
         $validator->isValid(Message::fromString('TST+1', $segmentFactory));
     }

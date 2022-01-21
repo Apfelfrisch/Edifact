@@ -2,10 +2,10 @@
 
 namespace Apfelfrisch\Edifact\Test\Segment;
 
+use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
 use Apfelfrisch\Edifact\Test\TestCase;
 use Apfelfrisch\Edifact\Segment\SegmentFactory;
 use Apfelfrisch\Edifact\Segment\GenericSegment;
-use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use Apfelfrisch\Edifact\Test\Fixtures\Unh;
 
 class SegmentFactoryTest extends TestCase
@@ -37,7 +37,7 @@ class SegmentFactoryTest extends TestCase
     {
         $this->segFactory = new SegmentFactory();
 
-        $this->expectException(EdifactException::class);
+        $this->expectException(InvalidEdifactContentException::class);
         $this->segFactory->build('UKW');
     }
 }

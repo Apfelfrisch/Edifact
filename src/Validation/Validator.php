@@ -2,11 +2,10 @@
 
 namespace Apfelfrisch\Edifact\Validation;
 
-use Apfelfrisch\Edifact\Exceptions\EdifactException;
+use Apfelfrisch\Edifact\Exceptions\ValidationException;
 use Apfelfrisch\Edifact\Validation\ValidateableInterface;
 use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Segment\SegmentCounter;
-use EmptyIterator;
 use Iterator;
 
 class Validator
@@ -30,21 +29,21 @@ class Validator
     }
 
     /**
-     * @throws EdifactException
+     * @throws ValidationException
      *
      * @psalm-return Iterator<Failure>
      */
     public function getFailures(): Iterator
     {
         if ($this->failures === null) {
-            throw new EdifactException("No Message was validated, call [" . __CLASS__ . "::isValid] first.");
+            throw ValidationException::messageNotValidated();
         }
 
         return $this->failures;
     }
 
     /**
-     * @throws EdifactException
+     * @throws ValidationException
      */
     public function getFirstFailure(): Failure|null
     {
@@ -58,7 +57,7 @@ class Validator
             $this->counter->count($segment);
 
             if (!($segment instanceof ValidateableInterface)) {
-                throw new EdifactException("[" . $segment::class . "] not validateable.");
+                throw ValidationException::segmentNotValidateable($segment::class);
             }
 
             foreach ($segment->validate($this->segmentValidator) as $failure) {
