@@ -23,10 +23,7 @@ final class SeglineParser
         $blueprintArray = $blueprint->toArray();
         $elementKeys = array_keys($blueprintArray);
 
-        $elementArray = $this->explodeString(
-            str_replace(["\r", "\n"], '', $segline),
-            $this->unaSegment->elementSeparator()
-        );
+        $elementArray = $this->explodeString($this->removeContrlChars($segline), $this->unaSegment->elementSeparator());
 
         $elements = new Elements;
 
@@ -64,10 +61,7 @@ final class SeglineParser
 
     public function parse(string $segline): Elements
     {
-        $elementArray = $this->explodeString(
-            str_replace(["\r", "\n"], '', $segline),
-            $this->unaSegment->elementSeparator()
-        );
+        $elementArray = $this->explodeString($this->removeContrlChars($segline), $this->unaSegment->elementSeparator());
 
         $elements = new Elements;
 
@@ -84,6 +78,11 @@ final class SeglineParser
         }
 
         return $elements;
+    }
+
+    private function removeContrlChars(string $segline): string
+    {
+        return str_replace(["\r", "\n"], '', $segline);
     }
 
     private function isNumeric(string|null $value): bool
