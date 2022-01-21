@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Apfelfrisch\Edifact\Segment;
 
+use Apfelfrisch\Edifact\Exceptions\EdifactException;
 use Apfelfrisch\Edifact\Stream\Stream;
 
 final class UnaSegment
@@ -45,7 +46,7 @@ final class UnaSegment
         }
 
         if (! isset($string[8])) {
-            return $fallback ?? new self();
+            throw EdifactException::invalidUnaSegment($string);
         }
 
         return new self(

@@ -12,4 +12,9 @@ class EdifactException extends RuntimeException
     {
         return new self("Segment not registered: ['$segment']");
     }
+
+    public static function invalidUnaSegment(string $segmentString): self
+    {
+        return new self("Invalid Una Segment: ['$segmentString']");
+    }
 }
