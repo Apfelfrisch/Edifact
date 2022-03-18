@@ -3,13 +3,10 @@
 namespace Apfelfrisch\Edifact\Segment;
 
 use Apfelfrisch\Edifact\Segment\SegmentInterface;
-use Apfelfrisch\Edifact\Formatter\EdifactFormatter;
 
 class GenericSegment implements SegmentInterface
 {
     private Elements $elements;
-
-    private ?UnaSegment $unaSegment = null;
 
     final protected function __construct(Elements $elements)
     {
@@ -39,14 +36,8 @@ class GenericSegment implements SegmentInterface
     public static function fromSegLine(SeglineParser $parser, string $segLine): static
     {
         $segment = new static($parser->parse($segLine));
-        $segment->setUnaSegment($parser->getUnaSegment());
 
         return $segment;
-    }
-
-    public function setUnaSegment(UnaSegment $unaSegment): void
-    {
-        $this->unaSegment = $unaSegment;
     }
 
     public function getValueFromPosition(int $elementPosition, int $valuePosition): ?string
@@ -75,15 +66,5 @@ class GenericSegment implements SegmentInterface
     public function toArray(): array
     {
         return $this->elements->toArray();
-    }
-
-    public function toString(): string
-    {
-        return substr((new EdifactFormatter($this->getUnaSegment()))->format($this), 0, -1);
-    }
-
-    private function getUnaSegment(): UnaSegment
-    {
-        return $this->unaSegment ??= UnaSegment::getDefault();
     }
 }
