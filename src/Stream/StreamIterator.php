@@ -13,7 +13,7 @@ use Iterator;
 final class StreamIterator implements Iterator
 {
     private int $currentSegmentNumber = 0;
-    private ?string $segline = null;
+    private string $segline = '';
 
     public function __construct(
         private Stream $stream,
@@ -32,7 +32,7 @@ final class StreamIterator implements Iterator
 
     public function currentSegline(): string
     {
-        return (string)$this->segline;
+        return $this->segline;
     }
 
     public function current(): SegmentInterface
@@ -53,34 +53,26 @@ final class StreamIterator implements Iterator
     {
         $this->currentSegmentNumber++;
 
-        $this->segline = $this->getNextSegLine();
+        $this->segline = $this->stream->getSegment();
     }
 
     public function rewind(): void
     {
         $this->stream->rewind();
         $this->currentSegmentNumber = 0;
-        $this->segline = $this->getNextSegLine();
-        if ($this->segline !== null && str_starts_with($this->segline, UnaSegment::UNA)) {
-            $this->segline = $this->getNextSegLine();
+        $this->segline = $this->stream->getSegment();
+        if ($this->segline !== '' && str_starts_with($this->segline, UnaSegment::UNA)) {
+            $this->segline = $this->stream->getSegment();
         }
     }
 
     public function valid(): bool
     {
-        return $this->segline !== null;
+        return $this->segline !== '';
     }
 
     private function getSegmentObject(string $segLine): SegmentInterface
     {
         return $this->segmentFactory->build($segLine);
-    }
-
-    private function getNextSegLine(): ?string
-    {
-        if ('' !== $segline = $this->stream->getSegment()) {
-            return $segline;
-        }
-        return null;
     }
 }
