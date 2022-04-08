@@ -51,9 +51,13 @@ class Message
         return $this;
     }
 
-    public function getFilepath(): string
+    public function getFilepath(): string|null
     {
-        return $this->stream->getRealPath();
+        if (false !== $filepath = $this->stream->getRealPath()) {
+            return $filepath;
+        }
+
+        return null;
     }
 
     public function getSegments(): StreamIterator
