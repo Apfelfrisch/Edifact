@@ -143,4 +143,40 @@ class BuilderTest extends TestCase
         $this->assertSame('6', $unts[1]->getValue('1', '0'));
         $this->assertSame('2', $unts[2]->getValue('1', '0'));
     }
+
+    /** @test */
+    public function test_write_direcly_into_file(): void
+    {
+        $tempFile = tempnam(sys_get_temp_dir(), 'test-edi-file');
+
+        $builder = new Builder(filepath: $tempFile);
+        $builder->writeSegments(
+            GenericSegment::fromAttributes('UNB', ['1', '2'], ['sender', '500'], ['receiver', '400'], ['210101', '1201'], ['unb-ref']),
+        );
+        $builder->get();
+
+        $this->assertSame(
+            "UNA:+.? 'UNB+1:2+sender:500+receiver:400+210101:1201+unb-ref'UNZ+0+unb-ref'",
+            file_get_contents($tempFile)
+        );
+
+        unlink($tempFile);
+    }
+
+    /** @test */
+    public function test_remove_edifact_file_when_build_was_not_finished(): void
+    {
+        $tempFile = tempnam(sys_get_temp_dir(), 'test-edi-file');
+
+        $builder = new Builder(filepath: $tempFile);
+        $builder->writeSegments(
+            GenericSegment::fromAttributes('UNB', ['1', '2'], ['sender', '500'], ['receiver', '400'], ['210101', '1201'], ['unb-ref']),
+        );
+
+        $this->assertTrue(file_exists($tempFile));
+
+        unset($builder);
+
+        $this->assertFalse(file_exists($tempFile));
+    }
 }

@@ -8,7 +8,7 @@ use Apfelfrisch\Edifact\Validation\ValueValidator;
 class ValueValidatorTest extends TestCase
 {
     /** @test */
-    public function test_optional_value()
+    public function test_optional_value(): void
     {
         $validator = new ValueValidator;
 
@@ -17,7 +17,7 @@ class ValueValidatorTest extends TestCase
     }
 
     /** @test */
-    public function test_needed_value()
+    public function test_needed_value(): void
     {
         $validator = new ValueValidator;
 
@@ -26,7 +26,7 @@ class ValueValidatorTest extends TestCase
     }
 
     /** @test */
-    public function test_numeric_value()
+    public function test_numeric_value(): void
     {
         $validator = new ValueValidator;
 
@@ -35,7 +35,7 @@ class ValueValidatorTest extends TestCase
     }
 
     /** @test */
-    public function test_alpha_value()
+    public function test_alpha_value(): void
     {
         $validator = new ValueValidator;
 
@@ -44,7 +44,7 @@ class ValueValidatorTest extends TestCase
     }
 
     /** @test */
-    public function test_exact_value_length()
+    public function test_exact_value_length(): void
     {
         $validator = new ValueValidator;
 
@@ -54,7 +54,7 @@ class ValueValidatorTest extends TestCase
     }
 
     /** @test */
-    public function test_maximum_value_length()
+    public function test_maximum_value_length(): void
     {
         $validator = new ValueValidator;
 
@@ -66,7 +66,7 @@ class ValueValidatorTest extends TestCase
     }
 
     /** @test */
-    public function test_multiple_failures()
+    public function test_multiple_failures(): void
     {
         $validator = new ValueValidator;
 

@@ -40,14 +40,15 @@ class StreamTest extends TestCase
 
     public function test_parsing_escaped_message(): void
     {
-        $message = "SEG+Up?'Verd?''";
+        $message = "SEG+SegOne?'AlsoSegOne'SegTwo'";
         $this->stream->writeAndRewind($message);
 
         $string = [];
         while (! $this->stream->eof()) {
             $string[] = $this->stream->getSegment();
         }
-        $this->assertEquals("SEG+Up'Verd'", $string[0]);
+        $this->assertEquals("SEG+SegOne'AlsoSegOne", $string[0]);
+        $this->assertEquals("SegTwo", $string[1]);
     }
 
     public function test_string_cast_provides_the_full_stream_content(): void

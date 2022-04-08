@@ -25,15 +25,23 @@ class MessageTest extends TestCase
             ->addSegment('MOA', Moa::class)
             ->addFallback(GenericSegment::class)
             ->markAsDefault();
-
-        $file = new Stream(__DIR__ . '/data/edifact.txt');
-        $this->message = new Message($file);
     }
 
     /** @test */
     public function test_instanciate_with_file_and_validator(): void
     {
-        $this->assertInstanceOf(Message::class, $this->message);
+        $message = new Message(new Stream(__DIR__ . '/data/edifact.txt'));
+        $this->assertInstanceOf(Message::class, $message);
+    }
+
+    /** @test */
+    public function test_providing_the_filepath(): void
+    {
+        $message = new Message(new Stream(__DIR__ . '/data/edifact.txt'));
+        $this->assertSame(__DIR__ . '/data/edifact.txt', $message->getFilepath());
+
+        $message = Message::fromString("UNH");
+        $this->assertNull($message->getFilepath());
     }
 
     /** @test */
@@ -53,12 +61,14 @@ class MessageTest extends TestCase
     /** @test */
     public function test_string_casting(): void
     {
-        $this->assertEquals("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'RFF+Z13:17103'", (string)$this->message);
+        $message = Message::fromFilepath(__DIR__ . '/data/edifact.txt');
+        $this->assertEquals("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'RFF+Z13:17103'", (string)$message);
     }
 
     /** @test */
     public function test_array_casting(): void
     {
+        $message = Message::fromFilepath(__DIR__ . '/data/edifact.txt');
         $array = [
             [
               "UNH" => ["UNH" => "UNH"],
@@ -71,7 +81,7 @@ class MessageTest extends TestCase
             ]
         ];
 
-        $this->assertEquals($array, $this->message->toArray());
+        $this->assertEquals($array, $message->toArray());
     }
 
     /** @test */
@@ -81,6 +91,7 @@ class MessageTest extends TestCase
 
         $this->assertInstanceOf(Unh::class, $message->getSegments()->current());
         $this->assertInstanceOf(Unh::class, $message->getSegments()->current());
+        $this->assertSame(0, $message->getSegments()->key());
     }
 
     /** @test */
