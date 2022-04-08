@@ -11,13 +11,11 @@ use Iterator;
 class Validator
 {
     private SegmentValidator $segmentValidator;
-    private SegmentCounter $counter;
     /** @psalm-var Iterator<Failure>|null */
     private ?Iterator $failures = null;
 
     public function __construct()
     {
-        $this->counter = new SegmentCounter;
         $this->segmentValidator = new SegmentValidator();
     }
 
@@ -53,15 +51,17 @@ class Validator
     /** @psalm-return Iterator<Failure> */
     private function validate(Message $message): Iterator
     {
+        $counter = new SegmentCounter;
+
         foreach ($message->getSegments() as $segment) {
-            $this->counter->count($segment);
+            $counter->count($segment);
 
             if (!($segment instanceof ValidateableInterface)) {
                 throw ValidationException::segmentNotValidateable($segment::class);
             }
 
             foreach ($segment->validate($this->segmentValidator) as $failure) {
-                yield $failure->setMessageCounter($this->counter->messageCount())->setUnhCounter($this->counter->unhCount());
+                yield $failure->setMessageCounter($counter->messageCount())->setUnhCounter($counter->unhCount());
             }
         }
     }
