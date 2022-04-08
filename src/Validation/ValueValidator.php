@@ -6,9 +6,9 @@ namespace Apfelfrisch\Edifact\Validation;
 
 use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
 use Apfelfrisch\Edifact\Exceptions\ValidationException;
-use Respect\Validation\Rules\Alpha;
-use Respect\Validation\Rules\Length;
-use Respect\Validation\Rules\Number;
+use Apfelfrisch\Edifact\Validation\Rules\HasStringLength;
+use Apfelfrisch\Edifact\Validation\Rules\IsAlpha;
+use Apfelfrisch\Edifact\Validation\Rules\IsNumber;
 use Throwable;
 
 final class ValueValidator
@@ -68,21 +68,23 @@ final class ValueValidator
 
         $failures = [];
 
-        if ($type === self::ELEMENT_TYPE_NUMERIC && ! (new Number)->validate($value)) {
+        /** @var string $value : $value is at this position always a string */
+
+        if ($type === self::ELEMENT_TYPE_NUMERIC && ! (new IsNumber)($value)) {
             $failures[Failure::VALUE_NOT_DIGIT] = $this->buildMessage(Failure::VALUE_NOT_DIGIT);
         }
 
-        if ($type === self::ELEMENT_TYPE_ALPHA && ! (new Alpha)->validate((string)$value)) {
+        if ($type === self::ELEMENT_TYPE_ALPHA && ! (new IsAlpha)($value)) {
             $failures[Failure::VALUE_NOT_ALPHA] = $this->buildMessage(Failure::VALUE_NOT_ALPHA);
         }
 
-        if ($minLenght !== $maxLength && ! (new Length($minLenght))->validate((string)$value)) {
+        if ($minLenght !== $maxLength && ! (new HasStringLength)->min($minLenght)($value)) {
             $failures[Failure::VALUE_TOO_SHORT] = $this->buildMessage(Failure::VALUE_TOO_SHORT, (string)$minLenght);
 
             return $failures;
         }
 
-        if (! (new Length($minLenght, $maxLength))->validate((string)$value)) {
+        if (! (new HasStringLength)->min($minLenght)->max($maxLength)($value)) {
             if ($minLenght === $maxLength) {
                 $failures[Failure::VALUE_LENGTH_INVALID] = $this->buildMessage(Failure::VALUE_LENGTH_INVALID, (string)$minLenght);
 
