@@ -1,4 +1,4 @@
-name: "Static Analysis with Psalm"
+name: "Mutation tests with Infection"
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   static-analysis-psalm:
-    name: "Static Analysis with Psalm"
+    name: "Mutation tests with Infection"
 
     runs-on: ${{ matrix.operating-system }}
 
@@ -40,4 +40,4 @@ jobs:
         run: "composer update --no-interaction --no-progress"
 
       - name: "Tests"
-        run: "vendor/bin/psalm --output-format=github"
+        run: "vendor/bin/infection --logger-github"

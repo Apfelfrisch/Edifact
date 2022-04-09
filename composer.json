@@ -10,7 +10,8 @@
         "phpunit/phpunit": "^9.3",
         "vimeo/psalm": "^4.7",
         "symfony/var-dumper": "^5.2",
-        "psalm/plugin-phpunit": "^0.16.1"
+        "psalm/plugin-phpunit": "^0.16.1",
+        "infection/infection": "^0.26.6"
     },
     "autoload": {
         "psr-4": {
@@ -24,7 +25,8 @@
     },
     "config": {
         "allow-plugins": {
-            "composer/package-versions-deprecated": true
+            "composer/package-versions-deprecated": true,
+            "infection/extension-installer": true
         }
     }
 }

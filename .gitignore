@@ -1,4 +1,7 @@
+vendor/
 .phpunit.result.cache
 composer.lock
 composer.phar
-vendor/
+infection.json
+phpunit.xml
+psalm.xml

@@ -8,5 +8,7 @@
     "mutators": {
         "@default": true,
         "CastString": false
-    }
+    },
+    "minMsi": 90,
+    "minCoveredMsi": 94
 }
