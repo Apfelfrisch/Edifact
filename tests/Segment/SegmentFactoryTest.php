@@ -18,6 +18,19 @@ class SegmentFactoryTest extends TestCase
 
         $segFactory = (new SegmentFactory)->addSegment('UNH', Unh::class);
 
+        $this->assertSame(Unh::class, $segFactory->getClassname('UNH'));
+        $this->assertInstanceOf($segmentClass, $segFactory->build('UNH+'));
+    }
+
+    /** @test */
+    public function test_using_always_upper_case_as_segment_key(): void
+    {
+        /** @psalm-var class-string */
+        $segmentClass = Unh::class;
+
+        $segFactory = (new SegmentFactory)->addSegment('unh', Unh::class);
+
+        $this->assertSame(Unh::class, $segFactory->getClassname('UNH'));
         $this->assertInstanceOf($segmentClass, $segFactory->build('UNH+'));
     }
 

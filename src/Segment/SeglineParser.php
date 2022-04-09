@@ -88,7 +88,7 @@ final class SeglineParser
 
     private function isNumeric(string|null $value): bool
     {
-        return $value !== null && strpos($value, '|n|') !== false;
+        return $value !== null && str_contains($value, '|n|');
     }
 
     private function prepareValue(string $value, bool $isNumeric = false): string

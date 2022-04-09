@@ -100,7 +100,8 @@ class Message
      */
     public function filterAllSegments(string $segmentClass, ?Closure $closure = null): array
     {
-        return array_values(iterator_to_array($this->filterSegments($segmentClass, $closure)));
+        /** @var list<T> */
+        return iterator_to_array($this->filterSegments($segmentClass, $closure));
     }
 
     /**

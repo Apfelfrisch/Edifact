@@ -129,11 +129,14 @@ class MessageTest extends TestCase
     {
         $message = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNT");
 
-        $foundSegments = $message->filterAllSegments(Unh::class);
+        $foundSegements = [];
+        foreach ($message->filterSegments(Unh::class) as $segement) {
+            $this->assertInstanceOf(Unh::class, $segement);
+            $foundSegements[] = $segement;
+        }
 
-        $this->assertCount(2, $foundSegments);
-        $this->assertInstanceOf(Unh::class, $foundSegments[0]);
-        $this->assertInstanceOf(Unh::class, $foundSegments[1]);
+        $this->assertCount(2, $foundSegements);
+        $this->assertEquals($foundSegements, $message->filterAllSegments(Unh::class));
     }
 
     /** @test */

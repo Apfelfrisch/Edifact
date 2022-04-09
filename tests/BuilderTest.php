@@ -46,6 +46,20 @@ class BuilderTest extends TestCase
     }
 
     /** @test */
+    public function test_provide_message_is_empty(): void
+    {
+        $builder = new Builder(new UnaSegment('|', '#', ',', '!', '_'));
+
+        $this->assertTrue($builder->messageIsEmpty());
+
+        $builder->writeSegments(
+            GenericSegment::fromAttributes('FTX', ['Foo?', 'Bar']),
+        );
+
+        $this->assertFalse($builder->messageIsEmpty());
+    }
+
+    /** @test */
     public function test_terminate_strings(): void
     {
         $builder = new Builder();
@@ -97,11 +111,11 @@ class BuilderTest extends TestCase
     {
         $builder = new Builder;
         $builder->writeSegments(
-            GenericSegment::fromAttributes('UNB', ['1', '2'], ['sender', '500'], ['receiver', '400'], ['210101', '1201'], ['unb-ref']),
             GenericSegment::fromAttributes('UNH', ['unh-ref'], ['type', 'v-no', 'r-no', 'o-no', 'o-co']),
+            GenericSegment::fromAttributes('UNH', ['unh-ref-two'], ['type', 'v-no', 'r-no', 'o-no', 'o-co']),
         );
 
-        $this->assertStringEndsWith("UNT+2+unh-ref'UNZ+1+unb-ref'", (string)$builder->get());
+        $this->assertSame("UNA:+.? 'UNH+unh-ref+type:v-no:r-no:o-no:o-co'UNT+2+unh-ref'UNH+unh-ref-two+type:v-no:r-no:o-no:o-co'UNT+2+unh-ref-two'", (string)$builder->get());
     }
 
     /** @test */
@@ -154,6 +168,9 @@ class BuilderTest extends TestCase
             GenericSegment::fromAttributes('UNB', ['1', '2'], ['sender', '500'], ['receiver', '400'], ['210101', '1201'], ['unb-ref']),
         );
         $builder->get();
+
+        // File stays because the Message was Build, even if the Builder is unlinked
+        unset($builder);
 
         $this->assertSame(
             "UNA:+.? 'UNB+1:2+sender:500+receiver:400+210101:1201+unb-ref'UNZ+0+unb-ref'",

@@ -27,7 +27,8 @@ final class StreamIterator implements Iterator
      */
     public function getAll(): array
     {
-        return array_values(iterator_to_array($this));
+        /** @var list<SegmentInterface> */
+        return iterator_to_array($this);
     }
 
     public function currentSegline(): string

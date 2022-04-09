@@ -4,7 +4,6 @@ namespace Apfelfrisch\Edifact\Test\Validation;
 
 use Apfelfrisch\Edifact\Exceptions\ValidationException;
 use Apfelfrisch\Edifact\Message;
-use Apfelfrisch\Edifact\Segment\AbstractSegment;
 use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Segment\SegmentFactory;
 use Apfelfrisch\Edifact\Test\Fixtures\ValidationSegment;
@@ -184,12 +183,14 @@ class ValidatorTest extends TestCase
 
         ValidationSegment::$ruleOne = 'M|an|3';
         $segmentFactory = new SegmentFactory;
-        $segmentFactory->addSegment('UNH', ValidationSegment::class);
+        $segmentFactory->addSegment('UNC', ValidationSegment::class);
 
-        $message = Message::fromString('UNH', $segmentFactory);
+        $message = Message::fromString('UNC', $segmentFactory);
 
         $this->assertFalse($validator->isValid($message));
         $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
+        $this->assertSame(0, $failure->getUnhCounter());
+        $this->assertSame(0, $failure->getMessageCounter());
         $this->assertSame(Failure::MISSING_COMPONENT, $failure->getType());
     }
 

@@ -40,14 +40,14 @@ class StreamTest extends TestCase
 
     public function test_parsing_escaped_message(): void
     {
-        $message = "SEG+SegOne?'AlsoSegOne'SegTwo'";
+        $message = "SEG+FirstSegOne?'SecondSegOne?'LastSegOne'SegTwo'";
         $this->stream->writeAndRewind($message);
 
         $string = [];
         while (! $this->stream->eof()) {
             $string[] = $this->stream->getSegment();
         }
-        $this->assertEquals("SEG+SegOne'AlsoSegOne", $string[0]);
+        $this->assertEquals("SEG+FirstSegOne'SecondSegOne'LastSegOne", $string[0]);
         $this->assertEquals("SegTwo", $string[1]);
     }
 
@@ -98,6 +98,7 @@ class StreamTest extends TestCase
         $this->assertTrue($stream->isEmpty());
 
         $stream->write('A');
+        $stream->rewind();
         $position = $stream->tell();
 
         $this->assertFalse($stream->isEmpty());

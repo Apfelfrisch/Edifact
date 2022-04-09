@@ -43,8 +43,8 @@ final class EdifactFormatterTest extends TestCase
     public function test_remove_loose_ends_string(): void
     {
         $unaSegment = UnaSegment::getDefault();
-        $givenString = "A+B+1:2:::+D++";
-        $expectedString = "A+B+1:2+D" . $unaSegment->segmentTerminator();
+        $givenString = "+A+B+1:2:::+DD++";
+        $expectedString = "+A+B+1:2+DD" . $unaSegment->segmentTerminator();
 
         $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser, $givenString);
 

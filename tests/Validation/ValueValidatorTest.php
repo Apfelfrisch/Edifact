@@ -51,6 +51,8 @@ class ValueValidatorTest extends TestCase
         $this->assertCount(1, $validator->validate('abcd', 'M|a|3', ''));
         $this->assertCount(1, $validator->validate('ab', 'M|a|3', ''));
         $this->assertEmpty($validator->validate('abc', 'M|a|3', ''));
+        $this->assertEmpty($validator->validate('abc', 'M|a|3', ''));
+        $this->assertEmpty($validator->validate('🙂🙂🙂', 'M|an|3', ''));
     }
 
     /** @test */
@@ -61,8 +63,6 @@ class ValueValidatorTest extends TestCase
         $this->assertCount(1, $validator->validate('', 'M|a|..3', ''));
         $this->assertCount(1, $validator->validate('abcd', 'M|a|..3', ''));
         $this->assertEmpty($validator->validate('ab', 'M|a|..3', ''));
-        $this->assertEmpty($validator->validate('abc', 'M|a|3', ''));
-        $this->assertEmpty($validator->validate('🙂🙂🙂', 'M|an|3', ''));
     }
 
     /** @test */
@@ -71,5 +71,6 @@ class ValueValidatorTest extends TestCase
         $validator = new ValueValidator;
 
         $this->assertCount(2, $validator->validate('ac', 'M|n|3', ''));
+        $this->assertCount(2, $validator->validate('acde', 'M|n|..3', ''));
     }
 }

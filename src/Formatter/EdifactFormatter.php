@@ -88,12 +88,12 @@ final class EdifactFormatter implements FormatterInterface
 
     private function trimEmpty(string $string, string $seperator): string
     {
-        while(true) {
-            if ($seperator !== $string[-1] ?? null) {
+        while ($string !== '') {
+            if ($seperator !== $string[-1]) {
                 break;
             }
 
-            if ($this->unaSegment->escapeCharacter() === $string[-2] ?? null) {
+            if ($this->unaSegment->escapeCharacter() === ($string[-2] ?? null)) {
                 break;
             }
 

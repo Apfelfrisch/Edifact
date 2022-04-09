@@ -33,6 +33,6 @@ final class SegmentCounter
 
     public function unhCount(): int
     {
-        return $this->messageCounter === 0 ? 0 : $this->unhCounter;
+        return $this->messageCounter > 0 ? $this->unhCounter : 0;
     }
 }
