@@ -13,6 +13,7 @@ final class SeglineParser
         $this->unaSegment = $unaSegment ?? UnaSegment::getDefault();
     }
 
+    /** @deprecated */
     public function getUnaSegment(): UnaSegment
     {
         return $this->unaSegment;
@@ -92,8 +93,8 @@ final class SeglineParser
 
     private function prepareValue(string $value, bool $isNumeric = false): string
     {
-        if ($isNumeric && ! $this->getUnaSegment()->usesPhpDecimalPoint()) {
-            return str_replace($this->getUnaSegment()->decimalPoint(), UnaSegment::PHP_DECIMAL, $value);
+        if ($isNumeric && ! $this->unaSegment->usesPhpDecimalPoint()) {
+            return str_replace($this->unaSegment->decimalPoint(), UnaSegment::PHP_DECIMAL, $value);
         }
 
         $value = str_replace(
