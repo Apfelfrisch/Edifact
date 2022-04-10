@@ -50,6 +50,7 @@ final class Stream extends SplFileInfo
      */
     public static function fromString(string $string, string $filename = 'php://temp', array $writeFilter = []): self
     {
+        // We have to set the UnaSegment here, cause the string is empty on instatiation
         $instance = new self($filename, 'w+', UnaSegment::setFromString($string));
 
         foreach ($writeFilter as $callable) {

@@ -157,5 +157,21 @@ class StreamTest extends TestCase
         $stream = Stream::fromString('foo bar', 'php://temp', ['string.toupper']);
         $this->assertEquals('FOO BAR', $stream->getContents());
     }
+
+    public function test_reading_una_from_file(): void
+    {
+        foreach (['r', 'r+'] as $openMode) {
+            $stream = new Stream(__DIR__ . '/../data/custom-una.txt', $openMode);  // UNA|-,!_#'
+
+            $unaSegment = $stream->getUnaSegment();
+
+            $this->assertSame("|", $unaSegment->componentSeparator());
+            $this->assertSame("-", $unaSegment->elementSeparator());
+            $this->assertSame(",", $unaSegment->decimalPoint());
+            $this->assertSame("!", $unaSegment->escapeCharacter());
+            $this->assertSame("_", $unaSegment->spaceCharacter());
+            $this->assertSame("#", $unaSegment->segmentTerminator());
+        }
+    }
 }
 

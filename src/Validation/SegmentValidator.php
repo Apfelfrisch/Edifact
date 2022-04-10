@@ -73,7 +73,6 @@ class SegmentValidator
         foreach ($failures as $failureType => $message) {
             $message = match($failureType) {
                 Failure::MISSING_COMPONENT => str_replace('%', "$elementKey:$componentKey", $message),
-                Failure::VALUE_TOO_SHORT => str_replace('%', "$elementKey:$componentKey", $message),
                 default => $message,
             };
 
