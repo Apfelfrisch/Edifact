@@ -23,7 +23,8 @@ class Rff extends AbstractSegment
 
     public static function fromAttributes(string $code, ?string $referenz = null): self
     {
-        return new self((new Elements)
+        return new self(
+            (new Elements)
             ->addValue('RFF', 'RFF', 'RFF')
             ->addValue('C506', '1153', $code)
             ->addValue('C506', '1154', $referenz)

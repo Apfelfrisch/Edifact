@@ -2,9 +2,9 @@
 
 namespace Apfelfrisch\Edifact\Test\Message;
 
-use Apfelfrisch\Edifact\Segment\GenericSegment;
-use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Builder;
+use Apfelfrisch\Edifact\Message;
+use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Segment\SegmentFactory;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Apfelfrisch\Edifact\Test\Fixtures\Moa;
@@ -151,7 +151,7 @@ class BuilderTest extends TestCase
 
         $message = new Message($builder->get(), (new SegmentFactory)->addFallback(GenericSegment::class));
 
-        $unts = $message->filterAllSegments(GenericSegment::class, fn(GenericSegment $seg) => $seg->name() === 'UNT');
+        $unts = $message->filterAllSegments(GenericSegment::class, fn (GenericSegment $seg) => $seg->name() === 'UNT');
 
         $this->assertSame('4', $unts[0]->getValue('1', '0'));
         $this->assertSame('6', $unts[1]->getValue('1', '0'));

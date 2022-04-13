@@ -2,9 +2,8 @@
 
 namespace Apfelfrisch\Edifact\Segment;
 
-use Apfelfrisch\Edifact\Segment\SegmentInterface;
-use Apfelfrisch\Edifact\Validation\ValidateableInterface;
 use Apfelfrisch\Edifact\Validation\SegmentValidator;
+use Apfelfrisch\Edifact\Validation\ValidateableInterface;
 use Iterator;
 
 abstract class AbstractSegment implements SegmentInterface, ValidateableInterface

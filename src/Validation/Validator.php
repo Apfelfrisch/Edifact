@@ -3,7 +3,6 @@
 namespace Apfelfrisch\Edifact\Validation;
 
 use Apfelfrisch\Edifact\Exceptions\ValidationException;
-use Apfelfrisch\Edifact\Validation\ValidateableInterface;
 use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Segment\SegmentCounter;
 use Iterator;
@@ -56,7 +55,7 @@ class Validator
         foreach ($message->getSegments() as $segment) {
             $counter->count($segment);
 
-            if (!($segment instanceof ValidateableInterface)) {
+            if (! ($segment instanceof ValidateableInterface)) {
                 throw ValidationException::segmentNotValidateable($segment::class);
             }
 

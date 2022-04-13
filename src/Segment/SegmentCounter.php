@@ -1,10 +1,8 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact\Segment;
-
-use Apfelfrisch\Edifact\Segment\SegmentInterface;
 
 final class SegmentCounter
 {
@@ -20,6 +18,7 @@ final class SegmentCounter
         if ($segment->name() === 'UNH') {
             $this->unhCounter = 1;
             $this->messageCounter++;
+
             return;
         }
 

@@ -1,11 +1,11 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact;
 
-use Apfelfrisch\Edifact\Segment\SegmentInterface;
 use Apfelfrisch\Edifact\Segment\SegmentFactory;
+use Apfelfrisch\Edifact\Segment\SegmentInterface;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Apfelfrisch\Edifact\Stream\Stream;
 use Apfelfrisch\Edifact\Stream\StreamIterator;
@@ -36,9 +36,10 @@ class Message
     }
 
     public static function fromString(
-        string $string, ?SegmentFactory $segmentFactory = null, string $filename = 'php://temp'
-    ): self
-    {
+        string $string,
+        ?SegmentFactory $segmentFactory = null,
+        string $filename = 'php://temp'
+    ): self {
         $stream = Stream::fromString($string, $filename);
 
         return new self($stream, $segmentFactory);
@@ -161,7 +162,7 @@ class Message
      */
     public function toArray(): array
     {
-        return array_map(function(SegmentInterface $segment): array {
+        return array_map(function (SegmentInterface $segment): array {
             return $segment->toArray();
         }, $this->getAllSegments());
     }

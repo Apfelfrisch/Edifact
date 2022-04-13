@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Tests\Segment;
 
@@ -75,17 +75,17 @@ final class SeglineParserTest extends TestCase
     {
         yield 'simple-terminate-control-chars' => [
             'string' => 'A+?:?+',
-            'result' => '[["A"],[":+"]]'
+            'result' => '[["A"],[":+"]]',
         ];
 
         yield 'double-terminate-control-chars' => [
             'string' => 'A+??:???+',
-            'result' => '[["A"],["?","?+"]]'
+            'result' => '[["A"],["?","?+"]]',
         ];
 
         yield 'triple-terminate-control-chars' => [
             'string' => 'A+??????:B',
-            'result' => '[["A"],["???","B"]]'
+            'result' => '[["A"],["???","B"]]',
         ];
     }
 
@@ -97,7 +97,7 @@ final class SeglineParserTest extends TestCase
         yield 'simple-terminate-control-chars' => [
             'string' => 'A+?:?+',
             'elements' => (new Elements)->addValue('A', 'A', 'M|a|1')->addValue('B', 'B', 'M|a|2'),
-            'result' => '{"A":{"A":"A"},"B":{"B":":+"}}'
+            'result' => '{"A":{"A":"A"},"B":{"B":":+"}}',
         ];
 
         yield 'double-terminate-control-chars' => [
@@ -107,7 +107,7 @@ final class SeglineParserTest extends TestCase
                 ->addValue('B', '1', 'M|a|2')
                 ->addValue('B', '2', 'M|a|1')
                 ->addValue('C', '1', 'M|a|1'),
-            'result' => '{"A":{"1":"A"},"B":{"1":"?","2":"?+B"}}'
+            'result' => '{"A":{"1":"A"},"B":{"1":"?","2":"?+B"}}',
         ];
 
         yield 'triple-terminate-control-chars' => [
@@ -116,7 +116,7 @@ final class SeglineParserTest extends TestCase
                 ->addValue('A', 'A', 'M|a|1')
                 ->addValue('B', '1', 'M|a|3')
                 ->addValue('B', '2', 'M|a|1'),
-            'result' => '{"A":{"A":"A"},"B":{"1":"???","2":"B"}}'
+            'result' => '{"A":{"A":"A"},"B":{"1":"???","2":"B"}}',
         ];
 
         yield 'unkown-element' => [
@@ -125,7 +125,7 @@ final class SeglineParserTest extends TestCase
                 ->addValue('A', 'A', 'M|a|1')
                 ->addValue('B', '1', 'M|a|1')
                 ->addValue('C', '1', 'M|a|1'),
-            'result' => '{"A":{"A":"A"},"B":{"1":"B"},"C":{"1":"C","unknown-1":"1"}}'
+            'result' => '{"A":{"A":"A"},"B":{"1":"B"},"C":{"1":"C","unknown-1":"1"}}',
         ];
 
         yield 'unkown-component' => [
@@ -133,7 +133,7 @@ final class SeglineParserTest extends TestCase
             'elements' => (new Elements)
                 ->addValue('A', 'A', 'M|a|1')
                 ->addValue('B', '1', 'M|a|1'),
-            'result' => '{"A":{"A":"A"},"B":{"1":"B"},"unknown-2":{"unknown-0":"C"}}'
+            'result' => '{"A":{"A":"A"},"B":{"1":"B"},"unknown-2":{"unknown-0":"C"}}',
         ];
     }
 }

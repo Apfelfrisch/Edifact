@@ -174,4 +174,3 @@ class StreamTest extends TestCase
         }
     }
 }
-

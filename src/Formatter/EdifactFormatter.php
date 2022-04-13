@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact\Formatter;
 
-use Apfelfrisch\Edifact\Formatter\FormatterInterface;
 use Apfelfrisch\Edifact\Segment\SegmentInterface;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 
@@ -14,7 +13,8 @@ final class EdifactFormatter implements FormatterInterface
 
     public function __construct(
         private UnaSegment $unaSegment
-    ) { }
+    ) {
+    }
 
     public function prefixUna(): self
     {
@@ -34,14 +34,15 @@ final class EdifactFormatter implements FormatterInterface
 
         foreach ($segments as $segment) {
             $segmentString = '';
-            foreach($segment->toArray() as $elementKey => $element) {
+            foreach ($segment->toArray() as $elementKey => $element) {
                 foreach ($element as $componentKey => $value) {
                     /** @psalm-suppress RedundantCastGivenDocblockType: Php autocasts to integer */
                     $segmentString .= $this->buildComponent($value, $segment, (string)$elementKey, (string)$componentKey);
                 }
 
                 $segmentString = $this->trimEmpty(
-                    $segmentString, $this->unaSegment->componentSeparator()
+                    $segmentString,
+                    $this->unaSegment->componentSeparator()
                 ) . $this->unaSegment->elementSeparator();
             }
             $string .= $this->trimEmpty($segmentString, $this->unaSegment->elementSeparator()) . $this->unaSegment->segmentTerminator();
@@ -74,13 +75,13 @@ final class EdifactFormatter implements FormatterInterface
                 $this->unaSegment->escapeCharacter(),
                 $this->unaSegment->componentSeparator(),
                 $this->unaSegment->elementSeparator(),
-                '\\n'
+                '\\n',
             ],
             [
                 $this->unaSegment->escapeCharacter() . $this->unaSegment->escapeCharacter(),
                 $this->unaSegment->escapeCharacter() . $this->unaSegment->componentSeparator(),
                 $this->unaSegment->escapeCharacter() . $this->unaSegment->elementSeparator(),
-                ''
+                '',
             ],
             $string
         );

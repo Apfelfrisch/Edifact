@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact\Validation\Rules;
 
@@ -9,7 +9,8 @@ final class HasStringLength
     public function __construct(
         private int|null $min = null,
         private int|null $max = null
-    ) { }
+    ) {
+    }
 
     public function min(int|null $min = null): self
     {

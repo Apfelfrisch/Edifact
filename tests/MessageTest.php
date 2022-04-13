@@ -3,15 +3,14 @@
 namespace Apfelfrisch\Edifact\Test;
 
 use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
-use Apfelfrisch\Edifact\Segment\GenericSegment;
-use Apfelfrisch\Edifact\Segment\SegmentInterface;
 use Apfelfrisch\Edifact\Message;
+use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Segment\SegmentFactory;
+use Apfelfrisch\Edifact\Segment\SegmentInterface;
 use Apfelfrisch\Edifact\Stream\Stream;
 use Apfelfrisch\Edifact\Test\Fixtures\Moa;
 use Apfelfrisch\Edifact\Test\Fixtures\Rff;
 use Apfelfrisch\Edifact\Test\Fixtures\Unh;
-use Apfelfrisch\Edifact\Test\TestCase;
 
 class MessageTest extends TestCase
 {
@@ -78,7 +77,7 @@ class MessageTest extends TestCase
             [
               "RFF" => ["RFF" => "RFF"],
               "C506" => [1153 => "Z13", 1154 => "17103"],
-            ]
+            ],
         ];
 
         $this->assertEquals($array, $message->toArray());
@@ -144,7 +143,9 @@ class MessageTest extends TestCase
     {
         $message = Message::fromString("UNH+O160482A7C2+ORDERS:D:09B:UN:1.1e'UNB'UNH+O11111+ORDERS:D:09B:UN:1.1e'UNT");
 
-        $foundSegments = $message->filterAllSegments(Unh::class, fn(Unh $seg): bool =>
+        $foundSegments = $message->filterAllSegments(
+            Unh::class,
+            fn (Unh $seg): bool =>
             $seg->reference() === 'O160482A7C2'
         );
 
@@ -169,14 +170,15 @@ class MessageTest extends TestCase
         foreach ($unaValues as $unaValue) {
             $message = Message::fromString("UNA" . $unaValue . "UNH+'");
             $unaSegment = $message->getUnaSegment();
-            $this->assertEquals($unaValue,
-                 $unaSegment->componentSeparator()
+            $this->assertEquals(
+                $unaValue,
+                $unaSegment->componentSeparator()
                . $unaSegment->elementSeparator()
                . $unaSegment->decimalPoint()
                . $unaSegment->escapeCharacter()
                . $unaSegment->spaceCharacter()
                . $unaSegment->segmentTerminator()
-           );
+            );
         }
     }
 

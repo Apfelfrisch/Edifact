@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact\Segment;
 
@@ -17,7 +17,6 @@ final class UnaSegment
 
     private static ?self $defaultUnaSegment = null;
 
-
     public function __construct(
         private string $componentSeparator = ':',
         private string $elementSeparator = '+',
@@ -25,7 +24,8 @@ final class UnaSegment
         private string $escapeCharacter = '?',
         private string $spaceCharacter = ' ',
         private string $segmentTerminator = '\''
-    ) { }
+    ) {
+    }
 
     public static function setFromStream(Stream $stream, ?self $fallback = null): self
     {
@@ -42,7 +42,7 @@ final class UnaSegment
     public static function setFromString(string $string, ?self $fallback = null): self
     {
         if (substr($string, 0, 3) !== self::UNA) {
-            return $fallback ?? new self();
+            return $fallback ?? new self;
         }
 
         if (! isset($string[8])) {
@@ -50,7 +50,12 @@ final class UnaSegment
         }
 
         return new self(
-            $string[3], $string[4], $string[5], $string[6], $string[7], $string[8]
+            $string[3],
+            $string[4],
+            $string[5],
+            $string[6],
+            $string[7],
+            $string[8]
         );
     }
 

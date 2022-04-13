@@ -58,7 +58,7 @@ class SegmentValidator
             }
         }
 
-        foreach($this->validateMissingElements($blueprint, $blueprintElementKeys) as $failure) {
+        foreach ($this->validateMissingElements($blueprint, $blueprintElementKeys) as $failure) {
             yield $failure;
         }
     }
@@ -71,7 +71,7 @@ class SegmentValidator
         $failures = $this->valueValidator->validate($value, $rules, (string)$this->elementPosition);
 
         foreach ($failures as $failureType => $message) {
-            $message = match($failureType) {
+            $message = match ($failureType) {
                 Failure::MISSING_COMPONENT => str_replace('%', "$elementKey:$componentKey", $message),
                 default => $message,
             };
@@ -126,7 +126,7 @@ class SegmentValidator
 
         $blueprintComponentKeys = $blueprint->getComponentKeys($blueprintElementKey);
         $blueprintComponentPosition = $this->componentPosition + 1;
-        while($blueprintComponentKey = $blueprintComponentKeys[$blueprintComponentPosition] ?? null) {
+        while ($blueprintComponentKey = $blueprintComponentKeys[$blueprintComponentPosition] ?? null) {
             $blueprintComponentPosition++;
             /** @var string $rules */
             if (null === $rules = $blueprint->getValue($blueprintElementKey, $blueprintComponentKey)) {

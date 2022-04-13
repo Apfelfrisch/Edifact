@@ -1,13 +1,13 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Code\Php\Edifact\tests\Message\Segments;
 
 use Apfelfrisch\Edifact\Segment\SeglineParser;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
-use Apfelfrisch\Edifact\Test\TestCase;
 use Apfelfrisch\Edifact\Test\Fixtures\AbstractSegmentTestSegment;
+use Apfelfrisch\Edifact\Test\TestCase;
 
 class AbstractSegmentTest extends TestCase
 {

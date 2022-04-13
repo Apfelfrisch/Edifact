@@ -26,7 +26,8 @@ class Moa extends AbstractSegment
      */
     public static function fromAttributes(string $qualifier, float $amount, string $decimalSeperator = '.'): self
     {
-        return new self((new Elements)
+        return new self(
+            (new Elements)
             ->addValue('MOA', 'MOA', 'MOA')
             ->addValue('C516', '5025', $qualifier)
             ->addValue('C516', '5004', number_format($amount, 2, $decimalSeperator, ''))

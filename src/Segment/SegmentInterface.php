@@ -1,10 +1,8 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact\Segment;
-
-use Apfelfrisch\Edifact\Segment\SeglineParser;
 
 interface SegmentInterface
 {

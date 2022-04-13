@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact\Validation;
 
@@ -110,7 +110,7 @@ final class ValueValidator
                     $rulesArray[0],
                     $rulesArray[1],
                     1,
-                    (int)substr($rulesArray[2], 2)
+                    (int)substr($rulesArray[2], 2),
                 ];
             }
 
@@ -118,7 +118,7 @@ final class ValueValidator
                 $rulesArray[0],
                 $rulesArray[1],
                 (int)$rulesArray[2],
-                (int)$rulesArray[2]
+                (int)$rulesArray[2],
             ];
         } catch (Throwable) {
             throw ValidationException::invalidRule("Invalid Validation Rule [$rules]");

@@ -1,11 +1,10 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact\Segment;
 
 use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
-use Apfelfrisch\Edifact\Segment\SegmentInterface;
 
 final class SegmentFactory
 {
@@ -55,6 +54,7 @@ final class SegmentFactory
         if (is_subclass_of($segmentClass, SegmentInterface::class)) {
             $this->segmentClasses[substr(strtoupper($name), 0, 3)] = $segmentClass;
         }
+
         return $this;
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact\Stream;
 
@@ -28,9 +28,11 @@ final class Stream extends SplFileInfo
         parent::__construct($filename);
 
         $resource = null;
+
         try {
             $resource = fopen($filename, $openMode);
-        } catch (Throwable) { }
+        } catch (Throwable) {
+        }
 
         if (! is_resource($resource)) {
             throw InvalidStreamException::readError($filename);
@@ -208,7 +210,7 @@ final class Stream extends SplFileInfo
     private function fetchSegment(): string
     {
         $mergedLines = '';
-        while (($line = $this->streamGetLine()) && !ctype_cntrl($line)) {
+        while (($line = $this->streamGetLine()) && ! ctype_cntrl($line)) {
             if (! $this->terminatorWasEscaped($line)) {
                 return $mergedLines . $line;
             }
@@ -229,4 +231,3 @@ final class Stream extends SplFileInfo
         return str_ends_with($line, $this->getUnaSegment()->escapeCharacter());
     }
 }
-

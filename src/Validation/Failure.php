@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact\Validation;
 
@@ -25,7 +25,8 @@ final class Failure
         private string $message,
         private int $messageCounter = 0,
         private int $unhCounter = 0,
-    ) { }
+    ) {
+    }
 
     public function setMessageCounter(int $messageCounter): self
     {

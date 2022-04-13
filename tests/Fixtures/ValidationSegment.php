@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact\Test\Fixtures;
 
@@ -22,7 +22,8 @@ final class ValidationSegment extends AbstractSegment
 
     public static function fromAttributes(string|null $valueOne = null, string|null $valueTwo = null): self
     {
-        return new self((new Elements)
+        return new self(
+            (new Elements)
             ->addValue('UNH', 'UNH', 'M|a|3')
             ->addValue('1', '1', $valueOne)
             ->addValue('1', '1', $valueTwo)

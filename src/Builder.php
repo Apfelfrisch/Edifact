@@ -1,14 +1,14 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact;
 
 use Apfelfrisch\Edifact\Formatter\EdifactFormatter;
 use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Segment\SegmentCounter;
-use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Apfelfrisch\Edifact\Segment\SegmentInterface;
+use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Apfelfrisch\Edifact\Stream\Stream;
 
 class Builder

@@ -32,9 +32,9 @@ class Unh extends AbstractSegment
         string $releaseNumber,
         string $organisation,
         string $organisationCode
-    ): self
-    {
-        return new self((new Elements)
+    ): self {
+        return new self(
+            (new Elements)
             ->addValue('UNH', 'UNH', 'UNH')
             ->addValue('0062', '0062', $referenz)
             ->addValue('S009', '0065', $type)

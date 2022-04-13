@@ -2,8 +2,6 @@
 
 namespace Apfelfrisch\Edifact\Segment;
 
-use Apfelfrisch\Edifact\Segment\SegmentInterface;
-
 class GenericSegment implements SegmentInterface
 {
     private Elements $elements;
@@ -23,7 +21,7 @@ class GenericSegment implements SegmentInterface
         $i = 1;
         foreach ($valueArrays as $values) {
             $j = 1;
-            foreach($values as $value) {
+            foreach ($values as $value) {
                 $elements->addValue((string)$i, (string)$j, $value);
                 $j++;
             }

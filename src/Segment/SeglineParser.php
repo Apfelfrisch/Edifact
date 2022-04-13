@@ -40,11 +40,13 @@ final class SeglineParser
                             $componentKey,
                             $this->prepareValue($value, $this->isNumeric($blueprintArray[$elementKey][$componentKey]))
                         );
+
                         continue;
                     }
 
                     $elements->addValue($elementKey, self::SEG_UNKOWN_KEY_PREFIX . "-$componentPosition", $this->prepareValue($value));
                 }
+
                 continue;
             }
 
@@ -138,17 +140,20 @@ final class SeglineParser
                 }
                 $partialString .= $char;
                 $escapeChar = false;
+
                 continue;
             }
 
             if ($char === $this->unaSegment->escapeCharacter()) {
                 $escapeChar = true;
+
                 continue;
             }
 
             if ($char === $pattern) {
                 $explodedString[] = $partialString;
                 $partialString = '';
+
                 continue;
             }
 

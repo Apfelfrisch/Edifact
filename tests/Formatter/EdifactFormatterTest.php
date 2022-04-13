@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact\Test\Formatte;
 
@@ -66,7 +66,8 @@ final class EdifactFormatterTest extends TestCase
     {
         $unaSegment = new UnaSegment(':', '+', '.', '?', '_');
         $givenString = "test replace space char";
-        $expectedString = "test_replace_space_char" . $unaSegment->segmentTerminator();;
+        $expectedString = "test_replace_space_char" . $unaSegment->segmentTerminator();
+        ;
 
         $segment = AbstractSegmentTestSegment::fromAttributes($givenString);
 
