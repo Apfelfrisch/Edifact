@@ -6,8 +6,6 @@ on:
 
 jobs:
   static-analysis-psalm:
-    name: "Static Analysis with Psalm"
-
     runs-on: ${{ matrix.operating-system }}
 
     strategy:

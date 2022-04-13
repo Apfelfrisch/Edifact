@@ -6,8 +6,6 @@ on:
 
 jobs:
   phpunit:
-    name: "PHPUnit tests"
-
     runs-on: ${{ matrix.operating-system }}
 
     strategy:

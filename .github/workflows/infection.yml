@@ -5,9 +5,7 @@ on:
   push:
 
 jobs:
-  static-analysis-psalm:
-    name: "Mutation tests with Infection"
-
+  infection:
     runs-on: ${{ matrix.operating-system }}
 
     strategy:
