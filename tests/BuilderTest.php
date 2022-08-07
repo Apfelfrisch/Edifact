@@ -3,6 +3,7 @@
 namespace Apfelfrisch\Edifact\Test\Message;
 
 use Apfelfrisch\Edifact\Builder;
+use Apfelfrisch\Edifact\Exceptions\BuildException;
 use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Segment\SegmentFactory;
@@ -195,5 +196,20 @@ class BuilderTest extends TestCase
         unset($builder);
 
         $this->assertFalse(file_exists($tempFile));
+    }
+
+    /** @test */
+    public function test_throw_exception_when_add_a_segement_to_a_finalized_build(): void
+    {
+        $builder = new Builder;
+        $builder->writeSegments(
+            GenericSegment::fromAttributes('UNB', ['1', '2'], ['sender', '500'], ['receiver', '400'], ['210101', '1201'], ['referenz-no']),
+        );
+        $builder->get();
+
+        $this->expectException(BuildException::class);
+        $builder->writeSegments(
+            GenericSegment::fromAttributes('UNB', ['1', '2'], ['sender', '500'], ['receiver', '400'], ['210101', '1201'], ['referenz-no']),
+        );
     }
 }

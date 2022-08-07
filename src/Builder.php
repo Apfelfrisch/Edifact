@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact;
 
+use Apfelfrisch\Edifact\Exceptions\BuildException;
 use Apfelfrisch\Edifact\Formatter\EdifactFormatter;
 use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Segment\SegmentCounter;
@@ -16,7 +17,7 @@ class Builder
     private ?string $unbRef = null;
     private ?string $unhRef = null;
 
-    private bool $messageWasFetched = false;
+    private bool $buildIsFinalized = false;
 
     private Stream $stream;
     private string $filepath;
@@ -44,7 +45,7 @@ class Builder
     {
         // Delete File if build process could not finshed
         $filepath = $this->stream->getRealPath();
-        if ($this->messageWasFetched === false && $filepath && file_exists($filepath)) {
+        if ($this->buildIsFinalized === false && $filepath && file_exists($filepath)) {
             unlink($filepath);
         }
     }
@@ -56,6 +57,10 @@ class Builder
 
     public function writeSegments(SegmentInterface ...$segments): void
     {
+        if ($this->buildIsFinalized) {
+            throw BuildException::finalizedBuildNotModifiable();
+        }
+
         foreach ($segments as $segment) {
             if ($segment->name() === 'UNB') {
                 $this->unbRef = $segment->getValueFromPosition(5, 0) ?? '';
@@ -103,13 +108,9 @@ class Builder
             }
         }
 
-        $this->messageWasFetched = true;
+        $this->buildIsFinalized = true;
 
-        if (str_starts_with($this->filepath, 'php://')) {
-            return $this->stream;
-        }
-
-        return new Stream($this->filepath);
+        return $this->stream;
     }
 
     public function messageIsEmpty(): bool
