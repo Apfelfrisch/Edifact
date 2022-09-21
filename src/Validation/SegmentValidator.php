@@ -153,7 +153,6 @@ class SegmentValidator
             $blueprintComponentKeys = $blueprint->getComponentKeys($blueprintElementKey);
 
             foreach ($blueprintComponentKeys as $blueprintComponentKey) {
-
                 /** @var string $rules */
                 if (null === $rules = $blueprint->getValue($blueprintElementKey, $blueprintComponentKey)) {
                     continue;

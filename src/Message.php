@@ -142,7 +142,13 @@ class Message
                 continue;
             }
 
-            $stream->write($segLine.$this->getUnaSegment()->segmentTerminator());
+            $stream->write(
+                str_replace(
+                    $this->getUnaSegment()->segmentTerminator(),
+                    $this->getUnaSegment()->escapeCharacter().$this->getUnaSegment()->segmentTerminator(),
+                    $segLine
+                ).$this->getUnaSegment()->segmentTerminator()
+            );
 
             if ($segmentName === $trailer) {
                 yield new self($stream, $this->segmentFactory);

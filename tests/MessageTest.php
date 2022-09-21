@@ -196,11 +196,11 @@ class MessageTest extends TestCase
     /** @test */
     public function test_unwrapping_the_message_with_the_default_header_and_trailer(): void
     {
-        $message = Message::fromString("UNA:+.? 'UNH+1+ORDERS:D:96A:UN'UNT+2+1'UNH+2+ORDERS:D:96A:UN'UNT+2+2'");
+        $message = Message::fromString("UNA:+.? 'UNH+1+ORDERS:D:96A:UN'NAD+DP++++Auf m Rott?''UNT+2+1'UNH+2+ORDERS:D:96A:UN'UNT+2+2'");
 
         [$firstMessage, $secondMessage] = iterator_to_array($message->unwrap());
 
-        $this->assertSame("UNH+1+ORDERS:D:96A:UN'UNT+2+1'", $firstMessage->toString());
+        $this->assertSame("UNH+1+ORDERS:D:96A:UN'NAD+DP++++Auf m Rott?''UNT+2+1'", $firstMessage->toString());
         $this->assertSame("UNH+2+ORDERS:D:96A:UN'UNT+2+2'", $secondMessage->toString());
     }
 
