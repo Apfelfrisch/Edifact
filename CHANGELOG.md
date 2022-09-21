@@ -1,5 +1,14 @@
 # Changelog
 
+1.1.0
+ - Specify PHP version
+ - Remove Respect\Validation dependency
+ - Fix MessageCount on Validator
+ - Fix Bug on filepath when Message is in memory
+ - Mark SeglineParser::getUnaSegment as deprecated
+ - Throw Exception when adding a Segment to finalize build
+ - Fix message unwrapping when escape charcter is needed
+
 1.0
  - Remove obsolete Apfelfrisch\Edifact\Stream::setUnaSegment
  - Remove obsolete Apfelfrisch\Edifact\Segment\AbstractSegment::toString
