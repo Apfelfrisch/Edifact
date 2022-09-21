@@ -1,8 +1,11 @@
 # Changelog
 
+1.1.1
+ - Remove obsolete Respect\Validation from dependencies
+
 1.1.0
  - Specify PHP version
- - Remove Respect\Validation dependency
+ - Remove Respect\Validation from Code
  - Fix MessageCount on Validator
  - Fix Bug on filepath when Message is in memory
  - Mark SeglineParser::getUnaSegment as deprecated
