@@ -9,6 +9,6 @@
         "@default": true,
         "CastString": false
     },
-    "minMsi": 91,
-    "minCoveredMsi": 94
+    "minMsi": 92,
+    "minCoveredMsi": 96
 }
