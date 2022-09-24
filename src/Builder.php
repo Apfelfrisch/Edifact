@@ -28,7 +28,7 @@ class Builder
     {
         $this->filepath = $filepath;
 
-        $this->stream = new Stream($this->filepath, 'w', $unaSegment);
+        $this->stream = new Stream($this->filepath, 'w+', $unaSegment);
         $this->counter = new SegmentCounter;
         $this->stringFormatter = new EdifactFormatter($this->stream->getUnaSegment());
         $this->stringFormatter->prefixUna();
