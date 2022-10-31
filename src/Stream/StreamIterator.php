@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Apfelfrisch\Edifact\Stream;
 
 use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
-use Apfelfrisch\Edifact\Segment\SegmentFactory;
+use Apfelfrisch\Edifact\Segment\SegmentFactoryInterface;
 use Apfelfrisch\Edifact\Segment\SegmentInterface;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Iterator;
@@ -20,7 +20,7 @@ final class StreamIterator implements Iterator
 
     public function __construct(
         private Stream $stream,
-        private SegmentFactory $segmentFactory
+        private SegmentFactoryInterface $segmentFactory
     ) {
         $stream->rewind();
     }

@@ -6,7 +6,7 @@ namespace Apfelfrisch\Edifact\Segment;
 
 use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
 
-final class SegmentFactory
+final class SegmentFactory implements SegmentFactoryInterface
 {
     /** @psalm-var array<string, class-string<SegmentInterface>> */
     private array $segmentClasses = [];

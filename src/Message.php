@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact;
 
-use Apfelfrisch\Edifact\Segment\SegmentFactory;
+use Apfelfrisch\Edifact\Segment\SegmentFactoryInterface;
 use Apfelfrisch\Edifact\Segment\SegmentInterface;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Apfelfrisch\Edifact\Stream\Stream;
@@ -14,35 +14,40 @@ use Generator;
 
 class Message
 {
+    public static MessageFactory|null $factory = null;
+
     protected Stream $stream;
 
     protected StreamIterator $segmentIterator;
 
-    protected SegmentFactory $segmentFactory;
+    protected SegmentFactoryInterface $segmentFactory;
 
-    public function __construct(Stream $stream, ?SegmentFactory $segmentFactory = null)
+    public function __construct(Stream $stream, SegmentFactoryInterface $segmentFactory)
     {
         $this->stream = $stream;
-        $this->segmentFactory = $segmentFactory ?? SegmentFactory::fromDefault();
+        $this->segmentFactory = $segmentFactory;
         $this->segmentFactory->setUnaSegment($this->stream->getUnaSegment());
         $this->segmentIterator = new StreamIterator($this->stream, $this->segmentFactory);
     }
 
-    public static function fromFilepath(string $filepath, ?SegmentFactory $segmentFactory = null): self
+    public static function fromFilepath(string $filepath): self
     {
-        $stream = new Stream($filepath);
-
-        return new self($stream, $segmentFactory);
+        return self::getFactory()->fromFilepath($filepath);
     }
 
-    public static function fromString(
-        string $string,
-        ?SegmentFactory $segmentFactory = null,
-        string $filename = 'php://temp'
-    ): self {
-        $stream = Stream::fromString($string, $filename);
+    public static function fromString(string $string, string $filename = 'php://temp'): self
+    {
+        return self::getFactory()->fromString($string, $filename);
+    }
 
-        return new self($stream, $segmentFactory);
+    public static function fromStream(Stream $stream): self
+    {
+        return self::getFactory()->fromStream($stream);
+    }
+
+    public static function getFactory(): MessageFactory
+    {
+        return self::$factory ?? new MessageFactory;
     }
 
     public function addStreamFilter(string $filtername, mixed $params = null): self
