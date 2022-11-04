@@ -10,7 +10,7 @@ use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Segment\SegmentCounter;
 use Apfelfrisch\Edifact\Segment\SegmentInterface;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
-use Apfelfrisch\Edifact\Stream\Stream;
+use Apfelfrisch\Edifact\Segment\Iterator\Stream\Stream;
 
 class Builder
 {

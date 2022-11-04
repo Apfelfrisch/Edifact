@@ -6,7 +6,7 @@ namespace Apfelfrisch\Edifact\Formatter;
 
 use Apfelfrisch\Edifact\Segment\SegmentInterface;
 
-interface FormatterInterface
+interface Formatter
 {
     public function prefixUna(): self;
 

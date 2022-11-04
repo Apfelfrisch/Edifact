@@ -2,25 +2,26 @@
 
 declare(strict_types=1);
 
-namespace Apfelfrisch\Edifact\Stream;
+namespace Apfelfrisch\Edifact\Segment\Iterator\Stream;
 
 use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
-use Apfelfrisch\Edifact\Segment\SegmentFactoryInterface;
+use Apfelfrisch\Edifact\Segment\Iterator\SegmentIterator;
+use Apfelfrisch\Edifact\Segment\SegmentFactory;
 use Apfelfrisch\Edifact\Segment\SegmentInterface;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
-use Iterator;
+use Apfelfrisch\Edifact\Segment\Iterator\Stream\Stream;
 
 /**
  * @implements Iterator<int, SegmentInterface>
  */
-final class StreamIterator implements Iterator
+final class StreamIterator implements SegmentIterator
 {
     private int $currentSegmentNumber = 0;
     private string $segline = '';
 
     public function __construct(
         private Stream $stream,
-        private SegmentFactoryInterface $segmentFactory
+        private SegmentFactory $segmentFactory
     ) {
         $stream->rewind();
     }

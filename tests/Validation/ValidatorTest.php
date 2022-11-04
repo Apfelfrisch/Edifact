@@ -4,7 +4,6 @@ namespace Apfelfrisch\Edifact\Test\Validation;
 
 use Apfelfrisch\Edifact\Exceptions\ValidationException;
 use Apfelfrisch\Edifact\Message;
-use Apfelfrisch\Edifact\MessageFactory;
 use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Segment\SegmentFactory;
 use Apfelfrisch\Edifact\Test\Fixtures\ValidationSegment;
@@ -35,13 +34,12 @@ class ValidatorTest extends TestCase
     {
         $validator = new Validator;
 
-        Message::$factory = new MessageFactory(
-            (new SegmentFactory)->addFallback(GenericSegment::class)
-        );
+        $segmentFactory = new SegmentFactory;
+        $segmentFactory->addFallback(GenericSegment::class);
 
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('[Apfelfrisch\Edifact\Segment\GenericSegment] not validateable');
-        $validator->isValid(Message::fromString('UNH+1'));
+        $validator->isValid(Message::fromString('UNH+1', $segmentFactory));
     }
 
     /** @test */
@@ -170,12 +168,10 @@ class ValidatorTest extends TestCase
         $validator = new Validator;
 
         ValidationSegment::$ruleOne = 'O|an|3';
+        $segmentFactory = new SegmentFactory;
+        $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
-        Message::$factory = new MessageFactory(
-            (new SegmentFactory)->addSegment('UNH', ValidationSegment::class)
-        );
-
-        $message = Message::fromString('UNH');
+        $message = Message::fromString('UNH', $segmentFactory);
 
         $this->assertTrue($validator->isValid($message));
     }
@@ -186,12 +182,10 @@ class ValidatorTest extends TestCase
         $validator = new Validator;
 
         ValidationSegment::$ruleOne = 'M|an|3';
+        $segmentFactory = new SegmentFactory;
+        $segmentFactory->addSegment('UNC', ValidationSegment::class);
 
-        Message::$factory = new MessageFactory(
-            (new SegmentFactory)->addSegment('UNC', ValidationSegment::class)
-        );
-
-        $message = Message::fromString('UNC');
+        $message = Message::fromString('UNC', $segmentFactory);
 
         $this->assertFalse($validator->isValid($message));
         $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
@@ -208,11 +202,10 @@ class ValidatorTest extends TestCase
         ValidationSegment::$ruleOne = 'M|an|3';
         ValidationSegment::$ruleTwo = 'O|an|3';
 
-        Message::$factory = new MessageFactory(
-            (new SegmentFactory)->addSegment('UNH', ValidationSegment::class)
-        );
+        $segmentFactory = new SegmentFactory;
+        $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
-        $message = Message::fromString('UNH+ABC');
+        $message = Message::fromString('UNH+ABC', $segmentFactory);
 
         $this->assertTrue($validator->isValid($message));
     }
@@ -221,14 +214,13 @@ class ValidatorTest extends TestCase
     public function test_skip_empty_rules(): void
     {
         $validator = new Validator;
-        Message::$factory = new MessageFactory(
-            (new SegmentFactory)->addSegment('UNH', ValidationSegment::class)
-        );
+        $segmentFactory = new SegmentFactory;
+        $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
         // Case One: Wrong Elements
         ValidationSegment::$ruleOne = null;
         ValidationSegment::$ruleTwo = 'M|an|3';
-        $message = Message::fromString('UNH+missing-rule:ABC');
+        $message = Message::fromString('UNH+missing-rule:ABC', $segmentFactory);
         $this->assertTrue($validator->isValid($message));
     }
 
@@ -240,11 +232,10 @@ class ValidatorTest extends TestCase
         ValidationSegment::$ruleOne = 'M|an|3';
         ValidationSegment::$ruleTwo = 'M|an|3';
 
-        Message::$factory = new MessageFactory(
-            (new SegmentFactory)->addSegment('UNH', ValidationSegment::class)
-        );
+        $segmentFactory = new SegmentFactory;
+        $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
-        $message = Message::fromString('UNH+ABC');
+        $message = Message::fromString('UNH+ABC', $segmentFactory);
 
         $this->assertFalse($validator->isValid($message));
         $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
@@ -259,11 +250,10 @@ class ValidatorTest extends TestCase
         ValidationSegment::$ruleOne = 'D|an|3';
         ValidationSegment::$ruleTwo = 'O|an|3';
 
-        Message::$factory = new MessageFactory(
-            (new SegmentFactory)->addSegment('UNH', ValidationSegment::class)
-        );
+        $segmentFactory = new SegmentFactory;
+        $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
-        $message = Message::fromString('UNH');
+        $message = Message::fromString('UNH', $segmentFactory);
 
         $this->assertTrue($validator->isValid($message));
     }
@@ -276,11 +266,10 @@ class ValidatorTest extends TestCase
         ValidationSegment::$ruleOne = 'D|an|3';
         ValidationSegment::$ruleTwo = 'O|an|3';
 
-        Message::$factory = new MessageFactory(
-            (new SegmentFactory)->addSegment('UNH', ValidationSegment::class)
-        );
+        $segmentFactory = new SegmentFactory;
+        $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
-        $message = Message::fromString('UNH+:ABC');
+        $message = Message::fromString('UNH+:ABC', $segmentFactory);
 
         $this->assertFalse($validator->isValid($message));
         $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
@@ -318,10 +307,9 @@ class ValidatorTest extends TestCase
 
     private function buildMessage(string $string): Message
     {
-        Message::$factory = new MessageFactory(
-            (new SegmentFactory)->addSegment('UNH', ValidationSegment::class)
-        );
+        $segmentFactory = new SegmentFactory;
+        $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
-        return Message::fromString('UNH+' . $string);
+        return Message::fromString('UNH+' . $string, $segmentFactory);
     }
 }

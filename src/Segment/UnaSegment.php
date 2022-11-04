@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Apfelfrisch\Edifact\Segment;
 
 use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
-use Apfelfrisch\Edifact\Stream\Stream;
+use Apfelfrisch\Edifact\Segment\Iterator\Stream\Stream;
 
 final class UnaSegment
 {

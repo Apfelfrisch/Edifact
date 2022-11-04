@@ -6,7 +6,7 @@ namespace Apfelfrisch\Edifact;
 
 use Apfelfrisch\Edifact\Segment\SegmentFactory;
 use Apfelfrisch\Edifact\Segment\SegmentFactoryInterface;
-use Apfelfrisch\Edifact\Stream\Stream;
+use Apfelfrisch\Edifact\Segment\Iterator\Stream\Stream;
 
 class MessageFactory
 {

@@ -7,7 +7,7 @@ namespace Apfelfrisch\Edifact\Formatter;
 use Apfelfrisch\Edifact\Segment\SegmentInterface;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 
-final class EdifactFormatter implements FormatterInterface
+final class EdifactFormatter implements Formatter
 {
     private bool $prefixUna = false;
 

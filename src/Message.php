@@ -4,50 +4,46 @@ declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact;
 
-use Apfelfrisch\Edifact\Segment\SegmentFactoryInterface;
+use Apfelfrisch\Edifact\Segment\Iterator\SegmentIterator;
+use Apfelfrisch\Edifact\Segment\SegmentFactory;
 use Apfelfrisch\Edifact\Segment\SegmentInterface;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
-use Apfelfrisch\Edifact\Stream\Stream;
-use Apfelfrisch\Edifact\Stream\StreamIterator;
+use Apfelfrisch\Edifact\Segment\Iterator\Stream\Stream;
+use Apfelfrisch\Edifact\Segment\Iterator\Stream\StreamIterator;
 use Closure;
 use Generator;
 
 class Message
 {
-    public static MessageFactory|null $factory = null;
-
     protected Stream $stream;
 
     protected StreamIterator $segmentIterator;
 
-    protected SegmentFactoryInterface $segmentFactory;
+    protected SegmentFactory $segmentFactory;
 
-    public function __construct(Stream $stream, SegmentFactoryInterface $segmentFactory)
+    public function __construct(Stream $stream, ?SegmentFactory $segmentFactory = null)
     {
         $this->stream = $stream;
-        $this->segmentFactory = $segmentFactory;
+        $this->segmentFactory = $segmentFactory ?? SegmentFactory::fromDefault();
         $this->segmentFactory->setUnaSegment($this->stream->getUnaSegment());
         $this->segmentIterator = new StreamIterator($this->stream, $this->segmentFactory);
     }
 
-    public static function fromFilepath(string $filepath): self
+    public static function fromFilepath(string $filepath, ?SegmentFactory $segmentFactory = null): self
     {
-        return self::getFactory()->fromFilepath($filepath);
+        $stream = new Stream($filepath);
+
+        return new self($stream, $segmentFactory);
     }
 
-    public static function fromString(string $string, string $filename = 'php://temp'): self
-    {
-        return self::getFactory()->fromString($string, $filename);
-    }
+    public static function fromString(
+        string $string,
+        ?SegmentFactory $segmentFactory = null,
+        string $filename = 'php://temp'
+    ): self {
+        $stream = Stream::fromString($string, $filename);
 
-    public static function fromStream(Stream $stream): self
-    {
-        return self::getFactory()->fromStream($stream);
-    }
-
-    public static function getFactory(): MessageFactory
-    {
-        return self::$factory ?? new MessageFactory;
+        return new self($stream, $segmentFactory);
     }
 
     public function addStreamFilter(string $filtername, mixed $params = null): self
@@ -57,16 +53,7 @@ class Message
         return $this;
     }
 
-    public function getFilepath(): string|null
-    {
-        if (false !== $filepath = $this->stream->getRealPath()) {
-            return $filepath;
-        }
-
-        return null;
-    }
-
-    public function getSegments(): StreamIterator
+    public function getSegments(): SegmentIterator
     {
         $this->segmentIterator->rewind();
 
