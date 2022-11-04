@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact;
 
+use Apfelfrisch\Edifact\Formatter\EdifactFormatter;
+use Apfelfrisch\Edifact\Formatter\Formatter;
 use Apfelfrisch\Edifact\Segment\Iterator\SegmentIterator;
 use Apfelfrisch\Edifact\Segment\SegmentFactory;
 use Apfelfrisch\Edifact\Segment\SegmentInterface;
@@ -21,12 +23,15 @@ class Message
 
     protected SegmentFactory $segmentFactory;
 
+    protected Formatter $formatter;
+
     public function __construct(Stream $stream, ?SegmentFactory $segmentFactory = null)
     {
         $this->stream = $stream;
         $this->segmentFactory = $segmentFactory ?? SegmentFactory::fromDefault();
         $this->segmentFactory->setUnaSegment($this->stream->getUnaSegment());
         $this->segmentIterator = new StreamIterator($this->stream, $this->segmentFactory);
+        $this->formatter = new EdifactFormatter($this->stream->getUnaSegment());
     }
 
     public static function fromFilepath(string $filepath, ?SegmentFactory $segmentFactory = null): self
@@ -65,7 +70,7 @@ class Message
      */
     public function getAllSegments(): array
     {
-        return $this->getSegments()->getAll();
+        return iterator_to_array($this->getSegments());
     }
 
     /**
@@ -167,7 +172,7 @@ class Message
 
     public function toString(): string
     {
-        return $this->stream->toString();
+        return $this->formatter->format(...$this->getAllSegments());
     }
 
     public function __toString(): string

@@ -159,10 +159,10 @@ class MessageTest extends TestCase
     /** @test */
     public function test_using_stream_filters(): void
     {
-        $message = Message::fromString("FOO BAR");
+        $message = Message::fromString("FOO BAR'");
         $message->addStreamFilter('string.tolower');
 
-        $this->assertEquals("foo bar", (string)$message);
+        $this->assertEquals("foo bar'", (string)$message);
     }
 
     /** @test */
