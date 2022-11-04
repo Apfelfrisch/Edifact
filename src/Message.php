@@ -17,8 +17,6 @@ use Generator;
 
 class Message
 {
-    protected Stream $stream;
-
     protected SegmentIterator $segmentIterator;
 
     protected SegmentFactory $segmentFactory;
@@ -27,11 +25,10 @@ class Message
 
     public function __construct(Stream $stream, ?SegmentFactory $segmentFactory = null)
     {
-        $this->stream = $stream;
         $this->segmentFactory = $segmentFactory ?? SegmentFactory::fromDefault();
-        $this->segmentFactory->setUnaSegment($this->stream->getUnaSegment());
-        $this->segmentIterator = new StreamIterator($this->stream, $this->segmentFactory);
-        $this->formatter = new EdifactFormatter($this->stream->getUnaSegment());
+        $this->segmentFactory->setUnaSegment($stream->getUnaSegment());
+        $this->segmentIterator = new StreamIterator($stream, $this->segmentFactory);
+        $this->formatter = new EdifactFormatter($stream->getUnaSegment());
     }
 
     public static function fromFilepath(string $filepath, ?SegmentFactory $segmentFactory = null): self
