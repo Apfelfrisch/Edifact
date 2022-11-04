@@ -19,7 +19,7 @@ class Message
 {
     protected Stream $stream;
 
-    protected StreamIterator $segmentIterator;
+    protected SegmentIterator $segmentIterator;
 
     protected SegmentFactory $segmentFactory;
 
@@ -63,7 +63,7 @@ class Message
      */
     public function getAllSegments(): array
     {
-        return iterator_to_array($this->getSegments());
+        return array_values(iterator_to_array($this->getSegments()));
     }
 
     /**
@@ -150,7 +150,7 @@ class Message
 
     public function getUnaSegment(): UnaSegment
     {
-        return $this->stream->getUnaSegment();
+        return $this->segmentIterator->getUnaSegment();
     }
 
     /**

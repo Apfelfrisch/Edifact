@@ -26,13 +26,9 @@ final class StreamIterator implements SegmentIterator
         $stream->rewind();
     }
 
-    /**
-     * @psalm-return list<SegmentInterface>
-     */
-    public function getAll(): array
+    public function getUnaSegment(): UnaSegment
     {
-        /** @var list<SegmentInterface> */
-        return iterator_to_array($this);
+        return $this->stream->getUnaSegment();
     }
 
     public function currentSegline(): string
