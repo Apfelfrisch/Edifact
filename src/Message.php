@@ -17,25 +17,20 @@ use Generator;
 
 class Message
 {
-    protected SegmentIterator $segmentIterator;
-
-    protected SegmentFactory $segmentFactory;
-
-    protected Formatter $formatter;
-
-    public function __construct(Stream $stream, ?SegmentFactory $segmentFactory = null)
-    {
-        $this->segmentFactory = $segmentFactory ?? SegmentFactory::fromDefault();
-        $this->segmentFactory->setUnaSegment($stream->getUnaSegment());
-        $this->segmentIterator = new StreamIterator($stream, $this->segmentFactory);
-        $this->formatter = new EdifactFormatter($stream->getUnaSegment());
+    public function __construct(
+        protected SegmentIterator $segmentIterator,
+        protected Formatter $formatter,
+    ) {
     }
 
     public static function fromFilepath(string $filepath, ?SegmentFactory $segmentFactory = null): self
     {
         $stream = new Stream($filepath);
 
-        return new self($stream, $segmentFactory);
+        $segmentFactory = $segmentFactory ?? SegmentFactory::fromDefault();
+        $segmentFactory->setUnaSegment($stream->getUnaSegment());
+
+        return new self(new StreamIterator($stream, $segmentFactory), new EdifactFormatter($stream->getUnaSegment()));
     }
 
     public static function fromString(
@@ -45,7 +40,10 @@ class Message
     ): self {
         $stream = Stream::fromString($string, $filename);
 
-        return new self($stream, $segmentFactory);
+        $segmentFactory = $segmentFactory ?? SegmentFactory::fromDefault();
+        $segmentFactory->setUnaSegment($stream->getUnaSegment());
+
+        return new self(new StreamIterator($stream, $segmentFactory), new EdifactFormatter($stream->getUnaSegment()));
     }
 
     public function getSegments(): SegmentIterator
@@ -109,41 +107,41 @@ class Message
     /**
      * @psalm-return Generator<self>
      */
-    public function unwrap(string $header = 'UNH', string $trailer = 'UNT'): Generator
-    {
-        $this->segmentIterator->rewind();
+    // public function unwrap(string $header = 'UNH', string $trailer = 'UNT'): Generator
+    // {
+    //     $this->segmentIterator->rewind();
 
-        $stream = null;
+    //     $stream = null;
 
-        while ($this->segmentIterator->valid()) {
-            $segLine = $this->segmentIterator->currentSegline();
-            $this->segmentIterator->next();
+    //     while ($this->segmentIterator->valid()) {
+    //         $segLine = $this->segmentIterator->currentSegline();
+    //         $this->segmentIterator->next();
 
-            $segmentName = substr($segLine, 0, 3);
+    //         $segmentName = substr($segLine, 0, 3);
 
-            if ($segmentName === $header) {
-                $stream = new Stream('php://temp', 'w+', $this->getUnaSegment());
-            }
+    //         if ($segmentName === $header) {
+    //             $stream = new Stream('php://temp', 'w+', $this->getUnaSegment());
+    //         }
 
-            if ($stream === null) {
-                continue;
-            }
+    //         if ($stream === null) {
+    //             continue;
+    //         }
 
-            $stream->write(
-                str_replace(
-                    $this->getUnaSegment()->segmentTerminator(),
-                    $this->getUnaSegment()->escapeCharacter().$this->getUnaSegment()->segmentTerminator(),
-                    $segLine
-                ).$this->getUnaSegment()->segmentTerminator()
-            );
+    //         $stream->write(
+    //             str_replace(
+    //                 $this->getUnaSegment()->segmentTerminator(),
+    //                 $this->getUnaSegment()->escapeCharacter().$this->getUnaSegment()->segmentTerminator(),
+    //                 $segLine
+    //             ).$this->getUnaSegment()->segmentTerminator()
+    //         );
 
-            if ($segmentName === $trailer) {
-                yield new self($stream, $this->segmentFactory);
+    //         if ($segmentName === $trailer) {
+    //             yield new self($stream, $this->segmentFactory);
 
-                $stream = null;
-            }
-        }
-    }
+    //             $stream = null;
+    //         }
+    //     }
+    // }
 
     public function getUnaSegment(): UnaSegment
     {
