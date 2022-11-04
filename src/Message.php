@@ -51,13 +51,6 @@ class Message
         return new self($stream, $segmentFactory);
     }
 
-    public function addStreamFilter(string $filtername, mixed $params = null): self
-    {
-        $this->stream->addReadFilter($filtername, $params);
-
-        return $this;
-    }
-
     public function getSegments(): SegmentIterator
     {
         $this->segmentIterator->rewind();
