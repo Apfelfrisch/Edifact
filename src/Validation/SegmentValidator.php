@@ -8,7 +8,7 @@ use Iterator;
 
 class SegmentValidator
 {
-    /** @psalm-var array<string, string> */
+    /** @var array<string, string> */
     private array $messages = [
         Failure::UNKOWN_ELEMENT => 'The input Element is unkown',
         Failure::UNKOWN_COMPONENT => 'The input Component is unkown',
@@ -27,7 +27,7 @@ class SegmentValidator
         $this->valueValidator = new ValueValidator;
     }
 
-    /** @psalm-return Iterator<Failure> */
+    /** @return Iterator<Failure> */
     public function validate(Elements $blueprint, Elements $data): Iterator
     {
         $this->segname = $data->getName();
@@ -64,7 +64,7 @@ class SegmentValidator
     }
 
     /**
-     * @psalm-return Iterator<Failure>
+     * @return Iterator<Failure>
      */
     private function validateValue(string|null $value, string $rules, string $elementKey, string $componentKey): Iterator
     {
@@ -88,7 +88,7 @@ class SegmentValidator
     }
 
     /**
-     * @psalm-return Iterator<Failure>
+     * @return Iterator<Failure>
      */
     private function validateUnkownParts(Elements $blueprint, string $elementKey, string $componentKey, string|null $value): Iterator
     {
@@ -114,9 +114,9 @@ class SegmentValidator
     }
 
     /**
-     * @psalm-param list<string> $blueprintElementKeys
+     * @param list<string> $blueprintElementKeys
      *
-     * @psalm-return Iterator<Failure>
+     * @return Iterator<Failure>
      */
     private function validateMissingComponents(Elements $blueprint, array $blueprintElementKeys): Iterator
     {
@@ -140,9 +140,9 @@ class SegmentValidator
     }
 
     /**
-     * @psalm-param list<string> $blueprintElementKeys
+     * @param list<string> $blueprintElementKeys
      *
-     * @psalm-return Iterator<Failure>
+     * @return Iterator<Failure>
      **/
     private function validateMissingElements(Elements $blueprint, array $blueprintElementKeys): Iterator
     {

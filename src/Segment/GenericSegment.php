@@ -12,7 +12,7 @@ class GenericSegment implements Segment
     }
 
     /**
-     * @psalm-param list<list<string>> $valueArrays
+     * @param list<string> $valueArrays
      */
     public static function fromAttributes(string $name, array ...$valueArrays): self
     {
@@ -59,7 +59,7 @@ class GenericSegment implements Segment
     }
 
     /**
-     * @psalm-return array<string, array<string, string|null>>
+     * @return array<string, array<string, string|null>>
      */
     public function toArray(): array
     {

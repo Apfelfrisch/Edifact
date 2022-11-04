@@ -69,7 +69,7 @@ final class SeglineParserTest extends TestCase
     }
 
     /**
-     * @psalm-return iterable<string, array{string: string, result: string}>
+     * @return iterable<string, array{string: string, result: string}>
      */
     public function seglineStringProviderForStringEscaping(): iterable
     {
@@ -90,7 +90,7 @@ final class SeglineParserTest extends TestCase
     }
 
     /**
-     * @psalm-return iterable<string, array{string: string, elements: Elements, result: string}>
+     * @return iterable<string, array{string: string, elements: Elements, result: string}>
      */
     public function seglineStringProviderForBlueprintParsing(): iterable
     {

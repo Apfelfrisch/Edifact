@@ -6,7 +6,7 @@ final class Elements
 {
     private ?string $name = null;
 
-    /** @psalm-var array<string, array<string, string|null>> */
+    /** @var array<string, array<string, string|null>> */
     private array $elements = [];
 
     public function addValue(string $elementKey, string $componentKey, ?string $value): self
@@ -34,7 +34,7 @@ final class Elements
     }
 
     /**
-     * @psalm-return array<string, string|null>
+     * @return array<string, string|null>
      */
     public function getElement(string $elementKey): array
     {
@@ -42,7 +42,7 @@ final class Elements
     }
 
     /**
-     * @psalm-return list<string>
+     * @return list<string>
      */
     public function getElementKeys(): array
     {
@@ -55,7 +55,7 @@ final class Elements
     }
 
     /**
-     * @psalm-return list<string>
+     * @return list<string>
      */
     public function getComponentKeys(string $elementKey): array
     {
@@ -68,7 +68,7 @@ final class Elements
     }
 
     /**
-     * @psalm-return array<string, array<string, string|null>>
+     * @return array<string, array<string, string|null>>
      */
     public function toArray(): array
     {

@@ -12,7 +12,7 @@ use Throwable;
 
 final class Stream extends SplFileInfo
 {
-    /* @var array<string, array<resource>> */
+    /** @var array<string, array<resource>> */
     private array $filters = [];
 
     /** @var resource */
@@ -92,14 +92,16 @@ final class Stream extends SplFileInfo
         return $this->toString();
     }
 
-    public function addReadFilter(string $filter, mixed $params = null): self
+    /** @param array<mixed> $params*/
+    public function addReadFilter(string $filter, array $params = []): self
     {
         $this->addFilter($filter, STREAM_FILTER_READ, $params);
 
         return $this;
     }
 
-    public function addWriteFilter(string $filter, mixed $params = null): self
+    /** @param array<mixed> $params*/
+    public function addWriteFilter(string $filter, array $params = []): self
     {
         $this->addFilter($filter, STREAM_FILTER_WRITE, $params);
 
@@ -108,7 +110,7 @@ final class Stream extends SplFileInfo
 
     public function getContents(): string
     {
-        return trim(stream_get_contents($this->resource));
+        return trim(stream_get_contents($this->resource) ?: '');
     }
 
     public function eof(): bool
@@ -141,7 +143,8 @@ final class Stream extends SplFileInfo
         return fpassthru($this->resource);
     }
 
-    public function read(int $length): string
+    /** @param int<0, max> $length */
+    public function read(int $length): string|false
     {
         return fread($this->resource, $length);
     }
@@ -151,7 +154,8 @@ final class Stream extends SplFileInfo
         return 0 == fseek($this->resource, $offset, $whence);
     }
 
-    public function stat(): array
+    /** @return array<int|string, int>|false */
+    public function stat(): array|false
     {
         return fstat($this->resource);
     }
@@ -195,7 +199,8 @@ final class Stream extends SplFileInfo
         rewind($this->resource);
     }
 
-    private function addFilter(string $filtername, int $direction, mixed $params = null): void
+    /** @param array<mixed> $params*/
+    private function addFilter(string $filtername, int $direction, array $params): void
     {
         $res = @stream_filter_append($this->resource, $filtername, $direction, $params);
 
@@ -203,7 +208,7 @@ final class Stream extends SplFileInfo
             throw InvalidStreamException::filterError($filtername);
         }
 
-        /** @psalm-suppress MixedArrayAssignment */
+        /** @suppress MixedArrayAssignment */
         $this->filters[$filtername][] = $res;
     }
 

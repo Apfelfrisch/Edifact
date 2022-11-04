@@ -13,12 +13,6 @@ final class SeglineParser
         $this->unaSegment = $unaSegment ?? UnaSegment::getDefault();
     }
 
-    /** @deprecated */
-    public function getUnaSegment(): UnaSegment
-    {
-        return $this->unaSegment;
-    }
-
     public function parseToBlueprint(string $segline, Elements $blueprint): Elements
     {
         $blueprintArray = $blueprint->toArray();
@@ -113,6 +107,8 @@ final class SeglineParser
     }
 
     /**
+     * @psalm-param non-empty-string $pattern
+     *
      * @return array<int, string>
      */
     private function explodeString(string $string, string $pattern): array

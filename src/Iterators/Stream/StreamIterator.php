@@ -10,9 +10,6 @@ use Apfelfrisch\Edifact\Segment\SegmentFactory;
 use Apfelfrisch\Edifact\Segment\SegmentIterator;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 
-/**
- * @implements Iterator<int, Segment>
- */
 final class StreamIterator implements SegmentIterator
 {
     private int $currentSegmentNumber = 0;

@@ -13,7 +13,7 @@ class SegmentFactoryTest extends TestCase
     /** @test */
     public function test_instanciate_the_segment_from_segment_string(): void
     {
-        /** @psalm-var class-string */
+        /** @var class-string */
         $segmentClass = Unh::class;
 
         $segFactory = (new ConcreteSegmentFactory)->addSegment('UNH', Unh::class);
@@ -25,7 +25,7 @@ class SegmentFactoryTest extends TestCase
     /** @test */
     public function test_using_always_upper_case_as_segment_key(): void
     {
-        /** @psalm-var class-string */
+        /** @var class-string */
         $segmentClass = Unh::class;
 
         $segFactory = (new ConcreteSegmentFactory)->addSegment('unh', Unh::class);

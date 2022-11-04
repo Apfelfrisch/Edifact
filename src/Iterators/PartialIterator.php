@@ -11,17 +11,14 @@ use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Iterator;
 use LimitIterator;
 
-/**
- * @implements Iterator<int, Segment>
- */
 final class PartialIterator implements SegmentIterator
 {
     private int $currentSegmentNumber = 0;
 
-    /** @psalm-var LimitIterator<int, Segment> */
+    /** @var LimitIterator<int, Segment, Iterator<int, Segment>> */
     private LimitIterator $segementIterator;
 
-    /** @psalm-param Iterator<int, Segment> $segementIterator */
+    /** @param Iterator<int, Segment> $segementIterator */
     public function __construct(
         private UnaSegment $unaSegment,
         Iterator $segementIterator,

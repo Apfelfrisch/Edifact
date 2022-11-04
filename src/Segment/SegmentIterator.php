@@ -6,9 +6,7 @@ namespace Apfelfrisch\Edifact\Segment;
 
 use Iterator;
 
-/**
- * @implements Iterator<int, Segment>
- */
+/** @extends Iterator<int, Segment> */
 interface SegmentIterator extends Iterator
 {
     public function getUnaSegment(): UnaSegment;

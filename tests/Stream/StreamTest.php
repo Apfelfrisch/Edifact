@@ -146,7 +146,7 @@ class StreamTest extends TestCase
     public function test_write_filter(): void
     {
         $stream = new Stream('php://temp', 'w+');
-        $stream->addWriteFilter('string.toupper', STREAM_FILTER_WRITE);
+        $stream->addWriteFilter('string.toupper', [STREAM_FILTER_WRITE]);
         $stream->write('foo bar');
         $stream->rewind();
         $this->assertEquals('FOO BAR', $stream->getContents());

@@ -6,6 +6,7 @@ namespace Apfelfrisch\Edifact\Segment;
 
 use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
 use Apfelfrisch\Edifact\Iterators\Stream\Stream;
+use Webmozart\Assert\Assert;
 
 final class UnaSegment
 {
@@ -25,6 +26,11 @@ final class UnaSegment
         private string $spaceCharacter = ' ',
         private string $segmentTerminator = '\''
     ) {
+        Assert::stringNotEmpty($componentSeparator);
+        Assert::stringNotEmpty($elementSeparator);
+        Assert::stringNotEmpty($decimalPoint);
+        Assert::stringNotEmpty($escapeCharacter);
+        Assert::stringNotEmpty($segmentTerminator);
     }
 
     public static function setFromStream(Stream $stream, ?self $fallback = null): self
@@ -32,7 +38,7 @@ final class UnaSegment
         $position = $stream->tell();
         $stream->rewind();
 
-        $instance = self::setFromString($stream->read(9), $fallback);
+        $instance = self::setFromString($stream->read(9) ?: '', $fallback);
 
         $stream->seek($position);
 
@@ -78,33 +84,45 @@ final class UnaSegment
         return $this->spaceCharacter() === self::PHP_SPACE;
     }
 
+    /** @phpstan-return non-empty-string */
     public function componentSeparator(): string
     {
+        /** @var non-empty-string */
         return $this->componentSeparator;
     }
 
+    /** @phpstan-return non-empty-string */
     public function elementSeparator(): string
     {
+        /** @var non-empty-string */
         return $this->elementSeparator;
     }
 
+    /** @phpstan-return non-empty-string */
     public function decimalPoint(): string
     {
+        /** @var non-empty-string */
         return $this->decimalPoint;
     }
 
+    /** @phpstan-return non-empty-string */
     public function escapeCharacter(): string
     {
+        /** @var non-empty-string */
         return $this->escapeCharacter;
     }
 
+    /** @phpstan-return non-empty-string */
     public function spaceCharacter(): string
     {
+        /** @var non-empty-string */
         return $this->spaceCharacter;
     }
 
+    /** @phpstan-return non-empty-string */
     public function segmentTerminator(): string
     {
+        /** @var non-empty-string */
         return $this->segmentTerminator;
     }
 

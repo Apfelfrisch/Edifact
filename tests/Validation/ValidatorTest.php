@@ -4,8 +4,7 @@ namespace Apfelfrisch\Edifact\Test\Validation;
 
 use Apfelfrisch\Edifact\Exceptions\ValidationException;
 use Apfelfrisch\Edifact\Message;
-use Apfelfrisch\Edifact\Iterators\Stream\StreamMessageFactory;
-use Apfelfrisch\Edifact\Segment\ConcreteSegmentFactory;
+use Apfelfrisch\Edifact\StreamMessageFactory;
 use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Test\Fixtures\ValidationSegment;
 use Apfelfrisch\Edifact\Test\TestCase;
@@ -35,7 +34,7 @@ class ValidatorTest extends TestCase
     {
         $validator = new Validator;
 
-        $segmentFactory = new ConcreteSegmentFactory;
+        $segmentFactory = new StreamMessageFactory;
         $segmentFactory->addFallback(GenericSegment::class);
 
         $this->expectException(ValidationException::class);
@@ -169,7 +168,7 @@ class ValidatorTest extends TestCase
         $validator = new Validator;
 
         ValidationSegment::$ruleOne = 'O|an|3';
-        $segmentFactory = new ConcreteSegmentFactory;
+        $segmentFactory = new StreamMessageFactory;
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
         $this->assertTrue($validator->isValid($this->buildMessage("UNH", $segmentFactory)));
@@ -181,7 +180,7 @@ class ValidatorTest extends TestCase
         $validator = new Validator;
 
         ValidationSegment::$ruleOne = 'M|an|3';
-        $segmentFactory = new ConcreteSegmentFactory;
+        $segmentFactory = new StreamMessageFactory;
         $segmentFactory->addSegment('UNC', ValidationSegment::class);
 
         $message = $this->buildMessage("UNC'", $segmentFactory);
@@ -201,7 +200,7 @@ class ValidatorTest extends TestCase
         ValidationSegment::$ruleOne = 'M|an|3';
         ValidationSegment::$ruleTwo = 'O|an|3';
 
-        $segmentFactory = new ConcreteSegmentFactory;
+        $segmentFactory = new StreamMessageFactory;
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
         $this->assertTrue($validator->isValid($this->buildMessage("UNH+ABC'", $segmentFactory)));
@@ -211,7 +210,7 @@ class ValidatorTest extends TestCase
     public function test_skip_empty_rules(): void
     {
         $validator = new Validator;
-        $segmentFactory = new ConcreteSegmentFactory;
+        $segmentFactory = new StreamMessageFactory;
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
         // Case One: Wrong Elements
@@ -229,7 +228,7 @@ class ValidatorTest extends TestCase
         ValidationSegment::$ruleOne = 'M|an|3';
         ValidationSegment::$ruleTwo = 'M|an|3';
 
-        $segmentFactory = new ConcreteSegmentFactory;
+        $segmentFactory = new StreamMessageFactory;
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
         $this->assertFalse($validator->isValid($this->buildMessage("UNH+ABC'", $segmentFactory)));
@@ -259,7 +258,7 @@ class ValidatorTest extends TestCase
         ValidationSegment::$ruleOne = 'D|an|3';
         ValidationSegment::$ruleTwo = 'O|an|3';
 
-        $segmentFactory = new ConcreteSegmentFactory;
+        $segmentFactory = new StreamMessageFactory;
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
         $message = $this->buildMessage("UNH+:ABC");
@@ -298,13 +297,13 @@ class ValidatorTest extends TestCase
         $this->assertSame(2, $i);
     }
 
-    private function buildMessage(string $string, ConcreteSegmentFactory|null $segmentFactory = null): Message
+    private function buildMessage(string $string, StreamMessageFactory|null $segmentFactory = null): Message
     {
         if ($segmentFactory === null) {
-            $segmentFactory = new ConcreteSegmentFactory;
+            $segmentFactory = new StreamMessageFactory;
             $segmentFactory->addSegment('UNH', ValidationSegment::class);
         }
 
-        return (new StreamMessageFactory($segmentFactory))->fromString($string);
+        return $segmentFactory->fromString($string);
     }
 }

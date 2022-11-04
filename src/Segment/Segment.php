@@ -16,6 +16,6 @@ interface Segment
 
     public function isValueNumeric(string $elementKey, string $componentKey): bool;
 
-    /** @psalm-return array<string, array<string, string|null>> */
+    /** @return array<string, array<string, string|null>> */
     public function toArray(): array;
 }

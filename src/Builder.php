@@ -34,7 +34,8 @@ class Builder
         $this->stringFormatter->prefixUna();
     }
 
-    public function addStreamFilter(string $filtername, mixed $params = null): self
+    /** @param array<mixed> $params*/
+    public function addStreamFilter(string $filtername, array $params = []): self
     {
         $this->stream->addWriteFilter($filtername, $params);
 

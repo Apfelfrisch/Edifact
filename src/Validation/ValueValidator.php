@@ -20,7 +20,7 @@ final class ValueValidator
     public const ELEMENT_DEPENDS = 'D';
     public const ELEMENT_OPTIONAL = 'O';
 
-    /** @psalm-var array<string, string> */
+    /** @var array<string, string> */
     private array $messages = [
         Failure::VALUE_NOT_ALPHA => 'String must contain only alphabetic characters',
         Failure::VALUE_NOT_DIGIT => 'String must contain only digits',
@@ -33,7 +33,7 @@ final class ValueValidator
     private string|null $missingElementPosition = null;
 
     /**
-     * @psalm-return array<string, string>
+     * @return array<string, string>
      */
     public function validate(string|null $value, string $rules, string $elementPosition): array
     {
@@ -98,7 +98,7 @@ final class ValueValidator
     }
 
     /**
-     * @psalm-return array{string, string, int, int}
+     * @return array{string, string, int, int}
      */
     private function explodeRules(string $rules): array
     {

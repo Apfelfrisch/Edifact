@@ -4,8 +4,7 @@ namespace Apfelfrisch\Edifact\Test;
 
 use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
 use Apfelfrisch\Edifact\Message;
-use Apfelfrisch\Edifact\Iterators\Stream\StreamMessageFactory;
-use Apfelfrisch\Edifact\Segment\ConcreteSegmentFactory;
+use Apfelfrisch\Edifact\StreamMessageFactory;
 use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Segment\Segment;
 use Apfelfrisch\Edifact\Test\Fixtures\Moa;
@@ -16,7 +15,7 @@ class MessageTest extends TestCase
 {
     public function setUp(): void
     {
-        (new ConcreteSegmentFactory)
+        (new StreamMessageFactory)
             ->addSegment('UNH', Unh::class)
             ->addSegment('RFF', Rff::class)
             ->addSegment('MOA', Moa::class)
@@ -26,7 +25,7 @@ class MessageTest extends TestCase
 
     public function tearDown(): void
     {
-        (new ConcreteSegmentFactory)->markAsDefault();
+        (new StreamMessageFactory)->markAsDefault();
     }
 
     /** @test */
@@ -34,18 +33,6 @@ class MessageTest extends TestCase
     {
         $message = Message::fromFilepath(__DIR__ . '/data/edifact.txt');
         $this->assertInstanceOf(Message::class, $message);
-    }
-
-    /** @test */
-    public function test_providing_the_filepath(): void
-    {
-        $this->markTestSkipped();
-
-        $message = Message::fromFilepath(__DIR__ . '/data/edifact.txt');
-        $this->assertSame(__DIR__ . '/data/edifact.txt', $message->getFilepath());
-
-        $message = Message::fromString("UNH");
-        $this->assertNull($message->getFilepath());
     }
 
     /** @test */
@@ -162,10 +149,10 @@ class MessageTest extends TestCase
     /** @test */
     public function test_using_stream_filters(): void
     {
-        $this->markTestSkipped();
-
-        $message = Message::fromString("FOO BAR'");
-        $message->addStreamFilter('string.tolower');
+        $message = (new StreamMessageFactory)
+            ->addFallback(GenericSegment::class)
+            ->addStreamFilter('string.tolower')
+            ->fromString("FOO BAR'");
 
         $this->assertEquals("foo bar'", (string)$message);
     }

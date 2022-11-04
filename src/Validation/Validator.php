@@ -10,7 +10,8 @@ use Iterator;
 class Validator
 {
     private SegmentValidator $segmentValidator;
-    /** @psalm-var Iterator<Failure>|null */
+
+    /** @var Iterator<Failure|null>|null */
     private ?Iterator $failures = null;
 
     public function __construct()
@@ -28,7 +29,7 @@ class Validator
     /**
      * @throws ValidationException
      *
-     * @psalm-return Iterator<Failure>
+     * @return Iterator<Failure|null>
      */
     public function getFailures(): Iterator
     {
@@ -47,7 +48,7 @@ class Validator
         return $this->getFailures()->current();
     }
 
-    /** @psalm-return Iterator<Failure> */
+    /** @return Iterator<Failure|null> */
     private function validate(Message $message): Iterator
     {
         $counter = new SegmentCounter;

@@ -22,7 +22,7 @@ abstract class AbstractSegment implements Segment, Validateable
         return new static($parser->parseToBlueprint($segLine, static::blueprint()));
     }
 
-    /** @psalm-return Iterator<\Apfelfrisch\Edifact\Validation\Failure> */
+    /** @return Iterator<\Apfelfrisch\Edifact\Validation\Failure> */
     public function validate(SegmentValidator $segmentValidator): Iterator
     {
         return $segmentValidator->validate(static::blueprint(), $this->elements);
@@ -51,7 +51,7 @@ abstract class AbstractSegment implements Segment, Validateable
     }
 
     /**
-     * @psalm-return array<string, array<string, string|null>>
+     * @return array<string, array<string, string|null>>
      */
     public function toArray(): array
     {

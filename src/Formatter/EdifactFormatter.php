@@ -36,7 +36,6 @@ final class EdifactFormatter implements Formatter
             $segmentString = '';
             foreach ($segment->toArray() as $elementKey => $element) {
                 foreach ($element as $componentKey => $value) {
-                    /** @psalm-suppress RedundantCastGivenDocblockType: Php autocasts to integer */
                     $segmentString .= $this->buildComponent($value, $segment, (string)$elementKey, (string)$componentKey);
                 }
 

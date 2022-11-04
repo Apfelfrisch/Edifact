@@ -6,7 +6,7 @@ namespace Apfelfrisch\Edifact;
 
 use Apfelfrisch\Edifact\Formatter\Formatter;
 use Apfelfrisch\Edifact\Iterators\PartialIterator;
-use Apfelfrisch\Edifact\Iterators\Stream\StreamMessageFactory;
+use Apfelfrisch\Edifact\StreamMessageFactory;
 use Apfelfrisch\Edifact\Segment\Segment;
 use Apfelfrisch\Edifact\Segment\SegmentIterator;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
@@ -15,7 +15,7 @@ use Generator;
 
 class Message
 {
-    private static MessageFactory|null $factory;
+    protected static MessageFactory|null $factory;
 
     public function __construct(
         protected SegmentIterator $segmentIterator,
@@ -23,7 +23,7 @@ class Message
     ) {
     }
 
-    public static function setFactory(MessageFactory $factory)
+    public static function setFactory(MessageFactory $factory): void
     {
         self::$factory = $factory;
     }
@@ -51,7 +51,7 @@ class Message
     }
 
     /**
-     * @psalm-return list<Segment>
+     * @phpstan-return list<Segment>
      */
     public function getAllSegments(): array
     {
@@ -60,9 +60,9 @@ class Message
 
     /**
      * @template T of Segment
-     * @psalm-param class-string<T> $segmentClass
-     * @psalm-suppress InvalidReturnType
-     * @psalm-return Generator<int, T, mixed, void>
+     * @param class-string<T> $segmentClass
+     *
+     * @phpstan-return Generator<int, T, null, void>
      */
     public function filterSegments(string $segmentClass, ?Closure $closure = null): Generator
     {
@@ -70,6 +70,8 @@ class Message
             if ($segment::class !== $segmentClass) {
                 continue;
             }
+
+            /** @var T $segment */
             if ($closure === null || $closure($segment) === true) {
                 yield $segment;
             }
@@ -78,8 +80,8 @@ class Message
 
     /**
      * @template T of Segment
-     * @psalm-param class-string<T> $segmentClass
-     * @psalm-return list<T>
+     * @phpstan-param class-string<T> $segmentClass
+     * @phpstan-return list<T>
      */
     public function filterAllSegments(string $segmentClass, ?Closure $closure = null): array
     {
@@ -89,8 +91,8 @@ class Message
 
     /**
      * @template T of Segment
-     * @psalm-param class-string<T> $segmentClass
-     * @psalm-return T|null
+     * @phpstan-param class-string<T> $segmentClass
+     * @phpstan-return T|null
      */
     public function findFirstSegment(string $segmentClass, ?Closure $closure = null): ?Segment
     {
@@ -102,7 +104,7 @@ class Message
     }
 
     /**
-     * @psalm-return Generator<self>
+     * @return Generator<self>
      */
     public function unwrap(string $header = 'UNH', string $trailer = 'UNT'): Generator
     {
@@ -132,7 +134,7 @@ class Message
     }
 
     /**
-     * @psalm-return list<array<string, array<string, string|null>>>
+     * @return list<array<string, array<string, string|null>>>
      */
     public function toArray(): array
     {

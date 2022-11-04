@@ -10,7 +10,9 @@
         "vimeo/psalm": "^4.7",
         "symfony/var-dumper": "^5.2",
         "psalm/plugin-phpunit": "^0.16.1",
-        "infection/infection": "^0.26.6"
+        "infection/infection": "^0.26.6",
+        "phpstan/phpstan": "^1.9",
+        "phpstan/phpstan-phpunit": "^1.2"
     },
     "autoload": {
         "psr-4": {
