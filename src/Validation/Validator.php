@@ -55,7 +55,7 @@ class Validator
         foreach ($message->getSegments() as $segment) {
             $counter->count($segment);
 
-            if (! ($segment instanceof ValidateableInterface)) {
+            if (! ($segment instanceof Validateable)) {
                 throw ValidationException::segmentNotValidateable($segment::class);
             }
 

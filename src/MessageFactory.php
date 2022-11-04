@@ -4,28 +4,23 @@ declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact;
 
+use Apfelfrisch\Edifact\Segment\ConcreteSegmentFactory;
 use Apfelfrisch\Edifact\Segment\SegmentFactory;
-use Apfelfrisch\Edifact\Segment\SegmentFactoryInterface;
 use Apfelfrisch\Edifact\Segment\Iterator\Stream\Stream;
 
 class MessageFactory
 {
-    private SegmentFactoryInterface $segmentFactory;
+    private SegmentFactory $segmentFactory;
 
     public function __construct(
-        SegmentFactoryInterface $segmentFactory = null
+        SegmentFactory $segmentFactory = null
     ) {
-        $this->segmentFactory = $segmentFactory ?? SegmentFactory::fromDefault();
+        $this->segmentFactory = $segmentFactory ?? ConcreteSegmentFactory::fromDefault();
     }
 
     public function fromString(string $string, string $filename = 'php://temp'): Message
     {
         return new Message(Stream::fromString($string, $filename), $this->segmentFactory);
-    }
-
-    public function fromStream(Stream $stream): Message
-    {
-        return new Message($stream, $this->segmentFactory);
     }
 
     public function fromFilepath(string $filepath): Message

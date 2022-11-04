@@ -2,7 +2,7 @@
 
 namespace Apfelfrisch\Edifact\Segment;
 
-class GenericSegment implements SegmentInterface
+class GenericSegment implements Segment
 {
     private Elements $elements;
 

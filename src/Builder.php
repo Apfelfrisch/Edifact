@@ -8,7 +8,7 @@ use Apfelfrisch\Edifact\Exceptions\BuildException;
 use Apfelfrisch\Edifact\Formatter\EdifactFormatter;
 use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Segment\SegmentCounter;
-use Apfelfrisch\Edifact\Segment\SegmentInterface;
+use Apfelfrisch\Edifact\Segment\Segment;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Apfelfrisch\Edifact\Segment\Iterator\Stream\Stream;
 
@@ -55,7 +55,7 @@ class Builder
         return $this->counter->messageCount();
     }
 
-    public function writeSegments(SegmentInterface ...$segments): void
+    public function writeSegments(Segment ...$segments): void
     {
         if ($this->buildIsFinalized) {
             throw BuildException::finalizedBuildNotModifiable();
@@ -81,7 +81,7 @@ class Builder
         }
     }
 
-    private function writeSegment(SegmentInterface $segment): void
+    private function writeSegment(Segment $segment): void
     {
         $this->stream->write(
             $this->stringFormatter->format($segment)

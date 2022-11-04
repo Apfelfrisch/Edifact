@@ -5,7 +5,7 @@ namespace Apfelfrisch\Edifact\Test\Validation;
 use Apfelfrisch\Edifact\Exceptions\ValidationException;
 use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Segment\GenericSegment;
-use Apfelfrisch\Edifact\Segment\SegmentFactory;
+use Apfelfrisch\Edifact\Segment\ConcreteSegmentFactory;
 use Apfelfrisch\Edifact\Test\Fixtures\ValidationSegment;
 use Apfelfrisch\Edifact\Test\TestCase;
 use Apfelfrisch\Edifact\Validation\Failure;
@@ -34,7 +34,7 @@ class ValidatorTest extends TestCase
     {
         $validator = new Validator;
 
-        $segmentFactory = new SegmentFactory;
+        $segmentFactory = new ConcreteSegmentFactory;
         $segmentFactory->addFallback(GenericSegment::class);
 
         $this->expectException(ValidationException::class);
@@ -168,7 +168,7 @@ class ValidatorTest extends TestCase
         $validator = new Validator;
 
         ValidationSegment::$ruleOne = 'O|an|3';
-        $segmentFactory = new SegmentFactory;
+        $segmentFactory = new ConcreteSegmentFactory;
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
         $message = Message::fromString('UNH', $segmentFactory);
@@ -182,7 +182,7 @@ class ValidatorTest extends TestCase
         $validator = new Validator;
 
         ValidationSegment::$ruleOne = 'M|an|3';
-        $segmentFactory = new SegmentFactory;
+        $segmentFactory = new ConcreteSegmentFactory;
         $segmentFactory->addSegment('UNC', ValidationSegment::class);
 
         $message = Message::fromString('UNC', $segmentFactory);
@@ -202,7 +202,7 @@ class ValidatorTest extends TestCase
         ValidationSegment::$ruleOne = 'M|an|3';
         ValidationSegment::$ruleTwo = 'O|an|3';
 
-        $segmentFactory = new SegmentFactory;
+        $segmentFactory = new ConcreteSegmentFactory;
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
         $message = Message::fromString('UNH+ABC', $segmentFactory);
@@ -214,7 +214,7 @@ class ValidatorTest extends TestCase
     public function test_skip_empty_rules(): void
     {
         $validator = new Validator;
-        $segmentFactory = new SegmentFactory;
+        $segmentFactory = new ConcreteSegmentFactory;
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
         // Case One: Wrong Elements
@@ -232,7 +232,7 @@ class ValidatorTest extends TestCase
         ValidationSegment::$ruleOne = 'M|an|3';
         ValidationSegment::$ruleTwo = 'M|an|3';
 
-        $segmentFactory = new SegmentFactory;
+        $segmentFactory = new ConcreteSegmentFactory;
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
         $message = Message::fromString('UNH+ABC', $segmentFactory);
@@ -250,7 +250,7 @@ class ValidatorTest extends TestCase
         ValidationSegment::$ruleOne = 'D|an|3';
         ValidationSegment::$ruleTwo = 'O|an|3';
 
-        $segmentFactory = new SegmentFactory;
+        $segmentFactory = new ConcreteSegmentFactory;
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
         $message = Message::fromString('UNH', $segmentFactory);
@@ -266,7 +266,7 @@ class ValidatorTest extends TestCase
         ValidationSegment::$ruleOne = 'D|an|3';
         ValidationSegment::$ruleTwo = 'O|an|3';
 
-        $segmentFactory = new SegmentFactory;
+        $segmentFactory = new ConcreteSegmentFactory;
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
         $message = Message::fromString('UNH+:ABC', $segmentFactory);
@@ -307,7 +307,7 @@ class ValidatorTest extends TestCase
 
     private function buildMessage(string $string): Message
     {
-        $segmentFactory = new SegmentFactory;
+        $segmentFactory = new ConcreteSegmentFactory;
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
         return Message::fromString('UNH+' . $string, $segmentFactory);

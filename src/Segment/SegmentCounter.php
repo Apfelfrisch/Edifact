@@ -9,7 +9,7 @@ final class SegmentCounter
     private int $unhCounter = 0;
     private int $messageCounter = 0;
 
-    public function count(SegmentInterface $segment): void
+    public function count(Segment $segment): void
     {
         if ($segment->name() === 'UNB') {
             return;

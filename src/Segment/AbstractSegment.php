@@ -3,10 +3,10 @@
 namespace Apfelfrisch\Edifact\Segment;
 
 use Apfelfrisch\Edifact\Validation\SegmentValidator;
-use Apfelfrisch\Edifact\Validation\ValidateableInterface;
+use Apfelfrisch\Edifact\Validation\Validateable;
 use Iterator;
 
-abstract class AbstractSegment implements SegmentInterface, ValidateableInterface
+abstract class AbstractSegment implements Segment, Validateable
 {
     protected Elements $elements;
 

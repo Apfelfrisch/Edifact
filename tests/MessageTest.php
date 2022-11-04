@@ -5,8 +5,8 @@ namespace Apfelfrisch\Edifact\Test;
 use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
 use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Segment\GenericSegment;
-use Apfelfrisch\Edifact\Segment\SegmentFactory;
-use Apfelfrisch\Edifact\Segment\SegmentInterface;
+use Apfelfrisch\Edifact\Segment\ConcreteSegmentFactory;
+use Apfelfrisch\Edifact\Segment\Segment;
 use Apfelfrisch\Edifact\Segment\Iterator\Stream\Stream;
 use Apfelfrisch\Edifact\Test\Fixtures\Moa;
 use Apfelfrisch\Edifact\Test\Fixtures\Rff;
@@ -18,7 +18,7 @@ class MessageTest extends TestCase
 
     public function setUp(): void
     {
-        (new SegmentFactory)
+        (new ConcreteSegmentFactory)
             ->addSegment('UNH', Unh::class)
             ->addSegment('RFF', Rff::class)
             ->addSegment('MOA', Moa::class)
@@ -106,7 +106,7 @@ class MessageTest extends TestCase
     /** @test */
     public function test_throw_an_exception_if_no_fallback_was_set_and_the_segment_is_uknown(): void
     {
-        $message = Message::fromString("UKN", new SegmentFactory);
+        $message = Message::fromString("UKN", new ConcreteSegmentFactory);
 
         $this->expectException(InvalidEdifactContentException::class);
         $message->getAllSegments();
@@ -119,7 +119,7 @@ class MessageTest extends TestCase
 
         $i = 0;
         foreach ($message->getSegments() as $segment) {
-            $this->assertInstanceOf(SegmentInterface::class, $segment);
+            $this->assertInstanceOf(Segment::class, $segment);
             $i++;
         }
         $this->assertSame(2, $i);
@@ -216,7 +216,7 @@ class MessageTest extends TestCase
 
         $this->assertCount(4, $message->getAllSegments());
         foreach ($message->getAllSegments() as $segment) {
-            $this->assertInstanceOf(SegmentInterface::class, $segment);
+            $this->assertInstanceOf(Segment::class, $segment);
         }
     }
 
@@ -225,12 +225,12 @@ class MessageTest extends TestCase
     {
         $message = Message::fromString("UNH+?:?+?''");
 
-        $this->assertInstanceOf(SegmentInterface::class, $segment = $message->findFirstSegment(Unh::class));
+        $this->assertInstanceOf(Segment::class, $segment = $message->findFirstSegment(Unh::class));
         $this->assertSame(":+'", $segment->getValueFromPosition(1, 0));
 
         $message = Message::fromString("UNA|-.! _UNH-!|!-!__");
 
-        $this->assertInstanceOf(SegmentInterface::class, $segment = $message->findFirstSegment(Unh::class));
+        $this->assertInstanceOf(Segment::class, $segment = $message->findFirstSegment(Unh::class));
         $this->assertSame("|-_", $segment->getValueFromPosition(1, 0));
     }
 }

@@ -7,8 +7,8 @@ namespace Apfelfrisch\Edifact;
 use Apfelfrisch\Edifact\Formatter\EdifactFormatter;
 use Apfelfrisch\Edifact\Formatter\Formatter;
 use Apfelfrisch\Edifact\Segment\Iterator\SegmentIterator;
-use Apfelfrisch\Edifact\Segment\SegmentFactory;
-use Apfelfrisch\Edifact\Segment\SegmentInterface;
+use Apfelfrisch\Edifact\Segment\ConcreteSegmentFactory;
+use Apfelfrisch\Edifact\Segment\Segment;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Apfelfrisch\Edifact\Segment\Iterator\Stream\Stream;
 use Apfelfrisch\Edifact\Segment\Iterator\Stream\StreamIterator;
@@ -23,11 +23,11 @@ class Message
     ) {
     }
 
-    public static function fromFilepath(string $filepath, ?SegmentFactory $segmentFactory = null): self
+    public static function fromFilepath(string $filepath, ?ConcreteSegmentFactory $segmentFactory = null): self
     {
         $stream = new Stream($filepath);
 
-        $segmentFactory = $segmentFactory ?? SegmentFactory::fromDefault();
+        $segmentFactory = $segmentFactory ?? ConcreteSegmentFactory::fromDefault();
         $segmentFactory->setUnaSegment($stream->getUnaSegment());
 
         return new self(new StreamIterator($stream, $segmentFactory), new EdifactFormatter($stream->getUnaSegment()));
@@ -35,12 +35,12 @@ class Message
 
     public static function fromString(
         string $string,
-        ?SegmentFactory $segmentFactory = null,
+        ?ConcreteSegmentFactory $segmentFactory = null,
         string $filename = 'php://temp'
     ): self {
         $stream = Stream::fromString($string, $filename);
 
-        $segmentFactory = $segmentFactory ?? SegmentFactory::fromDefault();
+        $segmentFactory = $segmentFactory ?? ConcreteSegmentFactory::fromDefault();
         $segmentFactory->setUnaSegment($stream->getUnaSegment());
 
         return new self(new StreamIterator($stream, $segmentFactory), new EdifactFormatter($stream->getUnaSegment()));
@@ -95,7 +95,7 @@ class Message
      * @psalm-param class-string<T> $segmentClass
      * @psalm-return T|null
      */
-    public function findFirstSegment(string $segmentClass, ?Closure $closure = null): ?SegmentInterface
+    public function findFirstSegment(string $segmentClass, ?Closure $closure = null): ?Segment
     {
         foreach ($this->filterSegments($segmentClass, $closure) as $segment) {
             return $segment;
@@ -153,7 +153,7 @@ class Message
      */
     public function toArray(): array
     {
-        return array_map(function (SegmentInterface $segment): array {
+        return array_map(function (Segment $segment): array {
             return $segment->toArray();
         }, $this->getAllSegments());
     }

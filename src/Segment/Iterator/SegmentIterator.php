@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact\Segment\Iterator;
 
-use Apfelfrisch\Edifact\Segment\SegmentInterface;
+use Apfelfrisch\Edifact\Segment\Segment;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Iterator;
 
@@ -14,5 +14,5 @@ interface SegmentIterator extends Iterator
 
     public function currentSegline(): string;
 
-    public function current(): SegmentInterface;
+    public function current(): Segment;
 }

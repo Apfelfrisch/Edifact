@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact\Formatter;
 
-use Apfelfrisch\Edifact\Segment\SegmentInterface;
+use Apfelfrisch\Edifact\Segment\Segment;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 
 final class EdifactFormatter implements Formatter
@@ -23,7 +23,7 @@ final class EdifactFormatter implements Formatter
         return $this;
     }
 
-    public function format(SegmentInterface ...$segments): string
+    public function format(Segment ...$segments): string
     {
         $string = '';
 
@@ -51,7 +51,7 @@ final class EdifactFormatter implements Formatter
         return $string;
     }
 
-    private function buildComponent(string|null $value, SegmentInterface $segment, string $elementKey, string $componentKey): string
+    private function buildComponent(string|null $value, Segment $segment, string $elementKey, string $componentKey): string
     {
         if ($value === null) {
             return $this->unaSegment->componentSeparator();

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact\Segment;
 
-interface SegmentInterface
+interface Segment
 {
     public static function fromSegLine(SeglineParser $parser, string $segLine): self|static;
 
