@@ -6,6 +6,7 @@ use Apfelfrisch\Edifact\Exceptions\ValidationException;
 use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Segment\ConcreteSegmentFactory;
+use Apfelfrisch\Edifact\StreamMessageFactory;
 use Apfelfrisch\Edifact\Test\Fixtures\ValidationSegment;
 use Apfelfrisch\Edifact\Test\TestCase;
 use Apfelfrisch\Edifact\Validation\Failure;
@@ -39,7 +40,7 @@ class ValidatorTest extends TestCase
 
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('[Apfelfrisch\Edifact\Segment\GenericSegment] not validateable');
-        $validator->isValid(Message::fromString('UNH+1', $segmentFactory));
+        $validator->isValid($this->buildMessage('UNH+1', $segmentFactory));
     }
 
     /** @test */
@@ -49,7 +50,7 @@ class ValidatorTest extends TestCase
 
         $validator = new Validator;
 
-        $this->assertFalse($validator->isValid($this->buildMessage('1+unkown-element:unkown-component')));
+        $this->assertFalse($validator->isValid($this->buildMessage("UNH+1+unkown-element:unkown-component'")));
 
         $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
         $this->assertSame(2, $failure->getElementPosition());
@@ -64,7 +65,7 @@ class ValidatorTest extends TestCase
 
         $validator = new Validator;
 
-        $this->assertFalse($validator->isValid($this->buildMessage('1::unkown-component')));
+        $this->assertFalse($validator->isValid($this->buildMessage("UNH+1::unkown-component'")));
 
         $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
 
@@ -82,8 +83,8 @@ class ValidatorTest extends TestCase
 
         $validator = new Validator;
 
-        $this->assertTrue($validator->isValid($this->buildMessage($digits)));
-        $this->assertFalse($validator->isValid($this->buildMessage($digits . 'A')));
+        $this->assertTrue($validator->isValid($this->buildMessage("UNH+$digits")));
+        $this->assertFalse($validator->isValid($this->buildMessage("UNH+$digits" . 'A')));
         $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
 
         $this->assertSame('UNH', $failure->getSegmentName());
@@ -103,8 +104,8 @@ class ValidatorTest extends TestCase
 
         $validator = new Validator;
 
-        $this->assertTrue($validator->isValid($this->buildMessage($alphaValues)));
-        $this->assertFalse($validator->isValid($this->buildMessage($alphaValues . '1')));
+        $this->assertTrue($validator->isValid($this->buildMessage("UNH+$alphaValues")));
+        $this->assertFalse($validator->isValid($this->buildMessage("UNH+$alphaValues" . '1')));
         $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
         $this->assertSame($alphaValues . '1', $failure->getValue());
         $this->assertSame("String must contain only alphabetic characters", $failure->getMessage());
@@ -117,9 +118,9 @@ class ValidatorTest extends TestCase
 
         $validator = new Validator;
 
-        $this->assertTrue($validator->isValid($this->buildMessage('A')));
+        $this->assertTrue($validator->isValid($this->buildMessage("UNH+A'")));
 
-        $this->assertFalse($validator->isValid($this->buildMessage('ABC')));
+        $this->assertFalse($validator->isValid($this->buildMessage("UNH+ABC'")));
         $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
         $this->assertSame('ABC', $failure->getValue());
         $this->assertSame("String is more than 2 characters long", $failure->getMessage());
@@ -132,9 +133,9 @@ class ValidatorTest extends TestCase
 
         $validator = new Validator;
 
-        $this->assertTrue($validator->isValid($this->buildMessage('A')));
+        $this->assertTrue($validator->isValid($this->buildMessage("UNH+A'")));
 
-        $this->assertFalse($validator->isValid($this->buildMessage('')));
+        $this->assertFalse($validator->isValid($this->buildMessage("UNH+")));
         $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
         $this->assertSame('', $failure->getValue());
         $this->assertSame("Component with Id [1:1] is missing", $failure->getMessage());
@@ -149,14 +150,14 @@ class ValidatorTest extends TestCase
 
         $validator = new Validator;
 
-        $this->assertTrue($validator->isValid($this->buildMessage('123')));
+        $this->assertTrue($validator->isValid($this->buildMessage("UNH+123'")));
 
-        $this->assertFalse($validator->isValid($this->buildMessage('12')));
+        $this->assertFalse($validator->isValid($this->buildMessage("UNH+12'")));
         $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
         $this->assertSame('12', $failure->getValue());
         $this->assertSame("String is not 3 characters long", $failure->getMessage());
 
-        $this->assertFalse($validator->isValid($this->buildMessage($string . '4')));
+        $this->assertFalse($validator->isValid($this->buildMessage("UNH+$string" . '4')));
         $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
         $this->assertSame($string . '4', $failure->getValue());
         $this->assertSame("String is not 3 characters long", $failure->getMessage());
@@ -171,9 +172,7 @@ class ValidatorTest extends TestCase
         $segmentFactory = new ConcreteSegmentFactory;
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
-        $message = Message::fromString('UNH', $segmentFactory);
-
-        $this->assertTrue($validator->isValid($message));
+        $this->assertTrue($validator->isValid($this->buildMessage("UNH", $segmentFactory)));
     }
 
     /** @test */
@@ -185,7 +184,7 @@ class ValidatorTest extends TestCase
         $segmentFactory = new ConcreteSegmentFactory;
         $segmentFactory->addSegment('UNC', ValidationSegment::class);
 
-        $message = Message::fromString('UNC', $segmentFactory);
+        $message = $this->buildMessage("UNC'", $segmentFactory);
 
         $this->assertFalse($validator->isValid($message));
         $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
@@ -205,9 +204,7 @@ class ValidatorTest extends TestCase
         $segmentFactory = new ConcreteSegmentFactory;
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
-        $message = Message::fromString('UNH+ABC', $segmentFactory);
-
-        $this->assertTrue($validator->isValid($message));
+        $this->assertTrue($validator->isValid($this->buildMessage("UNH+ABC'", $segmentFactory)));
     }
 
     /** @test */
@@ -220,8 +217,8 @@ class ValidatorTest extends TestCase
         // Case One: Wrong Elements
         ValidationSegment::$ruleOne = null;
         ValidationSegment::$ruleTwo = 'M|an|3';
-        $message = Message::fromString('UNH+missing-rule:ABC', $segmentFactory);
-        $this->assertTrue($validator->isValid($message));
+
+        $this->assertTrue($validator->isValid($this->buildMessage("UNH+missing-rule:ABC'", $segmentFactory)));
     }
 
     /** @test */
@@ -235,9 +232,7 @@ class ValidatorTest extends TestCase
         $segmentFactory = new ConcreteSegmentFactory;
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
-        $message = Message::fromString('UNH+ABC', $segmentFactory);
-
-        $this->assertFalse($validator->isValid($message));
+        $this->assertFalse($validator->isValid($this->buildMessage("UNH+ABC'", $segmentFactory)));
         $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
         $this->assertSame(Failure::MISSING_COMPONENT, $failure->getType());
     }
@@ -250,11 +245,9 @@ class ValidatorTest extends TestCase
         ValidationSegment::$ruleOne = 'D|an|3';
         ValidationSegment::$ruleTwo = 'O|an|3';
 
-        $segmentFactory = new ConcreteSegmentFactory;
-        $segmentFactory->addSegment('UNH', ValidationSegment::class);
+        $message = $this->buildMessage("UNH+");
 
-        $message = Message::fromString('UNH', $segmentFactory);
-
+        $this->assertTrue($validator->isValid($message));
         $this->assertTrue($validator->isValid($message));
     }
 
@@ -269,7 +262,7 @@ class ValidatorTest extends TestCase
         $segmentFactory = new ConcreteSegmentFactory;
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
-        $message = Message::fromString('UNH+:ABC', $segmentFactory);
+        $message = $this->buildMessage("UNH+:ABC");
 
         $this->assertFalse($validator->isValid($message));
         $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
@@ -283,8 +276,8 @@ class ValidatorTest extends TestCase
 
         $validator = new Validator;
 
-        $this->assertTrue($validator->isValid($this->buildMessage('')));
-        $this->assertFalse($validator->isValid($this->buildMessage('1234')));
+        $this->assertTrue($validator->isValid($this->buildMessage("UNH")));
+        $this->assertFalse($validator->isValid($this->buildMessage("UNH+1234'")));
     }
 
     /** @test */
@@ -294,7 +287,7 @@ class ValidatorTest extends TestCase
 
         $validator = new Validator;
 
-        $this->assertFalse($validator->isValid($this->buildMessage('AB')));
+        $this->assertFalse($validator->isValid($this->buildMessage("UNH+AB'")));
 
         $i = 0;
         foreach ($validator->getFailures() as $failure) {
@@ -305,11 +298,13 @@ class ValidatorTest extends TestCase
         $this->assertSame(2, $i);
     }
 
-    private function buildMessage(string $string): Message
+    private function buildMessage(string $string, ConcreteSegmentFactory|null $segmentFactory = null): Message
     {
-        $segmentFactory = new ConcreteSegmentFactory;
-        $segmentFactory->addSegment('UNH', ValidationSegment::class);
+        if ($segmentFactory === null) {
+            $segmentFactory = new ConcreteSegmentFactory;
+            $segmentFactory->addSegment('UNH', ValidationSegment::class);
+        }
 
-        return Message::fromString('UNH+' . $string, $segmentFactory);
+        return (new StreamMessageFactory($segmentFactory))->fromString($string);
     }
 }

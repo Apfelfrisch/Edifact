@@ -7,15 +7,13 @@ use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Segment\ConcreteSegmentFactory;
 use Apfelfrisch\Edifact\Segment\Segment;
-use Apfelfrisch\Edifact\Segment\Iterator\Stream\Stream;
+use Apfelfrisch\Edifact\StreamMessageFactory;
 use Apfelfrisch\Edifact\Test\Fixtures\Moa;
 use Apfelfrisch\Edifact\Test\Fixtures\Rff;
 use Apfelfrisch\Edifact\Test\Fixtures\Unh;
 
 class MessageTest extends TestCase
 {
-    private Message $message;
-
     public function setUp(): void
     {
         (new ConcreteSegmentFactory)
@@ -24,6 +22,11 @@ class MessageTest extends TestCase
             ->addSegment('MOA', Moa::class)
             ->addFallback(GenericSegment::class)
             ->markAsDefault();
+    }
+
+    public function tearDown(): void
+    {
+        (new ConcreteSegmentFactory)->markAsDefault();
     }
 
     /** @test */
@@ -106,7 +109,7 @@ class MessageTest extends TestCase
     /** @test */
     public function test_throw_an_exception_if_no_fallback_was_set_and_the_segment_is_uknown(): void
     {
-        $message = Message::fromString("UKN", new ConcreteSegmentFactory);
+        $message = (new StreamMessageFactory)->fromString("UKN");
 
         $this->expectException(InvalidEdifactContentException::class);
         $message->getAllSegments();

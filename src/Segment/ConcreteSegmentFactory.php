@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace Apfelfrisch\Edifact\Segment;
 
 use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
+use Apfelfrisch\Edifact\Message;
+use Apfelfrisch\Edifact\StreamMessageFactory;
 
-final class ConcreteSegmentFactory
+final class ConcreteSegmentFactory implements SegmentFactory
 {
     /** @psalm-var array<string, class-string<SegmentInterface>> */
     private array $segmentClasses = [];
 
     /** @psalm-var class-string<SegmentInterface>|null */
     private ?string $fallback = null;
-
-    private static ?self $defaultFactory = null;
 
     private UnaSegment $unaSegment;
 
@@ -24,20 +24,6 @@ final class ConcreteSegmentFactory
     {
         $this->unaSegment = $unaSegment ?? UnaSegment::getDefault();
         $this->parser = new SeglineParser($this->unaSegment);
-    }
-
-    public static function setDefault(self $defaultFactory): void
-    {
-        self::$defaultFactory = $defaultFactory;
-    }
-
-    public static function fromDefault(): self
-    {
-        if (self::$defaultFactory === null) {
-            self::$defaultFactory = new self;
-        }
-
-        return clone(self::$defaultFactory);
     }
 
     public function setUnaSegment(UnaSegment $unaSegment): void
@@ -70,7 +56,7 @@ final class ConcreteSegmentFactory
 
     public function markAsDefault(): void
     {
-        self::setDefault($this);
+        Message::setFactory(new StreamMessageFactory($this));
     }
 
     public function build(string $segline): Segment

@@ -4,46 +4,41 @@ declare(strict_types=1);
 
 namespace Apfelfrisch\Edifact;
 
-use Apfelfrisch\Edifact\Formatter\EdifactFormatter;
 use Apfelfrisch\Edifact\Formatter\Formatter;
 use Apfelfrisch\Edifact\Segment\Iterator\SegmentIterator;
-use Apfelfrisch\Edifact\Segment\ConcreteSegmentFactory;
 use Apfelfrisch\Edifact\Segment\Segment;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
-use Apfelfrisch\Edifact\Segment\Iterator\Stream\Stream;
-use Apfelfrisch\Edifact\Segment\Iterator\Stream\StreamIterator;
 use Closure;
 use Generator;
 
 class Message
 {
+    private static MessageFactory|null $factory;
+
     public function __construct(
         protected SegmentIterator $segmentIterator,
         protected Formatter $formatter,
     ) {
     }
 
-    public static function fromFilepath(string $filepath, ?ConcreteSegmentFactory $segmentFactory = null): self
+    public static function setFactory(MessageFactory $factory)
     {
-        $stream = new Stream($filepath);
-
-        $segmentFactory = $segmentFactory ?? ConcreteSegmentFactory::fromDefault();
-        $segmentFactory->setUnaSegment($stream->getUnaSegment());
-
-        return new self(new StreamIterator($stream, $segmentFactory), new EdifactFormatter($stream->getUnaSegment()));
+        self::$factory = $factory;
     }
 
-    public static function fromString(
-        string $string,
-        ?ConcreteSegmentFactory $segmentFactory = null,
-        string $filename = 'php://temp'
-    ): self {
-        $stream = Stream::fromString($string, $filename);
+    public static function getFactory(): MessageFactory
+    {
+        return self::$factory ?? new StreamMessageFactory;
+    }
 
-        $segmentFactory = $segmentFactory ?? ConcreteSegmentFactory::fromDefault();
-        $segmentFactory->setUnaSegment($stream->getUnaSegment());
+    public static function fromFilepath(string $filepath): self
+    {
+        return self::getFactory()->fromFilepath($filepath);
+    }
 
-        return new self(new StreamIterator($stream, $segmentFactory), new EdifactFormatter($stream->getUnaSegment()));
+    public static function fromString(string $string): self
+    {
+        return self::getFactory()->fromString($string);
     }
 
     public function getSegments(): SegmentIterator
