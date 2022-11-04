@@ -2,17 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Apfelfrisch\Edifact\Segment\Iterator;
+namespace Apfelfrisch\Edifact\Segment;
 
-use Apfelfrisch\Edifact\Segment\Segment;
-use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Iterator;
 
+/**
+ * @implements Iterator<int, Segment>
+ */
 interface SegmentIterator extends Iterator
 {
     public function getUnaSegment(): UnaSegment;
-
-    public function currentSegline(): string;
 
     public function current(): Segment;
 }

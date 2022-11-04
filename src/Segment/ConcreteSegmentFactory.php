@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Apfelfrisch\Edifact\Segment;
 
 use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
+use Apfelfrisch\Edifact\Iterators\Stream\StreamMessageFactory;
 use Apfelfrisch\Edifact\Message;
-use Apfelfrisch\Edifact\StreamMessageFactory;
 
 final class ConcreteSegmentFactory implements SegmentFactory
 {
-    /** @psalm-var array<string, class-string<SegmentInterface>> */
+    /** @psalm-var array<string, class-string<Segment>> */
     private array $segmentClasses = [];
 
-    /** @psalm-var class-string<SegmentInterface>|null */
+    /** @psalm-var class-string<Segment>|null */
     private ?string $fallback = null;
 
     private UnaSegment $unaSegment;
@@ -33,7 +33,7 @@ final class ConcreteSegmentFactory implements SegmentFactory
     }
 
     /**
-     * @psalm-param $segmentClass class-string<SegmentInterface>
+     * @psalm-param $segmentClass class-string<Segment>
      */
     public function addSegment(string $name, string $segmentClass): self
     {
@@ -45,7 +45,7 @@ final class ConcreteSegmentFactory implements SegmentFactory
     }
 
     /**
-     * @psalm-param class-string<SegmentInterface> $fallback
+     * @psalm-param class-string<Segment> $fallback
      */
     public function addFallback(string $fallback): self
     {
@@ -61,7 +61,7 @@ final class ConcreteSegmentFactory implements SegmentFactory
 
     public function build(string $segline): Segment
     {
-        /** @psalm-var class-string<SegmentInterface> */
+        /** @psalm-var class-string<Segment> */
         $segmentClass = $this->getClassname(substr($segline, 0, 3));
 
         $segment = $segmentClass::fromSegLine($this->parser, $segline);
@@ -70,7 +70,7 @@ final class ConcreteSegmentFactory implements SegmentFactory
     }
 
     /*
-     * @psalm-return class-string<SegmentInterface>
+     * @psalm-return class-string<Segment>
      */
     public function getClassname(string $segmentName): string
     {

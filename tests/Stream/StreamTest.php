@@ -2,7 +2,7 @@
 
 namespace Apfelfrisch\Edifact\Test\Stream;
 
-use Apfelfrisch\Edifact\Segment\Iterator\Stream\Stream;
+use Apfelfrisch\Edifact\Iterators\Stream\Stream;
 use Apfelfrisch\Edifact\Test\TestCase;
 
 class StreamTest extends TestCase

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Apfelfrisch\Edifact;
+namespace Apfelfrisch\Edifact\Iterators\Stream;
 
 use Apfelfrisch\Edifact\Formatter\EdifactFormatter;
+use Apfelfrisch\Edifact\Message;
+use Apfelfrisch\Edifact\MessageFactory;
 use Apfelfrisch\Edifact\Segment\ConcreteSegmentFactory;
-use Apfelfrisch\Edifact\Segment\Iterator\Stream\StreamIterator;
 use Apfelfrisch\Edifact\Segment\SegmentFactory;
-use Apfelfrisch\Edifact\Segment\Iterator\Stream\Stream;
 
 class StreamMessageFactory implements MessageFactory
 {

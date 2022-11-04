@@ -4,9 +4,9 @@ namespace Apfelfrisch\Edifact\Test\Validation;
 
 use Apfelfrisch\Edifact\Exceptions\ValidationException;
 use Apfelfrisch\Edifact\Message;
-use Apfelfrisch\Edifact\Segment\GenericSegment;
+use Apfelfrisch\Edifact\Iterators\Stream\StreamMessageFactory;
 use Apfelfrisch\Edifact\Segment\ConcreteSegmentFactory;
-use Apfelfrisch\Edifact\StreamMessageFactory;
+use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Test\Fixtures\ValidationSegment;
 use Apfelfrisch\Edifact\Test\TestCase;
 use Apfelfrisch\Edifact\Validation\Failure;

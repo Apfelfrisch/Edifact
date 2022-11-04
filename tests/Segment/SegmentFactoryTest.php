@@ -3,8 +3,8 @@
 namespace Apfelfrisch\Edifact\Test\Segment;
 
 use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
-use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Segment\ConcreteSegmentFactory;
+use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Test\Fixtures\Unh;
 use Apfelfrisch\Edifact\Test\TestCase;
 

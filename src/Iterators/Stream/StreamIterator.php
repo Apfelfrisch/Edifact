@@ -2,17 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Apfelfrisch\Edifact\Segment\Iterator\Stream;
+namespace Apfelfrisch\Edifact\Iterators\Stream;
 
 use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
-use Apfelfrisch\Edifact\Segment\Iterator\SegmentIterator;
 use Apfelfrisch\Edifact\Segment\Segment;
 use Apfelfrisch\Edifact\Segment\SegmentFactory;
+use Apfelfrisch\Edifact\Segment\SegmentIterator;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
-use Apfelfrisch\Edifact\Segment\Iterator\Stream\Stream;
 
 /**
- * @implements Iterator<int, SegmentInterface>
+ * @implements Iterator<int, Segment>
  */
 final class StreamIterator implements SegmentIterator
 {

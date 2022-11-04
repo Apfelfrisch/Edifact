@@ -6,11 +6,11 @@ namespace Apfelfrisch\Edifact;
 
 use Apfelfrisch\Edifact\Exceptions\BuildException;
 use Apfelfrisch\Edifact\Formatter\EdifactFormatter;
+use Apfelfrisch\Edifact\Iterators\Stream\Stream;
 use Apfelfrisch\Edifact\Segment\GenericSegment;
-use Apfelfrisch\Edifact\Segment\SegmentCounter;
 use Apfelfrisch\Edifact\Segment\Segment;
+use Apfelfrisch\Edifact\Segment\SegmentCounter;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
-use Apfelfrisch\Edifact\Segment\Iterator\Stream\Stream;
 
 class Builder
 {

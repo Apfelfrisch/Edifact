@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Apfelfrisch\Edifact;
 
 use Apfelfrisch\Edifact\Formatter\Formatter;
-use Apfelfrisch\Edifact\Segment\Iterator\SegmentIterator;
+use Apfelfrisch\Edifact\Iterators\PartialIterator;
+use Apfelfrisch\Edifact\Iterators\Stream\StreamMessageFactory;
 use Apfelfrisch\Edifact\Segment\Segment;
+use Apfelfrisch\Edifact\Segment\SegmentIterator;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Closure;
 use Generator;
@@ -49,7 +51,7 @@ class Message
     }
 
     /**
-     * @psalm-return list<SegmentInterface>
+     * @psalm-return list<Segment>
      */
     public function getAllSegments(): array
     {
@@ -57,7 +59,7 @@ class Message
     }
 
     /**
-     * @template T of SegmentInterface
+     * @template T of Segment
      * @psalm-param class-string<T> $segmentClass
      * @psalm-suppress InvalidReturnType
      * @psalm-return Generator<int, T, mixed, void>
@@ -75,7 +77,7 @@ class Message
     }
 
     /**
-     * @template T of SegmentInterface
+     * @template T of Segment
      * @psalm-param class-string<T> $segmentClass
      * @psalm-return list<T>
      */
@@ -86,7 +88,7 @@ class Message
     }
 
     /**
-     * @template T of SegmentInterface
+     * @template T of Segment
      * @psalm-param class-string<T> $segmentClass
      * @psalm-return T|null
      */
@@ -102,41 +104,27 @@ class Message
     /**
      * @psalm-return Generator<self>
      */
-    // public function unwrap(string $header = 'UNH', string $trailer = 'UNT'): Generator
-    // {
-    //     $this->segmentIterator->rewind();
+    public function unwrap(string $header = 'UNH', string $trailer = 'UNT'): Generator
+    {
+        $loopCount = -1;
+        foreach ($this->segmentIterator as $segment) {
+            $loopCount++;
 
-    //     $stream = null;
+            $offset ??= $segment->name() === $header ? $loopCount : null;
 
-    //     while ($this->segmentIterator->valid()) {
-    //         $segLine = $this->segmentIterator->currentSegline();
-    //         $this->segmentIterator->next();
+            if ($offset === null) {
+                continue;
+            }
 
-    //         $segmentName = substr($segLine, 0, 3);
-
-    //         if ($segmentName === $header) {
-    //             $stream = new Stream('php://temp', 'w+', $this->getUnaSegment());
-    //         }
-
-    //         if ($stream === null) {
-    //             continue;
-    //         }
-
-    //         $stream->write(
-    //             str_replace(
-    //                 $this->getUnaSegment()->segmentTerminator(),
-    //                 $this->getUnaSegment()->escapeCharacter().$this->getUnaSegment()->segmentTerminator(),
-    //                 $segLine
-    //             ).$this->getUnaSegment()->segmentTerminator()
-    //         );
-
-    //         if ($segmentName === $trailer) {
-    //             yield new self($stream, $this->segmentFactory);
-
-    //             $stream = null;
-    //         }
-    //     }
-    // }
+            if ($segment->name() === $trailer) {
+                yield new self(
+                    new PartialIterator($this->getUnaSegment(), $this->segmentIterator, $offset, $loopCount + 1 - $offset),
+                    $this->formatter
+                );
+                $offset = null;
+            }
+        }
+    }
 
     public function getUnaSegment(): UnaSegment
     {

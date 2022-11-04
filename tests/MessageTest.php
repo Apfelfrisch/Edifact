@@ -4,10 +4,10 @@ namespace Apfelfrisch\Edifact\Test;
 
 use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
 use Apfelfrisch\Edifact\Message;
-use Apfelfrisch\Edifact\Segment\GenericSegment;
+use Apfelfrisch\Edifact\Iterators\Stream\StreamMessageFactory;
 use Apfelfrisch\Edifact\Segment\ConcreteSegmentFactory;
+use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Segment\Segment;
-use Apfelfrisch\Edifact\StreamMessageFactory;
 use Apfelfrisch\Edifact\Test\Fixtures\Moa;
 use Apfelfrisch\Edifact\Test\Fixtures\Rff;
 use Apfelfrisch\Edifact\Test\Fixtures\Unh;
@@ -203,7 +203,6 @@ class MessageTest extends TestCase
     /** @test */
     public function test_unwrapping_the_message_with_the_default_header_and_trailer(): void
     {
-        $this->markTestSkipped();
         $message = Message::fromString("UNA:+.? 'UNH+1+ORDERS:D:96A:UN'NAD+DP++++Auf m Rott?''UNT+2+1'UNH+2+ORDERS:D:96A:UN'UNT+2+2'");
 
         [$firstMessage, $secondMessage] = iterator_to_array($message->unwrap());

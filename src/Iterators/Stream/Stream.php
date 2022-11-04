@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Apfelfrisch\Edifact\Segment\Iterator\Stream;
+namespace Apfelfrisch\Edifact\Iterators\Stream;
 
 use Apfelfrisch\Edifact\Exceptions\InvalidStreamException;
 use Apfelfrisch\Edifact\Segment\UnaSegment;

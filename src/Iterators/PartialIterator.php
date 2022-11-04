@@ -1,0 +1,70 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Apfelfrisch\Edifact\Iterators;
+
+use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
+use Apfelfrisch\Edifact\Segment\Segment;
+use Apfelfrisch\Edifact\Segment\SegmentIterator;
+use Apfelfrisch\Edifact\Segment\UnaSegment;
+use Iterator;
+use LimitIterator;
+
+/**
+ * @implements Iterator<int, Segment>
+ */
+final class PartialIterator implements SegmentIterator
+{
+    private int $currentSegmentNumber = 0;
+
+    /** @psalm-var LimitIterator<int, Segment> */
+    private LimitIterator $segementIterator;
+
+    /** @psalm-param Iterator<int, Segment> $segementIterator */
+    public function __construct(
+        private UnaSegment $unaSegment,
+        Iterator $segementIterator,
+        int $offset = 0,
+        int $limit = -1
+    ) {
+        $this->segementIterator = new LimitIterator($segementIterator, $offset, $limit);
+    }
+
+    public function getUnaSegment(): UnaSegment
+    {
+        return $this->unaSegment;
+    }
+
+    public function current(): Segment
+    {
+        if (! $this->valid()) {
+            return throw InvalidEdifactContentException::noSegmentAvailable();
+        }
+
+        return $this->segementIterator->current();
+    }
+
+    public function key(): int
+    {
+        return $this->currentSegmentNumber;
+    }
+
+    public function next(): void
+    {
+        $this->currentSegmentNumber++;
+
+        $this->segementIterator->next();
+    }
+
+    public function rewind(): void
+    {
+        $this->segementIterator->rewind();
+        $this->currentSegmentNumber = 0;
+    }
+
+    public function valid(): bool
+    {
+        return $this->segementIterator->valid();
+    }
+}
