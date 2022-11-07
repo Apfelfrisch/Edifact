@@ -6,7 +6,6 @@ namespace Apfelfrisch\Edifact;
 
 use Apfelfrisch\Edifact\Formatter\Formatter;
 use Apfelfrisch\Edifact\Iterators\PartialIterator;
-use Apfelfrisch\Edifact\StreamMessageFactory;
 use Apfelfrisch\Edifact\Segment\Segment;
 use Apfelfrisch\Edifact\Segment\SegmentIterator;
 use Apfelfrisch\Edifact\Segment\UnaSegment;

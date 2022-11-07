@@ -7,8 +7,6 @@ namespace Apfelfrisch\Edifact;
 use Apfelfrisch\Edifact\Formatter\EdifactFormatter;
 use Apfelfrisch\Edifact\Iterators\Stream\Stream;
 use Apfelfrisch\Edifact\Iterators\Stream\StreamIterator;
-use Apfelfrisch\Edifact\Message;
-use Apfelfrisch\Edifact\MessageFactory;
 use Apfelfrisch\Edifact\Segment\ConcreteSegmentFactory;
 use Apfelfrisch\Edifact\Segment\Segment;
 
