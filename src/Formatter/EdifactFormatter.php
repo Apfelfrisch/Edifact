@@ -75,12 +75,14 @@ final class EdifactFormatter implements FormatterInterface
                 $this->unaSegment->escapeCharacter(),
                 $this->unaSegment->componentSeparator(),
                 $this->unaSegment->elementSeparator(),
+                $this->unaSegment->segmentTerminator(),
                 '\\n',
             ],
             [
                 $this->unaSegment->escapeCharacter() . $this->unaSegment->escapeCharacter(),
                 $this->unaSegment->escapeCharacter() . $this->unaSegment->componentSeparator(),
                 $this->unaSegment->escapeCharacter() . $this->unaSegment->elementSeparator(),
+                $this->unaSegment->escapeCharacter() . $this->unaSegment->segmentTerminator(),
                 '',
             ],
             $string

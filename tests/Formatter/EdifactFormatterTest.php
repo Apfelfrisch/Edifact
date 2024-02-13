@@ -55,9 +55,9 @@ final class EdifactFormatterTest extends TestCase
     public function test_escaping_string(): void
     {
         $unaSegment = UnaSegment::getDefault();
-        $expectedString = "???:?+" . $unaSegment->segmentTerminator();
+        $expectedString = "???:?+?'" . $unaSegment->segmentTerminator();
 
-        $segment = AbstractSegmentTestSegment::fromAttributes('?:+');
+        $segment = AbstractSegmentTestSegment::fromAttributes("?:+'");
 
         $this->assertSame($expectedString, (new EdifactFormatter($unaSegment))->format($segment));
     }
