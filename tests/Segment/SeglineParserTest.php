@@ -17,7 +17,7 @@ final class SeglineParserTest extends TestCase
         $unaSegment = new UnaSegment(decimalPoint: ',');
         $parser = new SeglineParser($unaSegment);
 
-        $elements = (new Elements)->addValue('A', 'A', 'M|n|3')->addValue('B', 'B', 'M|a|3');
+        $elements = (new Elements())->addValue('A', 'A', 'M|n|3')->addValue('B', 'B', 'M|a|3');
         $string = '1,0+1,1+1,2';
 
         // Marked as Numeric
@@ -37,7 +37,7 @@ final class SeglineParserTest extends TestCase
         $parser = new SeglineParser($unaSegment);
         $string = 'a🙂?🙂';
 
-        $elements = (new Elements)->addValue('A', 'A', 'M|a|1')->addValue('B', 'B', 'M|a|1');
+        $elements = (new Elements())->addValue('A', 'A', 'M|a|1')->addValue('B', 'B', 'M|a|1');
 
         $this->assertSame('a', $parser->parseToBlueprint($string, $elements)->getValue('A', 'A'));
         $this->assertSame('🙂', $parser->parseToBlueprint($string, $elements)->getValue('B', 'B'));
@@ -49,7 +49,7 @@ final class SeglineParserTest extends TestCase
      */
     public function test_escaping_string(string $string, string $result): void
     {
-        $parser = new SeglineParser;
+        $parser = new SeglineParser();
 
         $this->assertEquals(
             $result,
@@ -63,7 +63,7 @@ final class SeglineParserTest extends TestCase
      */
     public function test_parse_to_blueprint(string $string, Elements $elements, string $result): void
     {
-        $parser = new SeglineParser;
+        $parser = new SeglineParser();
 
         $this->assertEquals($result, json_encode($parser->parseToBlueprint($string, $elements)->toArray()));
     }
@@ -96,13 +96,13 @@ final class SeglineParserTest extends TestCase
     {
         yield 'simple-terminate-control-chars' => [
             'string' => 'A+?:?+',
-            'elements' => (new Elements)->addValue('A', 'A', 'M|a|1')->addValue('B', 'B', 'M|a|2'),
+            'elements' => (new Elements())->addValue('A', 'A', 'M|a|1')->addValue('B', 'B', 'M|a|2'),
             'result' => '{"A":{"A":"A"},"B":{"B":":+"}}',
         ];
 
         yield 'double-terminate-control-chars' => [
             'string' => 'A+??:???+B',
-            'elements' => (new Elements)
+            'elements' => (new Elements())
                 ->addValue('A', '1', 'M|a|1')
                 ->addValue('B', '1', 'M|a|2')
                 ->addValue('B', '2', 'M|a|1')
@@ -112,7 +112,7 @@ final class SeglineParserTest extends TestCase
 
         yield 'triple-terminate-control-chars' => [
             'string' => 'A+??????:B',
-            'elements' => (new Elements)
+            'elements' => (new Elements())
                 ->addValue('A', 'A', 'M|a|1')
                 ->addValue('B', '1', 'M|a|3')
                 ->addValue('B', '2', 'M|a|1'),
@@ -121,7 +121,7 @@ final class SeglineParserTest extends TestCase
 
         yield 'unkown-element' => [
             'string' => 'A+B+C:1',
-            'elements' => (new Elements)
+            'elements' => (new Elements())
                 ->addValue('A', 'A', 'M|a|1')
                 ->addValue('B', '1', 'M|a|1')
                 ->addValue('C', '1', 'M|a|1'),
@@ -130,7 +130,7 @@ final class SeglineParserTest extends TestCase
 
         yield 'unkown-component' => [
             'string' => 'A+B+C',
-            'elements' => (new Elements)
+            'elements' => (new Elements())
                 ->addValue('A', 'A', 'M|a|1')
                 ->addValue('B', '1', 'M|a|1'),
             'result' => '{"A":{"A":"A"},"B":{"1":"B"},"unknown-2":{"unknown-0":"C"}}',

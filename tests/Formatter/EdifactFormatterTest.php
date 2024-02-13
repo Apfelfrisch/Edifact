@@ -19,7 +19,7 @@ final class EdifactFormatterTest extends TestCase
         $givenString = "A+B+1:2:3:4:5+D+E";
         $expectedString = $givenString . $unaSegment->segmentTerminator();
 
-        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser, $givenString);
+        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser(), $givenString);
 
         $this->assertSame($expectedString, (new EdifactFormatter($unaSegment))->format($segment));
     }
@@ -33,7 +33,7 @@ final class EdifactFormatterTest extends TestCase
         $segments = [];
         for ($i = 0; $i < 3; $i++) {
             $expectedString .= "A+B+1:2:3:4:5+D+E" . $unaSegment->segmentTerminator();
-            $segments[] = AbstractSegmentTestSegment::fromSegLine(new SeglineParser, "A+B+1:2:3:4:5+D+E");
+            $segments[] = AbstractSegmentTestSegment::fromSegLine(new SeglineParser(), "A+B+1:2:3:4:5+D+E");
         }
 
         $this->assertSame($expectedString, (new EdifactFormatter($unaSegment))->format(...$segments));
@@ -46,7 +46,7 @@ final class EdifactFormatterTest extends TestCase
         $givenString = "+A+B+1:2:::+DD++";
         $expectedString = "+A+B+1:2+DD" . $unaSegment->segmentTerminator();
 
-        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser, $givenString);
+        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser(), $givenString);
 
         $this->assertSame($expectedString, (new EdifactFormatter($unaSegment))->format($segment));
     }

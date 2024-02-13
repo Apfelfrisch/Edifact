@@ -70,21 +70,21 @@ final class ValueValidator
 
         /** @var string $value : $value is at this position always a string */
 
-        if ($type === self::ELEMENT_TYPE_NUMERIC && ! (new IsNumber)($value)) {
+        if ($type === self::ELEMENT_TYPE_NUMERIC && ! (new IsNumber())($value)) {
             $failures[Failure::VALUE_NOT_DIGIT] = $this->buildMessage(Failure::VALUE_NOT_DIGIT);
         }
 
-        if ($type === self::ELEMENT_TYPE_ALPHA && ! (new IsAlpha)($value)) {
+        if ($type === self::ELEMENT_TYPE_ALPHA && ! (new IsAlpha())($value)) {
             $failures[Failure::VALUE_NOT_ALPHA] = $this->buildMessage(Failure::VALUE_NOT_ALPHA);
         }
 
-        if ($minLenght !== $maxLength && ! (new HasStringLength)->min($minLenght)($value)) {
+        if ($minLenght !== $maxLength && ! (new HasStringLength())->min($minLenght)($value)) {
             $failures[Failure::VALUE_TOO_SHORT] = $this->buildMessage(Failure::VALUE_TOO_SHORT, (string)$minLenght);
 
             return $failures;
         }
 
-        if (! (new HasStringLength)->min($minLenght)->max($maxLength)($value)) {
+        if (! (new HasStringLength())->min($minLenght)->max($maxLength)($value)) {
             if ($minLenght === $maxLength) {
                 $failures[Failure::VALUE_LENGTH_INVALID] = $this->buildMessage(Failure::VALUE_LENGTH_INVALID, (string)$minLenght);
 

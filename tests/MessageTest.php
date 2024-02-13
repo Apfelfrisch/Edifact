@@ -18,7 +18,7 @@ class MessageTest extends TestCase
 
     public function setUp(): void
     {
-        (new SegmentFactory)
+        (new SegmentFactory())
             ->addSegment('UNH', Unh::class)
             ->addSegment('RFF', Rff::class)
             ->addSegment('MOA', Moa::class)
@@ -104,7 +104,7 @@ class MessageTest extends TestCase
     /** @test */
     public function test_throw_an_exception_if_no_fallback_was_set_and_the_segment_is_uknown(): void
     {
-        $message = Message::fromString("UKN", new SegmentFactory);
+        $message = Message::fromString("UKN", new SegmentFactory());
 
         $this->expectException(InvalidEdifactContentException::class);
         $message->getAllSegments();

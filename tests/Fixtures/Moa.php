@@ -12,7 +12,7 @@ class Moa extends AbstractSegment
     public static function blueprint(): Elements
     {
         if (self::$blueprint === null) {
-            self::$blueprint = (new Elements)
+            self::$blueprint = (new Elements())
                 ->addValue('MOA', 'MOA', 'M|a|3')
                 ->addValue('C516', '5025', 'M|an|3')
                 ->addValue('C516', '5004', 'M|n|35');
@@ -27,7 +27,7 @@ class Moa extends AbstractSegment
     public static function fromAttributes(string $qualifier, float $amount, string $decimalSeperator = '.'): self
     {
         return new self(
-            (new Elements)
+            (new Elements())
             ->addValue('MOA', 'MOA', 'MOA')
             ->addValue('C516', '5025', $qualifier)
             ->addValue('C516', '5004', number_format($amount, 2, $decimalSeperator, ''))

@@ -50,7 +50,7 @@ class Validator
     /** @psalm-return Iterator<Failure> */
     private function validate(Message $message): Iterator
     {
-        $counter = new SegmentCounter;
+        $counter = new SegmentCounter();
 
         foreach ($message->getSegments() as $segment) {
             $counter->count($segment);

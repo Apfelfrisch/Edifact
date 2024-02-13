@@ -34,7 +34,7 @@ final class SegmentFactory
     public static function fromDefault(): self
     {
         if (self::$defaultFactory === null) {
-            self::$defaultFactory = new self;
+            self::$defaultFactory = new self();
         }
 
         return clone(self::$defaultFactory);

@@ -42,7 +42,7 @@ final class UnaSegment
     public static function setFromString(string $string, ?self $fallback = null): self
     {
         if (substr($string, 0, 3) !== self::UNA) {
-            return $fallback ?? new self;
+            return $fallback ?? new self();
         }
 
         if (! isset($string[8])) {

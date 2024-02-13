@@ -24,7 +24,7 @@ class SegmentValidator
 
     public function __construct()
     {
-        $this->valueValidator = new ValueValidator;
+        $this->valueValidator = new ValueValidator();
     }
 
     /** @psalm-return Iterator<Failure> */

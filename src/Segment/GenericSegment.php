@@ -16,7 +16,7 @@ class GenericSegment implements SegmentInterface
      */
     public static function fromAttributes(string $name, array ...$valueArrays): self
     {
-        $elements = new Elements;
+        $elements = new Elements();
         $elements->addValue('0', '0', $name);
         $i = 1;
         foreach ($valueArrays as $values) {

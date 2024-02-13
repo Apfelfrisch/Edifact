@@ -14,7 +14,7 @@ class AbstractSegmentTest extends TestCase
     /** @test */
     public function test_provide_segment_name(): void
     {
-        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser, 'A');
+        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser(), 'A');
 
         $this->assertEquals('A', $segment->name());
     }
@@ -31,7 +31,7 @@ class AbstractSegmentTest extends TestCase
             "E" => ["E" => "E",],
         ];
 
-        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser, $givenString);
+        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser(), $givenString);
 
         $this->assertEquals($expectedArray, $segment->toArray());
     }
@@ -41,7 +41,7 @@ class AbstractSegmentTest extends TestCase
     {
         $givenString = "A+???:?+";
 
-        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser, $givenString);
+        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser(), $givenString);
 
         $this->assertEquals('?:+', $segment->getValue('B', 'B'));
         $this->assertEquals('?:+', $segment->getValueFromPosition(1, 0));

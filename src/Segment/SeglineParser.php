@@ -26,7 +26,7 @@ final class SeglineParser
 
         $elementArray = $this->explodeString($this->removeContrlChars($segline), $this->unaSegment->elementSeparator());
 
-        $elements = new Elements;
+        $elements = new Elements();
 
         foreach ($elementArray as $elementPosition => $elementsArray) {
             $components = $this->explodeString($elementsArray, $this->unaSegment->componentSeparator());
@@ -66,7 +66,7 @@ final class SeglineParser
     {
         $elementArray = $this->explodeString($this->removeContrlChars($segline), $this->unaSegment->elementSeparator());
 
-        $elements = new Elements;
+        $elements = new Elements();
 
         $i = 0;
         foreach ($elementArray as $element) {

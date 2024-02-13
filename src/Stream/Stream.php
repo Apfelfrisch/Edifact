@@ -43,7 +43,7 @@ final class Stream extends SplFileInfo
         if ($openMode === 'r' || substr($openMode, 1, 1) === '+') { // Stream is readable
             $this->unaSegment = UnaSegment::setFromStream($this, fallback: $unaSegment);
         } else {
-            $this->unaSegment = $unaSegment ?? new UnaSegment;
+            $this->unaSegment = $unaSegment ?? new UnaSegment();
         }
     }
 

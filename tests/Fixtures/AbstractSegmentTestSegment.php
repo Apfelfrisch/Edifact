@@ -12,7 +12,7 @@ class AbstractSegmentTestSegment extends AbstractSegment
     public static function blueprint(): Elements
     {
         if (self::$blueprint === null) {
-            self::$blueprint = (new Elements)
+            self::$blueprint = (new Elements())
                 ->addValue('A', 'A', 'M|an|3')
                 ->addValue('B', 'B', 'O|an|3')
                 ->addValue('C', '1', 'M|n|3')
@@ -31,7 +31,7 @@ class AbstractSegmentTestSegment extends AbstractSegment
     public static function fromAttributes(string $a, string|null $b = null, string|null $c = null): self
     {
         return new self(
-            (new Elements)->addValue('A', 'A', $a)
+            (new Elements())->addValue('A', 'A', $a)
                 ->addValue('B', 'B', $b)
                 ->addValue('C', '1', $c)
         );

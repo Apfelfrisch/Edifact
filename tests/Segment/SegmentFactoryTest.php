@@ -16,7 +16,7 @@ class SegmentFactoryTest extends TestCase
         /** @psalm-var class-string */
         $segmentClass = Unh::class;
 
-        $segFactory = (new SegmentFactory)->addSegment('UNH', Unh::class);
+        $segFactory = (new SegmentFactory())->addSegment('UNH', Unh::class);
 
         $this->assertSame(Unh::class, $segFactory->getClassname('UNH'));
         $this->assertInstanceOf($segmentClass, $segFactory->build('UNH+'));
@@ -28,7 +28,7 @@ class SegmentFactoryTest extends TestCase
         /** @psalm-var class-string */
         $segmentClass = Unh::class;
 
-        $segFactory = (new SegmentFactory)->addSegment('unh', Unh::class);
+        $segFactory = (new SegmentFactory())->addSegment('unh', Unh::class);
 
         $this->assertSame(Unh::class, $segFactory->getClassname('UNH'));
         $this->assertInstanceOf($segmentClass, $segFactory->build('UNH+'));
@@ -37,7 +37,7 @@ class SegmentFactoryTest extends TestCase
     /** @test **/
     public function test_instanciate_the_dafault_seg_if_its_allowed_and_no_specific_segement_was_found(): void
     {
-        $segFactory = (new SegmentFactory)->addFallback(GenericSegment::class);
+        $segFactory = (new SegmentFactory())->addFallback(GenericSegment::class);
 
         $this->assertInstanceOf(GenericSegment::class, $segFactory->build('UKW'));
     }

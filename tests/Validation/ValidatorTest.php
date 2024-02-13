@@ -22,7 +22,7 @@ class ValidatorTest extends TestCase
     /** @test */
     public function test_throwing_exception_when_get_failures_was_called_before_is_valid(): void
     {
-        $validator = new Validator;
+        $validator = new Validator();
 
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('No Message was validated, call [Apfelfrisch\Edifact\Validation\Validator::isValid] first');
@@ -32,9 +32,9 @@ class ValidatorTest extends TestCase
     /** @test */
     public function test_throw_exception_when_validating_a_segment_wich_not_implements_the_validateable_interface(): void
     {
-        $validator = new Validator;
+        $validator = new Validator();
 
-        $segmentFactory = new SegmentFactory;
+        $segmentFactory = new SegmentFactory();
         $segmentFactory->addFallback(GenericSegment::class);
 
         $this->expectException(ValidationException::class);
@@ -47,7 +47,7 @@ class ValidatorTest extends TestCase
     {
         ValidationSegment::$ruleOne = 'M|n|1';
 
-        $validator = new Validator;
+        $validator = new Validator();
 
         $this->assertFalse($validator->isValid($this->buildMessage('1+unkown-element:unkown-component')));
 
@@ -62,7 +62,7 @@ class ValidatorTest extends TestCase
     {
         ValidationSegment::$ruleOne = 'M|n|1';
 
-        $validator = new Validator;
+        $validator = new Validator();
 
         $this->assertFalse($validator->isValid($this->buildMessage('1::unkown-component')));
 
@@ -80,7 +80,7 @@ class ValidatorTest extends TestCase
         ValidationSegment::$ruleOne = 'M|n|..11';
         $digits = implode(range(0, 7)) . '.1';
 
-        $validator = new Validator;
+        $validator = new Validator();
 
         $this->assertTrue($validator->isValid($this->buildMessage($digits)));
         $this->assertFalse($validator->isValid($this->buildMessage($digits . 'A')));
@@ -101,7 +101,7 @@ class ValidatorTest extends TestCase
         ValidationSegment::$ruleOne = 'M|a|..53';
         $alphaValues = implode(array_merge(range('a', 'z'), range('A', 'Z')));
 
-        $validator = new Validator;
+        $validator = new Validator();
 
         $this->assertTrue($validator->isValid($this->buildMessage($alphaValues)));
         $this->assertFalse($validator->isValid($this->buildMessage($alphaValues . '1')));
@@ -115,7 +115,7 @@ class ValidatorTest extends TestCase
     {
         ValidationSegment::$ruleOne = 'M|an|..2';
 
-        $validator = new Validator;
+        $validator = new Validator();
 
         $this->assertTrue($validator->isValid($this->buildMessage('A')));
 
@@ -130,7 +130,7 @@ class ValidatorTest extends TestCase
     {
         ValidationSegment::$ruleOne = 'M|an|..2';
 
-        $validator = new Validator;
+        $validator = new Validator();
 
         $this->assertTrue($validator->isValid($this->buildMessage('A')));
 
@@ -147,7 +147,7 @@ class ValidatorTest extends TestCase
 
         $string = '123';
 
-        $validator = new Validator;
+        $validator = new Validator();
 
         $this->assertTrue($validator->isValid($this->buildMessage('123')));
 
@@ -165,10 +165,10 @@ class ValidatorTest extends TestCase
     /** @test */
     public function test_validate_missing_optional_element(): void
     {
-        $validator = new Validator;
+        $validator = new Validator();
 
         ValidationSegment::$ruleOne = 'O|an|3';
-        $segmentFactory = new SegmentFactory;
+        $segmentFactory = new SegmentFactory();
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
         $message = Message::fromString('UNH', $segmentFactory);
@@ -179,10 +179,10 @@ class ValidatorTest extends TestCase
     /** @test */
     public function test_validate_missing_required_element(): void
     {
-        $validator = new Validator;
+        $validator = new Validator();
 
         ValidationSegment::$ruleOne = 'M|an|3';
-        $segmentFactory = new SegmentFactory;
+        $segmentFactory = new SegmentFactory();
         $segmentFactory->addSegment('UNC', ValidationSegment::class);
 
         $message = Message::fromString('UNC', $segmentFactory);
@@ -197,12 +197,12 @@ class ValidatorTest extends TestCase
     /** @test */
     public function test_validate_missing_optional_component(): void
     {
-        $validator = new Validator;
+        $validator = new Validator();
 
         ValidationSegment::$ruleOne = 'M|an|3';
         ValidationSegment::$ruleTwo = 'O|an|3';
 
-        $segmentFactory = new SegmentFactory;
+        $segmentFactory = new SegmentFactory();
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
         $message = Message::fromString('UNH+ABC', $segmentFactory);
@@ -213,8 +213,8 @@ class ValidatorTest extends TestCase
     /** @test */
     public function test_skip_empty_rules(): void
     {
-        $validator = new Validator;
-        $segmentFactory = new SegmentFactory;
+        $validator = new Validator();
+        $segmentFactory = new SegmentFactory();
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
         // Case One: Wrong Elements
@@ -227,12 +227,12 @@ class ValidatorTest extends TestCase
     /** @test */
     public function test_validate_missing_required_component(): void
     {
-        $validator = new Validator;
+        $validator = new Validator();
 
         ValidationSegment::$ruleOne = 'M|an|3';
         ValidationSegment::$ruleTwo = 'M|an|3';
 
-        $segmentFactory = new SegmentFactory;
+        $segmentFactory = new SegmentFactory();
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
         $message = Message::fromString('UNH+ABC', $segmentFactory);
@@ -245,12 +245,12 @@ class ValidatorTest extends TestCase
     /** @test */
     public function test_validate_missing_valid_dependend_component(): void
     {
-        $validator = new Validator;
+        $validator = new Validator();
 
         ValidationSegment::$ruleOne = 'D|an|3';
         ValidationSegment::$ruleTwo = 'O|an|3';
 
-        $segmentFactory = new SegmentFactory;
+        $segmentFactory = new SegmentFactory();
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
         $message = Message::fromString('UNH', $segmentFactory);
@@ -261,12 +261,12 @@ class ValidatorTest extends TestCase
     /** @test */
     public function test_validate_missing_invalid_dependend_component(): void
     {
-        $validator = new Validator;
+        $validator = new Validator();
 
         ValidationSegment::$ruleOne = 'D|an|3';
         ValidationSegment::$ruleTwo = 'O|an|3';
 
-        $segmentFactory = new SegmentFactory;
+        $segmentFactory = new SegmentFactory();
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
         $message = Message::fromString('UNH+:ABC', $segmentFactory);
@@ -281,7 +281,7 @@ class ValidatorTest extends TestCase
     {
         ValidationSegment::$ruleOne = 'O|an|3';
 
-        $validator = new Validator;
+        $validator = new Validator();
 
         $this->assertTrue($validator->isValid($this->buildMessage('')));
         $this->assertFalse($validator->isValid($this->buildMessage('1234')));
@@ -292,7 +292,7 @@ class ValidatorTest extends TestCase
     {
         ValidationSegment::$ruleOne = 'M|n|1';
 
-        $validator = new Validator;
+        $validator = new Validator();
 
         $this->assertFalse($validator->isValid($this->buildMessage('AB')));
 
@@ -307,7 +307,7 @@ class ValidatorTest extends TestCase
 
     private function buildMessage(string $string): Message
     {
-        $segmentFactory = new SegmentFactory;
+        $segmentFactory = new SegmentFactory();
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
         return Message::fromString('UNH+' . $string, $segmentFactory);
