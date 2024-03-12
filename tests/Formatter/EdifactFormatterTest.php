@@ -7,24 +7,22 @@ namespace Apfelfrisch\Edifact\Test\Formatte;
 use Apfelfrisch\Edifact\Formatter\EdifactFormatter;
 use Apfelfrisch\Edifact\Segment\SeglineParser;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
-use Apfelfrisch\Edifact\Test\Fixtures\AbstractSegmentTestSegment;
+use Apfelfrisch\Edifact\Test\Fixtures\Segment;
 use Apfelfrisch\Edifact\Test\TestCase;
 
 final class EdifactFormatterTest extends TestCase
 {
-    /** @test */
     public function test_formatting_one_segment_to_edifact_string(): void
     {
         $unaSegment = UnaSegment::getDefault();
         $givenString = "A+B+1:2:3:4:5+D+E";
         $expectedString = $givenString . $unaSegment->segmentTerminator();
 
-        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser(), $givenString);
+        $segment = Segment::fromSegLine(new SeglineParser(), $givenString);
 
         $this->assertSame($expectedString, (new EdifactFormatter($unaSegment))->format($segment));
     }
 
-    /** @test */
     public function test_formatting_multiple_segments_to_edifact_string(): void
     {
         $unaSegment = UnaSegment::getDefault();
@@ -33,7 +31,7 @@ final class EdifactFormatterTest extends TestCase
         $segments = [];
         for ($i = 0; $i < 3; $i++) {
             $expectedString .= "A+B+1:2:3:4:5+D+E" . $unaSegment->segmentTerminator();
-            $segments[] = AbstractSegmentTestSegment::fromSegLine(new SeglineParser(), "A+B+1:2:3:4:5+D+E");
+            $segments[] = Segment::fromSegLine(new SeglineParser(), "A+B+1:2:3:4:5+D+E");
         }
 
         $this->assertSame($expectedString, (new EdifactFormatter($unaSegment))->format(...$segments));
@@ -46,7 +44,7 @@ final class EdifactFormatterTest extends TestCase
         $givenString = "+A+B+1:2:::+DD++";
         $expectedString = "+A+B+1:2+DD" . $unaSegment->segmentTerminator();
 
-        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser(), $givenString);
+        $segment = Segment::fromSegLine(new SeglineParser(), $givenString);
 
         $this->assertSame($expectedString, (new EdifactFormatter($unaSegment))->format($segment));
     }
@@ -57,7 +55,7 @@ final class EdifactFormatterTest extends TestCase
         $unaSegment = UnaSegment::getDefault();
         $expectedString = "???:?+?'" . $unaSegment->segmentTerminator();
 
-        $segment = AbstractSegmentTestSegment::fromAttributes("?:+'");
+        $segment = Segment::fromAttributes("?:+'");
 
         $this->assertSame($expectedString, (new EdifactFormatter($unaSegment))->format($segment));
     }
@@ -69,7 +67,7 @@ final class EdifactFormatterTest extends TestCase
         $expectedString = "test_replace_space_char" . $unaSegment->segmentTerminator();
         ;
 
-        $segment = AbstractSegmentTestSegment::fromAttributes($givenString);
+        $segment = Segment::fromAttributes($givenString);
 
         $this->assertSame($expectedString, (new EdifactFormatter($unaSegment))->format($segment));
     }
@@ -80,7 +78,7 @@ final class EdifactFormatterTest extends TestCase
         $unaSegment = new UnaSegment(':', '+', ',');
         $expectedString = "A++1,23" . $unaSegment->segmentTerminator();
 
-        $segment = AbstractSegmentTestSegment::fromAttributes('A', null, '1.23');
+        $segment = Segment::fromAttributes('A', null, '1.23');
 
         $this->assertSame($expectedString, (new EdifactFormatter($unaSegment))->format($segment));
     }

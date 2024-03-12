@@ -8,10 +8,10 @@ use Apfelfrisch\Edifact\Segment\Elements;
 use Apfelfrisch\Edifact\Segment\SeglineParser;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Apfelfrisch\Edifact\Test\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class SeglineParserTest extends TestCase
 {
-    /** @test */
     public function test_parse_numeric_value(): void
     {
         $unaSegment = new UnaSegment(decimalPoint: ',');
@@ -30,7 +30,6 @@ final class SeglineParserTest extends TestCase
         $this->assertSame('1,2', $parser->parseToBlueprint($string, $elements)->getValue('unknown-2', 'unknown-0'));
     }
 
-    /** @test */
     public function test_escaping_with_utf8(): void
     {
         $unaSegment = new UnaSegment(':', '🙂');
@@ -43,10 +42,7 @@ final class SeglineParserTest extends TestCase
         $this->assertSame('🙂', $parser->parseToBlueprint($string, $elements)->getValue('B', 'B'));
     }
 
-    /**
-     * @test
-     * @dataProvider seglineStringProviderForStringEscaping
-     */
+    #[DataProvider('seglineStringProviderForStringEscaping')]
     public function test_escaping_string(string $string, string $result): void
     {
         $parser = new SeglineParser();
@@ -57,10 +53,7 @@ final class SeglineParserTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     * @dataProvider seglineStringProviderForBlueprintParsing
-     */
+    #[DataProvider('seglineStringProviderForBlueprintParsing')]
     public function test_parse_to_blueprint(string $string, Elements $elements, string $result): void
     {
         $parser = new SeglineParser();
@@ -71,7 +64,7 @@ final class SeglineParserTest extends TestCase
     /**
      * @psalm-return iterable<string, array{string: string, result: string}>
      */
-    public function seglineStringProviderForStringEscaping(): iterable
+    static public function seglineStringProviderForStringEscaping(): iterable
     {
         yield 'simple-terminate-control-chars' => [
             'string' => 'A+?:?+',
@@ -92,7 +85,7 @@ final class SeglineParserTest extends TestCase
     /**
      * @psalm-return iterable<string, array{string: string, elements: Elements, result: string}>
      */
-    public function seglineStringProviderForBlueprintParsing(): iterable
+    static public function seglineStringProviderForBlueprintParsing(): iterable
     {
         yield 'simple-terminate-control-chars' => [
             'string' => 'A+?:?+',

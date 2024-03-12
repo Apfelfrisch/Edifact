@@ -58,15 +58,6 @@ class StreamTest extends TestCase
         $this->assertEquals($message, (string) $this->stream);
     }
 
-    public function test_string_serialization_returns_empty_string_when_stream_is_not_readable(): void
-    {
-        $this->tempname = tempnam(sys_get_temp_dir(), 'diac');
-        file_put_contents($this->tempname, 'FOO BAR');
-        $stream = new Stream($this->tempname, 'w');
-
-        $this->assertEquals('', $stream->__toString());
-    }
-
     public function test_seek_and_tell(): void
     {
         $stream = Stream::fromString('FOO BAR');

@@ -7,7 +7,6 @@ use Apfelfrisch\Edifact\Validation\Failure;
 
 class FailureTest extends TestCase
 {
-    /** @test */
     public function test_instantiate_with_default_message_and_unh_count(): void
     {
         $failure = new Failure(Failure::MISSING_COMPONENT, 'TST', 5, 10, 'TestValue', 'TestText');
@@ -22,7 +21,6 @@ class FailureTest extends TestCase
         $this->assertSame(0, $failure->getUnhCounter());
     }
 
-    /** @test */
     public function test_setting_message_counter(): void
     {
         $failure = new Failure(Failure::MISSING_COMPONENT, 'TST', 5, 10, 'TestValue', 'TestText');
@@ -34,7 +32,6 @@ class FailureTest extends TestCase
         $this->assertSame(2, $failure->getMessageCounter());
     }
 
-    /** @test */
     public function test_setting_unh_counter(): void
     {
         $failure = new Failure(Failure::MISSING_COMPONENT, 'TST', 5, 10, 'TestValue', 'TestText');

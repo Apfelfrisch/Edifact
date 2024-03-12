@@ -9,7 +9,6 @@ use Apfelfrisch\Edifact\Test\TestCase;
 
 final class GenericSegmentTest extends TestCase
 {
-    /** @test */
     public function test_instantiate_from_static_constructor(): void
     {
         $segment = GenericSegment::fromAttributes('UNB', ['1', '2'], ['3']);

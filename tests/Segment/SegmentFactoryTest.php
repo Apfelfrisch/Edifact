@@ -10,7 +10,6 @@ use Apfelfrisch\Edifact\Test\TestCase;
 
 class SegmentFactoryTest extends TestCase
 {
-    /** @test */
     public function test_instanciate_the_segment_from_segment_string(): void
     {
         /** @psalm-var class-string */
@@ -22,7 +21,6 @@ class SegmentFactoryTest extends TestCase
         $this->assertInstanceOf($segmentClass, $segFactory->build('UNH+'));
     }
 
-    /** @test */
     public function test_using_always_upper_case_as_segment_key(): void
     {
         /** @psalm-var class-string */
@@ -34,7 +32,6 @@ class SegmentFactoryTest extends TestCase
         $this->assertInstanceOf($segmentClass, $segFactory->build('UNH+'));
     }
 
-    /** @test **/
     public function test_instanciate_the_dafault_seg_if_its_allowed_and_no_specific_segement_was_found(): void
     {
         $segFactory = (new SegmentFactory())->addFallback(GenericSegment::class);
@@ -42,7 +39,6 @@ class SegmentFactoryTest extends TestCase
         $this->assertInstanceOf(GenericSegment::class, $segFactory->build('UKW'));
     }
 
-    /** @test **/
     public function test_throw_an_exception_if_no_default_seg_is_allowed_and_the_segment_is_unknowed(): void
     {
         $segFactory = new SegmentFactory();

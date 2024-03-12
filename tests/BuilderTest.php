@@ -13,7 +13,6 @@ use Apfelfrisch\Edifact\Test\TestCase;
 
 class BuilderTest extends TestCase
 {
-    /** @test */
     public function test_setting_default_una(): void
     {
         $builder = new Builder();
@@ -27,7 +26,6 @@ class BuilderTest extends TestCase
         $this->assertEquals(new UnaSegment(), $message->getUnaSegment());
     }
 
-    /** @test */
     public function test_using_custom_una(): void
     {
         $builder = new Builder(new UnaSegment('|', '#', ',', '!', '_'));
@@ -46,7 +44,6 @@ class BuilderTest extends TestCase
         );
     }
 
-    /** @test */
     public function test_provide_message_is_empty(): void
     {
         $builder = new Builder(new UnaSegment('|', '#', ',', '!', '_'));
@@ -60,7 +57,6 @@ class BuilderTest extends TestCase
         $this->assertFalse($builder->messageIsEmpty());
     }
 
-    /** @test */
     public function test_terminate_strings(): void
     {
         $builder = new Builder();
@@ -73,7 +69,6 @@ class BuilderTest extends TestCase
         $this->assertSame("UNA:+.? 'FTX+Foo??:Bar'", $message->toString());
     }
 
-    /** @test */
     public function test_auto_write_unz_segement(): void
     {
         $builder = new Builder();
@@ -84,7 +79,6 @@ class BuilderTest extends TestCase
         $this->assertStringEndsWith("UNZ+0+referenz-no'", (string)$builder->get());
     }
 
-    /** @test */
     public function test_writing_to_a_file(): void
     {
         $builder = new Builder();
@@ -95,7 +89,6 @@ class BuilderTest extends TestCase
         $this->assertSame("UNA:+.? 'AJT+COD'", (string)$builder->get());
     }
 
-    /** @test */
     public function test_using_stream_filters(): void
     {
         $builder = new Builder();
@@ -107,7 +100,6 @@ class BuilderTest extends TestCase
         $this->assertSame("UNA:+.? 'AJT+COD'", (string)$builder->get());
     }
 
-    /** @test */
     public function test_auto_write_unt_segement(): void
     {
         $builder = new Builder();
@@ -119,7 +111,6 @@ class BuilderTest extends TestCase
         $this->assertSame("UNA:+.? 'UNH+unh-ref+type:v-no:r-no:o-no:o-co'UNT+2+unh-ref'UNH+unh-ref-two+type:v-no:r-no:o-no:o-co'UNT+2+unh-ref-two'", (string)$builder->get());
     }
 
-    /** @test */
     public function test_counting_messages(): void
     {
         $builder = new Builder();
@@ -133,7 +124,6 @@ class BuilderTest extends TestCase
         $this->assertStringEndsWith("UNZ+3+unb-ref'", (string)$builder->get());
     }
 
-    /** @test */
     public function test_counting_unh_segments(): void
     {
         $builder = new Builder();
@@ -159,7 +149,6 @@ class BuilderTest extends TestCase
         $this->assertSame('2', $unts[2]->getValue('1', '0'));
     }
 
-    /** @test */
     public function test_write_direcly_into_file(): void
     {
         $tempFile = tempnam(sys_get_temp_dir(), 'test-edi-file');
@@ -181,7 +170,6 @@ class BuilderTest extends TestCase
         unlink($tempFile);
     }
 
-    /** @test */
     public function test_remove_edifact_file_when_build_was_not_finished(): void
     {
         $tempFile = tempnam(sys_get_temp_dir(), 'test-edi-file');
@@ -198,7 +186,6 @@ class BuilderTest extends TestCase
         $this->assertFalse(file_exists($tempFile));
     }
 
-    /** @test */
     public function test_throw_exception_when_add_a_segement_to_a_finalized_build(): void
     {
         $builder = new Builder();

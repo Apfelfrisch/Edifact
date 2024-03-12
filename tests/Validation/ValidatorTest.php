@@ -19,7 +19,6 @@ class ValidatorTest extends TestCase
         ValidationSegment::$ruleTwo = null;
     }
 
-    /** @test */
     public function test_throwing_exception_when_get_failures_was_called_before_is_valid(): void
     {
         $validator = new Validator();
@@ -29,7 +28,6 @@ class ValidatorTest extends TestCase
         $validator->getFailures();
     }
 
-    /** @test */
     public function test_throw_exception_when_validating_a_segment_wich_not_implements_the_validateable_interface(): void
     {
         $validator = new Validator();
@@ -42,7 +40,6 @@ class ValidatorTest extends TestCase
         $validator->isValid(Message::fromString('UNH+1', $segmentFactory));
     }
 
-    /** @test */
     public function test_validate_unkown_elements(): void
     {
         ValidationSegment::$ruleOne = 'M|n|1';
@@ -57,7 +54,6 @@ class ValidatorTest extends TestCase
         $this->assertSame('The input Element is unkown', $failure->getMessage());
     }
 
-    /** @test */
     public function test_validate_unkown_components(): void
     {
         ValidationSegment::$ruleOne = 'M|n|1';
@@ -74,7 +70,6 @@ class ValidatorTest extends TestCase
         $this->assertSame('The input Component is unkown', $failure->getMessage());
     }
 
-    /** @test */
     public function test_validate_digit_values(): void
     {
         ValidationSegment::$ruleOne = 'M|n|..11';
@@ -95,7 +90,6 @@ class ValidatorTest extends TestCase
         $this->assertSame(1, $failure->getUnhCounter());
     }
 
-    /** @test */
     public function test_validate_alpha_values(): void
     {
         ValidationSegment::$ruleOne = 'M|a|..53';
@@ -110,7 +104,6 @@ class ValidatorTest extends TestCase
         $this->assertSame("String must contain only alphabetic characters", $failure->getMessage());
     }
 
-    /** @test */
     public function test_validate_max_lenght(): void
     {
         ValidationSegment::$ruleOne = 'M|an|..2';
@@ -125,7 +118,6 @@ class ValidatorTest extends TestCase
         $this->assertSame("String is more than 2 characters long", $failure->getMessage());
     }
 
-    /** @test */
     public function test_validate_needed_component(): void
     {
         ValidationSegment::$ruleOne = 'M|an|..2';
@@ -140,7 +132,6 @@ class ValidatorTest extends TestCase
         $this->assertSame("Component with Id [1:1] is missing", $failure->getMessage());
     }
 
-    /** @test */
     public function test_validate_exact_string_lenght(): void
     {
         ValidationSegment::$ruleOne = 'M|an|3';
@@ -162,7 +153,6 @@ class ValidatorTest extends TestCase
         $this->assertSame("String is not 3 characters long", $failure->getMessage());
     }
 
-    /** @test */
     public function test_validate_missing_optional_element(): void
     {
         $validator = new Validator();
@@ -176,7 +166,6 @@ class ValidatorTest extends TestCase
         $this->assertTrue($validator->isValid($message));
     }
 
-    /** @test */
     public function test_validate_missing_required_element(): void
     {
         $validator = new Validator();
@@ -194,7 +183,6 @@ class ValidatorTest extends TestCase
         $this->assertSame(Failure::MISSING_COMPONENT, $failure->getType());
     }
 
-    /** @test */
     public function test_validate_missing_optional_component(): void
     {
         $validator = new Validator();
@@ -210,7 +198,6 @@ class ValidatorTest extends TestCase
         $this->assertTrue($validator->isValid($message));
     }
 
-    /** @test */
     public function test_skip_empty_rules(): void
     {
         $validator = new Validator();
@@ -224,7 +211,6 @@ class ValidatorTest extends TestCase
         $this->assertTrue($validator->isValid($message));
     }
 
-    /** @test */
     public function test_validate_missing_required_component(): void
     {
         $validator = new Validator();
@@ -242,7 +228,6 @@ class ValidatorTest extends TestCase
         $this->assertSame(Failure::MISSING_COMPONENT, $failure->getType());
     }
 
-    /** @test */
     public function test_validate_missing_valid_dependend_component(): void
     {
         $validator = new Validator();
@@ -258,7 +243,6 @@ class ValidatorTest extends TestCase
         $this->assertTrue($validator->isValid($message));
     }
 
-    /** @test */
     public function test_validate_missing_invalid_dependend_component(): void
     {
         $validator = new Validator();
@@ -276,7 +260,6 @@ class ValidatorTest extends TestCase
         $this->assertSame(Failure::MISSING_COMPONENT, $failure->getType());
     }
 
-    /** @test */
     public function test_ignore_optional_empty_components(): void
     {
         ValidationSegment::$ruleOne = 'O|an|3';
@@ -287,7 +270,6 @@ class ValidatorTest extends TestCase
         $this->assertFalse($validator->isValid($this->buildMessage('1234')));
     }
 
-    /** @test */
     public function test_iterate_over_failures(): void
     {
         ValidationSegment::$ruleOne = 'M|n|1';

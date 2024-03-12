@@ -5,7 +5,7 @@ namespace Apfelfrisch\Edifact\Test\Fixtures;
 use Apfelfrisch\Edifact\Segment\AbstractSegment;
 use Apfelfrisch\Edifact\Segment\Elements;
 
-class AbstractSegmentTestSegment extends AbstractSegment
+class Segment extends AbstractSegment
 {
     private static ?Elements $blueprint = null;
 

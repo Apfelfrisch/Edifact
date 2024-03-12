@@ -6,20 +6,18 @@ namespace Code\Php\Edifact\tests\Message\Segments;
 
 use Apfelfrisch\Edifact\Segment\SeglineParser;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
-use Apfelfrisch\Edifact\Test\Fixtures\AbstractSegmentTestSegment;
+use Apfelfrisch\Edifact\Test\Fixtures\Segment;
 use Apfelfrisch\Edifact\Test\TestCase;
 
 class AbstractSegmentTest extends TestCase
 {
-    /** @test */
     public function test_provide_segment_name(): void
     {
-        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser(), 'A');
+        $segment = Segment::fromSegLine(new SeglineParser(), 'A');
 
         $this->assertEquals('A', $segment->name());
     }
 
-    /** @test */
     public function test_array_casting(): void
     {
         $givenString = 'A+B+1:2:3:4:5+D+E';
@@ -31,28 +29,26 @@ class AbstractSegmentTest extends TestCase
             "E" => ["E" => "E",],
         ];
 
-        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser(), $givenString);
+        $segment = Segment::fromSegLine(new SeglineParser(), $givenString);
 
         $this->assertEquals($expectedArray, $segment->toArray());
     }
 
-    /** @test */
     public function test_escaping_string(): void
     {
         $givenString = "A+???:?+";
 
-        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser(), $givenString);
+        $segment = Segment::fromSegLine(new SeglineParser(), $givenString);
 
         $this->assertEquals('?:+', $segment->getValue('B', 'B'));
         $this->assertEquals('?:+', $segment->getValueFromPosition(1, 0));
     }
 
-    /** @test */
     public function test_replace_space_character(): void
     {
         $givenString = "A+test_replace_space_char";
 
-        $segment = AbstractSegmentTestSegment::fromSegLine(
+        $segment = Segment::fromSegLine(
             new SeglineParser(new UnaSegment(':', '+', '.', '?', '_')),
             $givenString
         );
@@ -61,12 +57,11 @@ class AbstractSegmentTest extends TestCase
         $this->assertEquals('test replace space char', $segment->getValueFromPosition(1, 0));
     }
 
-    /** @test */
     public function test_replace_decimal_point(): void
     {
         $givenString = "A++1,23";
 
-        $segment = AbstractSegmentTestSegment::fromSegLine(
+        $segment = Segment::fromSegLine(
             new SeglineParser(new UnaSegment(':', '+', ',')),
             $givenString
         );

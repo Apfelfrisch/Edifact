@@ -7,7 +7,6 @@ use Apfelfrisch\Edifact\Validation\ValueValidator;
 
 class ValueValidatorTest extends TestCase
 {
-    /** @test */
     public function test_optional_value(): void
     {
         $validator = new ValueValidator();
@@ -16,7 +15,6 @@ class ValueValidatorTest extends TestCase
         $this->assertEmpty($validator->validate('a', 'O|a|1', ''));
     }
 
-    /** @test */
     public function test_needed_value(): void
     {
         $validator = new ValueValidator();
@@ -25,7 +23,6 @@ class ValueValidatorTest extends TestCase
         $this->assertCount(1, $validator->validate('', 'M|a|1', ''));
     }
 
-    /** @test */
     public function test_numeric_value(): void
     {
         $validator = new ValueValidator();
@@ -34,7 +31,6 @@ class ValueValidatorTest extends TestCase
         $this->assertEmpty($validator->validate('1', 'M|n|1', ''));
     }
 
-    /** @test */
     public function test_alpha_value(): void
     {
         $validator = new ValueValidator();
@@ -43,7 +39,6 @@ class ValueValidatorTest extends TestCase
         $this->assertEmpty($validator->validate('a', 'M|a|1', ''));
     }
 
-    /** @test */
     public function test_exact_value_length(): void
     {
         $validator = new ValueValidator();
@@ -55,7 +50,6 @@ class ValueValidatorTest extends TestCase
         $this->assertEmpty($validator->validate('🙂🙂🙂', 'M|an|3', ''));
     }
 
-    /** @test */
     public function test_maximum_value_length(): void
     {
         $validator = new ValueValidator();
@@ -65,7 +59,6 @@ class ValueValidatorTest extends TestCase
         $this->assertEmpty($validator->validate('ab', 'M|a|..3', ''));
     }
 
-    /** @test */
     public function test_multiple_failures(): void
     {
         $validator = new ValueValidator();
