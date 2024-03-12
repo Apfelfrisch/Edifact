@@ -1,9 +1,9 @@
 {
     "name": "apfelfrisch/edifact",
-    "description": "Parse, build, serialize and validate UN/EDIFACT messages",    
+    "description": "Parse, build, serialize and validate UN/EDIFACT messages",
     "license": "MIT",
-    "require": { 
-        "php": "~8.0.0 || ~8.1.0 || ~8.2.0"
+    "require": {
+        "php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.3",
