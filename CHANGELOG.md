@@ -1,5 +1,8 @@
 # Changelog
 
+1.2.1
+ - fix Terminate segment terminator
+
 1.1.1
  - Remove obsolete Respect\Validation from dependencies
 
