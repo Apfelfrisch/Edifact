@@ -6,9 +6,14 @@ namespace Apfelfrisch\Edifact\Exceptions;
 
 class InvalidStreamException extends EdifactException
 {
-    public static function readError(string $filename): self
+    public static function openError(string $filename): self
     {
         throw new self("Failed to open stream: [{$filename}]");
+    }
+
+    public static function readError(string $filename): self
+    {
+        throw new self("Failed to read stream: [{$filename}]");
     }
 
     public static function filterError(string $filtername): self

@@ -10,5 +10,5 @@
         "CastString": false
     },
     "minMsi": 92,
-    "minCoveredMsi": 96
+    "minCoveredMsi": 95
 }

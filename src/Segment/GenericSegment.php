@@ -12,7 +12,7 @@ class GenericSegment implements SegmentInterface
     }
 
     /**
-     * @psalm-param list<list<string>> $valueArrays
+     * @psalm-param list<string> $valueArrays
      */
     public static function fromAttributes(string $name, array ...$valueArrays): self
     {

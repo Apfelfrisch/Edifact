@@ -117,6 +117,10 @@ final class SeglineParser
      */
     private function explodeString(string $string, string $pattern): array
     {
+        if ($pattern === '') {
+            return [$string];
+        }
+
         if (str_contains($string, $this->unaSegment->escapeCharacter() . $pattern)) {
             return $this->safeExplodeString($string, $pattern);
         }

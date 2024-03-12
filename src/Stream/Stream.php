@@ -12,7 +12,7 @@ use Throwable;
 
 final class Stream extends SplFileInfo
 {
-    /* @var array<string, array<resource>> */
+    /** @var array<string, list<resource>> */
     private array $filters = [];
 
     /** @var resource */
@@ -35,7 +35,7 @@ final class Stream extends SplFileInfo
         }
 
         if (! is_resource($resource)) {
-            throw InvalidStreamException::readError($filename);
+            throw InvalidStreamException::openError($filename);
         }
 
         $this->resource = $resource;
@@ -108,7 +108,11 @@ final class Stream extends SplFileInfo
 
     public function getContents(): string
     {
-        return trim(stream_get_contents($this->resource));
+        if (false === $content = stream_get_contents($this->resource)) {
+            throw InvalidStreamException::readError($this->getFilename());
+        }
+
+        return trim($content);
     }
 
     public function eof(): bool
@@ -141,9 +145,14 @@ final class Stream extends SplFileInfo
         return fpassthru($this->resource);
     }
 
+    /** @param int<0, max> $length*/
     public function read(int $length): string
     {
-        return fread($this->resource, $length);
+        if (false === $content = fread($this->resource, $length)) {
+            throw InvalidStreamException::readError($this->getFilename());
+        }
+
+        return $content;
     }
 
     public function seek(int $offset, int $whence = SEEK_SET): bool
@@ -151,9 +160,16 @@ final class Stream extends SplFileInfo
         return 0 == fseek($this->resource, $offset, $whence);
     }
 
+    /**
+     * @return array<int|string, int>
+     */
     public function stat(): array
     {
-        return fstat($this->resource);
+        if (false === $stats = fstat($this->resource)) {
+            throw InvalidStreamException::readError($this->getFilename());
+        }
+
+        return $stats;
     }
 
     public function tell(): int
@@ -197,6 +213,7 @@ final class Stream extends SplFileInfo
 
     private function addFilter(string $filtername, int $direction, mixed $params = null): void
     {
+        /** @phpstan-ignore-next-line */
         $res = @stream_filter_append($this->resource, $filtername, $direction, $params);
 
         if (! is_resource($res)) {

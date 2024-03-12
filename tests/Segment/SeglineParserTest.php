@@ -64,7 +64,7 @@ final class SeglineParserTest extends TestCase
     /**
      * @psalm-return iterable<string, array{string: string, result: string}>
      */
-    static public function seglineStringProviderForStringEscaping(): iterable
+    public static function seglineStringProviderForStringEscaping(): iterable
     {
         yield 'simple-terminate-control-chars' => [
             'string' => 'A+?:?+',
@@ -85,7 +85,7 @@ final class SeglineParserTest extends TestCase
     /**
      * @psalm-return iterable<string, array{string: string, elements: Elements, result: string}>
      */
-    static public function seglineStringProviderForBlueprintParsing(): iterable
+    public static function seglineStringProviderForBlueprintParsing(): iterable
     {
         yield 'simple-terminate-control-chars' => [
             'string' => 'A+?:?+',

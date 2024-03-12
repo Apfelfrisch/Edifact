@@ -78,9 +78,11 @@ class Message
 
     /**
      * @template T of SegmentInterface
-     * @psalm-param class-string<T> $segmentClass
-     * @psalm-suppress InvalidReturnType
-     * @psalm-return Generator<int, T, mixed, void>
+     *
+     * @param class-string<T> $segmentClass
+     * @param Closure(T):bool|null $closure
+     *
+     * @return Generator<int, T>
      */
     public function filterSegments(string $segmentClass, ?Closure $closure = null): Generator
     {
@@ -88,7 +90,9 @@ class Message
             if ($segment::class !== $segmentClass) {
                 continue;
             }
+            /** @phpstan-ignore-next-line */
             if ($closure === null || $closure($segment) === true) {
+                /** @phpstan-ignore-next-line */
                 yield $segment;
             }
         }
@@ -96,8 +100,11 @@ class Message
 
     /**
      * @template T of SegmentInterface
-     * @psalm-param class-string<T> $segmentClass
-     * @psalm-return list<T>
+     *
+     * @param class-string<T> $segmentClass
+     * @param Closure(T):bool|null $closure
+     *
+     * @return list<T>
      */
     public function filterAllSegments(string $segmentClass, ?Closure $closure = null): array
     {
@@ -107,8 +114,11 @@ class Message
 
     /**
      * @template T of SegmentInterface
-     * @psalm-param class-string<T> $segmentClass
-     * @psalm-return T|null
+     *
+     * @param class-string<T> $segmentClass
+     * @param Closure(T):bool|null $closure
+     *
+     * @return T|null
      */
     public function findFirstSegment(string $segmentClass, ?Closure $closure = null): ?SegmentInterface
     {
