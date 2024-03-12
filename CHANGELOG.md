@@ -1,5 +1,9 @@
 # Changelog
 
+1.3.1
+ - Add php 8.3
+ - Drop php 8.0
+
 1.2.1
  - fix Terminate segment terminator
 
