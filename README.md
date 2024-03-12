@@ -1,7 +1,7 @@
 # PHP - EDIFACT
 
 ![Unit test](https://github.com/Apfelfrisch/Edifact/actions/workflows/phpunit.yml/badge.svg)
-![Static Analysis](https://github.com/Apfelfrisch/Edifact/actions/workflows/psalm.yml/badge.svg)
+![Static Analysis](https://github.com/Apfelfrisch/Edifact/actions/workflows/phpstan.yml/badge.svg)
 ![Mutation tests](https://github.com/Apfelfrisch/Edifact/actions/workflows/infection.yml/badge.svg)
 
 Parse, build, serialize and validate UN/EDIFACT Messages in a memory efficient way.
