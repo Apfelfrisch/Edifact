@@ -24,11 +24,11 @@ class Builder
     private EdifactFormatter $stringFormatter;
     private SegmentCounter $counter;
 
-    public function __construct(UnaSegment $unaSegment = null, string $filepath = 'php://temp')
+    public function __construct(UnaSegment|null $unaSegment = null, string $filepath = 'php://temp')
     {
         $this->filepath = $filepath;
 
-        $this->stream = new Stream($this->filepath, 'w+', $unaSegment);
+        $this->stream = new Stream($this->filepath, 'w+', $unaSegment ?? new UnaSegment());
         $this->counter = new SegmentCounter();
         $this->stringFormatter = new EdifactFormatter($this->stream->getUnaSegment());
         $this->stringFormatter->prefixUna();

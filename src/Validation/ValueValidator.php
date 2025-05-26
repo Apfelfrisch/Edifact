@@ -125,7 +125,7 @@ final class ValueValidator
         }
     }
 
-    private function buildMessage(string $key, string $replacement = null): string
+    private function buildMessage(string $key, string|null $replacement = null): string
     {
         $message = $this->messages[$key] ?? throw InvalidEdifactContentException::messageUnknown("Unkown message key [$key]");
 

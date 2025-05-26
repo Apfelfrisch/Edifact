@@ -6,6 +6,7 @@ namespace Apfelfrisch\Edifact\Stream;
 
 use Apfelfrisch\Edifact\Exceptions\InvalidStreamException;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
+use Exception;
 use RuntimeException;
 use SplFileInfo;
 use Throwable;
@@ -41,7 +42,7 @@ final class Stream extends SplFileInfo
         $this->resource = $resource;
 
         if ($openMode === 'r' || substr($openMode, 1, 1) === '+') { // Stream is readable
-            $this->unaSegment = UnaSegment::setFromStream($this, fallback: $unaSegment);
+            $this->unaSegment = UnaSegment::setFromStream($this, fallback: $unaSegment ?? new UnaSegment());
         } else {
             $this->unaSegment = $unaSegment ?? new UnaSegment();
         }
@@ -148,6 +149,10 @@ final class Stream extends SplFileInfo
     /** @param int<0, max> $length*/
     public function read(int $length): string
     {
+        if ($length < 1) {
+            throw new InvalidStreamException("Parameter #1 $length of function read expects int<1, max>, int<0, max> given");
+        }
+
         if (false === $content = fread($this->resource, $length)) {
             throw InvalidStreamException::readError($this->getFilename());
         }
