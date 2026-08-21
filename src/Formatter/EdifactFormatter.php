@@ -12,9 +12,8 @@ final class EdifactFormatter implements Formatter
     private bool $prefixUna = false;
 
     public function __construct(
-        private UnaSegment $unaSegment
-    ) {
-    }
+        private readonly UnaSegment $unaSegment,
+    ) {}
 
     public function prefixUna(): self
     {
@@ -34,33 +33,41 @@ final class EdifactFormatter implements Formatter
 
         foreach ($segments as $segment) {
             $segmentString = '';
+
             foreach ($segment->toArray() as $elementKey => $element) {
                 foreach ($element as $componentKey => $value) {
-                    $segmentString .= $this->buildComponent($value, $segment, (string)$elementKey, (string)$componentKey);
+                    $segmentString .= $this->buildComponent(
+                        $value,
+                        $segment,
+                        (string) $elementKey,
+                        (string) $componentKey,
+                    );
                 }
 
-                $segmentString = $this->trimEmpty(
-                    $segmentString,
-                    $this->unaSegment->componentSeparator()
-                ) . $this->unaSegment->elementSeparator();
+                $segmentString =
+                    $this->trimEmpty($segmentString, $this->unaSegment->componentSeparator())
+                    . $this->unaSegment->elementSeparator();
             }
-            $string .= $this->trimEmpty($segmentString, $this->unaSegment->elementSeparator()) . $this->unaSegment->segmentTerminator();
+
+            $string .=
+                $this->trimEmpty($segmentString, $this->unaSegment->elementSeparator())
+                . $this->unaSegment->segmentTerminator();
         }
 
         return $string;
     }
 
-    private function buildComponent(string|null $value, Segment $segment, string $elementKey, string $componentKey): string
+    private function buildComponent(?string $value, Segment $segment, string $elementKey, string $componentKey): string
     {
         if ($value === null) {
             return $this->unaSegment->componentSeparator();
         }
 
-        if (! $this->unaSegment->usesPhpDecimalPoint() && $segment->isValueNumeric($elementKey, $componentKey)) {
+        if (!$this->unaSegment->usesPhpDecimalPoint() && $segment->isValueNumeric($elementKey, $componentKey)) {
             return str_replace(UnaSegment::PHP_DECIMAL, $this->unaSegment->decimalPoint(), $value);
         }
 
-        if (! $this->unaSegment->usesPhpSpaceCharacter()) {
+        if (!$this->unaSegment->usesPhpSpaceCharacter()) {
             $value = str_replace(UnaSegment::PHP_SPACE, $this->unaSegment->spaceCharacter(), $value);
         }
 
@@ -84,14 +91,14 @@ final class EdifactFormatter implements Formatter
                 $this->unaSegment->escapeCharacter() . $this->unaSegment->segmentTerminator(),
                 '',
             ],
-            $string
+            $string,
         );
     }
 
-    private function trimEmpty(string $string, string $seperator): string
+    private function trimEmpty(string $string, string $separator): string
     {
         while ($string !== '') {
-            if ($seperator !== $string[-1]) {
+            if ($separator !== $string[-1]) {
                 break;
             }
 

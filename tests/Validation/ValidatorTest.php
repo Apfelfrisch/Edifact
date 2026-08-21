@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Apfelfrisch\Edifact\Test\Validation;
 
 use Apfelfrisch\Edifact\Exceptions\ValidationException;
@@ -10,31 +12,33 @@ use Apfelfrisch\Edifact\Test\Fixtures\ValidationSegment;
 use Apfelfrisch\Edifact\Test\TestCase;
 use Apfelfrisch\Edifact\Validation\Failure;
 use Apfelfrisch\Edifact\Validation\Validator;
+use Override;
 
-class ValidatorTest extends TestCase
+final class ValidatorTest extends TestCase
 {
-    public function setUp(): void
+    #[Override]
+    protected function setUp(): void
     {
         ValidationSegment::$ruleOne = null;
         ValidationSegment::$ruleTwo = null;
     }
 
-    /** @test */
     public function test_throwing_exception_when_get_failures_was_called_before_is_valid(): void
     {
-        $validator = new Validator;
+        $validator = new Validator();
 
         $this->expectException(ValidationException::class);
-        $this->expectExceptionMessage('No Message was validated, call [Apfelfrisch\Edifact\Validation\Validator::isValid] first');
+        $this->expectExceptionMessage(
+            'No Message was validated, call [Apfelfrisch\Edifact\Validation\Validator::isValid] first',
+        );
         $validator->getFailures();
     }
 
-    /** @test */
     public function test_throw_exception_when_validating_a_segment_wich_not_implements_the_validateable_interface(): void
     {
-        $validator = new Validator;
+        $validator = new Validator();
 
-        $segmentFactory = new StreamMessageFactory;
+        $segmentFactory = new StreamMessageFactory();
         $segmentFactory->addFallback(GenericSegment::class);
 
         $this->expectException(ValidationException::class);
@@ -42,268 +46,263 @@ class ValidatorTest extends TestCase
         $validator->isValid($this->buildMessage('UNH+1', $segmentFactory));
     }
 
-    /** @test */
-    public function test_validate_unkown_elements(): void
+    public function test_validate_unknown_elements(): void
     {
         ValidationSegment::$ruleOne = 'M|n|1';
 
-        $validator = new Validator;
+        $validator = new Validator();
 
-        $this->assertFalse($validator->isValid($this->buildMessage("UNH+1+unkown-element:unkown-component'")));
+        static::assertFalse($validator->isValid($this->buildMessage("UNH+1+unknown-element:unknown-component'")));
 
-        $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
-        $this->assertSame(2, $failure->getElementPosition());
-        $this->assertSame('unkown-element', $failure->getValue());
-        $this->assertSame('The input Element is unkown', $failure->getMessage());
+        static::assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
+        static::assertSame(2, $failure->elementPosition);
+        static::assertSame('unknown-element', $failure->value);
+        static::assertSame('The input Element is unknown', $failure->message);
     }
 
-    /** @test */
-    public function test_validate_unkown_components(): void
+    public function test_validate_unknown_components(): void
     {
         ValidationSegment::$ruleOne = 'M|n|1';
 
-        $validator = new Validator;
+        $validator = new Validator();
 
-        $this->assertFalse($validator->isValid($this->buildMessage("UNH+1::unkown-component'")));
+        static::assertFalse($validator->isValid($this->buildMessage("UNH+1::unknown-component'")));
 
-        $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
+        static::assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
 
-        $this->assertSame(1, $failure->getElementPosition());
-        $this->assertSame(2, $failure->getComponentPosition());
-        $this->assertSame('unkown-component', $failure->getValue());
-        $this->assertSame('The input Component is unkown', $failure->getMessage());
+        static::assertSame(1, $failure->elementPosition);
+        static::assertSame(2, $failure->componentPosition);
+        static::assertSame('unknown-component', $failure->value);
+        static::assertSame('The input Component is unknown', $failure->message);
     }
 
-    /** @test */
     public function test_validate_digit_values(): void
     {
         ValidationSegment::$ruleOne = 'M|n|..11';
-        $digits = implode(range(0, 7)) . '.1';
+        $digits = '01234567.1';
 
-        $validator = new Validator;
+        $validator = new Validator();
 
-        $this->assertTrue($validator->isValid($this->buildMessage("UNH+$digits")));
-        $this->assertFalse($validator->isValid($this->buildMessage("UNH+$digits" . 'A')));
-        $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
+        static::assertTrue($validator->isValid($this->buildMessage("UNH+{$digits}")));
+        static::assertFalse($validator->isValid($this->buildMessage("UNH+{$digits}A")));
+        static::assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
 
-        $this->assertSame('UNH', $failure->getSegmentName());
-        $this->assertSame(1, $failure->getElementPosition());
-        $this->assertSame(0, $failure->getComponentPosition());
-        $this->assertSame($digits . 'A', $failure->getValue());
-        $this->assertSame('String must contain only digits', $failure->getMessage());
-        $this->assertSame(1, $failure->getMessageCounter());
-        $this->assertSame(1, $failure->getUnhCounter());
+        static::assertSame('UNH', $failure->segmentName);
+        static::assertSame(1, $failure->elementPosition);
+        static::assertSame(0, $failure->componentPosition);
+        static::assertSame($digits . 'A', $failure->value);
+        static::assertSame('String must contain only digits', $failure->message);
+        static::assertSame(1, $failure->messageCounter);
+        static::assertSame(1, $failure->unhCounter);
     }
 
-    /** @test */
     public function test_validate_alpha_values(): void
     {
         ValidationSegment::$ruleOne = 'M|a|..53';
         $alphaValues = implode(array_merge(range('a', 'z'), range('A', 'Z')));
 
-        $validator = new Validator;
+        $validator = new Validator();
 
-        $this->assertTrue($validator->isValid($this->buildMessage("UNH+$alphaValues")));
-        $this->assertFalse($validator->isValid($this->buildMessage("UNH+$alphaValues" . '1')));
-        $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
-        $this->assertSame($alphaValues . '1', $failure->getValue());
-        $this->assertSame("String must contain only alphabetic characters", $failure->getMessage());
+        static::assertTrue($validator->isValid($this->buildMessage("UNH+{$alphaValues}")));
+        static::assertFalse($validator->isValid($this->buildMessage("UNH+{$alphaValues}1")));
+        static::assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
+        static::assertSame($alphaValues . '1', $failure->value);
+        static::assertSame('String must contain only alphabetic characters', $failure->message);
     }
 
-    /** @test */
     public function test_validate_max_lenght(): void
     {
         ValidationSegment::$ruleOne = 'M|an|..2';
 
-        $validator = new Validator;
+        $validator = new Validator();
 
-        $this->assertTrue($validator->isValid($this->buildMessage("UNH+A'")));
+        static::assertTrue($validator->isValid($this->buildMessage("UNH+A'")));
 
-        $this->assertFalse($validator->isValid($this->buildMessage("UNH+ABC'")));
-        $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
-        $this->assertSame('ABC', $failure->getValue());
-        $this->assertSame("String is more than 2 characters long", $failure->getMessage());
+        static::assertFalse($validator->isValid($this->buildMessage("UNH+ABC'")));
+        static::assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
+        static::assertSame('ABC', $failure->value);
+        static::assertSame('String is more than 2 characters long', $failure->message);
     }
 
-    /** @test */
     public function test_validate_needed_component(): void
     {
         ValidationSegment::$ruleOne = 'M|an|..2';
 
-        $validator = new Validator;
+        $validator = new Validator();
 
-        $this->assertTrue($validator->isValid($this->buildMessage("UNH+A'")));
+        static::assertTrue($validator->isValid($this->buildMessage("UNH+A'")));
 
-        $this->assertFalse($validator->isValid($this->buildMessage("UNH+")));
-        $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
-        $this->assertSame('', $failure->getValue());
-        $this->assertSame("Component with Id [1:1] is missing", $failure->getMessage());
+        static::assertFalse($validator->isValid($this->buildMessage('UNH+')));
+        static::assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
+        static::assertSame('', $failure->value);
+        static::assertSame('Component with Id [1:1] is missing', $failure->message);
     }
 
-    /** @test */
     public function test_validate_exact_string_lenght(): void
     {
         ValidationSegment::$ruleOne = 'M|an|3';
 
         $string = '123';
 
-        $validator = new Validator;
+        $validator = new Validator();
 
-        $this->assertTrue($validator->isValid($this->buildMessage("UNH+123'")));
+        static::assertTrue($validator->isValid($this->buildMessage("UNH+123'")));
 
-        $this->assertFalse($validator->isValid($this->buildMessage("UNH+12'")));
-        $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
-        $this->assertSame('12', $failure->getValue());
-        $this->assertSame("String is not 3 characters long", $failure->getMessage());
+        static::assertFalse($validator->isValid($this->buildMessage("UNH+12'")));
+        static::assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
+        static::assertSame('12', $failure->value);
+        static::assertSame('String is not 3 characters long', $failure->message);
 
-        $this->assertFalse($validator->isValid($this->buildMessage("UNH+$string" . '4')));
-        $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
-        $this->assertSame($string . '4', $failure->getValue());
-        $this->assertSame("String is not 3 characters long", $failure->getMessage());
+        static::assertFalse($validator->isValid($this->buildMessage("UNH+{$string}4")));
+        static::assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
+        static::assertSame($string . '4', $failure->value);
+        static::assertSame('String is not 3 characters long', $failure->message);
     }
 
-    /** @test */
     public function test_validate_missing_optional_element(): void
     {
-        $validator = new Validator;
+        $validator = new Validator();
 
         ValidationSegment::$ruleOne = 'O|an|3';
-        $segmentFactory = new StreamMessageFactory;
+        $segmentFactory = new StreamMessageFactory();
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
-        $this->assertTrue($validator->isValid($this->buildMessage("UNH", $segmentFactory)));
+        static::assertTrue($validator->isValid($this->buildMessage('UNH', $segmentFactory)));
     }
 
-    /** @test */
     public function test_validate_missing_required_element(): void
     {
-        $validator = new Validator;
+        $validator = new Validator();
 
         ValidationSegment::$ruleOne = 'M|an|3';
-        $segmentFactory = new StreamMessageFactory;
+        $segmentFactory = new StreamMessageFactory();
         $segmentFactory->addSegment('UNC', ValidationSegment::class);
 
         $message = $this->buildMessage("UNC'", $segmentFactory);
 
-        $this->assertFalse($validator->isValid($message));
-        $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
-        $this->assertSame(0, $failure->getUnhCounter());
-        $this->assertSame(0, $failure->getMessageCounter());
-        $this->assertSame(Failure::MISSING_COMPONENT, $failure->getType());
+        static::assertFalse($validator->isValid($message));
+        static::assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
+        static::assertSame(0, $failure->unhCounter);
+        static::assertSame(0, $failure->messageCounter);
+        static::assertSame(Failure::MISSING_COMPONENT, $failure->type);
     }
 
-    /** @test */
     public function test_validate_missing_optional_component(): void
     {
-        $validator = new Validator;
+        $validator = new Validator();
 
         ValidationSegment::$ruleOne = 'M|an|3';
         ValidationSegment::$ruleTwo = 'O|an|3';
 
-        $segmentFactory = new StreamMessageFactory;
+        $segmentFactory = new StreamMessageFactory();
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
-        $this->assertTrue($validator->isValid($this->buildMessage("UNH+ABC'", $segmentFactory)));
+        static::assertTrue($validator->isValid($this->buildMessage("UNH+ABC'", $segmentFactory)));
     }
 
-    /** @test */
     public function test_skip_empty_rules(): void
     {
-        $validator = new Validator;
-        $segmentFactory = new StreamMessageFactory;
+        $validator = new Validator();
+        $segmentFactory = new StreamMessageFactory();
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
         // Case One: Wrong Elements
         ValidationSegment::$ruleOne = null;
         ValidationSegment::$ruleTwo = 'M|an|3';
 
-        $this->assertTrue($validator->isValid($this->buildMessage("UNH+missing-rule:ABC'", $segmentFactory)));
+        static::assertTrue($validator->isValid($this->buildMessage("UNH+missing-rule:ABC'", $segmentFactory)));
     }
 
-    /** @test */
     public function test_validate_missing_required_component(): void
     {
-        $validator = new Validator;
+        $validator = new Validator();
 
         ValidationSegment::$ruleOne = 'M|an|3';
         ValidationSegment::$ruleTwo = 'M|an|3';
 
-        $segmentFactory = new StreamMessageFactory;
+        $segmentFactory = new StreamMessageFactory();
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
-        $this->assertFalse($validator->isValid($this->buildMessage("UNH+ABC'", $segmentFactory)));
-        $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
-        $this->assertSame(Failure::MISSING_COMPONENT, $failure->getType());
+        static::assertFalse($validator->isValid($this->buildMessage("UNH+ABC'", $segmentFactory)));
+        static::assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
+        static::assertSame(Failure::MISSING_COMPONENT, $failure->type);
     }
 
-    /** @test */
     public function test_validate_missing_valid_dependend_component(): void
     {
-        $validator = new Validator;
+        $validator = new Validator();
 
         ValidationSegment::$ruleOne = 'D|an|3';
         ValidationSegment::$ruleTwo = 'O|an|3';
 
-        $message = $this->buildMessage("UNH+");
+        $message = $this->buildMessage('UNH+');
 
-        $this->assertTrue($validator->isValid($message));
-        $this->assertTrue($validator->isValid($message));
+        static::assertTrue($validator->isValid($message));
+        static::assertTrue($validator->isValid($message));
     }
 
-    /** @test */
     public function test_validate_missing_invalid_dependend_component(): void
     {
-        $validator = new Validator;
+        $validator = new Validator();
 
         ValidationSegment::$ruleOne = 'D|an|3';
         ValidationSegment::$ruleTwo = 'O|an|3';
 
-        $segmentFactory = new StreamMessageFactory;
+        $segmentFactory = new StreamMessageFactory();
         $segmentFactory->addSegment('UNH', ValidationSegment::class);
 
-        $message = $this->buildMessage("UNH+:ABC");
+        $message = $this->buildMessage('UNH+:ABC');
 
-        $this->assertFalse($validator->isValid($message));
-        $this->assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
-        $this->assertSame(Failure::MISSING_COMPONENT, $failure->getType());
+        static::assertFalse($validator->isValid($message));
+        static::assertInstanceOf(Failure::class, $failure = $validator->getFirstFailure());
+        static::assertSame(Failure::MISSING_COMPONENT, $failure->type);
     }
 
-    /** @test */
     public function test_ignore_optional_empty_components(): void
     {
         ValidationSegment::$ruleOne = 'O|an|3';
 
-        $validator = new Validator;
+        $validator = new Validator();
 
-        $this->assertTrue($validator->isValid($this->buildMessage("UNH")));
-        $this->assertFalse($validator->isValid($this->buildMessage("UNH+1234'")));
+        static::assertTrue($validator->isValid($this->buildMessage('UNH')));
+        static::assertFalse($validator->isValid($this->buildMessage("UNH+1234'")));
     }
 
-    /** @test */
     public function test_iterate_over_failures(): void
     {
         ValidationSegment::$ruleOne = 'M|n|1';
 
-        $validator = new Validator;
+        $validator = new Validator();
 
-        $this->assertFalse($validator->isValid($this->buildMessage("UNH+AB'")));
+        static::assertFalse($validator->isValid($this->buildMessage("UNH+AB'")));
 
         $i = 0;
+
         foreach ($validator->getFailures() as $failure) {
             $i++;
-            $this->assertInstanceOf(Failure::class, $failure);
+            static::assertInstanceOf(Failure::class, $failure);
         }
 
-        $this->assertSame(2, $i);
+        static::assertSame(2, $i);
     }
 
-    private function buildMessage(string $string, StreamMessageFactory|null $segmentFactory = null): Message
+    private function buildMessage(string $string, ?StreamMessageFactory $segmentFactory = null): Message
     {
         if ($segmentFactory === null) {
-            $segmentFactory = new StreamMessageFactory;
+            $segmentFactory = new StreamMessageFactory();
             $segmentFactory->addSegment('UNH', ValidationSegment::class);
         }
 
         return $segmentFactory->fromString($string);
+    }
+
+    public function test_get_first_failure_returns_null_when_the_message_is_valid(): void
+    {
+        ValidationSegment::$ruleOne = 'O|an|3';
+
+        $validator = new Validator();
+
+        static::assertTrue($validator->isValid($this->buildMessage('UNH')));
+        static::assertNull($validator->getFirstFailure());
     }
 }

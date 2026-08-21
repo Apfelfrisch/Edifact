@@ -6,35 +6,32 @@ on:
 
 jobs:
   phpunit:
-    runs-on: ${{ matrix.operating-system }}
+    runs-on: "ubuntu-latest"
 
     strategy:
       matrix:
         php-versions:
-          - 8.0
-          - 8.1
-        operating-system: 
-          - "ubuntu-latest"
+          - "8.5"
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@v2"
+        uses: "actions/checkout@v4"
 
       - name: "Install PHP"
         uses: "shivammathur/setup-php@v2"
         with:
           coverage: "pcov"
           php-version: "${{ matrix.php-versions }}"
-          tools: composer, cs2pr
+          tools: "composer"
 
       - name: "Cache dependencies"
-        uses: "actions/cache@v2"
+        uses: "actions/cache@v4"
         with:
           path: |
             ~/.composer/cache
             vendor
-          key: "php-${{ matrix.php-versions }}"
-          restore-keys: "php-${{ matrix.php-versions }}"
+          key: "php-${{ matrix.php-versions }}-${{ hashFiles('composer.json') }}"
+          restore-keys: "php-${{ matrix.php-versions }}-"
 
       - name: "Install dependencies"
         run: "composer update --no-interaction --no-progress"

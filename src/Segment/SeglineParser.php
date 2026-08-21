@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Apfelfrisch\Edifact\Segment;
 
 final class SeglineParser
 {
-    private const SEG_UNKOWN_KEY_PREFIX = 'unknown';
+    private const string UNKNOWN_KEY_PREFIX = 'unknown';
 
-    private UnaSegment $unaSegment;
+    private readonly UnaSegment $unaSegment;
 
     public function __construct(?UnaSegment $unaSegment = null)
     {
@@ -18,37 +20,47 @@ final class SeglineParser
         $blueprintArray = $blueprint->toArray();
         $elementKeys = array_keys($blueprintArray);
 
-        $elementArray = $this->explodeString($this->removeContrlChars($segline), $this->unaSegment->elementSeparator());
+        $elementArray = $this->explodeString(
+            $this->removeControlChars($segline),
+            $this->unaSegment->elementSeparator(),
+        );
 
-        $elements = new Elements;
+        $elements = new Elements();
 
-        foreach ($elementArray as $elementPosition => $elementsArray) {
-            $components = $this->explodeString($elementsArray, $this->unaSegment->componentSeparator());
+        foreach ($elementArray as $elementPosition => $elementString) {
+            $components = $this->explodeString($elementString, $this->unaSegment->componentSeparator());
 
-            if (null !== $elementKey = $elementKeys[$elementPosition] ?? null) {
-                $componentKeys = array_keys($blueprintArray[$elementKey]);
+            if (null === ($elementKey = $elementKeys[$elementPosition] ?? null)) {
                 foreach ($components as $componentPosition => $value) {
-                    if (null !== $componentKey = $componentKeys[$componentPosition] ?? null) {
-                        $elements->addValue(
-                            $elementKey,
-                            $componentKey,
-                            $this->prepareValue($value, $this->isNumeric($blueprintArray[$elementKey][$componentKey]))
-                        );
-
-                        continue;
-                    }
-
-                    $elements->addValue($elementKey, self::SEG_UNKOWN_KEY_PREFIX . "-$componentPosition", $this->prepareValue($value));
+                    $elements->addValue(
+                        self::UNKNOWN_KEY_PREFIX . "-{$elementPosition}",
+                        self::UNKNOWN_KEY_PREFIX . "-{$componentPosition}",
+                        $this->prepareValue($value),
+                    );
                 }
 
                 continue;
             }
 
+            $componentKeys = array_keys($blueprintArray[$elementKey]);
+
             foreach ($components as $componentPosition => $value) {
+                if (null === ($componentKey = $componentKeys[$componentPosition] ?? null)) {
+                    $elements->addValue(
+                        (string) $elementKey,
+                        self::UNKNOWN_KEY_PREFIX . "-{$componentPosition}",
+                        $this->prepareValue($value),
+                    );
+
+                    continue;
+                }
+
                 $elements->addValue(
-                    self::SEG_UNKOWN_KEY_PREFIX . "-$elementPosition",
-                    self::SEG_UNKOWN_KEY_PREFIX . "-$componentPosition",
-                    $this->prepareValue($value)
+                    (string) $elementKey,
+                    (string) $componentKey,
+                    $this->isNumeric($blueprintArray[$elementKey][$componentKey])
+                        ? $this->prepareNumericValue($value)
+                        : $this->prepareValue($value),
                 );
             }
         }
@@ -58,48 +70,56 @@ final class SeglineParser
 
     public function parse(string $segline): Elements
     {
-        $elementArray = $this->explodeString($this->removeContrlChars($segline), $this->unaSegment->elementSeparator());
+        $elementArray = $this->explodeString(
+            $this->removeControlChars($segline),
+            $this->unaSegment->elementSeparator(),
+        );
 
-        $elements = new Elements;
+        $elements = new Elements();
 
-        $i = 0;
-        foreach ($elementArray as $element) {
+        foreach (array_values($elementArray) as $elementPosition => $element) {
             $components = $this->explodeString($element, $this->unaSegment->componentSeparator());
 
-            $j = 0;
-            foreach ($components as $component) {
-                $elements->addValue((string)$i, (string)$j, $this->prepareValue($component));
-                $j++;
+            foreach (array_values($components) as $componentPosition => $component) {
+                $elements->addValue(
+                    (string) $elementPosition,
+                    (string) $componentPosition,
+                    $this->prepareValue($component),
+                );
             }
-            $i++;
         }
 
         return $elements;
     }
 
-    private function removeContrlChars(string $segline): string
+    private function removeControlChars(string $segline): string
     {
         return str_replace(["\r", "\n"], '', $segline);
     }
 
-    private function isNumeric(string|null $value): bool
+    private function isNumeric(?string $value): bool
     {
         return $value !== null && str_contains($value, '|n|');
     }
 
-    private function prepareValue(string $value, bool $isNumeric = false): string
+    private function prepareNumericValue(string $value): string
     {
-        if ($isNumeric && ! $this->unaSegment->usesPhpDecimalPoint()) {
-            return str_replace($this->unaSegment->decimalPoint(), UnaSegment::PHP_DECIMAL, $value);
+        if ($this->unaSegment->usesPhpDecimalPoint()) {
+            return $this->prepareValue($value);
         }
 
+        return str_replace($this->unaSegment->decimalPoint(), UnaSegment::PHP_DECIMAL, $value);
+    }
+
+    private function prepareValue(string $value): string
+    {
         $value = str_replace(
-            $this->unaSegment->escapeCharacter().$this->unaSegment->escapeCharacter(),
+            $this->unaSegment->escapeCharacter() . $this->unaSegment->escapeCharacter(),
             $this->unaSegment->escapeCharacter(),
-            $value
+            $value,
         );
 
-        if (! $this->unaSegment->usesPhpSpaceCharacter()) {
+        if (!$this->unaSegment->usesPhpSpaceCharacter()) {
             $value = str_replace($this->unaSegment->spaceCharacter(), UnaSegment::PHP_SPACE, $value);
         }
 
@@ -107,9 +127,9 @@ final class SeglineParser
     }
 
     /**
-     * @psalm-param non-empty-string $pattern
+     * @param non-empty-string $pattern
      *
-     * @return array<int, string>
+     * @return list<string>
      */
     private function explodeString(string $string, string $pattern): array
     {
@@ -121,7 +141,7 @@ final class SeglineParser
     }
 
     /**
-     * @return array<int, string>
+     * @return list<string>
      */
     private function safeExplodeString(string $string, string $pattern): array
     {

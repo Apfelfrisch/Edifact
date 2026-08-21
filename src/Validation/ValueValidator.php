@@ -9,19 +9,17 @@ use Apfelfrisch\Edifact\Exceptions\ValidationException;
 use Apfelfrisch\Edifact\Validation\Rules\HasStringLength;
 use Apfelfrisch\Edifact\Validation\Rules\IsAlpha;
 use Apfelfrisch\Edifact\Validation\Rules\IsNumber;
-use Throwable;
 
 final class ValueValidator
 {
-    public const ELEMENT_TYPE_ALPHA = 'a';
-    public const ELEMENT_TYPE_NUMERIC = 'n';
-    public const ELEMENT_TYPE_ALPHA_NUMERIC = 'an';
-    public const ELEMENT_NEEDED = 'M';
-    public const ELEMENT_DEPENDS = 'D';
-    public const ELEMENT_OPTIONAL = 'O';
+    public const string ELEMENT_TYPE_ALPHA = 'a';
+    public const string ELEMENT_TYPE_NUMERIC = 'n';
+    public const string ELEMENT_TYPE_ALPHA_NUMERIC = 'an';
+    public const string ELEMENT_NEEDED = 'M';
+    public const string ELEMENT_DEPENDS = 'D';
+    public const string ELEMENT_OPTIONAL = 'O';
 
-    /** @var array<string, string> */
-    private array $messages = [
+    private const array MESSAGES = [
         Failure::VALUE_NOT_ALPHA => 'String must contain only alphabetic characters',
         Failure::VALUE_NOT_DIGIT => 'String must contain only digits',
         Failure::VALUE_TOO_LONG => 'String is more than % characters long',
@@ -30,71 +28,96 @@ final class ValueValidator
         Failure::MISSING_COMPONENT => 'Component with Id [%] is missing',
     ];
 
-    private string|null $missingElementPosition = null;
+    private ?string $missingElementPosition = null;
 
     /**
      * @return array<string, string>
      */
-    public function validate(string|null $value, string $rules, string $elementPosition): array
+    public function validate(?string $value, string $rules, string $elementPosition): array
     {
-        [$necessaryState, $type, $minLenght, $maxLength] = $this->explodeRules($rules);
+        [$necessaryState, $type, $minLength, $maxLength] = $this->explodeRules($rules);
 
-        if ($value === null || $value === '') {
-            if ($necessaryState === self::ELEMENT_OPTIONAL) {
-                return [];
-            }
+        $knownStates = [self::ELEMENT_OPTIONAL, self::ELEMENT_NEEDED, self::ELEMENT_DEPENDS];
 
-            if ($necessaryState === self::ELEMENT_NEEDED) {
-                return [Failure::MISSING_COMPONENT => $this->buildMessage(Failure::MISSING_COMPONENT)];
-            }
-
-            // If Component the component is only needed if the Element is set,
-            // Save Failure for next iteration and check there if the Element is truly needed
-            if ($necessaryState === self::ELEMENT_DEPENDS) {
-                $this->missingElementPosition = $elementPosition;
-
-                return [];
-            }
+        if (($value === null || $value === '') && in_array($necessaryState, $knownStates, true)) {
+            return $this->validateMissingValue($necessaryState, $elementPosition);
         }
 
-        // Check if previosly needed Segement, was really needed
+        // Check if the previously saved dependent component was really needed
         if ($this->missingElementPosition !== null) {
             if ($this->missingElementPosition === $elementPosition) {
                 return [Failure::MISSING_COMPONENT => $this->buildMessage(Failure::MISSING_COMPONENT)];
-            } else {
-                $this->missingElementPosition = null;
-            }
-        }
-
-        $failures = [];
-
-        /** @var string $value : $value is at this position always a string */
-
-        if ($type === self::ELEMENT_TYPE_NUMERIC && ! (new IsNumber)($value)) {
-            $failures[Failure::VALUE_NOT_DIGIT] = $this->buildMessage(Failure::VALUE_NOT_DIGIT);
-        }
-
-        if ($type === self::ELEMENT_TYPE_ALPHA && ! (new IsAlpha)($value)) {
-            $failures[Failure::VALUE_NOT_ALPHA] = $this->buildMessage(Failure::VALUE_NOT_ALPHA);
-        }
-
-        if ($minLenght !== $maxLength && ! (new HasStringLength)->min($minLenght)($value)) {
-            $failures[Failure::VALUE_TOO_SHORT] = $this->buildMessage(Failure::VALUE_TOO_SHORT, (string)$minLenght);
-
-            return $failures;
-        }
-
-        if (! (new HasStringLength)->min($minLenght)->max($maxLength)($value)) {
-            if ($minLenght === $maxLength) {
-                $failures[Failure::VALUE_LENGTH_INVALID] = $this->buildMessage(Failure::VALUE_LENGTH_INVALID, (string)$minLenght);
-
-                return $failures;
             }
 
-            $failures[Failure::VALUE_TOO_LONG] = $this->buildMessage(Failure::VALUE_TOO_LONG, (string)$maxLength);
+            $this->missingElementPosition = null;
         }
 
-        return $failures;
+        $value ??= '';
+
+        return [...$this->validateType($value, $type), ...$this->validateLength($value, $minLength, $maxLength)];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function validateMissingValue(string $necessaryState, string $elementPosition): array
+    {
+        if ($necessaryState === self::ELEMENT_NEEDED) {
+            return [Failure::MISSING_COMPONENT => $this->buildMessage(Failure::MISSING_COMPONENT)];
+        }
+
+        // A dependent component is only needed if its element is set at all.
+        // Save the failure for the next iteration and check there if the element is truly needed.
+        if ($necessaryState === self::ELEMENT_DEPENDS) {
+            $this->missingElementPosition = $elementPosition;
+        }
+
+        return [];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function validateType(string $value, string $type): array
+    {
+        if ($type === self::ELEMENT_TYPE_NUMERIC && !(new IsNumber())($value)) {
+            return [Failure::VALUE_NOT_DIGIT => $this->buildMessage(Failure::VALUE_NOT_DIGIT)];
+        }
+
+        if ($type === self::ELEMENT_TYPE_ALPHA && !(new IsAlpha())($value)) {
+            return [Failure::VALUE_NOT_ALPHA => $this->buildMessage(Failure::VALUE_NOT_ALPHA)];
+        }
+
+        return [];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function validateLength(string $value, int $minLength, int $maxLength): array
+    {
+        if ($minLength === $maxLength) {
+            if (new HasStringLength()->min($minLength)->max($maxLength)($value)) {
+                return [];
+            }
+
+            return [
+                Failure::VALUE_LENGTH_INVALID => $this->buildMessage(
+                    Failure::VALUE_LENGTH_INVALID,
+                    (string) $minLength,
+                ),
+            ];
+        }
+
+        if (!new HasStringLength()->min($minLength)($value)) {
+            return [Failure::VALUE_TOO_SHORT => $this->buildMessage(Failure::VALUE_TOO_SHORT, (string) $minLength)];
+        }
+
+        if (!new HasStringLength()->max($maxLength)($value)) {
+            return [Failure::VALUE_TOO_LONG => $this->buildMessage(Failure::VALUE_TOO_LONG, (string) $maxLength)];
+        }
+
+        return [];
     }
 
     /**
@@ -102,35 +125,27 @@ final class ValueValidator
      */
     private function explodeRules(string $rules): array
     {
-        try {
-            $rulesArray = explode('|', $rules);
+        $parts = explode('|', $rules);
 
-            if (substr($rulesArray[2], 0, 2) === '..') {
-                return [
-                    $rulesArray[0],
-                    $rulesArray[1],
-                    1,
-                    (int)substr($rulesArray[2], 2),
-                ];
-            }
-
-            return [
-                $rulesArray[0],
-                $rulesArray[1],
-                (int)$rulesArray[2],
-                (int)$rulesArray[2],
-            ];
-        } catch (Throwable) {
-            throw ValidationException::invalidRule("Invalid Validation Rule [$rules]");
+        if (count($parts) < 3) {
+            throw ValidationException::invalidRule($rules);
         }
+
+        [$necessaryState, $type, $length] = $parts;
+
+        if (str_starts_with($length, '..')) {
+            return [$necessaryState, $type, 1, (int) substr($length, 2)];
+        }
+
+        return [$necessaryState, $type, (int) $length, (int) $length];
     }
 
-    private function buildMessage(string $key, string $replacement = null): string
+    private function buildMessage(string $key, ?string $replacement = null): string
     {
-        $message = $this->messages[$key] ?? throw InvalidEdifactContentException::messageUnknown("Unkown message key [$key]");
+        $message = self::MESSAGES[$key] ?? throw InvalidEdifactContentException::messageUnknown($key);
 
         if ($replacement !== null) {
-            $message = str_replace('%', $replacement, $message);
+            return str_replace('%', $replacement, $message);
         }
 
         return $message;

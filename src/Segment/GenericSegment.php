@@ -1,31 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Apfelfrisch\Edifact\Segment;
 
-class GenericSegment implements Segment
+final class GenericSegment implements Segment
 {
-    private Elements $elements;
-
-    final protected function __construct(Elements $elements)
-    {
-        $this->elements = $elements;
-    }
+    private function __construct(
+        private readonly Elements $elements,
+    ) {}
 
     /**
-     * @param list<string> $valueArrays
+     * @param list<string|null> ...$valueArrays
      */
     public static function fromAttributes(string $name, array ...$valueArrays): self
     {
-        $elements = new Elements;
+        $elements = new Elements();
         $elements->addValue('0', '0', $name);
-        $i = 1;
+
+        $elementPosition = 1;
+
         foreach ($valueArrays as $values) {
-            $j = 1;
+            $componentPosition = 1;
+
             foreach ($values as $value) {
-                $elements->addValue((string)$i, (string)$j, $value);
-                $j++;
+                $elements->addValue((string) $elementPosition, (string) $componentPosition, $value);
+                $componentPosition++;
             }
-            $i++;
+
+            $elementPosition++;
         }
 
         return new self($elements);
@@ -33,9 +36,7 @@ class GenericSegment implements Segment
 
     public static function fromSegLine(SeglineParser $parser, string $segLine): static
     {
-        $segment = new static($parser->parse($segLine));
-
-        return $segment;
+        return new self($parser->parse($segLine));
     }
 
     public function getValueFromPosition(int $elementPosition, int $valuePosition): ?string
@@ -59,7 +60,7 @@ class GenericSegment implements Segment
     }
 
     /**
-     * @return array<string, array<string, string|null>>
+     * @return array<array-key, array<array-key, string|null>>
      */
     public function toArray(): array
     {

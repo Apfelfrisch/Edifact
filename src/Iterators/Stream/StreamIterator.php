@@ -13,11 +13,12 @@ use Apfelfrisch\Edifact\Segment\UnaSegment;
 final class StreamIterator implements SegmentIterator
 {
     private int $currentSegmentNumber = 0;
+
     private string $segline = '';
 
     public function __construct(
-        private Stream $stream,
-        private SegmentFactory $segmentFactory
+        private readonly Stream $stream,
+        private readonly SegmentFactory $segmentFactory,
     ) {
         $stream->rewind();
     }
@@ -34,11 +35,11 @@ final class StreamIterator implements SegmentIterator
 
     public function current(): Segment
     {
-        if (! $this->valid()) {
-            return throw InvalidEdifactContentException::noSegmentAvailable();
+        if (!$this->valid()) {
+            throw InvalidEdifactContentException::noSegmentAvailable();
         }
 
-        return $this->getSegmentObject($this->currentSegline());
+        return $this->segmentFactory->build($this->segline);
     }
 
     public function key(): int
@@ -58,6 +59,7 @@ final class StreamIterator implements SegmentIterator
         $this->stream->rewind();
         $this->currentSegmentNumber = 0;
         $this->segline = $this->stream->getSegment();
+
         if ($this->segline !== '' && str_starts_with($this->segline, UnaSegment::UNA)) {
             $this->segline = $this->stream->getSegment();
         }
@@ -66,10 +68,5 @@ final class StreamIterator implements SegmentIterator
     public function valid(): bool
     {
         return $this->segline !== '';
-    }
-
-    private function getSegmentObject(string $segLine): Segment
-    {
-        return $this->segmentFactory->build($segLine);
     }
 }

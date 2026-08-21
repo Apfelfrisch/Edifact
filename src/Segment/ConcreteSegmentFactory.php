@@ -8,10 +8,10 @@ use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
 
 final class ConcreteSegmentFactory implements SegmentFactory
 {
-    /** @phpstan-var array<string, class-string<Segment>> */
+    /** @var array<string, class-string<Segment>> */
     private array $segmentClasses = [];
 
-    /** @phpstan-var class-string<Segment>|null */
+    /** @var class-string<Segment>|null */
     private ?string $fallback = null;
 
     private UnaSegment $unaSegment;
@@ -36,14 +36,14 @@ final class ConcreteSegmentFactory implements SegmentFactory
     public function addSegment(string $name, string $segmentClass): self
     {
         if (is_subclass_of($segmentClass, Segment::class)) {
-            $this->segmentClasses[substr(strtoupper($name), 0, 3)] = $segmentClass;
+            $this->segmentClasses[strtoupper(substr($name, 0, 3))] = $segmentClass;
         }
 
         return $this;
     }
 
     /**
-     * @phpstan-param class-string<Segment> $fallback
+     * @param class-string<Segment> $fallback
      */
     public function addFallback(string $fallback): self
     {
@@ -54,27 +54,23 @@ final class ConcreteSegmentFactory implements SegmentFactory
 
     public function build(string $segline): Segment
     {
-        /** @var class-string<Segment> */
         $segmentClass = $this->getClassname(substr($segline, 0, 3));
 
-        $segment = $segmentClass::fromSegLine($this->parser, $segline);
-
-        return $segment;
+        // @mago-expect analysis:possibly-static-access-on-interface — the Segment interface declares fromSegLine()
+        return $segmentClass::fromSegLine($this->parser, $segline);
     }
 
-    /*
-     * @phpstan-return class-string<Segment>
+    /**
+     * @return class-string<Segment>
      */
     public function getClassname(string $segmentName): string
     {
         $segmentName = strtoupper($segmentName);
 
-        if (null === $segmentClass = $this->segmentClasses[$segmentName] ?? null) {
-            if (null === $segmentClass = $this->fallback) {
-                throw InvalidEdifactContentException::segmentUnknown($segmentName);
-            }
-        }
-
-        return $segmentClass;
+        return (
+            $this->segmentClasses[$segmentName] ?? $this->fallback ?? throw InvalidEdifactContentException::segmentUnknown(
+                $segmentName,
+            )
+        );
     }
 }

@@ -10,30 +10,28 @@ use Apfelfrisch\Edifact\Iterators\Stream\StreamIterator;
 use Apfelfrisch\Edifact\Segment\ConcreteSegmentFactory;
 use Apfelfrisch\Edifact\Segment\Segment;
 
-class StreamMessageFactory implements MessageFactory
+final class StreamMessageFactory implements MessageFactory
 {
     /** @var array<string, array<mixed>> */
     private array $streamFilters = [];
 
-    private ConcreteSegmentFactory $segmentFactory;
+    private readonly ConcreteSegmentFactory $segmentFactory;
 
     public function __construct()
     {
-        $this->segmentFactory = new ConcreteSegmentFactory;
+        $this->segmentFactory = new ConcreteSegmentFactory();
     }
 
-    /** @param array<mixed> $params*/
+    /** @param array<mixed> $params */
     public function addStreamFilter(string $filter, array $params = []): self
     {
-        if (! isset($this->streamFilters[$filter])) {
-            $this->streamFilters[$filter] = $params;
-        }
+        $this->streamFilters[$filter] ??= $params;
 
         return $this;
     }
 
     /**
-     * @phpstan-param class-string<Segment> $segmentClass
+     * @param class-string<Segment> $segmentClass
      */
     public function addSegment(string $name, string $segmentClass): self
     {
@@ -43,7 +41,7 @@ class StreamMessageFactory implements MessageFactory
     }
 
     /**
-     * @phpstan-param class-string<Segment> $fallback
+     * @param class-string<Segment> $fallback
      */
     public function addFallback(string $fallback): self
     {
@@ -75,6 +73,9 @@ class StreamMessageFactory implements MessageFactory
 
         $this->segmentFactory->setUnaSegment($stream->getUnaSegment());
 
-        return new Message(new StreamIterator($stream, $this->segmentFactory), new EdifactFormatter($stream->getUnaSegment()));
+        return new Message(
+            new StreamIterator($stream, $this->segmentFactory),
+            new EdifactFormatter($stream->getUnaSegment()),
+        );
     }
 }

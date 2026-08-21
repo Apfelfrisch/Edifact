@@ -1,0 +1,41 @@
+# Mago configuration — https://mago.carthage.software/tools/overview
+php-version = "8.5"
+
+[source]
+paths = ["src", "tests"]
+includes = ["vendor"]
+
+[formatter]
+
+[linter]
+integrations = ["phpunit"]
+
+# Named arguments for every literal add more noise than clarity in a
+# string-parsing library full of substr()/explode() offset arithmetic.
+[linter.rules.literal-named-argument]
+enabled = false
+
+# Test classes and the Stream wrapper (thin OO facade over the f* stream
+# functions) naturally exceed the default of 10 methods.
+[linter.rules.too-many-methods]
+threshold = 25
+
+# Failure and UnaSegment are value objects whose constructors mirror the
+# EDIFACT domain (six UNA characters, eight failure attributes).
+[linter.rules.excessive-parameter-list]
+threshold = 5
+constructor-threshold = 8
+
+# The parser and validator cores (SeglineParser, SegmentValidator,
+# ValueValidator) are inherently branch-heavy; the default class-level
+# thresholds are tuned for CRUD-style code.
+[linter.rules.cyclomatic-complexity]
+threshold = 30
+
+[linter.rules.kan-defect]
+threshold = 3.0
+
+[linter.rules.halstead]
+difficulty-threshold = 20.0
+
+[analyzer]

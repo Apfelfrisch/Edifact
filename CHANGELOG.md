@@ -1,5 +1,21 @@
 # Changelog
 
+2.0.0 (unreleased)
+ - Require PHP 8.5
+ - Replace Phpstan, Psalm and PHP-CS-Fixer with Mago (formatter, linter and static analyzer)
+ - Update PHPUnit to 12, Infection to 0.31
+ - Make all classes final; Failure is now a readonly value object with public properties
+   (the getter methods and the mutable setMessageCounter/setUnhCounter are gone,
+   use the properties and Failure::withCounters instead)
+ - Fix misspelled Failure type constants: UNKNOWN_ELEMENT / UNKNOWN_COMPONENT
+   (values changed to 'unknownElement' / 'unknownComponent') and validation messages
+ - Remove the undeclared webmozart/assert dependency from UnaSegment
+ - Implement the previously empty InMemoryIterator to build messages from segments in memory
+ - Builder, GenericSegment: constructors are private/promoted, behavior unchanged
+ - Moa test fixture: fromAttributes no longer takes a decimal separator
+ - Rff/Unh test fixtures: referenz() renamed to reference()
+ - Stream: toString() no longer relies on error suppression; segment lines consisting of '0' parse correctly
+
 1.1.1
  - Remove obsolete Respect\Validation from dependencies
 

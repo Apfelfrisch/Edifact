@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Apfelfrisch\Edifact\Validation;
 
 use Apfelfrisch\Edifact\Exceptions\ValidationException;
@@ -7,9 +9,9 @@ use Apfelfrisch\Edifact\Message;
 use Apfelfrisch\Edifact\Segment\SegmentCounter;
 use Iterator;
 
-class Validator
+final class Validator
 {
-    private SegmentValidator $segmentValidator;
+    private readonly SegmentValidator $segmentValidator;
 
     /** @var Iterator<Failure|null>|null */
     private ?Iterator $failures = null;
@@ -33,17 +35,13 @@ class Validator
      */
     public function getFailures(): Iterator
     {
-        if ($this->failures === null) {
-            throw ValidationException::messageNotValidated();
-        }
-
-        return $this->failures;
+        return $this->failures ?? throw ValidationException::messageNotValidated();
     }
 
     /**
      * @throws ValidationException
      */
-    public function getFirstFailure(): Failure|null
+    public function getFirstFailure(): ?Failure
     {
         return $this->getFailures()->current();
     }
@@ -51,17 +49,17 @@ class Validator
     /** @return Iterator<Failure|null> */
     private function validate(Message $message): Iterator
     {
-        $counter = new SegmentCounter;
+        $counter = new SegmentCounter();
 
         foreach ($message->getSegments() as $segment) {
             $counter->count($segment);
 
-            if (! ($segment instanceof Validateable)) {
+            if (!$segment instanceof Validateable) {
                 throw ValidationException::segmentNotValidateable($segment::class);
             }
 
             foreach ($segment->validate($this->segmentValidator) as $failure) {
-                yield $failure->setMessageCounter($counter->messageCount())->setUnhCounter($counter->unhCount());
+                yield $failure->withCounters($counter->messageCount(), $counter->unhCount());
             }
         }
     }

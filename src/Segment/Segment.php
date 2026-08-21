@@ -6,7 +6,7 @@ namespace Apfelfrisch\Edifact\Segment;
 
 interface Segment
 {
-    public static function fromSegLine(SeglineParser $parser, string $segLine): self|static;
+    public static function fromSegLine(SeglineParser $parser, string $segLine): static;
 
     public function name(): string;
 
@@ -16,6 +16,6 @@ interface Segment
 
     public function isValueNumeric(string $elementKey, string $componentKey): bool;
 
-    /** @return array<string, array<string, string|null>> */
+    /** @return array<array-key, array<array-key, string|null>> */
     public function toArray(): array;
 }

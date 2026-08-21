@@ -1,8 +1,8 @@
 vendor/
-.php-cs-fixer.cache
+.phpunit.cache/
 .phpunit.result.cache
 composer.lock
 composer.phar
 infection.json
 phpunit.xml
-psalm.xml
+mago.toml.local

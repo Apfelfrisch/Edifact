@@ -16,16 +16,16 @@ final class PartialIterator implements SegmentIterator
     private int $currentSegmentNumber = 0;
 
     /** @var LimitIterator<int, Segment, Iterator<int, Segment>> */
-    private LimitIterator $segementIterator;
+    private readonly LimitIterator $segmentIterator;
 
-    /** @param Iterator<int, Segment> $segementIterator */
+    /** @param Iterator<int, Segment> $segmentIterator */
     public function __construct(
-        private UnaSegment $unaSegment,
-        Iterator $segementIterator,
+        private readonly UnaSegment $unaSegment,
+        Iterator $segmentIterator,
         int $offset = 0,
-        int $limit = -1
+        int $limit = -1,
     ) {
-        $this->segementIterator = new LimitIterator($segementIterator, $offset, $limit);
+        $this->segmentIterator = new LimitIterator($segmentIterator, $offset, $limit);
     }
 
     public function getUnaSegment(): UnaSegment
@@ -35,11 +35,11 @@ final class PartialIterator implements SegmentIterator
 
     public function current(): Segment
     {
-        if (! $this->valid()) {
-            return throw InvalidEdifactContentException::noSegmentAvailable();
+        if (!$this->valid()) {
+            throw InvalidEdifactContentException::noSegmentAvailable();
         }
 
-        return $this->segementIterator->current();
+        return $this->segmentIterator->current();
     }
 
     public function key(): int
@@ -51,17 +51,17 @@ final class PartialIterator implements SegmentIterator
     {
         $this->currentSegmentNumber++;
 
-        $this->segementIterator->next();
+        $this->segmentIterator->next();
     }
 
     public function rewind(): void
     {
-        $this->segementIterator->rewind();
+        $this->segmentIterator->rewind();
         $this->currentSegmentNumber = 0;
     }
 
     public function valid(): bool
     {
-        return $this->segementIterator->valid();
+        return $this->segmentIterator->valid();
     }
 }

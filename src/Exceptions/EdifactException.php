@@ -6,6 +6,4 @@ namespace Apfelfrisch\Edifact\Exceptions;
 
 use RuntimeException;
 
-class EdifactException extends RuntimeException
-{
-}
+class EdifactException extends RuntimeException {}

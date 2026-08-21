@@ -6,31 +6,49 @@ namespace Apfelfrisch\Edifact\Segment;
 
 use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
 use Apfelfrisch\Edifact\Iterators\Stream\Stream;
-use Webmozart\Assert\Assert;
+use InvalidArgumentException;
 
 final class UnaSegment
 {
-    public const UNA = 'UNA';
+    public const string UNA = 'UNA';
 
-    public const PHP_SPACE = ' ';
+    public const string PHP_SPACE = ' ';
 
-    public const PHP_DECIMAL = '.';
+    public const string PHP_DECIMAL = '.';
 
     private static ?self $defaultUnaSegment = null;
 
+    /**
+     * @param non-empty-string $componentSeparator
+     * @param non-empty-string $elementSeparator
+     * @param non-empty-string $decimalPoint
+     * @param non-empty-string $escapeCharacter
+     * @param non-empty-string $spaceCharacter
+     * @param non-empty-string $segmentTerminator
+     */
     public function __construct(
-        private string $componentSeparator = ':',
-        private string $elementSeparator = '+',
-        private string $decimalPoint = '.',
-        private string $escapeCharacter = '?',
-        private string $spaceCharacter = ' ',
-        private string $segmentTerminator = '\''
+        private readonly string $componentSeparator = ':',
+        private readonly string $elementSeparator = '+',
+        private readonly string $decimalPoint = '.',
+        private readonly string $escapeCharacter = '?',
+        private readonly string $spaceCharacter = ' ',
+        private readonly string $segmentTerminator = "'",
     ) {
-        Assert::stringNotEmpty($componentSeparator);
-        Assert::stringNotEmpty($elementSeparator);
-        Assert::stringNotEmpty($decimalPoint);
-        Assert::stringNotEmpty($escapeCharacter);
-        Assert::stringNotEmpty($segmentTerminator);
+        foreach ([
+            $componentSeparator,
+            $elementSeparator,
+            $decimalPoint,
+            $escapeCharacter,
+            $spaceCharacter,
+            $segmentTerminator,
+        ] as $character) {
+            // Defense in depth: enforce the non-empty-string contract at runtime
+            // @mago-expect analysis:impossible-condition
+            // @mago-expect analysis:redundant-comparison
+            if ($character === '') {
+                throw new InvalidArgumentException('UNA characters must be non-empty strings.');
+            }
+        }
     }
 
     public static function setFromStream(Stream $stream, ?self $fallback = null): self
@@ -38,7 +56,9 @@ final class UnaSegment
         $position = $stream->tell();
         $stream->rewind();
 
-        $instance = self::setFromString($stream->read(9) ?: '', $fallback);
+        $unaString = $stream->read(9);
+
+        $instance = self::setFromString($unaString === false ? '' : $unaString, $fallback);
 
         $stream->seek($position);
 
@@ -47,93 +67,97 @@ final class UnaSegment
 
     public static function setFromString(string $string, ?self $fallback = null): self
     {
-        if (substr($string, 0, 3) !== self::UNA) {
-            return $fallback ?? new self;
+        if (!str_starts_with($string, self::UNA)) {
+            return $fallback ?? new self();
         }
 
-        if (! isset($string[8])) {
+        if (strlen($string) < 9) {
             throw InvalidEdifactContentException::invalidUnaSegment($string);
         }
 
         return new self(
-            $string[3],
-            $string[4],
-            $string[5],
-            $string[6],
-            $string[7],
-            $string[8]
+            self::characterAt($string, 3),
+            self::characterAt($string, 4),
+            self::characterAt($string, 5),
+            self::characterAt($string, 6),
+            self::characterAt($string, 7),
+            self::characterAt($string, 8),
         );
+    }
+
+    /** @return non-empty-string */
+    private static function characterAt(string $string, int $offset): string
+    {
+        $character = substr($string, $offset, 1);
+
+        if ($character === '') {
+            throw InvalidEdifactContentException::invalidUnaSegment($string);
+        }
+
+        return $character;
     }
 
     public static function getDefault(): self
     {
-        if (self::$defaultUnaSegment === null) {
-            self::$defaultUnaSegment = new self();
-        }
-
-        return self::$defaultUnaSegment;
+        return self::$defaultUnaSegment ??= new self();
     }
 
     public function usesPhpDecimalPoint(): bool
     {
-        return $this->decimalPoint() === self::PHP_DECIMAL;
+        return $this->decimalPoint === self::PHP_DECIMAL;
     }
 
     public function usesPhpSpaceCharacter(): bool
     {
-        return $this->spaceCharacter() === self::PHP_SPACE;
+        return $this->spaceCharacter === self::PHP_SPACE;
     }
 
-    /** @phpstan-return non-empty-string */
+    /** @return non-empty-string */
     public function componentSeparator(): string
     {
-        /** @var non-empty-string */
         return $this->componentSeparator;
     }
 
-    /** @phpstan-return non-empty-string */
+    /** @return non-empty-string */
     public function elementSeparator(): string
     {
-        /** @var non-empty-string */
         return $this->elementSeparator;
     }
 
-    /** @phpstan-return non-empty-string */
+    /** @return non-empty-string */
     public function decimalPoint(): string
     {
-        /** @var non-empty-string */
         return $this->decimalPoint;
     }
 
-    /** @phpstan-return non-empty-string */
+    /** @return non-empty-string */
     public function escapeCharacter(): string
     {
-        /** @var non-empty-string */
         return $this->escapeCharacter;
     }
 
-    /** @phpstan-return non-empty-string */
+    /** @return non-empty-string */
     public function spaceCharacter(): string
     {
-        /** @var non-empty-string */
         return $this->spaceCharacter;
     }
 
-    /** @phpstan-return non-empty-string */
+    /** @return non-empty-string */
     public function segmentTerminator(): string
     {
-        /** @var non-empty-string */
         return $this->segmentTerminator;
     }
 
     public function toString(): string
     {
-        return self::UNA
-            . $this->componentSeparator()
-            . $this->elementSeparator()
-            . $this->decimalPoint()
-            . $this->escapeCharacter()
-            . $this->spaceCharacter()
-            . $this->segmentTerminator();
+        return (
+            self::UNA
+            . $this->componentSeparator
+            . $this->elementSeparator
+            . $this->decimalPoint
+            . $this->escapeCharacter
+            . $this->spaceCharacter
+            . $this->segmentTerminator
+        );
     }
 }

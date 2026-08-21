@@ -1,0 +1,40 @@
+name: "Static Analysis with Mago"
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  mago:
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v4"
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          php-version: "8.5"
+          tools: "composer"
+
+      - name: "Cache dependencies"
+        uses: "actions/cache@v4"
+        with:
+          path: |
+            ~/.composer/cache
+            vendor
+          key: "php-8.5-${{ hashFiles('composer.json') }}"
+          restore-keys: "php-8.5-"
+
+      - name: "Install dependencies"
+        run: "composer update --no-interaction --no-progress"
+
+      - name: "Check formatting"
+        run: "vendor/bin/mago fmt --check"
+
+      - name: "Lint"
+        run: "vendor/bin/mago lint"
+
+      - name: "Analyze"
+        run: "vendor/bin/mago analyze"

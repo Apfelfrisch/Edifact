@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Apfelfrisch\Edifact\Segment;
 
 final class Elements
 {
     private ?string $name = null;
 
-    /** @var array<string, array<string, string|null>> */
+    /** @var array<array-key, array<array-key, string|null>> */
     private array $elements = [];
 
     public function addValue(string $elementKey, string $componentKey, ?string $value): self
@@ -34,7 +36,7 @@ final class Elements
     }
 
     /**
-     * @return array<string, string|null>
+     * @return array<array-key, string|null>
      */
     public function getElement(string $elementKey): array
     {
@@ -46,10 +48,10 @@ final class Elements
      */
     public function getElementKeys(): array
     {
-        return array_keys($this->toArray());
+        return array_map(strval(...), array_keys($this->elements));
     }
 
-    public function getElementKeyFromPosition(int $elementPosition): string|null
+    public function getElementKeyFromPosition(int $elementPosition): ?string
     {
         return $this->getElementKeys()[$elementPosition] ?? null;
     }
@@ -59,16 +61,16 @@ final class Elements
      */
     public function getComponentKeys(string $elementKey): array
     {
-        return array_keys($this->getElement($elementKey));
+        return array_map(strval(...), array_keys($this->getElement($elementKey)));
     }
 
-    public function getComponentKeyFromPosition(string $elementKey, int $valuePosition): string|null
+    public function getComponentKeyFromPosition(string $elementKey, int $valuePosition): ?string
     {
         return $this->getComponentKeys($elementKey)[$valuePosition] ?? null;
     }
 
     /**
-     * @return array<string, array<string, string|null>>
+     * @return array<array-key, array<array-key, string|null>>
      */
     public function toArray(): array
     {

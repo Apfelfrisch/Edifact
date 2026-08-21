@@ -11,16 +11,16 @@ use Apfelfrisch\Edifact\Segment\SegmentIterator;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Closure;
 use Generator;
+use Stringable;
 
-class Message
+final class Message implements Stringable
 {
-    protected static MessageFactory|null $factory;
+    private static ?MessageFactory $factory = null;
 
     public function __construct(
-        protected SegmentIterator $segmentIterator,
-        protected Formatter $formatter,
-    ) {
-    }
+        private readonly SegmentIterator $segmentIterator,
+        private readonly Formatter $formatter,
+    ) {}
 
     public static function setFactory(MessageFactory $factory): void
     {
@@ -29,7 +29,7 @@ class Message
 
     public static function getFactory(): MessageFactory
     {
-        return self::$factory ?? new StreamMessageFactory;
+        return self::$factory ?? new StreamMessageFactory();
     }
 
     public static function fromFilepath(string $filepath): self
@@ -50,7 +50,7 @@ class Message
     }
 
     /**
-     * @phpstan-return list<Segment>
+     * @return list<Segment>
      */
     public function getAllSegments(): array
     {
@@ -59,9 +59,10 @@ class Message
 
     /**
      * @template T of Segment
+     *
      * @param class-string<T> $segmentClass
      *
-     * @phpstan-return Generator<int, T, null, void>
+     * @return Generator<int, T, null, void>
      */
     public function filterSegments(string $segmentClass, ?Closure $closure = null): Generator
     {
@@ -79,8 +80,10 @@ class Message
 
     /**
      * @template T of Segment
-     * @phpstan-param class-string<T> $segmentClass
-     * @phpstan-return list<T>
+     *
+     * @param class-string<T> $segmentClass
+     *
+     * @return list<T>
      */
     public function filterAllSegments(string $segmentClass, ?Closure $closure = null): array
     {
@@ -90,16 +93,14 @@ class Message
 
     /**
      * @template T of Segment
-     * @phpstan-param class-string<T> $segmentClass
-     * @phpstan-return T|null
+     *
+     * @param class-string<T> $segmentClass
+     *
+     * @return T|null
      */
     public function findFirstSegment(string $segmentClass, ?Closure $closure = null): ?Segment
     {
-        foreach ($this->filterSegments($segmentClass, $closure) as $segment) {
-            return $segment;
-        }
-
-        return null;
+        return $this->filterSegments($segmentClass, $closure)->current();
     }
 
     /**
@@ -107,7 +108,9 @@ class Message
      */
     public function unwrap(string $header = 'UNH', string $trailer = 'UNT'): Generator
     {
+        $offset = null;
         $loopCount = -1;
+
         foreach ($this->segmentIterator as $segment) {
             $loopCount++;
 
@@ -119,8 +122,13 @@ class Message
 
             if ($segment->name() === $trailer) {
                 yield new self(
-                    new PartialIterator($this->getUnaSegment(), $this->segmentIterator, $offset, $loopCount + 1 - $offset),
-                    $this->formatter
+                    new PartialIterator(
+                        $this->getUnaSegment(),
+                        $this->segmentIterator,
+                        $offset,
+                        $loopCount + 1 - $offset,
+                    ),
+                    $this->formatter,
                 );
                 $offset = null;
             }
@@ -133,13 +141,11 @@ class Message
     }
 
     /**
-     * @return list<array<string, array<string, string|null>>>
+     * @return list<array<array-key, array<array-key, string|null>>>
      */
     public function toArray(): array
     {
-        return array_map(function (Segment $segment): array {
-            return $segment->toArray();
-        }, $this->getAllSegments());
+        return array_map(static fn(Segment $segment): array => $segment->toArray(), $this->getAllSegments());
     }
 
     public function toString(): string

@@ -1,19 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Apfelfrisch\Edifact\Segment;
 
+use Apfelfrisch\Edifact\Validation\Failure;
 use Apfelfrisch\Edifact\Validation\SegmentValidator;
 use Apfelfrisch\Edifact\Validation\Validateable;
 use Iterator;
 
 abstract class AbstractSegment implements Segment, Validateable
 {
-    protected Elements $elements;
-
-    final protected function __construct(Elements $elements)
-    {
-        $this->elements = $elements;
-    }
+    final protected function __construct(
+        protected readonly Elements $elements,
+    ) {}
 
     abstract public static function blueprint(): Elements;
 
@@ -22,7 +22,7 @@ abstract class AbstractSegment implements Segment, Validateable
         return new static($parser->parseToBlueprint($segLine, static::blueprint()));
     }
 
-    /** @return Iterator<\Apfelfrisch\Edifact\Validation\Failure> */
+    /** @return Iterator<Failure> */
     public function validate(SegmentValidator $segmentValidator): Iterator
     {
         return $segmentValidator->validate(static::blueprint(), $this->elements);
@@ -42,7 +42,7 @@ abstract class AbstractSegment implements Segment, Validateable
     {
         $value = static::blueprint()->getValue($elementKey, $componentKey);
 
-        return $value !== null && strpos($value, '|n|') !== false;
+        return $value !== null && str_contains($value, '|n|');
     }
 
     public function name(): string
@@ -51,7 +51,7 @@ abstract class AbstractSegment implements Segment, Validateable
     }
 
     /**
-     * @return array<string, array<string, string|null>>
+     * @return array<array-key, array<array-key, string|null>>
      */
     public function toArray(): array
     {

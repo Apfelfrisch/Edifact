@@ -12,43 +12,44 @@ use Apfelfrisch\Edifact\Segment\Segment;
 use Apfelfrisch\Edifact\Segment\SegmentCounter;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 
-class Builder
+final class Builder
 {
     private ?string $unbRef = null;
+
     private ?string $unhRef = null;
 
     private bool $buildIsFinalized = false;
 
-    private Stream $stream;
-    private string $filepath;
-    private EdifactFormatter $stringFormatter;
-    private SegmentCounter $counter;
+    private readonly Stream $stream;
 
-    public function __construct(UnaSegment $unaSegment = null, string $filepath = 'php://temp')
+    private readonly EdifactFormatter $stringFormatter;
+
+    private readonly SegmentCounter $counter;
+
+    public function __construct(?UnaSegment $unaSegment = null, string $filepath = 'php://temp')
     {
-        $this->filepath = $filepath;
-
-        $this->stream = new Stream($this->filepath, 'w+', $unaSegment);
-        $this->counter = new SegmentCounter;
+        $this->stream = new Stream($filepath, 'w+', $unaSegment);
+        $this->counter = new SegmentCounter();
         $this->stringFormatter = new EdifactFormatter($this->stream->getUnaSegment());
         $this->stringFormatter->prefixUna();
     }
 
-    /** @param array<mixed> $params*/
+    public function __destruct()
+    {
+        // Delete the file if the build process could not be finished
+        $filepath = $this->stream->getRealPath();
+
+        if ($this->buildIsFinalized === false && $filepath !== false && file_exists($filepath)) {
+            unlink($filepath);
+        }
+    }
+
+    /** @param array<mixed> $params */
     public function addStreamFilter(string $filtername, array $params = []): self
     {
         $this->stream->addWriteFilter($filtername, $params);
 
         return $this;
-    }
-
-    public function __destruct()
-    {
-        // Delete File if build process could not finshed
-        $filepath = $this->stream->getRealPath();
-        if ($this->buildIsFinalized === false && $filepath && file_exists($filepath)) {
-            unlink($filepath);
-        }
     }
 
     public function getMessageCount(): int
@@ -69,10 +70,7 @@ class Builder
 
             if ($segment->name() === 'UNH') {
                 if ($this->unhRef !== null) {
-                    $unhCount = $this->counter->unhCount() + 1;
-                    $this->writeSegment(
-                        GenericSegment::fromAttributes('UNT', [(string)$unhCount], [$this->unhRef])
-                    );
+                    $this->writeUntSegment();
                 }
 
                 $this->unhRef = $segment->getValueFromPosition(1, 0) ?? '';
@@ -82,29 +80,20 @@ class Builder
         }
     }
 
-    private function writeSegment(Segment $segment): void
-    {
-        $this->stream->write(
-            $this->stringFormatter->format($segment)
-        );
-
-        $this->counter->count($segment);
-    }
-
     public function get(): Stream
     {
-        if (! $this->messageIsEmpty()) {
+        if (!$this->messageIsEmpty()) {
             if ($this->unhRef !== null) {
-                $unhCount = $this->counter->unhCount() + 1;
-                $this->writeSegment(
-                    GenericSegment::fromAttributes('UNT', [(string)$unhCount], [$this->unhRef])
-                );
+                $this->writeUntSegment();
                 $this->unhRef = null;
             }
+
             if ($this->unbRef !== null) {
-                $this->writeSegment(
-                    GenericSegment::fromAttributes('UNZ', [(string)$this->counter->messageCount()], [$this->unbRef])
-                );
+                $this->writeSegment(GenericSegment::fromAttributes(
+                    'UNZ',
+                    [(string) $this->counter->messageCount()],
+                    [$this->unbRef],
+                ));
                 $this->unbRef = null;
             }
         }
@@ -117,5 +106,19 @@ class Builder
     public function messageIsEmpty(): bool
     {
         return $this->stream->isEmpty();
+    }
+
+    private function writeUntSegment(): void
+    {
+        $unhCount = $this->counter->unhCount() + 1;
+
+        $this->writeSegment(GenericSegment::fromAttributes('UNT', [(string) $unhCount], [(string) $this->unhRef]));
+    }
+
+    private function writeSegment(Segment $segment): void
+    {
+        $this->stream->write($this->stringFormatter->format($segment));
+
+        $this->counter->count($segment);
     }
 }
