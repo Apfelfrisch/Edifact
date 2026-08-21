@@ -1,6 +1,6 @@
 # Changelog
 
-2.0.0 (unreleased)
+2.0.0
  - Add InterchangeValidator for CONTRL-style syntax checks of complete
    transmission files (UNB/UNZ and UNH/UNT structure, references, control
    counts, duplicates) with SyntaxFailure/SyntaxErrorCode/ReportLevel
