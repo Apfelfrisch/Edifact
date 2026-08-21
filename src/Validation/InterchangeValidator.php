@@ -168,7 +168,8 @@ final class InterchangeValidator
             $this->addInterchangeFailure(SyntaxErrorCode::Missing, self::UNZ);
         }
 
-        if ($sawUnb && $sawUnz && $messageCount === 0 && $this->interchangeFailures === []) {
+        // No interchange failures implies UNB and UNZ were both present
+        if ($messageCount === 0 && $this->interchangeFailures === []) {
             $this->addInterchangeFailure(SyntaxErrorCode::LowerLevelEmpty);
         }
 

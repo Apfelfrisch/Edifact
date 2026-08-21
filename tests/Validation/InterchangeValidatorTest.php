@@ -37,6 +37,7 @@ final class InterchangeValidatorTest extends TestCase
         static::assertSame(ReportLevel::Interchange, $failures[0]->level);
         static::assertSame(SyntaxErrorCode::Missing, $failures[0]->errorCode);
         static::assertSame('UNB', $failures[0]->serviceSegment);
+        static::assertSame(0, $failures[0]->messageCounter);
     }
 
     public function test_missing_unz_segment(): void
@@ -174,6 +175,63 @@ final class InterchangeValidatorTest extends TestCase
         static::assertCount(1, $failures);
         static::assertSame(SyntaxErrorCode::TooManyConstituents, $failures[0]->errorCode);
         static::assertSame('SEQ', $failures[0]->value);
+    }
+
+    public function test_multiple_segments_after_the_interchange_trailer_are_reported_once(): void
+    {
+        $failures = new InterchangeValidator()->validate($this->buildMessage(
+            "UNB+UNOC:3+sender+receiver+210101:1201+REF1'UNH+M1+ORDERS:D:96A:UN'UNT+2+M1'UNZ+1+REF1'SEQ+1'SEQ+2'",
+        ));
+
+        static::assertCount(1, $failures);
+        static::assertSame(SyntaxErrorCode::TooManyConstituents, $failures[0]->errorCode);
+        static::assertSame('SEQ', $failures[0]->value);
+    }
+
+    public function test_a_duplicate_unb_segment(): void
+    {
+        $failures = new InterchangeValidator()->validate($this->buildMessage(
+            "UNB+UNOC:3+sender+receiver+210101:1201+REF1'"
+            . "UNB+UNOC:3+sender+receiver+210101:1201+REF1'"
+            . "UNH+M1+ORDERS:D:96A:UN'UNT+2+M1'UNZ+1+REF1'",
+        ));
+
+        static::assertCount(1, $failures);
+        static::assertSame(SyntaxErrorCode::NotSupportedAtPosition, $failures[0]->errorCode);
+        static::assertSame('UNB', $failures[0]->serviceSegment);
+    }
+
+    public function test_a_missing_message_reference_skips_the_trailer_reference_check(): void
+    {
+        $failures = new InterchangeValidator()->validate($this->buildMessage(
+            "UNB+UNOC:3+sender+receiver+210101:1201+REF1'UNH++ORDERS:D:96A:UN'UNT+2+X'UNZ+1+REF1'",
+        ));
+
+        static::assertCount(1, $failures);
+        static::assertSame(SyntaxErrorCode::Missing, $failures[0]->errorCode);
+        static::assertSame('UNH', $failures[0]->serviceSegment);
+    }
+
+    public function test_every_failing_message_reports_all_its_failures(): void
+    {
+        $failures = new InterchangeValidator()->validate($this->buildMessage(
+            "UNB+UNOC:3+sender+receiver+210101:1201+REF1'"
+            . "UNH+M1+ORDERS:D:96A:UN'UNT+9+WRONG'"
+            . "UNH+M2+ORDERS:D:96A:UN'UNT+2+ALSO'"
+            . "UNZ+2+REF1'",
+        ));
+
+        static::assertCount(3, $failures);
+
+        // Message one reports its wrong control count and its wrong reference
+        static::assertSame(SyntaxErrorCode::ControlCountDoesNotMatch, $failures[0]->errorCode);
+        static::assertSame(1, $failures[0]->messageCounter);
+        static::assertSame(SyntaxErrorCode::ReferencesDoNotMatch, $failures[1]->errorCode);
+        static::assertSame(1, $failures[1]->messageCounter);
+
+        // Message two reports its wrong reference
+        static::assertSame(SyntaxErrorCode::ReferencesDoNotMatch, $failures[2]->errorCode);
+        static::assertSame(2, $failures[2]->messageCounter);
     }
 
     public function test_validating_segments_against_their_blueprints(): void

@@ -71,10 +71,6 @@ final class UnaSegment
             return $fallback ?? new self();
         }
 
-        if (strlen($string) < 9) {
-            throw InvalidEdifactContentException::invalidUnaSegment($string);
-        }
-
         return new self(
             self::characterAt($string, 3),
             self::characterAt($string, 4),

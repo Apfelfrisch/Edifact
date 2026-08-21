@@ -85,6 +85,20 @@ final class StreamIteratorTest extends TestCase
         $iterator->current();
     }
 
+    public function test_the_constructor_rewinds_the_stream(): void
+    {
+        $segmentFactory = new ConcreteSegmentFactory();
+        $segmentFactory->addFallback(GenericSegment::class);
+
+        $stream = Stream::fromString("AAA+1'BBB+2'");
+        $stream->seek(4);
+
+        $iterator = new StreamIterator($stream, $segmentFactory);
+        $iterator->next();
+
+        static::assertSame('AAA+1', $iterator->currentSegline());
+    }
+
     private function buildIterator(string $ediContent): StreamIterator
     {
         $segmentFactory = new ConcreteSegmentFactory();

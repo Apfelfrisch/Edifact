@@ -153,10 +153,6 @@ final class SegmentValidator
     {
         $failures = $this->valueValidator->validate($value, $rules, (string) $this->elementPosition);
 
-        if ($failures === []) {
-            return [];
-        }
-
         $result = [];
 
         foreach ($failures as $failureType => $message) {

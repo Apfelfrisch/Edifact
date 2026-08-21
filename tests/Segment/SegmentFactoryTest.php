@@ -71,4 +71,29 @@ final class SegmentFactoryTest extends TestCase
         static::assertSame('a', $segment->getValueFromPosition(1, 0));
         static::assertSame('b', $segment->getValueFromPosition(1, 1));
     }
+
+    public function test_the_una_segment_can_be_set_over_the_constructor(): void
+    {
+        $segFactory = new ConcreteSegmentFactory(new UnaSegment('|', '#'))->addFallback(GenericSegment::class);
+
+        $segment = $segFactory->build('SEG#a|b');
+
+        static::assertSame('a', $segment->getValueFromPosition(1, 0));
+        static::assertSame('b', $segment->getValueFromPosition(1, 1));
+    }
+
+    public function test_with_una_segment_returns_the_same_instance_for_unchanged_characters(): void
+    {
+        $segFactory = new ConcreteSegmentFactory(new UnaSegment('|', '#'));
+
+        static::assertSame($segFactory, $segFactory->withUnaSegment(new UnaSegment('|', '#')));
+        static::assertNotSame($segFactory, $segFactory->withUnaSegment(new UnaSegment()));
+    }
+
+    public function test_getting_the_classname_is_case_insensitive(): void
+    {
+        $segFactory = new ConcreteSegmentFactory()->addSegment('UNH', Unh::class);
+
+        static::assertSame(Unh::class, $segFactory->getClassname('unh'));
+    }
 }

@@ -34,19 +34,11 @@ final class HasStringLength
 
     private function checkMin(int $shouldLength): bool
     {
-        if ($this->min === null) {
-            return true;
-        }
-
-        return $shouldLength >= $this->min;
+        return $this->min === null || $shouldLength >= $this->min;
     }
 
     private function checkMax(int $shouldLength): bool
     {
-        if ($this->max === null) {
-            return true;
-        }
-
-        return $shouldLength <= $this->max;
+        return $this->max === null || $shouldLength <= $this->max;
     }
 }

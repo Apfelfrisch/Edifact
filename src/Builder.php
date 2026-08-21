@@ -136,11 +136,9 @@ final class Builder
 
     private function flushWriteBuffer(): void
     {
-        if ($this->writeBuffer === '') {
-            return;
+        if ($this->writeBuffer !== '') {
+            $this->stream->write($this->writeBuffer);
+            $this->writeBuffer = '';
         }
-
-        $this->stream->write($this->writeBuffer);
-        $this->writeBuffer = '';
     }
 }

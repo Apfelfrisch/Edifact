@@ -14,6 +14,7 @@ use Apfelfrisch\Edifact\Test\Fixtures\Rff;
 use Apfelfrisch\Edifact\Test\Fixtures\Unh;
 use Override;
 
+// @mago-expect lint:too-many-methods
 final class MessageTest extends TestCase
 {
     #[Override]
@@ -266,6 +267,16 @@ final class MessageTest extends TestCase
 
         static::assertCount(1, $partials);
         static::assertSame("UNH+1'UNT+1'", $partials[0]->toString());
+    }
+
+    public function test_unwrapping_ignores_a_trailer_before_the_first_header(): void
+    {
+        $message = Message::fromString("UNT+9'UNH+1'UNT+2'");
+
+        $partials = iterator_to_array($message->unwrap());
+
+        static::assertCount(1, $partials);
+        static::assertSame("UNH+1'UNT+2'", $partials[0]->toString());
     }
 
     public function test_marked_default_factory_is_returned(): void

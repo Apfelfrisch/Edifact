@@ -219,4 +219,11 @@ final class StreamTest extends TestCase
         static::assertSame('|', $stream->getUnaSegment()->componentSeparator());
         static::assertSame('#', $stream->getUnaSegment()->elementSeparator());
     }
+
+    public function test_get_contents_trims_the_content(): void
+    {
+        $stream = Stream::fromString("A+B'\n");
+
+        static::assertSame("A+B'", $stream->getContents());
+    }
 }

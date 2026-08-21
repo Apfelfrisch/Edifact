@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Apfelfrisch\Edifact\Test\Formatter;
 
 use Apfelfrisch\Edifact\Formatter\EdifactFormatter;
+use Apfelfrisch\Edifact\Segment\GenericSegment;
 use Apfelfrisch\Edifact\Segment\SeglineParser;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
 use Apfelfrisch\Edifact\Test\Fixtures\AbstractSegmentTestSegment;
@@ -114,5 +115,40 @@ final class EdifactFormatterTest extends TestCase
         $segment = AbstractSegmentTestSegment::fromAttributes("a'b");
 
         static::assertSame("a?'b'", new EdifactFormatter(UnaSegment::getDefault())->format($segment));
+    }
+
+    public function test_escaping_a_lone_component_separator(): void
+    {
+        $segment = AbstractSegmentTestSegment::fromAttributes('a:b');
+
+        static::assertSame("a?:b'", new EdifactFormatter(UnaSegment::getDefault())->format($segment));
+    }
+
+    public function test_escaping_a_lone_element_separator(): void
+    {
+        $segment = AbstractSegmentTestSegment::fromAttributes('a+b');
+
+        static::assertSame("a?+b'", new EdifactFormatter(UnaSegment::getDefault())->format($segment));
+    }
+
+    public function test_removing_literal_backslash_n_sequences(): void
+    {
+        $segment = AbstractSegmentTestSegment::fromAttributes('a\nb');
+
+        static::assertSame("ab'", new EdifactFormatter(UnaSegment::getDefault())->format($segment));
+    }
+
+    public function test_an_empty_component_before_a_filled_one_is_kept(): void
+    {
+        $segment = GenericSegment::fromAttributes('SEG', [null, 'x']);
+
+        static::assertSame("SEG+:x'", new EdifactFormatter(UnaSegment::getDefault())->format($segment));
+    }
+
+    public function test_formatting_only_empty_values_yields_only_the_terminator(): void
+    {
+        $segment = GenericSegment::fromAttributes('', ['', '']);
+
+        static::assertSame("'", new EdifactFormatter(UnaSegment::getDefault())->format($segment));
     }
 }

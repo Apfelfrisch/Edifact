@@ -6,6 +6,7 @@ namespace Apfelfrisch\Edifact\Test\Validation;
 
 use Apfelfrisch\Edifact\Exceptions\ValidationException;
 use Apfelfrisch\Edifact\Test\TestCase;
+use Apfelfrisch\Edifact\Validation\Failure;
 use Apfelfrisch\Edifact\Validation\ValueValidator;
 
 final class ValueValidatorTest extends TestCase
@@ -60,6 +61,22 @@ final class ValueValidatorTest extends TestCase
         static::assertCount(1, $validator->validate('', 'M|a|..3', ''));
         static::assertCount(1, $validator->validate('abcd', 'M|a|..3', ''));
         static::assertEmpty($validator->validate('ab', 'M|a|..3', ''));
+        static::assertEmpty($validator->validate('abc', 'M|a|..3', ''));
+    }
+
+    public function test_a_range_rule_with_maximum_one_reports_an_invalid_length(): void
+    {
+        $failures = new ValueValidator()->validate('ab', 'M|an|..1', '');
+
+        static::assertSame([Failure::VALUE_LENGTH_INVALID], array_keys($failures));
+    }
+
+    public function test_an_exact_length_rule_reports_an_invalid_length(): void
+    {
+        $validator = new ValueValidator();
+
+        static::assertSame([Failure::VALUE_LENGTH_INVALID], array_keys($validator->validate('ab', 'M|an|3', '')));
+        static::assertSame([Failure::VALUE_LENGTH_INVALID], array_keys($validator->validate('abcd', 'M|an|3', '')));
     }
 
     public function test_multiple_failures(): void

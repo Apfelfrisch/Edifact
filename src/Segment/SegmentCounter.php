@@ -13,10 +13,6 @@ final class SegmentCounter
     {
         $segmentName = $segment->name();
 
-        if ($segmentName === 'UNB') {
-            return;
-        }
-
         if ($segmentName === 'UNH') {
             $this->unhCounter = 1;
             $this->messageCounter++;
@@ -24,7 +20,9 @@ final class SegmentCounter
             return;
         }
 
-        $this->unhCounter++;
+        if ($segmentName !== 'UNB') {
+            $this->unhCounter++;
+        }
     }
 
     public function messageCount(): int

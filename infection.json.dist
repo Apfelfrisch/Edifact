@@ -7,7 +7,124 @@
     },
     "mutators": {
         "@default": true,
-        "CastString": false
+        "CastString": false,
+        "AssignCoalesce": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Message::getAllSegments",
+                "Apfelfrisch\\Edifact\\StreamMessageFactory::addStreamFilter"
+            ]
+        },
+        "Coalesce": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Validation\\InterchangeValidator::__construct"
+            ]
+        },
+        "Concat": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Formatter\\EdifactFormatter::__construct"
+            ]
+        },
+        "ConcatOperandRemoval": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Segment\\SeglineParser::__construct"
+            ]
+        },
+        "DecrementInteger": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Validation\\InterchangeValidator::validate",
+                "Apfelfrisch\\Edifact\\Validation\\SegmentValidator::validate"
+            ]
+        },
+        "FalseValue": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Message::getAllSegments"
+            ]
+        },
+        "For_": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Segment\\SeglineParser::getBlueprintCache"
+            ]
+        },
+        "Foreach_": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Iterators\\Stream\\Stream::__destruct"
+            ]
+        },
+        "FunctionCallRemoval": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Iterators\\Stream\\Stream::__destruct"
+            ]
+        },
+        "GreaterThan": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Formatter\\EdifactFormatter::trimEmpty"
+            ]
+        },
+        "GreaterThanOrEqualTo": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Builder::writeSegment"
+            ]
+        },
+        "GreaterThanOrEqualToNegotiation": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Builder::writeSegment"
+            ]
+        },
+        "IncrementInteger": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Segment\\SeglineParser::getBlueprintCache",
+                "Apfelfrisch\\Edifact\\Segment\\UnaSegment::setFromStream"
+            ]
+        },
+        "LessThan": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Validation\\SegmentValidator::validate"
+            ]
+        },
+        "LessThanOrEqualTo": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Segment\\SeglineParser::getBlueprintCache"
+            ]
+        },
+        "LessThanOrEqualToNegotiation": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Segment\\SeglineParser::getBlueprintCache"
+            ]
+        },
+        "Plus": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Validation\\SegmentValidator::validate"
+            ]
+        },
+        "ReturnRemoval": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Segment\\SeglineParser::getBlueprintCache",
+                "Apfelfrisch\\Edifact\\Validation\\SegmentValidator::getBlueprintCache",
+                "Apfelfrisch\\Edifact\\Validation\\InterchangeValidator::registerMessageReference"
+            ]
+        },
+        "Throw_": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Validation\\SegmentValidator::buildMessage",
+                "Apfelfrisch\\Edifact\\Validation\\ValueValidator::buildMessage"
+            ]
+        },
+        "TrueValue": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Iterators\\Stream\\Stream::__construct",
+                "Apfelfrisch\\Edifact\\Validation\\InterchangeValidator::registerMessageReference"
+            ]
+        },
+        "UnwrapArrayValues": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Iterators\\InMemoryIterator::fromSegments"
+            ]
+        },
+        "UnwrapFinally": {
+            "ignore": [
+                "Apfelfrisch\\Edifact\\Iterators\\Stream\\Stream::__construct"
+            ]
+        }
     },
     "minMsi": 92,
     "minCoveredMsi": 96

@@ -51,6 +51,17 @@ final class ElementsTest extends TestCase
         static::assertSame('', new Elements()->getName());
     }
 
+    public function test_the_name_is_cached_after_the_first_call(): void
+    {
+        $elements = new Elements();
+
+        static::assertSame('', $elements->getName());
+
+        $elements->addValue('UNH', 'UNH', 'UNH');
+
+        static::assertSame('', $elements->getName());
+    }
+
     public function test_getting_an_element(): void
     {
         $elements = new Elements()
