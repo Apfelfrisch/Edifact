@@ -20,7 +20,7 @@ final class InMemoryIterator implements SegmentIterator
      */
     public function __construct(
         private readonly array $segments = [],
-        ?UnaSegment $unaSegment = null,
+        null|UnaSegment $unaSegment = null,
     ) {
         $this->unaSegment = $unaSegment ?? UnaSegment::getDefault();
     }

@@ -9,7 +9,7 @@ use Apfelfrisch\Edifact\Segment\Elements;
 
 final class Rff extends AbstractSegment
 {
-    private static ?Elements $blueprint = null;
+    private static null|Elements $blueprint = null;
 
     public static function blueprint(): Elements
     {
@@ -19,7 +19,7 @@ final class Rff extends AbstractSegment
             ->addValue('C506', '1154', 'M|an|70');
     }
 
-    public static function fromAttributes(string $code, ?string $reference = null): self
+    public static function fromAttributes(string $code, null|string $reference = null): self
     {
         return new self(
             new Elements()
@@ -29,12 +29,12 @@ final class Rff extends AbstractSegment
         );
     }
 
-    public function code(): ?string
+    public function code(): null|string
     {
         return $this->elements->getValue('C506', '1153');
     }
 
-    public function reference(): ?string
+    public function reference(): null|string
     {
         return $this->elements->getValue('C506', '1154');
     }

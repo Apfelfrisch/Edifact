@@ -14,9 +14,9 @@ use Apfelfrisch\Edifact\Segment\UnaSegment;
 
 final class Builder
 {
-    private ?string $unbRef = null;
+    private null|string $unbRef = null;
 
-    private ?string $unhRef = null;
+    private null|string $unhRef = null;
 
     private bool $buildIsFinalized = false;
 
@@ -26,7 +26,7 @@ final class Builder
 
     private readonly SegmentCounter $counter;
 
-    public function __construct(?UnaSegment $unaSegment = null, string $filepath = 'php://temp')
+    public function __construct(null|UnaSegment $unaSegment = null, string $filepath = 'php://temp')
     {
         $this->stream = new Stream($filepath, 'w+', $unaSegment);
         $this->counter = new SegmentCounter();

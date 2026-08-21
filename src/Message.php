@@ -15,7 +15,7 @@ use Stringable;
 
 final class Message implements Stringable
 {
-    private static ?MessageFactory $factory = null;
+    private static null|MessageFactory $factory = null;
 
     public function __construct(
         private readonly SegmentIterator $segmentIterator,
@@ -64,7 +64,7 @@ final class Message implements Stringable
      *
      * @return Generator<int, T, null, void>
      */
-    public function filterSegments(string $segmentClass, ?Closure $closure = null): Generator
+    public function filterSegments(string $segmentClass, null|Closure $closure = null): Generator
     {
         foreach ($this->getSegments() as $segment) {
             if ($segment::class !== $segmentClass) {
@@ -85,7 +85,7 @@ final class Message implements Stringable
      *
      * @return list<T>
      */
-    public function filterAllSegments(string $segmentClass, ?Closure $closure = null): array
+    public function filterAllSegments(string $segmentClass, null|Closure $closure = null): array
     {
         /** @var list<T> */
         return iterator_to_array($this->filterSegments($segmentClass, $closure));
@@ -98,7 +98,7 @@ final class Message implements Stringable
      *
      * @return T|null
      */
-    public function findFirstSegment(string $segmentClass, ?Closure $closure = null): ?Segment
+    public function findFirstSegment(string $segmentClass, null|Closure $closure = null): null|Segment
     {
         return $this->filterSegments($segmentClass, $closure)->current();
     }

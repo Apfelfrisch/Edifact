@@ -57,8 +57,12 @@ final class EdifactFormatter implements Formatter
         return $string;
     }
 
-    private function buildComponent(?string $value, Segment $segment, string $elementKey, string $componentKey): string
-    {
+    private function buildComponent(
+        null|string $value,
+        Segment $segment,
+        string $elementKey,
+        string $componentKey,
+    ): string {
         if ($value === null) {
             return $this->unaSegment->componentSeparator();
         }

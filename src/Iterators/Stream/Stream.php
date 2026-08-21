@@ -21,7 +21,7 @@ final class Stream extends SplFileInfo
 
     private readonly UnaSegment $unaSegment;
 
-    public function __construct(string $filename, string $openMode = 'r', ?UnaSegment $unaSegment = null)
+    public function __construct(string $filename, string $openMode = 'r', null|UnaSegment $unaSegment = null)
     {
         parent::__construct($filename);
 

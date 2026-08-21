@@ -21,7 +21,7 @@ final readonly class Failure
         public string $segmentName,
         public int $elementPosition,
         public int $componentPosition,
-        public ?string $value,
+        public null|string $value,
         public string $message,
         public int $messageCounter = 0,
         public int $unhCounter = 0,

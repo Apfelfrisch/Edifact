@@ -9,7 +9,7 @@ use Apfelfrisch\Edifact\Segment\Elements;
 
 final class AbstractSegmentTestSegment extends AbstractSegment
 {
-    private static ?Elements $blueprint = null;
+    private static null|Elements $blueprint = null;
 
     public static function blueprint(): Elements
     {
@@ -26,7 +26,7 @@ final class AbstractSegmentTestSegment extends AbstractSegment
             ->addValue('F', 'F', 'O|an|3');
     }
 
-    public static function fromAttributes(string $a, ?string $b = null, ?string $c = null): self
+    public static function fromAttributes(string $a, null|string $b = null, null|string $c = null): self
     {
         return new self(
             new Elements()
@@ -36,7 +36,7 @@ final class AbstractSegmentTestSegment extends AbstractSegment
         );
     }
 
-    public function dummyMethod(): ?string
+    public function dummyMethod(): null|string
     {
         return $this->elements->getValue('B', 'B');
     }

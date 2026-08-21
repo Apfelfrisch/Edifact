@@ -10,9 +10,9 @@ interface Segment
 
     public function name(): string;
 
-    public function getValue(string $elementKey, string $componentKey): ?string;
+    public function getValue(string $elementKey, string $componentKey): null|string;
 
-    public function getValueFromPosition(int $elementPosition, int $valuePosition): ?string;
+    public function getValueFromPosition(int $elementPosition, int $valuePosition): null|string;
 
     public function isValueNumeric(string $elementKey, string $componentKey): bool;
 

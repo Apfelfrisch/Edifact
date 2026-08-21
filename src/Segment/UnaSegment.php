@@ -16,7 +16,7 @@ final class UnaSegment
 
     public const string PHP_DECIMAL = '.';
 
-    private static ?self $defaultUnaSegment = null;
+    private static null|self $defaultUnaSegment = null;
 
     /**
      * @param non-empty-string $componentSeparator
@@ -51,7 +51,7 @@ final class UnaSegment
         }
     }
 
-    public static function setFromStream(Stream $stream, ?self $fallback = null): self
+    public static function setFromStream(Stream $stream, null|self $fallback = null): self
     {
         $position = $stream->tell();
         $stream->rewind();
@@ -65,7 +65,7 @@ final class UnaSegment
         return $instance;
     }
 
-    public static function setFromString(string $string, ?self $fallback = null): self
+    public static function setFromString(string $string, null|self $fallback = null): self
     {
         if (!str_starts_with($string, self::UNA)) {
             return $fallback ?? new self();

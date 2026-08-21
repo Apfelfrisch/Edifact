@@ -10,7 +10,7 @@ final class SeglineParser
 
     private readonly UnaSegment $unaSegment;
 
-    public function __construct(?UnaSegment $unaSegment = null)
+    public function __construct(null|UnaSegment $unaSegment = null)
     {
         $this->unaSegment = $unaSegment ?? UnaSegment::getDefault();
     }
@@ -97,7 +97,7 @@ final class SeglineParser
         return str_replace(["\r", "\n"], '', $segline);
     }
 
-    private function isNumeric(?string $value): bool
+    private function isNumeric(null|string $value): bool
     {
         return $value !== null && str_contains($value, '|n|');
     }

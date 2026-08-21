@@ -61,8 +61,12 @@ final class SegmentValidator
     /**
      * @return Iterator<Failure>
      */
-    private function validateValue(?string $value, string $rules, string $elementKey, string $componentKey): Iterator
-    {
+    private function validateValue(
+        null|string $value,
+        string $rules,
+        string $elementKey,
+        string $componentKey,
+    ): Iterator {
         $failures = $this->valueValidator->validate($value, $rules, (string) $this->elementPosition);
 
         foreach ($failures as $failureType => $message) {
@@ -89,7 +93,7 @@ final class SegmentValidator
         Elements $blueprint,
         string $elementKey,
         string $componentKey,
-        ?string $value,
+        null|string $value,
     ): Iterator {
         if (($element = $blueprint->getElement($elementKey)) === []) {
             yield new Failure(

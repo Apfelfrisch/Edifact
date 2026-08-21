@@ -9,7 +9,7 @@ use Apfelfrisch\Edifact\Segment\Elements;
 
 final class Unh extends AbstractSegment
 {
-    private static ?Elements $blueprint = null;
+    private static null|Elements $blueprint = null;
 
     public static function blueprint(): Elements
     {
@@ -49,27 +49,27 @@ final class Unh extends AbstractSegment
         return $this->elements->getValue('0062', '0062') ?? '';
     }
 
-    public function type(): ?string
+    public function type(): null|string
     {
         return $this->elements->getValue('S009', '0065');
     }
 
-    public function versionNumber(): ?string
+    public function versionNumber(): null|string
     {
         return $this->elements->getValue('S009', '0052');
     }
 
-    public function releaseNumber(): ?string
+    public function releaseNumber(): null|string
     {
         return $this->elements->getValue('S009', '0054');
     }
 
-    public function organisation(): ?string
+    public function organisation(): null|string
     {
         return $this->elements->getValue('S009', '0051');
     }
 
-    public function organisationCode(): ?string
+    public function organisationCode(): null|string
     {
         return $this->elements->getValue('S009', '0057');
     }

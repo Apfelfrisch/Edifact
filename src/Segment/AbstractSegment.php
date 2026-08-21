@@ -28,12 +28,12 @@ abstract class AbstractSegment implements Segment, Validateable
         return $segmentValidator->validate(static::blueprint(), $this->elements);
     }
 
-    public function getValueFromPosition(int $elementPosition, int $valuePosition): ?string
+    public function getValueFromPosition(int $elementPosition, int $valuePosition): null|string
     {
         return $this->elements->getValueFromPosition($elementPosition, $valuePosition);
     }
 
-    public function getValue(string $elementKey, string $componentKey): ?string
+    public function getValue(string $elementKey, string $componentKey): null|string
     {
         return $this->elements->getValue($elementKey, $componentKey);
     }

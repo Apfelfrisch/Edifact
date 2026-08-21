@@ -7,18 +7,18 @@ namespace Apfelfrisch\Edifact\Validation\Rules;
 final class HasStringLength
 {
     public function __construct(
-        private ?int $min = null,
-        private ?int $max = null,
+        private null|int $min = null,
+        private null|int $max = null,
     ) {}
 
-    public function min(?int $min = null): self
+    public function min(null|int $min = null): self
     {
         $this->min = $min;
 
         return $this;
     }
 
-    public function max(?int $max = null): self
+    public function max(null|int $max = null): self
     {
         $this->max = $max;
 

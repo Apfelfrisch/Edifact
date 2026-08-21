@@ -12,13 +12,13 @@ final class ConcreteSegmentFactory implements SegmentFactory
     private array $segmentClasses = [];
 
     /** @var class-string<Segment>|null */
-    private ?string $fallback = null;
+    private null|string $fallback = null;
 
     private UnaSegment $unaSegment;
 
     private SeglineParser $parser;
 
-    public function __construct(?UnaSegment $unaSegment = null)
+    public function __construct(null|UnaSegment $unaSegment = null)
     {
         $this->unaSegment = $unaSegment ?? UnaSegment::getDefault();
         $this->parser = new SeglineParser($this->unaSegment);

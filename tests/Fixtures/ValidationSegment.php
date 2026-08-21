@@ -9,9 +9,9 @@ use Apfelfrisch\Edifact\Segment\Elements;
 
 final class ValidationSegment extends AbstractSegment
 {
-    public static ?string $ruleOne = null;
+    public static null|string $ruleOne = null;
 
-    public static ?string $ruleTwo = 'O|a|3';
+    public static null|string $ruleTwo = 'O|a|3';
 
     public static function blueprint(): Elements
     {
@@ -21,7 +21,7 @@ final class ValidationSegment extends AbstractSegment
             ->addValue('1', '2', self::$ruleTwo);
     }
 
-    public static function fromAttributes(?string $valueOne = null, ?string $valueTwo = null): self
+    public static function fromAttributes(null|string $valueOne = null, null|string $valueTwo = null): self
     {
         return new self(
             new Elements()

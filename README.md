@@ -157,6 +157,41 @@ $builder = new Builder;
 $builder->addStreamFilter('convert.iconv.UTF-8.ISO-8859-1');
 ```
 
+### Validate a complete Interchange (CONTRL-style syntax check)
+
+The `InterchangeValidator` checks the structure of a whole transmission file
+(UNB/UNZ and UNH/UNT service segments, matching references, control counts,
+duplicate message references) plus the blueprints of all registered segments,
+following the CONTRL check order: an interchange level failure stops the
+check, a failing message reports only its UNH/UNT failures while other
+messages are still checked.
+
+Every `SyntaxFailure` carries the UN/EDIFACT error code (service code
+list 0085) and the context needed to fill the UCI/UCM/UCS/UCD segments of a
+CONTRL message: the affected service segment, the message counter and
+reference, the segment position within the message and the element/component
+positions.
+
+```php
+use Apfelfrisch\Edifact\Message;
+use Apfelfrisch\Edifact\Validation\InterchangeValidator;
+
+$message = Message::fromFilepath('path/to/interchange.txt');
+
+foreach (new InterchangeValidator()->validate($message) as $failure) {
+    echo $failure->errorCode->value;    // e.g. 28
+    echo $failure->description();       // "References do not match"
+    echo $failure->serviceSegment;      // e.g. "UNT"
+    echo $failure->messageCounter;      // n-th message of the interchange
+    echo $failure->segmentPosition;     // position within the message, UNH = 1
+}
+```
+
+Checks that need knowledge the file itself cannot provide (own MP-ID,
+known senders, already received interchange references, message type
+descriptions) remain the concern of the application; `SyntaxErrorCode`
+provides the matching codes (7, 23, 25, 26, 35, 36, …) for reporting them.
+
 ### Validate Message Segments
 
 ```php

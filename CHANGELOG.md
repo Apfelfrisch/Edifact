@@ -1,6 +1,10 @@
 # Changelog
 
 2.0.0 (unreleased)
+ - Add InterchangeValidator for CONTRL-style syntax checks of complete
+   transmission files (UNB/UNZ and UNH/UNT structure, references, control
+   counts, duplicates) with SyntaxFailure/SyntaxErrorCode/ReportLevel
+   carrying UN/EDIFACT 0085 codes and UCI/UCM/UCS/UCD positions
  - Require PHP 8.5
  - Replace Phpstan, Psalm and PHP-CS-Fixer with Mago (formatter, linter and static analyzer)
  - Update PHPUnit to 12, Infection to 0.31

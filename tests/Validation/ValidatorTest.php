@@ -286,7 +286,7 @@ final class ValidatorTest extends TestCase
         static::assertSame(2, $i);
     }
 
-    private function buildMessage(string $string, ?StreamMessageFactory $segmentFactory = null): Message
+    private function buildMessage(string $string, null|StreamMessageFactory $segmentFactory = null): Message
     {
         if ($segmentFactory === null) {
             $segmentFactory = new StreamMessageFactory();

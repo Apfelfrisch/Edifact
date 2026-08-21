@@ -14,7 +14,7 @@ final class Validator
     private readonly SegmentValidator $segmentValidator;
 
     /** @var Iterator<Failure|null>|null */
-    private ?Iterator $failures = null;
+    private null|Iterator $failures = null;
 
     public function __construct()
     {
@@ -41,7 +41,7 @@ final class Validator
     /**
      * @throws ValidationException
      */
-    public function getFirstFailure(): ?Failure
+    public function getFirstFailure(): null|Failure
     {
         return $this->getFailures()->current();
     }

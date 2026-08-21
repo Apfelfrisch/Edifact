@@ -6,6 +6,8 @@ paths = ["src", "tests"]
 includes = ["vendor"]
 
 [formatter]
+# Write nullable types as a union (null|Foo) instead of the question mark (?Foo)
+null-type-hint = "null_pipe"
 
 [linter]
 integrations = ["phpunit"]
@@ -20,11 +22,15 @@ enabled = false
 [linter.rules.too-many-methods]
 threshold = 25
 
-# Failure and UnaSegment are value objects whose constructors mirror the
-# EDIFACT domain (six UNA characters, eight failure attributes).
+# Failure, SyntaxFailure and UnaSegment are value objects whose constructors
+# mirror the EDIFACT domain (six UNA characters, failure/CONTRL context).
 [linter.rules.excessive-parameter-list]
 threshold = 5
-constructor-threshold = 8
+constructor-threshold = 9
+
+# SyntaxErrorCode mirrors the UN/EDIFACT 0085 service code list (22 codes).
+[linter.rules.too-many-enum-cases]
+threshold = 30
 
 # The parser and validator cores (SeglineParser, SegmentValidator,
 # ValueValidator) are inherently branch-heavy; the default class-level

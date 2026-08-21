@@ -28,12 +28,12 @@ final class ValueValidator
         Failure::MISSING_COMPONENT => 'Component with Id [%] is missing',
     ];
 
-    private ?string $missingElementPosition = null;
+    private null|string $missingElementPosition = null;
 
     /**
      * @return array<string, string>
      */
-    public function validate(?string $value, string $rules, string $elementPosition): array
+    public function validate(null|string $value, string $rules, string $elementPosition): array
     {
         [$necessaryState, $type, $minLength, $maxLength] = $this->explodeRules($rules);
 
@@ -140,7 +140,7 @@ final class ValueValidator
         return [$necessaryState, $type, (int) $length, (int) $length];
     }
 
-    private function buildMessage(string $key, ?string $replacement = null): string
+    private function buildMessage(string $key, null|string $replacement = null): string
     {
         $message = self::MESSAGES[$key] ?? throw InvalidEdifactContentException::messageUnknown($key);
 

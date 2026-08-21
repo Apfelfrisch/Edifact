@@ -9,7 +9,7 @@ use Apfelfrisch\Edifact\Segment\Elements;
 
 final class Moa extends AbstractSegment
 {
-    private static ?Elements $blueprint = null;
+    private static null|Elements $blueprint = null;
 
     public static function blueprint(): Elements
     {
@@ -29,12 +29,12 @@ final class Moa extends AbstractSegment
         );
     }
 
-    public function qualifier(): ?string
+    public function qualifier(): null|string
     {
         return $this->elements->getValue('C516', '5025');
     }
 
-    public function amount(): ?string
+    public function amount(): null|string
     {
         return $this->getValue('C516', '5004');
     }
