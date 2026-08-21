@@ -29,9 +29,15 @@ final readonly class Failure
 
     public function withCounters(int $messageCounter, int $unhCounter): self
     {
-        return clone($this, [
-            'messageCounter' => $messageCounter,
-            'unhCounter' => $unhCounter,
-        ]);
+        return new self(
+            $this->type,
+            $this->segmentName,
+            $this->elementPosition,
+            $this->componentPosition,
+            $this->value,
+            $this->message,
+            $messageCounter,
+            $unhCounter,
+        );
     }
 }

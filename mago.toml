@@ -1,5 +1,5 @@
 # Mago configuration — https://mago.carthage.software/tools/overview
-php-version = "8.5"
+php-version = "8.4"
 
 [source]
 paths = ["src", "tests"]

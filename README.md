@@ -12,7 +12,7 @@ Parse, build, serialize and validate UN/EDIFACT messages in a memory efficient w
 composer require apfelfrisch/edifact
 ```
 
-Version 2.0 requires PHP 8.5+. If you are on PHP 8.1–8.4, use the [1.x releases](https://github.com/Apfelfrisch/Edifact/tree/master) (`composer require apfelfrisch/edifact:^1.3`).
+Version 2.0 requires PHP 8.4+. If you are on PHP 8.1–8.3, use the [1.x releases](https://github.com/Apfelfrisch/Edifact/tree/master) (`composer require apfelfrisch/edifact:^1.3`).
 
 See the [CHANGELOG](CHANGELOG.md) for what is new in 2.0, including the breaking changes when upgrading from 1.x.
 
