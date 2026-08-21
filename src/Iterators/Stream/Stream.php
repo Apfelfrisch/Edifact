@@ -21,6 +21,12 @@ final class Stream extends SplFileInfo
 
     private readonly UnaSegment $unaSegment;
 
+    /** @var non-empty-string */
+    private readonly string $segmentTerminator;
+
+    /** @var non-empty-string */
+    private readonly string $escapeCharacter;
+
     public function __construct(string $filename, string $openMode = 'r', null|UnaSegment $unaSegment = null)
     {
         parent::__construct($filename);
@@ -45,6 +51,9 @@ final class Stream extends SplFileInfo
         $this->unaSegment = $this->readable
             ? UnaSegment::setFromStream($this, fallback: $unaSegment)
             : $unaSegment ?? new UnaSegment();
+
+        $this->segmentTerminator = $this->unaSegment->segmentTerminator();
+        $this->escapeCharacter = $this->unaSegment->escapeCharacter();
     }
 
     /**
@@ -135,12 +144,16 @@ final class Stream extends SplFileInfo
     {
         $mergedLines = '';
 
-        while (($line = $this->streamGetLine()) !== false && $line !== '' && !ctype_cntrl($line)) {
-            if (!$this->terminatorWasEscaped($line)) {
-                return $mergedLines . $line;
+        while (
+            ($line = stream_get_line($this->resource, 0, $this->segmentTerminator)) !== false
+            && $line !== ''
+            && !ctype_cntrl($line)
+        ) {
+            if (!str_ends_with($line, $this->escapeCharacter)) {
+                return $mergedLines === '' ? $line : $mergedLines . $line;
             }
 
-            $mergedLines .= substr_replace($line, $this->unaSegment->segmentTerminator(), -1);
+            $mergedLines .= substr_replace($line, $this->segmentTerminator, -1);
         }
 
         return $mergedLines;
@@ -223,15 +236,5 @@ final class Stream extends SplFileInfo
         }
 
         $this->filters[$filtername][] = $res;
-    }
-
-    private function streamGetLine(): string|false
-    {
-        return stream_get_line($this->resource, 0, $this->unaSegment->segmentTerminator());
-    }
-
-    private function terminatorWasEscaped(string $line): bool
-    {
-        return str_ends_with($line, $this->unaSegment->escapeCharacter());
     }
 }

@@ -80,6 +80,19 @@ final class EdifactFormatterTest extends TestCase
         static::assertSame($expectedString, new EdifactFormatter($unaSegment)->format($segment));
     }
 
+    public function test_replacing_the_decimal_point_keeps_the_component_separator(): void
+    {
+        $unaSegment = new UnaSegment(':', '+', ',');
+        $givenString = 'A++1,23:X';
+
+        $segment = AbstractSegmentTestSegment::fromSegLine(new SeglineParser($unaSegment), $givenString);
+
+        static::assertSame(
+            $givenString . $unaSegment->segmentTerminator(),
+            new EdifactFormatter($unaSegment)->format($segment),
+        );
+    }
+
     public function test_una_prefix_is_written_only_once(): void
     {
         $formatter = new EdifactFormatter(UnaSegment::getDefault());

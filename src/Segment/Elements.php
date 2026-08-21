@@ -8,8 +8,12 @@ final class Elements
 {
     private null|string $name = null;
 
-    /** @var array<array-key, array<array-key, string|null>> */
-    private array $elements = [];
+    /**
+     * @param array<array-key, array<array-key, string|null>> $elements
+     */
+    public function __construct(
+        private array $elements = [],
+    ) {}
 
     public function addValue(string $elementKey, string $componentKey, null|string $value): self
     {
@@ -20,7 +24,20 @@ final class Elements
 
     public function getName(): string
     {
-        return $this->name ??= $this->getValueFromPosition(0, 0) ?? '';
+        if ($this->name !== null) {
+            return $this->name;
+        }
+
+        $firstElementKey = array_key_first($this->elements);
+
+        if ($firstElementKey === null) {
+            return $this->name = '';
+        }
+
+        $firstElement = $this->elements[$firstElementKey];
+        $firstComponentKey = array_key_first($firstElement);
+
+        return $this->name = $firstComponentKey === null ? '' : $firstElement[$firstComponentKey] ?? '';
     }
 
     public function getValueFromPosition(int $elementPosition, int $valuePosition): null|string

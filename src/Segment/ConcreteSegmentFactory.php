@@ -11,6 +11,13 @@ final class ConcreteSegmentFactory implements SegmentFactory
     /** @var array<string, class-string<Segment>> */
     private array $segmentClasses = [];
 
+    /**
+     * Resolved classnames per raw (case-preserving) segline prefix.
+     *
+     * @var array<string, class-string<Segment>>
+     */
+    private array $resolvedClasses = [];
+
     /** @var class-string<Segment>|null */
     private null|string $fallback = null;
 
@@ -31,12 +38,30 @@ final class ConcreteSegmentFactory implements SegmentFactory
     }
 
     /**
+     * Returns a factory using the given UNA segment, leaving this instance
+     * untouched. The same instance is returned when the UNA characters are
+     * unchanged, so the parser's blueprint cache is retained.
+     */
+    public function withUnaSegment(UnaSegment $unaSegment): self
+    {
+        if ($unaSegment->toString() === $this->unaSegment->toString()) {
+            return $this;
+        }
+
+        $factory = clone $this;
+        $factory->setUnaSegment($unaSegment);
+
+        return $factory;
+    }
+
+    /**
      * @param class-string<Segment> $segmentClass
      */
     public function addSegment(string $name, string $segmentClass): self
     {
         if (is_subclass_of($segmentClass, Segment::class)) {
             $this->segmentClasses[strtoupper(substr($name, 0, 3))] = $segmentClass;
+            $this->resolvedClasses = [];
         }
 
         return $this;
@@ -48,13 +73,21 @@ final class ConcreteSegmentFactory implements SegmentFactory
     public function addFallback(string $fallback): self
     {
         $this->fallback = $fallback;
+        $this->resolvedClasses = [];
 
         return $this;
     }
 
     public function build(string $segline): Segment
     {
-        $segmentClass = $this->getClassname(substr($segline, 0, 3));
+        $prefix = substr($segline, 0, 3);
+
+        $segmentClass = $this->resolvedClasses[$prefix] ?? null;
+
+        if ($segmentClass === null) {
+            $segmentClass = $this->getClassname($prefix);
+            $this->resolvedClasses[$prefix] = $segmentClass;
+        }
 
         // @mago-expect analysis:possibly-static-access-on-interface — the Segment interface declares fromSegLine()
         return $segmentClass::fromSegLine($this->parser, $segline);

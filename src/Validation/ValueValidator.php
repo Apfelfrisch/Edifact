@@ -6,9 +6,6 @@ namespace Apfelfrisch\Edifact\Validation;
 
 use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
 use Apfelfrisch\Edifact\Exceptions\ValidationException;
-use Apfelfrisch\Edifact\Validation\Rules\HasStringLength;
-use Apfelfrisch\Edifact\Validation\Rules\IsAlpha;
-use Apfelfrisch\Edifact\Validation\Rules\IsNumber;
 
 final class ValueValidator
 {
@@ -28,6 +25,11 @@ final class ValueValidator
         Failure::MISSING_COMPONENT => 'Component with Id [%] is missing',
     ];
 
+    private const array KNOWN_STATES = [self::ELEMENT_OPTIONAL, self::ELEMENT_NEEDED, self::ELEMENT_DEPENDS];
+
+    /** @var array<string, array{string, string, int, int}> */
+    private static array $explodedRulesCache = [];
+
     private null|string $missingElementPosition = null;
 
     /**
@@ -35,11 +37,16 @@ final class ValueValidator
      */
     public function validate(null|string $value, string $rules, string $elementPosition): array
     {
-        [$necessaryState, $type, $minLength, $maxLength] = $this->explodeRules($rules);
+        $explodedRules = self::$explodedRulesCache[$rules] ?? null;
 
-        $knownStates = [self::ELEMENT_OPTIONAL, self::ELEMENT_NEEDED, self::ELEMENT_DEPENDS];
+        if ($explodedRules === null) {
+            $explodedRules = $this->explodeRules($rules);
+            self::$explodedRulesCache[$rules] = $explodedRules;
+        }
 
-        if (($value === null || $value === '') && in_array($necessaryState, $knownStates, true)) {
+        [$necessaryState, $type, $minLength, $maxLength] = $explodedRules;
+
+        if (($value === null || $value === '') && in_array($necessaryState, self::KNOWN_STATES, true)) {
             return $this->validateMissingValue($necessaryState, $elementPosition);
         }
 
@@ -54,7 +61,36 @@ final class ValueValidator
 
         $value ??= '';
 
-        return [...$this->validateType($value, $type), ...$this->validateLength($value, $minLength, $maxLength)];
+        $failures = [];
+
+        // Inlined IsNumber rule
+        if ($type === self::ELEMENT_TYPE_NUMERIC && (!is_numeric($value) || is_nan((float) $value))) {
+            $failures[Failure::VALUE_NOT_DIGIT] = $this->buildMessage(Failure::VALUE_NOT_DIGIT);
+        }
+
+        // Inlined IsAlpha rule
+        if ($type === self::ELEMENT_TYPE_ALPHA && !ctype_alpha($value)) {
+            $failures[Failure::VALUE_NOT_ALPHA] = $this->buildMessage(Failure::VALUE_NOT_ALPHA);
+        }
+
+        $length = mb_strlen($value);
+
+        if ($minLength === $maxLength && $length !== $minLength) {
+            $failures[Failure::VALUE_LENGTH_INVALID] = $this->buildMessage(
+                Failure::VALUE_LENGTH_INVALID,
+                (string) $minLength,
+            );
+        }
+
+        if ($minLength !== $maxLength && $length < $minLength) {
+            $failures[Failure::VALUE_TOO_SHORT] = $this->buildMessage(Failure::VALUE_TOO_SHORT, (string) $minLength);
+        }
+
+        if ($minLength !== $maxLength && $length > $maxLength) {
+            $failures[Failure::VALUE_TOO_LONG] = $this->buildMessage(Failure::VALUE_TOO_LONG, (string) $maxLength);
+        }
+
+        return $failures;
     }
 
     /**
@@ -70,51 +106,6 @@ final class ValueValidator
         // Save the failure for the next iteration and check there if the element is truly needed.
         if ($necessaryState === self::ELEMENT_DEPENDS) {
             $this->missingElementPosition = $elementPosition;
-        }
-
-        return [];
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private function validateType(string $value, string $type): array
-    {
-        if ($type === self::ELEMENT_TYPE_NUMERIC && !(new IsNumber())($value)) {
-            return [Failure::VALUE_NOT_DIGIT => $this->buildMessage(Failure::VALUE_NOT_DIGIT)];
-        }
-
-        if ($type === self::ELEMENT_TYPE_ALPHA && !(new IsAlpha())($value)) {
-            return [Failure::VALUE_NOT_ALPHA => $this->buildMessage(Failure::VALUE_NOT_ALPHA)];
-        }
-
-        return [];
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private function validateLength(string $value, int $minLength, int $maxLength): array
-    {
-        if ($minLength === $maxLength) {
-            if (new HasStringLength()->min($minLength)->max($maxLength)($value)) {
-                return [];
-            }
-
-            return [
-                Failure::VALUE_LENGTH_INVALID => $this->buildMessage(
-                    Failure::VALUE_LENGTH_INVALID,
-                    (string) $minLength,
-                ),
-            ];
-        }
-
-        if (!new HasStringLength()->min($minLength)($value)) {
-            return [Failure::VALUE_TOO_SHORT => $this->buildMessage(Failure::VALUE_TOO_SHORT, (string) $minLength)];
-        }
-
-        if (!new HasStringLength()->max($maxLength)($value)) {
-            return [Failure::VALUE_TOO_LONG => $this->buildMessage(Failure::VALUE_TOO_LONG, (string) $maxLength)];
         }
 
         return [];

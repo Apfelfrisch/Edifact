@@ -14,6 +14,10 @@ use Apfelfrisch\Edifact\Segment\UnaSegment;
 
 final class Builder
 {
+    private const int WRITE_BUFFER_SIZE = 65_536;
+
+    private string $writeBuffer = '';
+
     private null|string $unbRef = null;
 
     private null|string $unhRef = null;
@@ -64,11 +68,13 @@ final class Builder
         }
 
         foreach ($segments as $segment) {
-            if ($segment->name() === 'UNB') {
+            $segmentName = $segment->name();
+
+            if ($segmentName === 'UNB') {
                 $this->unbRef = $segment->getValueFromPosition(5, 0) ?? '';
             }
 
-            if ($segment->name() === 'UNH') {
+            if ($segmentName === 'UNH') {
                 if ($this->unhRef !== null) {
                     $this->writeUntSegment();
                 }
@@ -98,6 +104,8 @@ final class Builder
             }
         }
 
+        $this->flushWriteBuffer();
+
         $this->buildIsFinalized = true;
 
         return $this->stream;
@@ -105,7 +113,7 @@ final class Builder
 
     public function messageIsEmpty(): bool
     {
-        return $this->stream->isEmpty();
+        return $this->writeBuffer === '' && $this->stream->isEmpty();
     }
 
     private function writeUntSegment(): void
@@ -117,8 +125,22 @@ final class Builder
 
     private function writeSegment(Segment $segment): void
     {
-        $this->stream->write($this->stringFormatter->format($segment));
+        $this->writeBuffer .= $this->stringFormatter->format($segment);
+
+        if (strlen($this->writeBuffer) >= self::WRITE_BUFFER_SIZE) {
+            $this->flushWriteBuffer();
+        }
 
         $this->counter->count($segment);
+    }
+
+    private function flushWriteBuffer(): void
+    {
+        if ($this->writeBuffer === '') {
+            return;
+        }
+
+        $this->stream->write($this->writeBuffer);
+        $this->writeBuffer = '';
     }
 }

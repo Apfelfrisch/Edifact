@@ -71,10 +71,10 @@ final class StreamMessageFactory implements MessageFactory
             $stream->addReadFilter($filter, $params);
         }
 
-        $this->segmentFactory->setUnaSegment($stream->getUnaSegment());
-
+        // A per-message factory keeps a later fromString()/fromFilepath() call
+        // with different UNA characters from corrupting this message.
         return new Message(
-            new StreamIterator($stream, $this->segmentFactory),
+            new StreamIterator($stream, $this->segmentFactory->withUnaSegment($stream->getUnaSegment())),
             new EdifactFormatter($stream->getUnaSegment()),
         );
     }

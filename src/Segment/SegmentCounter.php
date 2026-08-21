@@ -11,11 +11,13 @@ final class SegmentCounter
 
     public function count(Segment $segment): void
     {
-        if ($segment->name() === 'UNB') {
+        $segmentName = $segment->name();
+
+        if ($segmentName === 'UNB') {
             return;
         }
 
-        if ($segment->name() === 'UNH') {
+        if ($segmentName === 'UNH') {
             $this->unhCounter = 1;
             $this->messageCounter++;
 

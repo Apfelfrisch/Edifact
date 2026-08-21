@@ -11,9 +11,62 @@ final class EdifactFormatter implements Formatter
 {
     private bool $prefixUna = false;
 
+    /** @var non-empty-string */
+    private readonly string $componentSeparator;
+
+    /** @var non-empty-string */
+    private readonly string $elementSeparator;
+
+    /** @var non-empty-string */
+    private readonly string $segmentTerminator;
+
+    /** @var non-empty-string */
+    private readonly string $escapeCharacter;
+
+    private readonly bool $usesPhpDecimalPoint;
+
+    private readonly bool $usesPhpSpaceCharacter;
+
+    /** @var list<string> */
+    private readonly array $escapeSearch;
+
+    /** @var list<string> */
+    private readonly array $escapeReplace;
+
+    /** Byte set for a fast strpbrk() pre-check before escaping */
+    private readonly string $escapeCheckBytes;
+
     public function __construct(
         private readonly UnaSegment $unaSegment,
-    ) {}
+    ) {
+        $this->componentSeparator = $unaSegment->componentSeparator();
+        $this->elementSeparator = $unaSegment->elementSeparator();
+        $this->segmentTerminator = $unaSegment->segmentTerminator();
+        $this->escapeCharacter = $unaSegment->escapeCharacter();
+        $this->usesPhpDecimalPoint = $unaSegment->usesPhpDecimalPoint();
+        $this->usesPhpSpaceCharacter = $unaSegment->usesPhpSpaceCharacter();
+
+        $this->escapeSearch = [
+            $this->escapeCharacter,
+            $this->componentSeparator,
+            $this->elementSeparator,
+            $this->segmentTerminator,
+            '\\n',
+        ];
+        $this->escapeReplace = [
+            $this->escapeCharacter . $this->escapeCharacter,
+            $this->escapeCharacter . $this->componentSeparator,
+            $this->escapeCharacter . $this->elementSeparator,
+            $this->escapeCharacter . $this->segmentTerminator,
+            '',
+        ];
+        $this->escapeCheckBytes =
+            $this->escapeCharacter
+            . $this->componentSeparator
+            . $this->elementSeparator
+            . $this->segmentTerminator
+            . '\\';
+    }
 
     public function prefixUna(): self
     {
@@ -36,83 +89,55 @@ final class EdifactFormatter implements Formatter
 
             foreach ($segment->toArray() as $elementKey => $element) {
                 foreach ($element as $componentKey => $value) {
-                    $segmentString .= $this->buildComponent(
-                        $value,
-                        $segment,
-                        (string) $elementKey,
-                        (string) $componentKey,
-                    );
+                    if ($value === null) {
+                        $segmentString .= $this->componentSeparator;
+
+                        continue;
+                    }
+
+                    if (
+                        !$this->usesPhpDecimalPoint
+                        && $segment->isValueNumeric((string) $elementKey, (string) $componentKey)
+                    ) {
+                        $segmentString .=
+                            str_replace(UnaSegment::PHP_DECIMAL, $this->unaSegment->decimalPoint(), $value)
+                            . $this->componentSeparator;
+
+                        continue;
+                    }
+
+                    if (!$this->usesPhpSpaceCharacter) {
+                        $value = str_replace(UnaSegment::PHP_SPACE, $this->unaSegment->spaceCharacter(), $value);
+                    }
+
+                    if (strpbrk($value, $this->escapeCheckBytes) !== false) {
+                        $value = str_replace($this->escapeSearch, $this->escapeReplace, $value);
+                    }
+
+                    $segmentString .= $value . $this->componentSeparator;
                 }
 
-                $segmentString =
-                    $this->trimEmpty($segmentString, $this->unaSegment->componentSeparator())
-                    . $this->unaSegment->elementSeparator();
+                $segmentString = $this->trimEmpty($segmentString, $this->componentSeparator) . $this->elementSeparator;
             }
 
-            $string .=
-                $this->trimEmpty($segmentString, $this->unaSegment->elementSeparator())
-                . $this->unaSegment->segmentTerminator();
+            $string .= $this->trimEmpty($segmentString, $this->elementSeparator) . $this->segmentTerminator;
         }
 
         return $string;
-    }
-
-    private function buildComponent(
-        null|string $value,
-        Segment $segment,
-        string $elementKey,
-        string $componentKey,
-    ): string {
-        if ($value === null) {
-            return $this->unaSegment->componentSeparator();
-        }
-
-        if (!$this->unaSegment->usesPhpDecimalPoint() && $segment->isValueNumeric($elementKey, $componentKey)) {
-            return str_replace(UnaSegment::PHP_DECIMAL, $this->unaSegment->decimalPoint(), $value);
-        }
-
-        if (!$this->unaSegment->usesPhpSpaceCharacter()) {
-            $value = str_replace(UnaSegment::PHP_SPACE, $this->unaSegment->spaceCharacter(), $value);
-        }
-
-        return $this->escapeString($value) . $this->unaSegment->componentSeparator();
-    }
-
-    private function escapeString(string $string): string
-    {
-        return str_replace(
-            [
-                $this->unaSegment->escapeCharacter(),
-                $this->unaSegment->componentSeparator(),
-                $this->unaSegment->elementSeparator(),
-                $this->unaSegment->segmentTerminator(),
-                '\\n',
-            ],
-            [
-                $this->unaSegment->escapeCharacter() . $this->unaSegment->escapeCharacter(),
-                $this->unaSegment->escapeCharacter() . $this->unaSegment->componentSeparator(),
-                $this->unaSegment->escapeCharacter() . $this->unaSegment->elementSeparator(),
-                $this->unaSegment->escapeCharacter() . $this->unaSegment->segmentTerminator(),
-                '',
-            ],
-            $string,
-        );
     }
 
     private function trimEmpty(string $string, string $separator): string
     {
-        while ($string !== '') {
-            if ($separator !== $string[-1]) {
+        $length = strlen($string);
+
+        while ($length > 0 && $string[$length - 1] === $separator) {
+            if ($length > 1 && $string[$length - 2] === $this->escapeCharacter) {
                 break;
             }
 
-            if ($this->unaSegment->escapeCharacter() === ($string[-2] ?? null)) {
-                break;
-            }
-
-            $string = substr($string, 0, -1);
+            $length--;
         }
 
-        return $string;
+        return $length === strlen($string) ? $string : substr($string, 0, $length);
     }
 }

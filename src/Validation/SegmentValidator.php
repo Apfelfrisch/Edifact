@@ -7,6 +7,7 @@ namespace Apfelfrisch\Edifact\Validation;
 use Apfelfrisch\Edifact\Exceptions\InvalidEdifactContentException;
 use Apfelfrisch\Edifact\Segment\Elements;
 use Iterator;
+use WeakMap;
 
 final class SegmentValidator
 {
@@ -17,6 +18,19 @@ final class SegmentValidator
 
     private readonly ValueValidator $valueValidator;
 
+    /**
+     * Cached per-blueprint metadata, keyed by the blueprint instance:
+     * the raw blueprint array (to detect mutation), stringified element
+     * keys and component keys per element key.
+     *
+     * @var WeakMap<Elements, array{
+     *     array: array<array-key, array<array-key, string|null>>,
+     *     elementKeys: list<string>,
+     *     componentKeys: array<string, list<string>>,
+     * }>
+     */
+    private WeakMap $blueprintCache;
+
     private string $segmentName = '';
 
     private int $elementPosition = -1;
@@ -26,6 +40,7 @@ final class SegmentValidator
     public function __construct()
     {
         $this->valueValidator = new ValueValidator();
+        $this->blueprintCache = new WeakMap();
     }
 
     /** @return Iterator<Failure> */
@@ -34,40 +49,115 @@ final class SegmentValidator
         $this->segmentName = $data->getName();
         $this->elementPosition = -1;
 
-        $blueprintElementKeys = $blueprint->getElementKeys();
+        [
+            'array' => $blueprintArray,
+            'elementKeys' => $blueprintElementKeys,
+            'componentKeys' => $blueprintComponentKeys,
+        ] = $this->getBlueprintCache($blueprint);
 
         foreach ($data->toArray() as $elementKey => $components) {
             $elementKey = (string) $elementKey;
             $this->elementPosition++;
             $this->componentPosition = -1;
 
+            $blueprintElement = $blueprintArray[$elementKey] ?? [];
+            $elementIsUnknown = $blueprintElement === [];
+
             foreach ($components as $componentKey => $value) {
                 $componentKey = (string) $componentKey;
                 $this->componentPosition++;
 
-                yield from $this->validateUnknownParts($blueprint, $elementKey, $componentKey, $value);
+                if ($elementIsUnknown) {
+                    yield new Failure(
+                        Failure::UNKNOWN_ELEMENT,
+                        $this->segmentName,
+                        $this->elementPosition,
+                        $this->componentPosition,
+                        $value,
+                        $this->buildMessage(Failure::UNKNOWN_ELEMENT),
+                    );
 
-                if (null !== ($rules = $blueprint->getValue($elementKey, $componentKey))) {
+                    continue;
+                }
+
+                if (!array_key_exists($componentKey, $blueprintElement)) {
+                    yield new Failure(
+                        Failure::UNKNOWN_COMPONENT,
+                        $this->segmentName,
+                        $this->elementPosition,
+                        $this->componentPosition,
+                        $value,
+                        $this->buildMessage(Failure::UNKNOWN_COMPONENT),
+                    );
+                }
+
+                if (null !== ($rules = $blueprintElement[$componentKey] ?? null)) {
                     yield from $this->validateValue($value, $rules, $elementKey, $componentKey);
                 }
             }
 
-            yield from $this->validateMissingComponents($blueprint, $blueprintElementKeys);
+            $blueprintElementKey = $blueprintElementKeys[$this->elementPosition] ?? null;
+
+            if (
+                $blueprintElementKey !== null
+                && ($this->componentPosition + 1) < count($blueprintComponentKeys[$blueprintElementKey])
+            ) {
+                yield from $this->validateMissingComponents($blueprintElementKeys, $blueprintComponentKeys, $blueprint);
+            }
         }
 
-        yield from $this->validateMissingElements($blueprint, $blueprintElementKeys);
+        if (($this->elementPosition + 1) < count($blueprintElementKeys)) {
+            yield from $this->validateMissingElements($blueprintElementKeys, $blueprintComponentKeys, $blueprint);
+        }
     }
 
     /**
-     * @return Iterator<Failure>
+     * @return array{
+     *     array: array<array-key, array<array-key, string|null>>,
+     *     elementKeys: list<string>,
+     *     componentKeys: array<string, list<string>>,
+     * }
      */
-    private function validateValue(
-        null|string $value,
-        string $rules,
-        string $elementKey,
-        string $componentKey,
-    ): Iterator {
+    private function getBlueprintCache(Elements $blueprint): array
+    {
+        $blueprintArray = $blueprint->toArray();
+
+        $cache = $this->blueprintCache[$blueprint] ?? null;
+
+        // Comparing against the cached raw array is O(1) while the blueprint
+        // stays untouched and detects mutation after the first validation.
+        if ($cache !== null && $cache['array'] === $blueprintArray) {
+            return $cache;
+        }
+
+        $elementKeys = [];
+        $componentKeys = [];
+
+        foreach ($blueprintArray as $elementKey => $components) {
+            $elementKey = (string) $elementKey;
+            $elementKeys[] = $elementKey;
+            $componentKeys[$elementKey] = array_map(strval(...), array_keys($components));
+        }
+
+        return $this->blueprintCache[$blueprint] = [
+            'array' => $blueprintArray,
+            'elementKeys' => $elementKeys,
+            'componentKeys' => $componentKeys,
+        ];
+    }
+
+    /**
+     * @return list<Failure>
+     */
+    private function validateValue(null|string $value, string $rules, string $elementKey, string $componentKey): array
+    {
         $failures = $this->valueValidator->validate($value, $rules, (string) $this->elementPosition);
+
+        if ($failures === []) {
+            return [];
+        }
+
+        $result = [];
 
         foreach ($failures as $failureType => $message) {
             $message = match ($failureType) {
@@ -75,7 +165,7 @@ final class SegmentValidator
                 default => $message,
             };
 
-            yield new Failure(
+            $result[] = new Failure(
                 $failureType,
                 $this->segmentName,
                 $this->elementPosition,
@@ -84,87 +174,77 @@ final class SegmentValidator
                 $message,
             );
         }
-    }
 
-    /**
-     * @return Iterator<Failure>
-     */
-    private function validateUnknownParts(
-        Elements $blueprint,
-        string $elementKey,
-        string $componentKey,
-        null|string $value,
-    ): Iterator {
-        if (($element = $blueprint->getElement($elementKey)) === []) {
-            yield new Failure(
-                Failure::UNKNOWN_ELEMENT,
-                $this->segmentName,
-                $this->elementPosition,
-                $this->componentPosition,
-                $value,
-                $this->buildMessage(Failure::UNKNOWN_ELEMENT),
-            );
-
-            return;
-        }
-
-        if (!array_key_exists($componentKey, $element)) {
-            yield new Failure(
-                Failure::UNKNOWN_COMPONENT,
-                $this->segmentName,
-                $this->elementPosition,
-                $this->componentPosition,
-                $value,
-                $this->buildMessage(Failure::UNKNOWN_COMPONENT),
-            );
-        }
+        return $result;
     }
 
     /**
      * @param list<string> $blueprintElementKeys
+     * @param array<string, list<string>> $blueprintComponentKeys
      *
-     * @return Iterator<Failure>
+     * @return list<Failure>
      */
-    private function validateMissingComponents(Elements $blueprint, array $blueprintElementKeys): Iterator
-    {
+    private function validateMissingComponents(
+        array $blueprintElementKeys,
+        array $blueprintComponentKeys,
+        Elements $blueprint,
+    ): array {
         if (null === ($blueprintElementKey = $blueprintElementKeys[$this->elementPosition] ?? null)) {
-            return;
+            return [];
         }
 
-        $blueprintComponentKeys = $blueprint->getComponentKeys($blueprintElementKey);
+        $componentKeys = $blueprintComponentKeys[$blueprintElementKey];
         $blueprintComponentPosition = $this->componentPosition + 1;
 
-        while (null !== ($blueprintComponentKey = $blueprintComponentKeys[$blueprintComponentPosition] ?? null)) {
+        $failures = [];
+
+        while (null !== ($blueprintComponentKey = $componentKeys[$blueprintComponentPosition] ?? null)) {
             $blueprintComponentPosition++;
 
             if (null === ($rules = $blueprint->getValue($blueprintElementKey, $blueprintComponentKey))) {
                 continue;
             }
 
-            yield from $this->validateValue(null, $rules, $blueprintElementKey, $blueprintComponentKey);
+            $failures = [
+                ...$failures,
+                ...$this->validateValue(null, $rules, $blueprintElementKey, $blueprintComponentKey),
+            ];
         }
+
+        return $failures;
     }
 
     /**
      * @param list<string> $blueprintElementKeys
+     * @param array<string, list<string>> $blueprintComponentKeys
      *
-     * @return Iterator<Failure>
+     * @return list<Failure>
      */
-    private function validateMissingElements(Elements $blueprint, array $blueprintElementKeys): Iterator
-    {
+    private function validateMissingElements(
+        array $blueprintElementKeys,
+        array $blueprintComponentKeys,
+        Elements $blueprint,
+    ): array {
         $blueprintElementPosition = $this->elementPosition + 1;
+
+        $failures = [];
 
         while (null !== ($blueprintElementKey = $blueprintElementKeys[$blueprintElementPosition] ?? null)) {
             $blueprintElementPosition++;
 
-            foreach ($blueprint->getComponentKeys($blueprintElementKey) as $blueprintComponentKey) {
+            foreach ($blueprintComponentKeys[$blueprintElementKey] as $blueprintComponentKey) {
                 if (null === ($rules = $blueprint->getValue($blueprintElementKey, $blueprintComponentKey))) {
                     continue;
                 }
 
-                yield from $this->validateValue(null, $rules, $blueprintElementKey, $blueprintComponentKey);
+                $failures = [
+                    ...$failures,
+                    ...$this->validateValue(null, $rules, $blueprintElementKey, $blueprintComponentKey),
+                ];
             }
         }
+
+        return $failures;
     }
 
     private function buildMessage(string $key): string

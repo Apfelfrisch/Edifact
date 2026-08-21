@@ -39,6 +39,16 @@ final class MessageTest extends TestCase
         static::assertInstanceOf(Message::class, $message);
     }
 
+    public function test_materialized_segments_are_reused(): void
+    {
+        $message = Message::fromString("UNH+1'RFF+Z13:17103'");
+
+        static::assertSame($message->getAllSegments(), $message->getAllSegments());
+        static::assertSame("UNH+1'RFF+Z13:17103'", $message->toString());
+        static::assertSame("UNH+1'RFF+Z13:17103'", $message->toString());
+        static::assertSame($message->getAllSegments(), iterator_to_array($message->getSegments(), false));
+    }
+
     public function test_instanciate_from_a_filepath(): void
     {
         $message = Message::fromFilepath(__DIR__ . '/data/edifact.txt');

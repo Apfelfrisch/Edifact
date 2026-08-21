@@ -26,7 +26,6 @@ use Apfelfrisch\Edifact\Segment\Segment;
  * Checks requiring external knowledge (own MP-ID, known senders,
  * already-received interchange references) are the callers concern.
  */
-// @mago-expect lint:cyclomatic-complexity -- state machine over the full interchange lifecycle
 final class InterchangeValidator
 {
     private const string UNB = 'UNB';

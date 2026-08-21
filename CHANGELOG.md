@@ -19,6 +19,21 @@
  - Moa test fixture: fromAttributes no longer takes a decimal separator
  - Rff/Unh test fixtures: referenz() renamed to reference()
  - Stream: toString() no longer relies on error suppression; segment lines consisting of '0' parse correctly
+ - Performance: roughly 2x faster parsing, formatting, building and validation
+   (cached UNA characters and blueprint metadata, escape-free fast paths,
+   fewer per-component allocations, buffered Builder writes)
+ - Message caches its parsed segments after the first materializing call
+   (getAllSegments/toArray/toString), so repeated serialization or validation
+   of the same message no longer re-parses the stream; plain getSegments()
+   iteration still streams without building the cache
+ - Message::unwrap() yields sub-messages backed by InMemoryIterator instead of
+   PartialIterator; iterating every sub-message is now linear instead of
+   quadratic in the number of segments
+ - Fix: parsing a second message with different UNA characters from the same
+   StreamMessageFactory no longer corrupts messages created earlier
+   (ConcreteSegmentFactory::withUnaSegment leaves the shared factory untouched)
+ - Fix: EdifactFormatter no longer drops the component separator after a
+   numeric value when a non-default decimal point is used
 
 1.1.1
  - Remove obsolete Respect\Validation from dependencies

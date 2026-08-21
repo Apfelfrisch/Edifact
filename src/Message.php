@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Apfelfrisch\Edifact;
 
 use Apfelfrisch\Edifact\Formatter\Formatter;
-use Apfelfrisch\Edifact\Iterators\PartialIterator;
+use Apfelfrisch\Edifact\Iterators\InMemoryIterator;
 use Apfelfrisch\Edifact\Segment\Segment;
 use Apfelfrisch\Edifact\Segment\SegmentIterator;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
@@ -16,6 +16,16 @@ use Stringable;
 final class Message implements Stringable
 {
     private static null|MessageFactory $factory = null;
+
+    /**
+     * Parsed segments, retained after the first materializing call
+     * (getAllSegments, toArray, toString) so later calls skip re-parsing
+     * the underlying stream. Plain iteration via getSegments() keeps
+     * streaming and does not build this cache.
+     *
+     * @var list<Segment>|null
+     */
+    private null|array $cachedSegments = null;
 
     public function __construct(
         private readonly SegmentIterator $segmentIterator,
@@ -44,6 +54,10 @@ final class Message implements Stringable
 
     public function getSegments(): SegmentIterator
     {
+        if ($this->cachedSegments !== null) {
+            return new InMemoryIterator($this->cachedSegments, $this->getUnaSegment());
+        }
+
         $this->segmentIterator->rewind();
 
         return $this->segmentIterator;
@@ -54,7 +68,7 @@ final class Message implements Stringable
      */
     public function getAllSegments(): array
     {
-        return array_values(iterator_to_array($this->getSegments()));
+        return $this->cachedSegments ??= iterator_to_array($this->getSegments(), false);
     }
 
     /**
@@ -108,29 +122,24 @@ final class Message implements Stringable
      */
     public function unwrap(string $header = 'UNH', string $trailer = 'UNT'): Generator
     {
-        $offset = null;
-        $loopCount = -1;
+        $subSegments = null;
 
-        foreach ($this->segmentIterator as $segment) {
-            $loopCount++;
+        foreach ($this->getSegments() as $segment) {
+            $segmentName = $segment->name();
 
-            $offset ??= $segment->name() === $header ? $loopCount : null;
+            if ($subSegments === null && $segmentName === $header) {
+                $subSegments = [];
+            }
 
-            if ($offset === null) {
+            if ($subSegments === null) {
                 continue;
             }
 
-            if ($segment->name() === $trailer) {
-                yield new self(
-                    new PartialIterator(
-                        $this->getUnaSegment(),
-                        $this->segmentIterator,
-                        $offset,
-                        $loopCount + 1 - $offset,
-                    ),
-                    $this->formatter,
-                );
-                $offset = null;
+            $subSegments[] = $segment;
+
+            if ($segmentName === $trailer) {
+                yield new self(new InMemoryIterator($subSegments, $this->getUnaSegment()), $this->formatter);
+                $subSegments = null;
             }
         }
     }
