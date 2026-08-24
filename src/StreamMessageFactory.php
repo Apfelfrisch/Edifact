@@ -57,25 +57,35 @@ final class StreamMessageFactory implements MessageFactory
 
     public function fromString(string $string): Message
     {
-        return $this->buildMessage(Stream::fromString($string, 'php://temp'));
+        return $this->fromStream($this->applyStreamFilters(Stream::fromString($string, 'php://temp')));
     }
 
     public function fromFilepath(string $filepath): Message
     {
-        return $this->buildMessage(new Stream($filepath));
+        return $this->fromStream($this->applyStreamFilters(new Stream($filepath)));
     }
 
-    private function buildMessage(Stream $stream): Message
+    /**
+     * Builds a message on top of an existing stream, e.g. one yielded by
+     * Stream::unwrap(). The stream is used as is: the factory's stream
+     * filters are only applied to streams the factory opens itself.
+     */
+    public function fromStream(Stream $stream): Message
     {
-        foreach ($this->streamFilters as $filter => $params) {
-            $stream->addReadFilter($filter, $params);
-        }
-
         // A per-message factory keeps a later fromString()/fromFilepath() call
         // with different UNA characters from corrupting this message.
         return new Message(
             new StreamIterator($stream, $this->segmentFactory->withUnaSegment($stream->getUnaSegment())),
             new EdifactFormatter($stream->getUnaSegment()),
         );
+    }
+
+    private function applyStreamFilters(Stream $stream): Stream
+    {
+        foreach ($this->streamFilters as $filter => $params) {
+            $stream->addReadFilter($filter, $params);
+        }
+
+        return $stream;
     }
 }

@@ -6,6 +6,7 @@ namespace Apfelfrisch\Edifact\Iterators\Stream;
 
 use Apfelfrisch\Edifact\Exceptions\InvalidStreamException;
 use Apfelfrisch\Edifact\Segment\UnaSegment;
+use Generator;
 use SplFileInfo;
 use Throwable;
 
@@ -218,6 +219,58 @@ final class Stream extends SplFileInfo
     public function getUnaSegment(): UnaSegment
     {
         return $this->unaSegment;
+    }
+
+    /**
+     * Splits the stream into one stream per header...trailer block.
+     *
+     * Segments outside of a header/trailer pair are skipped, a header without
+     * a trailer yields nothing. Each partial stream shares the UNA characters
+     * of this stream; if this stream starts with a UNA segment, it is written
+     * into every partial so they stay self-contained. Read filters of this
+     * stream are applied while splitting, so the partials hold the filtered
+     * content and carry no filters themselves.
+     *
+     * @return Generator<int, self>
+     */
+    public function unwrap(string $header = 'UNH', string $trailer = 'UNT'): Generator
+    {
+        $this->rewind();
+
+        $unaLine = '';
+        $partial = null;
+
+        while (($segLine = $this->getSegment()) !== '') {
+            $segmentName = substr($segLine, 0, 3);
+
+            if ($segmentName === UnaSegment::UNA) {
+                $unaLine = $this->unaSegment->toString();
+                continue;
+            }
+
+            if ($partial === null) {
+                if ($segmentName !== $header) {
+                    continue;
+                }
+
+                $partial = new self('php://temp', 'w+', $this->unaSegment);
+                $partial->write($unaLine);
+            }
+
+            // getSegment() unescapes "?'" to "'", so escape it again before writing it back
+            $partial->write(
+                str_replace($this->segmentTerminator, $this->escapeCharacter . $this->segmentTerminator, $segLine)
+                    . $this->segmentTerminator,
+            );
+
+            if ($segmentName === $trailer) {
+                $partial->rewind();
+
+                yield $partial;
+
+                $partial = null;
+            }
+        }
     }
 
     public function rewind(): void

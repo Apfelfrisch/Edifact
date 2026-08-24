@@ -100,11 +100,37 @@ echo $message->findFirstSegment(MyNad::class)?->name(); // NAD
 
 #### Unwrap Messages
 
+Splits an interchange into one message per `UNH`...`UNT` block (the segment names are configurable).
+
 ```php
 foreach ($message->unwrap() as $partialMessage) {
     echo $partialMessage instanceof \Apfelfrisch\Edifact\Message;
 }
+
+foreach ($message->unwrap('HDR', 'TRL') as $partialMessage) {
+    // custom header and trailer
+}
 ```
+
+The partial messages above live in memory. If you need every partial as its own `Stream` (e.g. to keep the
+raw segment lines, the file handle or to build your own wrapper around it), unwrap the stream instead and hand
+each partial to the factory. A leading `UNA` segment is copied into every partial, escaped segment terminators
+stay escaped.
+
+```php
+use Apfelfrisch\Edifact\Iterators\Stream\Stream;
+use Apfelfrisch\Edifact\StreamMessageFactory;
+
+$factory = new StreamMessageFactory;
+$stream = new Stream('path/to/interchange.txt');
+
+foreach ($stream->unwrap() as $partialStream) {
+    $partialMessage = $factory->fromStream($partialStream);
+}
+```
+
+`fromStream()` uses the given stream as is; the factory's read filters are only applied to streams it opens
+itself via `fromString()` / `fromFilepath()`.
 
 #### Add Readfilter
 

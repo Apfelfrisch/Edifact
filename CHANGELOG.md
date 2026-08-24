@@ -1,5 +1,13 @@
 # Changelog
 
+2.3.0
+ - Add Stream::unwrap() which splits a stream into one stream per
+   header/trailer block (UNH/UNT by default), keeping a leading UNA segment
+   and escaped segment terminators intact
+ - Add StreamMessageFactory::fromStream() to build a Message on top of an
+   existing Stream; the factory's read filters are only applied to streams
+   it opens itself
+
 2.0.0
  - Add InterchangeValidator for CONTRL-style syntax checks of complete
    transmission files (UNB/UNZ and UNH/UNT structure, references, control
